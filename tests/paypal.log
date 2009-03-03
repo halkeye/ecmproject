@@ -1,0 +1,88 @@
+[02/15/2009 3:54 PM] - SUCCESS!
+IPN POST Vars from Paypal:
+mc_gross=40.00, protection_eligibility=Ineligible, payer_id=WGV6CZSFRVEPN, tax=0.00, payment_date=15:54:19 Feb 15, 2009 PST, payment_status=Pending, charset=windows-1252, first_name=Test, notify_version=2.6, custom=, payer_status=unverified, business=ecmproject@kodekoan.com, quantity=1, verify_sign=AU74RC.jWcvZA8i8hqBAvsEXtE7.AsbzIq8aFmMYYN-5Ow6vkRgf9QKp, payer_email=halkey_1234741059_per@gmail.com, txn_id=13G22726B9332591K, payment_type=instant, btn_id=22221, last_name=User, receiver_email=ecmproject@kodekoan.com, shipping_discount=0.00, pending_reason=unilateral, insurance_amount=0.00, txn_type=web_accept, item_name=AE09 3-Day Registration, mc_currency=CAD, item_number=PR1-3DAY09, residence_country=CA, test_ipn=1, handling_amount=0.00, shipping_method=Default, transaction_subject=AE09 3-Day Registration, payment_gross=, shipping=0.00, 
+IPN Response from Paypal Server:
+ HTTP/1.1 200 OK
+Date: Sun, 15 Feb 2009 23:54:26 GMT
+Server: Apache/1.3.33 (Unix) mod_fastcgi/2.4.2 mod_gzip/1.3.26.1a mod_ssl/2.8.22 OpenSSL/0.9.7e
+Set-Cookie: c9MWDuvPtT9GIMyPc3jwol1VSlO=MIEyWM6rIu2bozfK9cc1wLttdzLEYhD672i8-kX1LPc5cMVr8yFttg0oXsoExVD5-cp5YwLXFC0FhdgbAt7T6l8bMsUJ6IhtjBYLjD4fUA9R5fzPv1uroM5fdFEWGOMT6JniYW%7cfhY_TzdwyKUkKoagU9Zs73ofwvuADoVQlu8hNrhgkL9fLRjP-l2xgN9prgWUOTWiBgeJCm%7cD7GdsYtBguUzjgTNkzDgYJauGN5zkNk3uce4aK5cfWFi8Vz55Z0vlP3O8ThoIPlgHwLTW0%7c1234742067; domain=.paypal.com; path=/
+Set-Cookie: cookie_check=yes; expires=Wed, 13-Feb-2019 23:54:27 GMT; domain=.paypal.com; path=/
+Set-Cookie: navcmd=_notify-validate; domain=.paypal.com; path=/
+Set-Cookie: navlns=0; expires=Sat, 10-Feb-2029 23:54:27 GMT; domain=.paypal.com; path=/
+Set-Cookie: Apache=10.191.196.11.248161234742066624; path=/; expires=Sat, 03-Jan-03 17:26:10 GMT
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=UTF-8
+
+8  
+VERIFIED
+0
+
+
+
+[02/19/2009 2:53 AM] - SUCCESS!
+IPN POST Vars from Paypal:
+mc_gross=40.00, protection_eligibility=Ineligible, payer_id=WGV6CZSFRVEPN, tax=0.00, payment_date=15:50:25 Feb 15, 2009 PST, payment_status=Completed, charset=windows-1252, first_name=Test, mc_fee=1.46, notify_version=2.7, custom=, payer_status=unverified, business=ecmproject@kodekoan.com, quantity=1, verify_sign=AFcWxV21C7fd0v3bYYYRCpSSRl31ALCq8pxhOQVMo2Kl5BeJxPLyyWCq, payer_email=halkey_1234741059_per@gmail.com, txn_id=41207412W8331384J, payment_type=instant, btn_id=22221, last_name=User, receiver_email=ecmproject@kodekoan.com, payment_fee=, shipping_discount=0.00, receiver_id=RZ37JKEZFMBPJ, insurance_amount=0.00, txn_type=web_accept, item_name=AE09 3-Day Registration, mc_currency=CAD, item_number=PR1-3DAY09, residence_country=CA, test_ipn=1, handling_amount=0.00, shipping_method=Default, transaction_subject=AE09 3-Day Registration, payment_gross=, shipping=0.00, 
+IPN Response from Paypal Server:
+ HTTP/1.1 200 OK
+Date: Thu, 19 Feb 2009 10:53:28 GMT
+Server: Apache/1.3.33 (Unix) mod_fastcgi/2.4.2 mod_gzip/1.3.26.1a mod_ssl/2.8.22 OpenSSL/0.9.7e
+Set-Cookie: c9MWDuvPtT9GIMyPc3jwol1VSlO=iGB682i9kBA2GeqeSLIXWmXfn-0lqwvbMT4nL2nSOVk6y_Hc9b00xk0eLd9njowujI4TARL1K0769qbIYyK1DHjS1pNEwf2U8Zf6eq28_y9Jj26sXYFVI4BcpRtkz0nL6Z08sW%7c7UTAQsHM5b4TEsQDmz06Wk1pyS2hgSIgJtlfUyzIicF-_VE2cOvDBOQWx8syD2aG0JB4Mm%7cgMzhEWvhwf3vvN-xjlWU-U8SpdfjWjBQa4ZDA-DsPGsCUzqRRI1l5xxl2S5dAKEsflOT_G%7c1235040809; domain=.paypal.com; path=/
+Set-Cookie: cookie_check=yes; expires=Sun, 17-Feb-2019 10:53:29 GMT; domain=.paypal.com; path=/
+Set-Cookie: navcmd=_notify-validate; domain=.paypal.com; path=/
+Set-Cookie: navlns=0; expires=Wed, 14-Feb-2029 10:53:29 GMT; domain=.paypal.com; path=/
+Set-Cookie: Apache=10.191.196.11.273461235040808630; path=/; expires=Wed, 07-Jan-03 04:25:12 GMT
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=UTF-8
+
+8  
+VERIFIED
+0
+
+
+
+[02/19/2009 2:53 AM] - SUCCESS!
+IPN POST Vars from Paypal:
+mc_gross=40.00, protection_eligibility=Ineligible, payer_id=WGV6CZSFRVEPN, tax=0.00, payment_date=15:52:38 Feb 15, 2009 PST, payment_status=Completed, charset=windows-1252, first_name=Test, mc_fee=1.46, notify_version=2.7, custom=, payer_status=unverified, business=ecmproject@kodekoan.com, quantity=1, verify_sign=An5ns1Kso7MWUdW4ErQKJJJ4qi4-Amq9t30msOy-WJdM4lV-bPD4gFJK, payer_email=halkey_1234741059_per@gmail.com, txn_id=80431606JS4512539, payment_type=instant, btn_id=22221, last_name=User, receiver_email=ecmproject@kodekoan.com, payment_fee=, shipping_discount=0.00, receiver_id=RZ37JKEZFMBPJ, insurance_amount=0.00, txn_type=web_accept, item_name=AE09 3-Day Registration, mc_currency=CAD, item_number=PR1-3DAY09, residence_country=CA, test_ipn=1, handling_amount=0.00, shipping_method=Default, transaction_subject=AE09 3-Day Registration, payment_gross=, shipping=0.00, 
+IPN Response from Paypal Server:
+ HTTP/1.1 200 OK
+Date: Thu, 19 Feb 2009 10:53:28 GMT
+Server: Apache/1.3.33 (Unix) mod_fastcgi/2.4.2 mod_gzip/1.3.26.1a mod_ssl/2.8.22 OpenSSL/0.9.7e
+Set-Cookie: c9MWDuvPtT9GIMyPc3jwol1VSlO=ivJwC5jZU6aOkVvuGHQOFgWMqi8tQmzrYqQiNFxPMMDh3shhqGCdaqEBf3UOxAq7Acve_MBgq30DqgpaQ-I9kyevfzrZxpVlsjna0WwmCuygh6qZeQLIbgs12uOLkwgKLdV9sW%7cnrU0IvrdBZVHL7U8Jlj3pPTpPf6Y93PhAdgMvR8EN9ppy6KKjp3SqY11JL_-jN8q9L5mq0%7csUM-R-kMctNIhs82sbVhlBwl31CsK-3HAK5sQu3xPNc1hSNLPQYK5BQ7z5RHB-i9sCAKdW%7c1235040809; domain=.paypal.com; path=/
+Set-Cookie: cookie_check=yes; expires=Sun, 17-Feb-2019 10:53:29 GMT; domain=.paypal.com; path=/
+Set-Cookie: navcmd=_notify-validate; domain=.paypal.com; path=/
+Set-Cookie: navlns=0; expires=Wed, 14-Feb-2029 10:53:29 GMT; domain=.paypal.com; path=/
+Set-Cookie: Apache=10.191.196.11.177971235040808820; path=/; expires=Wed, 07-Jan-03 04:25:12 GMT
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=UTF-8
+
+8  
+VERIFIED
+0
+
+
+
+[02/19/2009 2:53 AM] - SUCCESS!
+IPN POST Vars from Paypal:
+mc_gross=40.00, protection_eligibility=Ineligible, payer_id=WGV6CZSFRVEPN, tax=0.00, payment_date=15:54:19 Feb 15, 2009 PST, payment_status=Completed, charset=windows-1252, first_name=Test, mc_fee=1.46, notify_version=2.7, custom=, payer_status=unverified, business=ecmproject@kodekoan.com, quantity=1, verify_sign=AiPC9BjkCyDFQXbSkoZcgqH3hpacAW2j8S5Li.icS598RpVSM894qLoe, payer_email=halkey_1234741059_per@gmail.com, txn_id=13G22726B9332591K, payment_type=instant, btn_id=22221, last_name=User, receiver_email=ecmproject@kodekoan.com, payment_fee=, shipping_discount=0.00, receiver_id=RZ37JKEZFMBPJ, insurance_amount=0.00, txn_type=web_accept, item_name=AE09 3-Day Registration, mc_currency=CAD, item_number=PR1-3DAY09, residence_country=CA, test_ipn=1, handling_amount=0.00, shipping_method=Default, transaction_subject=AE09 3-Day Registration, payment_gross=, shipping=0.00, 
+IPN Response from Paypal Server:
+ HTTP/1.1 200 OK
+Date: Thu, 19 Feb 2009 10:53:28 GMT
+Server: Apache/1.3.33 (Unix) mod_fastcgi/2.4.2 mod_gzip/1.3.26.1a mod_ssl/2.8.22 OpenSSL/0.9.7e
+Set-Cookie: c9MWDuvPtT9GIMyPc3jwol1VSlO=q8XNSTyLKz_BvhgAtCOy0jmPWaUmvgw54a2dNBc9RNCyzO_Kq6sKmMxlKeDapFfBKnAySMpMAAFMhzOkaxeT49Zzh6UDo1eYJ_xcdcy0R5dis2uObcpcYX8pdngMKnxFXQlPB0%7clcJoekTNWrdtgeSz7_09eWC6hXGCcDgcsBIzNGA-klgflT1bMtskhCJ9yFU2TAEPKDwO6W%7cRIj-cos3dKh2b4ul9wscOarttwYIOMh9EgbSgPioxLx_qpDTeiGz1dcRS0waDUzUjmmdfm%7c1235040809; domain=.paypal.com; path=/
+Set-Cookie: cookie_check=yes; expires=Sun, 17-Feb-2019 10:53:29 GMT; domain=.paypal.com; path=/
+Set-Cookie: navcmd=_notify-validate; domain=.paypal.com; path=/
+Set-Cookie: navlns=0; expires=Wed, 14-Feb-2029 10:53:29 GMT; domain=.paypal.com; path=/
+Set-Cookie: Apache=10.191.196.11.149421235040808818; path=/; expires=Wed, 07-Jan-03 04:25:12 GMT
+Connection: close
+Transfer-Encoding: chunked
+Content-Type: text/html; charset=UTF-8
+
+8  
+VERIFIED
+0
+
+
+

@@ -1,0 +1,4 @@
+Options +FollowSymLinks
+RewriteEngine On
+RewriteBase /~gavinmogan/ecmproject
+RewriteRule ^([a-zA-Z0-9_-]+)(?:/([a-zA-Z0-9_-]*))?$ index.php?mod=$1&action=$2 [NC,L]
