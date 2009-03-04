@@ -58,7 +58,6 @@ class View extends Module_Base
 
     function auth($action) 
     {
-        $_SESSION['dept_name'] = 'Vendors';
         return true;
         if (!isset($_SESSION['ugroups']))
             return false;

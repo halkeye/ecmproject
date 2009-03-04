@@ -38,6 +38,7 @@ class Router
         /* Check if user has permission to do said action */			
         if ($instance->auth($action))
         {
+            $this->registry->template->template_dir []= MODL_PATH . '/' . $this->module_name . '/templates/';
             $instance->$action();
         }
         else if (!isset($_SESSION['ugroups'])) 

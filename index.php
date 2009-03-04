@@ -17,7 +17,7 @@ $registry = new Registry;
 $registry->router = new router($registry);
 
 $registry->template = new Smarty();
-$registry->template->template_dir = THEME_PATH.DIR_SEPARATOR.THEME.DIR_SEPARATOR.'templates';
+$registry->template->template_dir = array(THEME_PATH.DIR_SEPARATOR.THEME.DIR_SEPARATOR.'templates');
 $registry->template->compile_dir  = THEME_PATH.DIR_SEPARATOR.THEME.DIR_SEPARATOR.'compiled';
 $registry->template->cache_dir    = THEME_PATH.DIR_SEPARATOR.THEME.DIR_SEPARATOR.'cache';
 $registry->template->config_dir   = THEME_PATH.DIR_SEPARATOR.THEME.DIR_SEPARATOR.'configs';
