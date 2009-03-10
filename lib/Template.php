@@ -57,6 +57,7 @@ class Template
    /* FIXME: Should this be here? */
    function getLink($module, $action)
    {
+       return "?mod=$module&do=$action";
        /* FIXME: Check to see if clean urls is turned on */
        return BASE_URL .'/' . $module .'/'. $action;
    }

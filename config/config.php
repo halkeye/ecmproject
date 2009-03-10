@@ -24,5 +24,5 @@ require(BASE_DIR.DIR_SEPARATOR.MODL_PATH.DIR_SEPARATOR.'Base.php');
 require(BASE_DIR.DIR_SEPARATOR.INCL_PATH.DIR_SEPARATOR.'Router.php');
 require(BASE_DIR.DIR_SEPARATOR.INCL_PATH.DIR_SEPARATOR.'Template.php');
 // put full path to Smarty.class.php
-require(BASE_DIR.DIR_SEPARATOR.INCL_PATH.DIR_SEPARATOR.'smarty'.DIR_SEPARATOR.'smarty.class.php');
+require(BASE_DIR.DIR_SEPARATOR.INCL_PATH.DIR_SEPARATOR.'smarty'.DIR_SEPARATOR.'Smarty.class.php');
 

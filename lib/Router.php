@@ -30,19 +30,16 @@ class Router
             $action = $this->action;	
 
         /* Do the menu */
-        /*
-        $menu = new menu($this->registry);
-        $menu->setupMenu($this->module_name, $action);
-        */
-
         /* Check if user has permission to do said action */			
         if ($instance->auth($action))
         {
             $this->registry->template->addTemplateDir(MODL_PATH . '/' . $this->module_name . '/templates/');
             /* Default heading is module name */
-            $this->registry->template->heading = $module; 
+            $this->registry->template->heading = $this->module_name; 
             /* Default subheading is the action name */
             $this->registry->template->subheading = $action;
+            /* Default set the template to the action */
+            $instance->setTemplate($action);
             /* Call the action on the module */
             $instance->$action();
             /* Get Menu Data */

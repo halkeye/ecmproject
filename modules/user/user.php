@@ -6,19 +6,12 @@ class User extends Module_Base
     /* Default Action */
     function index() 
     {
-        $this->registry->template->heading = 'User Section'; # FIXME
-        $this->registry->template->subheading = 'index';
-
         $this->setTemplate('index');
     }
     
-    /* Default Action */
-    function registry() 
+    function register() 
     {
-        $this->registry->template->heading = 'User Section'; # FIXME
-        $this->registry->template->subheading = 'index';
-
-        $this->registry->template->display('user-registry');
+        $this->setTemplate('register');
     }
 
     /* 
