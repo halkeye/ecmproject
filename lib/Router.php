@@ -38,7 +38,12 @@ class Router
         /* Check if user has permission to do said action */			
         if ($instance->auth($action))
         {
-            $this->registry->template->template_dir []= MODL_PATH . '/' . $this->module_name . '/templates/';
+            $this->registry->template->addTemplateDir(MODL_PATH . '/' . $this->module_name . '/templates/');
+            /* Default heading is module name */
+            $this->registry->template->heading = $module; 
+            /* Default subheading is the action name */
+            $this->registry->template->subheading = $action;
+            /* Call the action on the module */
             $instance->$action();
         }
         else if (!isset($_SESSION['ugroups'])) 

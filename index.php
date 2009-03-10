@@ -15,15 +15,8 @@ $registry = new Registry;
     
 /* Add stuff we need to registry */	
 $registry->router = new router($registry);
+$registry->template = new Template($registry);
 
-$registry->template = new Smarty();
-$registry->template->template_dir = array(THEME_PATH.DIR_SEPARATOR.THEME.DIR_SEPARATOR.'templates');
-$registry->template->compile_dir  = THEME_PATH.DIR_SEPARATOR.THEME.DIR_SEPARATOR.'compiled';
-$registry->template->cache_dir    = THEME_PATH.DIR_SEPARATOR.THEME.DIR_SEPARATOR.'cache';
-$registry->template->config_dir   = THEME_PATH.DIR_SEPARATOR.THEME.DIR_SEPARATOR.'configs';
-$registry->template->assign('_registry', $registry);
-$registry->template->assign('_baseURL', BASE_URL);
-$registry->template->assign('_themeURL', BASE_URL.'/'.THEME_PATH.'/'.THEME.'/');
 
 /* No Database Yet
 $registry->db = $db;	

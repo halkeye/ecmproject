@@ -17,11 +17,12 @@ define('DB_NAME', 'aehr');
 define('DB_PORT', '3306');
 define('DB_DRIVER', 'mysqli');
 
-define('DEFAULT_MOD', 'view');
+define('DEFAULT_MOD', 'user');
 define('THEME', 'default');
 
 require(BASE_DIR.DIR_SEPARATOR.MODL_PATH.DIR_SEPARATOR.'Base.php');
 require(BASE_DIR.DIR_SEPARATOR.INCL_PATH.DIR_SEPARATOR.'Router.php');
+require(BASE_DIR.DIR_SEPARATOR.INCL_PATH.DIR_SEPARATOR.'Template.php');
 // put full path to Smarty.class.php
 require(BASE_DIR.DIR_SEPARATOR.INCL_PATH.DIR_SEPARATOR.'smarty'.DIR_SEPARATOR.'smarty.class.php');
 
