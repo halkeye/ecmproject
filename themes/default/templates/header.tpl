@@ -14,12 +14,15 @@
  
     <!-- Left Sidebar. --> 
     <div id="menu"> 
+        {if !$loggedIn}
+            {include file=loginBox.tpl}
+            <br/>
+        {/if}
         <ul> 
             <li class="title">Menu</li> 
-            <li><a href="?mod=view">View Your Status</a></li> 
-            <li><a href="?mod=edit">Edit your Profile</a></li>      
-            <li><a href="?mod=pwd">Change your Password</a></li>                                                            
-            <li><a href="?mod=login&amp;do=doLogout">Logout</a></li>
+            {foreach from=$menu item=m}
+            <li><a href="{$m.url}">{$m.title}</a></li> 
+            {/foreach}
         </ul> 
     </div> 
  

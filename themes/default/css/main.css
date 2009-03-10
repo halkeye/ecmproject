@@ -41,7 +41,7 @@ body {
   height: 100%;
   padding-top: 0px;     
   color: #CCC;
-  background-color: #20232B;  
+  background-color: #FFF;  
   font-size: 12px; 
 }
 
@@ -67,14 +67,14 @@ body {
   background-color: #FC0; 
 }
 
-#menu li.title {
+#menu .title {
   color: #8A0917; 
   font-size: 16px;
   font-weight: bold;
   border-bottom: 1px solid #BBB;
 }
 
-#menu li.title:hover { 
+#menu .title:hover { 
   background-color: #FFF;  
 }
 

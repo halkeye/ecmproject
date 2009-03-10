@@ -45,18 +45,18 @@ class Router
             $this->registry->template->subheading = $action;
             /* Call the action on the module */
             $instance->$action();
-        }
-        else if (!isset($_SESSION['ugroups'])) 
-        {
-            include MODL_PATH . '/register/register.php';
-            $instance = new register($this->registry);
-            $instance->index();
+            /* Get Menu Data */
+            $this->registry->template->menu = $instance->menu();
         }
         else
         {
             $this->registry->template->display('403.tpl');
             return 0;
         }
+        /* FIXME: is this the right place for this stuff ?*/
+        $this->registry->template->loginUrl = $this->registry->template->getLink('user','login');
+        $this->registry->template->isLoggedIn = $_SESSION['user'] ? TRUE : FALSE;
+        /* Render The content */
         $this->registry->template->render();
     }
 

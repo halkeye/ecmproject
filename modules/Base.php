@@ -25,4 +25,6 @@ Abstract Class Module_Base
     abstract function index();
     abstract function permissions();
     abstract function auth($action);
+    /* By default modules do not return any data for a menu */
+    function menu() { return array(); }
 }

@@ -54,6 +54,13 @@ class Template
    function setLayout($layoutFile) { $this->layoutFile = $layoutFile; }
    function setTemplate($templateFile) { $this->templateFile = $templateFile; }
 
+   /* FIXME: Should this be here? */
+   function getLink($module, $action)
+   {
+       /* FIXME: Check to see if clean urls is turned on */
+       return BASE_URL .'/' . $module .'/'. $action;
+   }
+
    function __set($key, $var)
    {
       $this->smarty->assign($key, $var);

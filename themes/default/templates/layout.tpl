@@ -3,5 +3,6 @@
 <!-- content start -->
 {$content}
 <!-- content end -->
+<br />
 
 {include file='footer.tpl'}

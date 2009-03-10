@@ -13,24 +13,23 @@ class User extends Module_Base
     }
     
     /* Default Action */
-    function register() 
+    function registry() 
     {
         $this->registry->template->heading = 'User Section'; # FIXME
         $this->registry->template->subheading = 'index';
 
-        $this->registry->template->display('user-register');
+        $this->registry->template->display('user-registry');
     }
 
     /* 
      * Return a list of menu options as provided by this module 
      * Add a weight field if it matters (default is 0)
      */
-    function getMenuOptions()
+    function menu()
     {
         return array(
-                array( 'module'=>'user', 'action'=>'register', 'weight'=>-100 ),
-                /* FIXME - only show login and register if not logged in */
-                array( 'module'=>'user', 'action'=>'login', 'weight'=>-100 ),
+                array('title'=>'Register', 'url'=>$this->registry->template->getLink('user','register')),
+                array('title'=>'Login', 'url'=>$this->registry->template->getLink('user','login')),
         );
     }
 
