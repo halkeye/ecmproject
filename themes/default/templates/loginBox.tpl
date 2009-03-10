@@ -1,4 +1,6 @@
-<div class="title">Login</div> 
+<ul> 
+    <li class="title">Login</li> 
+</ul>
 <form method="post" action="{$loginUrl}">
 <p>
     <label for="user">Email: </label>
