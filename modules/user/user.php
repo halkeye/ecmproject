@@ -9,7 +9,7 @@ class User extends Module_Base
         $this->registry->template->heading = 'User Section'; # FIXME
         $this->registry->template->subheading = 'index';
 
-        $this->registry->template->display('user-index');
+        $this->setTemplate('index');
     }
     
     /* Default Action */

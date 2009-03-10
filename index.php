@@ -17,7 +17,6 @@ $registry = new Registry;
 $registry->router = new router($registry);
 $registry->template = new Template($registry);
 
-
 /* No Database Yet
 $registry->db = $db;	
 */

@@ -6,6 +6,11 @@ class Template
    private $registry = null;
    private $smarty = null;
 
+   private $layoutFile = null;
+   private $templateFile = null;
+
+   const TEMPLATE_EXTENSION = '.tpl';
+
    function Template($registry)
    {
        $this->registry = $registry;
@@ -18,6 +23,8 @@ class Template
        $this->smarty->assign('_this->smarty', $this->smarty);
        $this->smarty->assign('_baseURL', BASE_URL);
        $this->smarty->assign('_themeURL', BASE_URL.'/'.THEME_PATH.'/'.THEME.'/');
+
+       $this->layoutFile = 'layout.tpl';
    }
 
    /*
@@ -26,13 +33,26 @@ class Template
     */
    function display($templateName)
    {
-        $this->smarty->display($templateName.'.tpl');
+        $this->smarty->display($templateName.self::TEMPLATE_EXTENSION);
+   }
+
+   function render()
+   {
+       $this->content = '';
+       if ($this->templateFile) 
+       {
+           $this->content = $this->smarty->fetch($this->templateFile.self::TEMPLATE_EXTENSION);
+       }
+       $this->smarty->display('layout'.self::TEMPLATE_EXTENSION);
    }
 
    function addTemplateDir($dir)
    {
        $this->smarty->template_dir[] = $dir;
    }
+   
+   function setLayout($layoutFile) { $this->layoutFile = $layoutFile; }
+   function setTemplate($templateFile) { $this->templateFile = $templateFile; }
 
    function __set($key, $var)
    {

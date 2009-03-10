@@ -7,8 +7,15 @@ Abstract Class Module_Base
      */
     protected $registry;
 
-    function __construct($registry) {
+    function __construct($registry) 
+    {
         $this->registry = $registry;
+        $this->moduleName = strtolower(get_class($this));
+    }
+   
+    function setTemplate($templateFile)
+    {
+        $this->registry->template->setTemplate($this->moduleName .'-'. $templateFile);
     }
 
     /**

@@ -57,6 +57,7 @@ class Router
             $this->registry->template->display('403.tpl');
             return 0;
         }
+        $this->registry->template->render();
     }
 
     /* Gets the arguments in the URL specifying the module and the action */

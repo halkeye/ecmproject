@@ -1,4 +1,3 @@
-{include file='header.tpl'}
 
 {if $userGroups}
 <p>User Groups: {$userGroups}</p>
@@ -10,4 +9,3 @@
 </p>
 {/if} 
 
-{include file='footer.tpl'}

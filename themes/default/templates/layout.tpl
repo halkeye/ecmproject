@@ -1,5 +1,7 @@
 {include file='header.tpl'}
 
-Url: {$url}
+<!-- content start -->
+{$content}
+<!-- content end -->
 
 {include file='footer.tpl'}
