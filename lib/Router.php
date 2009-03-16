@@ -17,7 +17,7 @@ class Router
 
         if (!is_readable($this->module_path))
         {
-            $this->registry->template->display('404.tpl');
+            $this->registry->template->display('404');
             return 0;
         }
 
@@ -47,12 +47,13 @@ class Router
         }
         else
         {
-            $this->registry->template->display('403.tpl');
+            $this->registry->template->display('403');
             return 0;
         }
         /* FIXME: is this the right place for this stuff ?*/
-        $this->registry->template->loginUrl = $this->registry->template->getLink('user','login');
-        $this->registry->template->isLoggedIn = $_SESSION['user'] ? TRUE : FALSE;
+        //$this->registry->template->loginUrl = $this->registry->template->getLink('user','login');
+        //$this->registry->template->isLoggedIn = $_SESSION['user'] ? TRUE : FALSE;
+
         /* Render The content */
         $this->registry->template->render();
     }
