@@ -1,22 +1,5 @@
-<html>
-<head>
-<title>Welcome to CodeIgniter</title>
-
 <style type="text/css">
 
-body {
- background-color: #fff;
- margin: 40px;
- font-family: Lucida Grande, Verdana, Sans-serif;
- font-size: 14px;
- color: #4F5155;
-}
-
-a {
- color: #003399;
- background-color: transparent;
- font-weight: normal;
-}
 
 h1 {
  color: #444;
@@ -40,8 +23,6 @@ code {
 }
 
 </style>
-</head>
-<body>
 
 <h1>Welcome to CodeIgniter!</h1>
 
