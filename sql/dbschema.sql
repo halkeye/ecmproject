@@ -1,5 +1,6 @@
-CREATE DATABASE ecms
-USE ecms
+﻿DROP DATABASE ecms;
+CREATE DATABASE ecms;
+USE ecms;
 
 
 DROP TABLE IF EXISTS `convention`;
@@ -27,7 +28,7 @@ DROP TABLE IF EXISTS `accounts`;
 -- Reg form information among other things. Require email at a minimum.
 -- Salt column, usergroups storing?
 CREATE TABLE accounts(
-   email VARCHAR(55) NOT NULL PRIMARY_KEY,
+   email VARCHAR(55) NOT NULL PRIMARY KEY,
    gname VARCHAR(55) NOT NULL,
    sname VARCHAR(55) NOT NULL,
    badge VARCHAR(55),
@@ -38,15 +39,15 @@ CREATE TABLE accounts(
    econtact VARCHAR(55) NOT NULL,
    ephone VARCHAR(15) NOT NULL,
    password VARCHAR(40) NOT NULL,
-   salt VARCHAR(10) NOT NULL,    
+   salt VARCHAR(10) NOT NULL
 );
 
 DROP TABLE IF EXISTS `usergroups`;
--- Expand on permissions later. 
+-- Expand on permissions later.
 CREATE TABLE usergroups(
-   guid INT(10) UNSIGNED NOT NULL PRIMARY_KEY,
+   guid int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
    name VARCHAR(55) NOT NULL
-)
+);
 
 DROP TABLE IF EXISTS `register`;
 CREATE TABLE register(
