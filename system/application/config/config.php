@@ -1,5 +1,4 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-
 /*
 |--------------------------------------------------------------------------
 | Base Site URL
@@ -11,8 +10,8 @@
 |	http://example.com/
 |
 */
-$config['base_url']	= "http://barkdog/ecmproject2/";
-$config['base_url']	= "/ecmproject2/";
+#$config['base_url']	= "http://barkdog/ecmproject/";
+$config['base_url']	= "/ecmproject/";
 
 /*
 |--------------------------------------------------------------------------
@@ -174,7 +173,7 @@ $config['directory_trigger'] 	= 'd'; // experimental not currently in use
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = 0;
+$config['log_threshold'] = 1;
 
 /*
 |--------------------------------------------------------------------------
@@ -264,7 +263,7 @@ $config['cookie_path']		= "/";
 | COOKIE data is encountered
 |
 */
-$config['global_xss_filtering'] = FALSE;
+$config['global_xss_filtering'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------

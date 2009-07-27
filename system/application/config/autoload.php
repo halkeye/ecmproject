@@ -39,7 +39,11 @@
 |	$autoload['libraries'] = array('database', 'session', 'xmlrpc');
 */
 
-$autoload['libraries'] = array();
+$autoload['libraries'] = array(
+        'database',
+        'session',
+        'template',
+);
 
 
 /*
@@ -108,7 +112,7 @@ $autoload['language'] = array();
 |
 */
 
-$autoload['model'] = array();
+$autoload['model'] = array('Account_model');
 
 
 

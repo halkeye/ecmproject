@@ -1,15 +1,12 @@
 <?php
 
-class Welcome extends Controller {
-
-	function Welcome()
-	{
-		parent::Controller();	
-	}
+class Welcome extends Ecmproject_Base_Controller 
+{
 	
 	function index()
 	{
-		$this->load->view('welcome_message');
+        $this->template->write_view('content', 'welcome/welcome_view');
+        $this->template->render();
 	}
 }
 

@@ -3,7 +3,7 @@ $this->load->helper('url');
 ?><ul> 
     <li class="title">Login</li> 
 </ul>
-<form method="post" action="<?php echo site_url('user','login') ?>">
+<form method="post" action="<?php echo site_url('user/login') ?>">
 <p>
     <label for="user">Email: </label>
     <input type="text" name="user" id="user" />

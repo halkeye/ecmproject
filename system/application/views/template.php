@@ -1,15 +1,17 @@
 <?php
 $this->load->helper('url');
-if (!isset($title))
-    $title = '';
+if (!isset($pageTitle))
+    $pageTitle = '';
 else
-    $title = ' :: ' . $title;
+    $pageTitle = ' :: ' . $pageTitle;
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
 <head> 
-<title>Electronic Convention Management (ECM)<?php echo $title ?></title> 
+<title>Electronic Convention Management (ECM)<?php echo $pageTitle ?></title> 
 <link href="<?php echo base_url() ?>css/main.css" rel="stylesheet" type="text/css" /> 
+<?= $_scripts ?>
+<?= $_styles ?>
 <script type="text/javascript" src="<?php echo base_url() ?>js/jquery-1.3.2.min.js"></script>
 </head> 
  
@@ -22,13 +24,23 @@ else
  
     <!-- Left Sidebar. --> 
     <div id="menu"> 
-        <?php if (!isset($isLoggedIn) || !$isLoggedIn): ?>
+        <?php if (!$isLoggedIn): ?>
         <?php $this->load->view('global/loginBox'); ?>
         <?php endif; ?>
-        <?php if (isset($menu)): ?>
-        <?php $this->load->view('global/menu'); ?>
-        <?php endif; ?>
-        </ul> 
+        <?php if ($menu || $isLoggedIn): ?>
+        <ul> 
+            <li class="title">Menu<?php if ($isLoggedIn) { echo ' - ' . htmlentities($user_name); } ?></li>
+            <?php if($menu): ?><?php foreach ($menu as $m): ?>
+            <li><?php echo anchor($m['url'], $m['title']); ?></li> 
+            <?php endforeach; ?><?php endif ?>
+
+            <?php if ($isLoggedIn): ?>
+            <li><?php echo anchor('user/logout', 'Logout'); ?></li>
+            <?php endif; ?>
+
+            </li>
+        </ul>
+        <?php endif ?>
     </div> 
  
     <!-- Content Pane (Right side) --> 
@@ -37,7 +49,7 @@ else
     <h3><?php echo $subheading ?></h3>
     <br />
     <!-- content start -->
-    <?php $this->load->view($view); ?>
+    <?php print $content ?>
     <!-- content end -->
     <br />
 </div> 

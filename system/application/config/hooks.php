@@ -10,13 +10,13 @@
 |
 */
 
-
+/*
 $hook['post_controller'][] = array(
                                 'class'    => 'MY_Controller',
                                 'function' => 'render',
                                 'filename' => 'MY_Controller.php',
                                 'filepath' => 'libraries'
                                 ); 
-
+                                */
 /* End of file hooks.php */
 /* Location: ./system/application/config/hooks.php */
