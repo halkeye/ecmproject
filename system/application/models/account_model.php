@@ -3,16 +3,32 @@ define ('ACCOUNT_MODEL_TABLE', 'accounts');
 define ('ACCOUNT_MODEL_SALT_LENGTH', 9);
 class Account_model extends Model 
 {
-    var $title   = '';
-
-    function Account_model()
+    function getUserByLogin($email, $password)
     {
-        // Call the Model constructor
-        parent::Model();
+        $user = $this->findByEmail($email);
+        if ($user->password != sha1($user->salt.$password))
+        {
+            return false;
+        }
+        return $user;
     }
 
+    function register($email, $password)
+    {
+        $salt = substr(md5(uniqid(rand(), true)), 0, ACCOUNT_MODEL_SALT_LENGTH);
+        $password = sha1($salt.$password);
 
-    function getUserByLogin($email, $password)
+        $data = array(
+                'email' => $email,
+                'password'  => $password,
+                'salt' => $salt,
+        );
+
+        $query = $this->db->insert(ACCOUNT_MODEL_TABLE, $data); 
+        return $this->findByEmail($email);
+    }
+
+    function findByEmail($email)
     {
         $this->db->from(ACCOUNT_MODEL_TABLE);
         $this->db->where('email', $email);
@@ -27,16 +43,9 @@ class Account_model extends Model
         }
         $user = $query->row();
         $query->free_result();
-        if ($user->password != sha1($user->salt.$password))
-        {
-            return false;
-        }
         return $user;
     }
 
-    function createUser($email, $password)
-    {
-        $salt = substr(md5(uniqid(rand(), true)), 0, ACCOUNT_MODEL_SALT_LENGTH);
-    }
+    /* Instance Functions */
     
 }

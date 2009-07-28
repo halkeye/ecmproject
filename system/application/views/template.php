@@ -44,10 +44,15 @@ else
     </div> 
  
     <!-- Content Pane (Right side) --> 
-    <div id="content"> 
+    <div id="content">
     <h2><?php echo $heading ?></h2>
     <h3><?php echo $subheading ?></h3>
     <br />
+    
+<?php if($this->session->flashdata('message')) : ?>
+	<p><?=$this->session->flashdata('message')?></p>
+<?php endif; ?>
+
     <!-- content start -->
     <?php print $content ?>
     <!-- content end -->

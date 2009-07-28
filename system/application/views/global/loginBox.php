@@ -17,4 +17,5 @@ $this->load->helper('url');
 <p class="submit">
 <input class="submit" type="submit" name="Submit" value="Login" />
 </p>
+<div><?php echo anchor('/user/register', 'Register'); ?></div>
 </form>
