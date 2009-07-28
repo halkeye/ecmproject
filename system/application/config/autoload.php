@@ -40,7 +40,6 @@
 */
 
 $autoload['libraries'] = array(
-        'database',
         'session',
         'template',
 );

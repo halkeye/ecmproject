@@ -5,7 +5,9 @@ if (!isset($pageTitle))
 else
     $pageTitle = ' :: ' . $pageTitle;
 
-?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+?><!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
 <head> 
 <title>Electronic Convention Management (ECM)<?php echo $pageTitle ?></title> 
@@ -29,7 +31,11 @@ else
         <?php endif; ?>
         <?php if ($menu || $isLoggedIn): ?>
         <ul> 
-            <li class="title">Menu<?php if ($isLoggedIn) { echo ' - ' . htmlentities($user_name); } ?></li>
+            <li class="title">Menu</li>
+            <?php if ($isLoggedIn): ?>
+            <li><b><?= htmlentities($user_name) ?></b></li>
+            <li>&nbsp;</li>
+            <?php endif; ?>
             <?php if($menu): ?><?php foreach ($menu as $m): ?>
             <li><?php echo anchor($m['url'], $m['title']); ?></li> 
             <?php endforeach; ?><?php endif ?>
@@ -37,8 +43,6 @@ else
             <?php if ($isLoggedIn): ?>
             <li><?php echo anchor('user/logout', 'Logout'); ?></li>
             <?php endif; ?>
-
-            </li>
         </ul>
         <?php endif ?>
     </div> 

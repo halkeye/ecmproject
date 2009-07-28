@@ -3,7 +3,7 @@ define ('ACCOUNT_MODEL_TABLE', 'accounts');
 define ('ACCOUNT_MODEL_SALT_LENGTH', 9);
 class Account_model extends Model 
 {
-    function getUserByLogin($email, $password)
+    function findByLogin($email, $password)
     {
         $user = $this->findByEmail($email);
         if ($user->password != sha1($user->salt.$password))

@@ -12,10 +12,8 @@ class user extends Ecmproject_Base_Controller
 
     function index()
     {
-
         $this->load->model('Account_model');
-        $user = $this->Account_model->findByEmail('halkeye@gmail.com');
-        var_dump($user->gname);
+        #$user = $this->Account_model->findByEmail('halkeye@gmail.com');
         
         $this->data['todo'] = array(
             'meow',
@@ -57,7 +55,7 @@ class user extends Ecmproject_Base_Controller
             if($this->auth->process_login($user,$pass))
             {
                 // Login successful, let's redirect.
-                redirect('/user/index');
+                $this->redirect('/user/index');
                 return;
             }
             else
@@ -77,7 +75,7 @@ class user extends Ecmproject_Base_Controller
 
         if($this->auth->logout())
         {
-            redirect();
+            $this->redirect('');
             return;
         }
     }
@@ -91,20 +89,21 @@ class user extends Ecmproject_Base_Controller
 
         $this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[5]|matches[passconf]');
         $this->form_validation->set_rules('passconf', 'Password Confirmation', 'trim|required');
-        $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email');
+        $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email|callback__check_duplicated_email');
         $this->form_validation->set_rules('recaptcha_response_field',  'lang:recaptcha_field_name', 'required|callback__check_captcha');
+
         if ($this->form_validation->run() == TRUE)
         {
             $this->load->model('Account_model');
-            $user = $this->Account_model->register(
-                    $this->input->post('email'),
-                    $this->input->post('pass')
-            );
-            if ($user !== FALSE)
+            $email = $this->input->post('email');
+            $pass  = $this->input->post('pass');
+            $this->Account_model->register($email, $pass);
+            /* FIXME: ADD FLASH MSG ABOUT USER CREATED SUCCESSFULLY */
+            if($this->auth->process_login ($email,$pass  ))
             {
-                $this->_login($user);
-                $this->load->helper('url');
-                return redirect('/user/index');
+                // Login successful, let's redirect.
+                $this->redirect('/user/index');
+                return;
             }
         }
 
@@ -112,31 +111,17 @@ class user extends Ecmproject_Base_Controller
         return $this->template->render();
     }
 
-    function _login_check($email, $passwordField)
+    function _check_duplicated_email($email)
     {
         $this->load->model('Account_model');
-        $user = $this->Account_model->getUserByLogin(
-                $this->input->post($email),
-                $this->input->post($passwordField)
-        );
-        if (!$user)
+        $user = $this->Account_model->findByEmail($email);
+        if ($user)
         {
-            $this->form_validation->set_message('_login_check', 'Wrong %s or %s');
-            return false;
+            $this->form_validation->set_message('_check_duplicated_email', 'Email address is unavailable');
+            return FALSE;
         }
 
-        //Destroy old session
-        $this->session->sess_destroy();
-        
-        //Create a fresh, brand new session
-        $this->session->sess_create();
-        
-        // Indicate we are logged in
-        $this->session->set_userdata('isLoggedIn', TRUE);
-        // Set all the session vars about a user
-        $this->session->set_userdata($user);
-
-        return true;
+        return TRUE;
     }
 
 
@@ -150,13 +135,15 @@ class user extends Ecmproject_Base_Controller
         }
     }
 
-    function redirect()
+    function redirect($where = '/user')
     {
-        if ($this->CI->session->userdata('redirected_from') == FALSE)
+        if ($this->session->userdata('redirected_from') == FALSE)
         {
-            redirect('/admin');
-        } else {
-            redirect($this->CI->session->userdata('redirected_from'));
+            redirect($user);
+        } 
+        else 
+        {
+            redirect($this->session->userdata('redirected_from'));
         }
     }
 

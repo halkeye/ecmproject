@@ -22,7 +22,7 @@ class Auth
             return FALSE;
 
         $this->CI->load->model('Account_model');
-        $user = $this->CI->Account_model->getUserByLogin(
+        $user = $this->CI->Account_model->findByLogin(
                 $username,
                 $password
         );

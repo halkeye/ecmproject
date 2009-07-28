@@ -5,12 +5,14 @@ class Ecmproject_base_controller extends Controller
     function Ecmproject_base_controller()
     {
         parent::Controller();
+
         $this->load->library('auth');
+        $loggedIn = $this->auth->logged_in();
         $this->template->write(
                 'isLoggedIn',
-                $this->auth->logged_in()
+                $loggedIn
         );
-        if ($this->session->userdata('isLoggedIn'))
+        if ($loggedIn)
         {
             $this->template->write(
                     'user_name',
