@@ -28,7 +28,8 @@ DROP TABLE IF EXISTS `accounts`;
 -- Reg form information among other things. Require email at a minimum.
 -- Salt column, usergroups storing?
 CREATE TABLE accounts(
-   email VARCHAR(55) NOT NULL PRIMARY KEY,
+   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   email VARCHAR(55) NOT NULL,
    gname VARCHAR(55) NOT NULL,
    sname VARCHAR(55) NOT NULL,
    badge VARCHAR(55),
@@ -45,7 +46,7 @@ CREATE TABLE accounts(
 DROP TABLE IF EXISTS `usergroups`;
 -- Expand on permissions later.
 CREATE TABLE usergroups(
-   guid int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   guid int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    name VARCHAR(55) NOT NULL
 );
 
@@ -54,10 +55,10 @@ CREATE TABLE register(
    reg_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    cid INT UNSIGNED NOT NULL,
    pass VARCHAR(100) NOT NULL,
-   account VARCHAR(55) NOT NULL,
+   account_id INT UNSIGNED NOT NULL,
    FOREIGN KEY (cid) REFERENCES convention(cid),
    FOREIGN KEY (pass) REFERENCES passes(name),
-   FOREIGN KEY (account) REFERENCES accounts(email)
+   FOREIGN KEY (account_id) REFERENCES accounts(id)
 );
 
 DROP TABLE IF EXISTS `payment`;
