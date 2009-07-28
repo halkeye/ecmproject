@@ -1,4 +1,4 @@
-﻿DROP DATABASE ecms;
+﻿-- DROP DATABASE ecms;
 CREATE DATABASE ecms;
 USE ecms;
 
@@ -29,7 +29,7 @@ DROP TABLE IF EXISTS `accounts`;
 -- Salt column, usergroups storing?
 CREATE TABLE accounts(
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-   email VARCHAR(55) NOT NULL,
+   email VARCHAR(55) NOT NULL UNIQUE,
    gname VARCHAR(55) NOT NULL,
    sname VARCHAR(55) NOT NULL,
    badge VARCHAR(55),
