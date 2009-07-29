@@ -28,7 +28,7 @@ DROP TABLE IF EXISTS `accounts`;
 -- Reg form information among other things. Require email at a minimum.
 -- Salt column, usergroups storing?
 CREATE TABLE accounts(
-   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    email VARCHAR(55) NOT NULL UNIQUE,
    gname VARCHAR(55) NOT NULL,
    sname VARCHAR(55) NOT NULL,
@@ -40,7 +40,10 @@ CREATE TABLE accounts(
    econtact VARCHAR(55) NOT NULL,
    ephone VARCHAR(15) NOT NULL,
    password VARCHAR(40) NOT NULL,
-   salt VARCHAR(10) NOT NULL
+   salt VARCHAR(10) NOT NULL,
+   reg_status TINYINT NOT NULL,
+   created DATETIME NOT NULL,
+   login DATETIME
 );
 
 DROP TABLE IF EXISTS `usergroups`;
