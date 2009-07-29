@@ -1,6 +1,6 @@
 ﻿-- DROP DATABASE ecms;
-CREATE DATABASE ecms;
-USE ecms;
+-- CREATE DATABASE ecms;
+-- USE ecms;
 
 
 DROP TABLE IF EXISTS `convention`;

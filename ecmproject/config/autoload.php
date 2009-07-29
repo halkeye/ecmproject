@@ -42,6 +42,8 @@
 $autoload['libraries'] = array(
         'session',
         'template',
+        'database',
+        'DataMapper',
 );
 
 
@@ -111,7 +113,9 @@ $autoload['language'] = array();
 |
 */
 
-$autoload['model'] = array('Account_model');
+$autoload['model'] = array(
+//        'Account_model'
+);
 
 
 

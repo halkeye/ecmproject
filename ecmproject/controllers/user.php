@@ -12,7 +12,19 @@ class user extends Ecmproject_Base_Controller
 
     function index()
     {
-        $this->load->model('Account_model');
+		$this->output->enable_profiler(TRUE);
+        $this->load->library('session');
+        // save a variable to the session
+        $this->session->set_userdata('foo','bar');
+        $this->session->destroy();
+
+        $u = new Account();
+        $u->email = 'halkeye@gmail.com';
+        $u->password = 'captain';
+        $u->save();
+return;
+
+        //$this->load->model('Account_model');
         #$user = $this->Account_model->findByEmail('halkeye@gmail.com');
         
         $this->data['todo'] = array(
@@ -41,6 +53,20 @@ class user extends Ecmproject_Base_Controller
         $this->template->write('subheading', 'Main Page', TRUE);
 
         $this->load->library('auth');
+        $user = $this->input->post('user');
+        $pass = $this->input->post('pass');
+        if($this->auth->process_login($user,$pass))
+        {
+            // Login successful, let's redirect.
+            $this->redirect('/user/index');
+            return;
+        }
+        $data['error'] = 'Login failed, please try again';
+        $this->load->vars($data);
+
+        $this->template->write_view('content', 'user/login_error', array(), TRUE);
+        return $this->template->render();
+        /*
         $this->auth->restrict(TRUE);
 
         $this->load->library('form_validation');
@@ -67,6 +93,7 @@ class user extends Ecmproject_Base_Controller
 
         $this->template->write_view('content', 'user/login_error', array(), TRUE);
         return $this->template->render();
+        */
     }
 
     function logout()
@@ -82,6 +109,7 @@ class user extends Ecmproject_Base_Controller
 
     function register()
     {
+        die('here');
         $this->load->library('recaptcha');
         $this->load->library('form_validation');
         $this->lang->load('recaptcha');
@@ -94,7 +122,7 @@ class user extends Ecmproject_Base_Controller
 
         if ($this->form_validation->run() == TRUE)
         {
-            $this->load->model('Account_model');
+            //$this->load->model('Account_model');
             $email = $this->input->post('email');
             $pass  = $this->input->post('pass');
             $this->Account_model->register($email, $pass);
@@ -113,6 +141,7 @@ class user extends Ecmproject_Base_Controller
 
     function _check_duplicated_email($email)
     {
+        die('here');
         $this->load->model('Account_model');
         $user = $this->Account_model->findByEmail($email);
         if ($user)

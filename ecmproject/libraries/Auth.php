@@ -11,7 +11,7 @@ class Auth
 		$this->CI->load->library('session');
 		$this->CI->load->database();
 		$this->CI->load->helper('url');
-        $this->CI->load->model('Account_model');
+        #$this->CI->load->model('Account_model');
 	}
 
     function process_login($username, $password)
@@ -21,16 +21,15 @@ class Auth
         if(!$username && !$password)
             return FALSE;
 
-        $this->CI->load->model('Account_model');
-        $user = $this->CI->Account_model->findByLogin(
-                $username,
-                $password
-        );
-        if (!$user) return false;
+        $this->CI->load->model('Account');
+        $u = new Account();
+        $u->email    = $username;
+        $u->password = $password;
+        if (!$u->login()) { return false; }
 
         // Our user exists, set session.
-        $this->CI->session->set_userdata('logged_user', $username);
-        $this->CI->session->set_userdata('user_name', $user->gname . ' '. $user->sname);
+        $this->CI->session->set_userdata('logged_user', $u->email());
+        $this->CI->session->set_userdata('user_name', $u->gname . ' '. $u->sname);
         return TRUE;
     }
 
