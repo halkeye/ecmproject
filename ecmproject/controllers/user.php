@@ -45,7 +45,7 @@ class user extends Ecmproject_Base_Controller
 
         $this->load->library('form_validation');
 
-        $this->form_validation->set_rules('user','Username', "trim|xss_clean|required|min_length[3]|valid_email");
+        $this->form_validation->set_rules('user','Email', "trim|xss_clean|required|min_length[3]|valid_email");
         $this->form_validation->set_rules('pass','Password', "trim|xss_clean|required|min_length[5]");
 
         if ($this->form_validation->run() !== FALSE)
@@ -139,7 +139,7 @@ class user extends Ecmproject_Base_Controller
     {
         if ($this->session->userdata('redirected_from') == FALSE)
         {
-            redirect($user);
+            redirect($where);
         } 
         else 
         {
