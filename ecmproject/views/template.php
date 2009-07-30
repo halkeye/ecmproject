@@ -5,6 +5,13 @@ if (!isset($pageTitle))
 else
     $pageTitle = ' :: ' . $pageTitle;
 
+$messages = array();
+$errors = array();
+if ($this->session->flashdata('messages')) 
+	$messages = $this->session->flashdata('messages');
+if ($this->session->flashdata('errors')) 
+	$errorss = $this->session->flashdata('errors');
+
 ?><!DOCTYPE html 
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
           "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -31,7 +38,7 @@ else
         <?php endif; ?>
         <?php if ($menu || $isLoggedIn): ?>
         <ul> 
-            <li class="title">Menu</li>
+            <li class="menuItem title"><a href="<?php base_url(); ?>">Menu</a></li>
             <?php if ($isLoggedIn): ?>
             <li><b><?= htmlentities($user_name) ?></b></li>
             <li>&nbsp;</li>
@@ -49,14 +56,13 @@ else
  
     <!-- Content Pane (Right side) --> 
     <div id="content">
-    <h2><?php echo $heading ?></h2>
-    <h3><?php echo $subheading ?></h3>
-    <br />
+    <?php if ($heading) echo "<h2>$heading</h2>"; ?>
+    <?php if ($subheading) echo "<h3>$subheading</h3>"; ?>
     
-<?php if($this->session->flashdata('message')) : ?>
-	<p><?=$this->session->flashdata('message')?></p>
-<?php endif; ?>
+<?php foreach ($messages as $msg) { echo '<p class="msg">'.$msg.'</p>'; } ?>
+<?php foreach ($errors as $err) { echo '<p class="errormsg">'.$err.'</p>'; } ?>
 
+    <br />
     <!-- content start -->
     <?php print $content ?>
     <!-- content end -->

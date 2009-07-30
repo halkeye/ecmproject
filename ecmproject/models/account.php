@@ -3,6 +3,8 @@
 class Account extends DataMapper 
 {
     var $table = 'accounts';
+    var $saltLength = 10;
+
     var $created_field = 'created';
     var $updated_field = 'login';
     var $has_many = array('book');
@@ -59,27 +61,21 @@ class Account extends DataMapper
         // Get this users stored record via their username
         $u->where('email', $this->email)->get();
 
+        ## Not a valid user
+        if (!isset($u->id))
+            return false;
+
         // Give this user their stored salt
         $this->salt = $u->salt;
 
-        // Validate and get this user by their property values,
-        // this will see the 'encrypt' validation run, encrypting the password with the salt
-        $this->validate()->get();
-        return false;
+        $this->_encrypt('password');
 
-        // If the username and encrypted password matched a record in the database,
-        // this user object would be fully populated, complete with their ID.
-
-        // If there was no matching record, this user would be completely cleared so their id would be empty.
-        if (!empty($this->id))
+        if ($u->password == $this->password)
         {
-            // Login failed, so set a custom error message
-            $this->error_message('login', 'Email or password invalid');
-
-            return FALSE;
+            // Login succeeded
+            return TRUE;
         }
-        // Login succeeded
-        return TRUE;
+        return FALSE;
     }
 
     // Validation prepping function to encrypt passwords
@@ -92,7 +88,7 @@ class Account extends DataMapper
             // Generate a random salt if empty
             if (empty($this->salt))
             {
-                $this->salt = md5(uniqid(rand(), true));
+                $this->salt = substr(md5(uniqid(rand(), true)), 0, $this->saltLength);
             }
 
             $this->{$field} = sha1($this->salt . $this->{$field});

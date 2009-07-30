@@ -6,7 +6,6 @@ class Ecmproject_base_controller extends Controller
     {
         parent::Controller();
 
-        /*
         $this->load->library('auth');
         $loggedIn = $this->auth->logged_in();
         $this->template->write(
@@ -20,7 +19,5 @@ class Ecmproject_base_controller extends Controller
                     $this->auth->name()
             );
         }
-        */
-
     }
 }

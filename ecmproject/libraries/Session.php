@@ -24,7 +24,8 @@
 * @author        Dariusz Debowczyk
 * @link        http://www.codeigniter.com/user_guide/libraries/sessions.html
 */
-class CI_Session {
+class CI_Session 
+{
     var $session_id_ttl = 360; // session id time to live (TTL) in seconds
     var $flash_key = 'flash'; // prefix for "flash" variables (eg. flash:new:message)
     

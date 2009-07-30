@@ -12,21 +12,6 @@ class user extends Ecmproject_Base_Controller
 
     function index()
     {
-		$this->output->enable_profiler(TRUE);
-        $this->load->library('session');
-        // save a variable to the session
-        $this->session->set_userdata('foo','bar');
-        $this->session->destroy();
-
-        $u = new Account();
-        $u->email = 'halkeye@gmail.com';
-        $u->password = 'captain';
-        $u->save();
-return;
-
-        //$this->load->model('Account_model');
-        #$user = $this->Account_model->findByEmail('halkeye@gmail.com');
-        
         $this->data['todo'] = array(
             'meow',
             'meow2',
@@ -52,11 +37,14 @@ return;
         $this->template->write('heading', 'User', TRUE);
         $this->template->write('subheading', 'Main Page', TRUE);
 
+        $this->auth->restrict(TRUE);
+
         $this->load->library('auth');
         $user = $this->input->post('user');
         $pass = $this->input->post('pass');
         if($this->auth->process_login($user,$pass))
         {
+            $this->session->set_flashdata('messages', array('Logged in sucessfully'));
             // Login successful, let's redirect.
             $this->redirect('/user/index');
             return;
@@ -66,34 +54,6 @@ return;
 
         $this->template->write_view('content', 'user/login_error', array(), TRUE);
         return $this->template->render();
-        /*
-        $this->auth->restrict(TRUE);
-
-        $this->load->library('form_validation');
-
-        $this->form_validation->set_rules('user','Email', "trim|xss_clean|required|min_length[3]|valid_email");
-        $this->form_validation->set_rules('pass','Password', "trim|xss_clean|required|min_length[5]");
-
-        if ($this->form_validation->run() !== FALSE)
-        {
-            $user = $this->input->post('user');
-            $pass = $this->input->post('pass');
-            if($this->auth->process_login($user,$pass))
-            {
-                // Login successful, let's redirect.
-                $this->redirect('/user/index');
-                return;
-            }
-            else
-            {
-                $data['error'] = 'Login failed, please try again';
-                $this->load->vars($data);
-            }
-        }
-
-        $this->template->write_view('content', 'user/login_error', array(), TRUE);
-        return $this->template->render();
-        */
     }
 
     function logout()
@@ -109,29 +69,25 @@ return;
 
     function register()
     {
-        die('here');
         $this->load->library('recaptcha');
         $this->load->library('form_validation');
         $this->lang->load('recaptcha');
         $this->load->helper(array('form', 'url'));
 
-        $this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[5]|matches[passconf]');
-        $this->form_validation->set_rules('passconf', 'Password Confirmation', 'trim|required');
-        $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email|callback__check_duplicated_email');
-        $this->form_validation->set_rules('recaptcha_response_field',  'lang:recaptcha_field_name', 'required|callback__check_captcha');
+        #$this->form_validation->set_rules('recaptcha_response_field',  'lang:recaptcha_field_name', 'required|callback__check_captcha');
 
-        if ($this->form_validation->run() == TRUE)
+		$this->output->enable_profiler(TRUE);
+        #if ($this->form_validation->run() == TRUE)
+        if (1)
         {
             //$this->load->model('Account_model');
-            $email = $this->input->post('email');
-            $pass  = $this->input->post('pass');
-            $this->Account_model->register($email, $pass);
-            /* FIXME: ADD FLASH MSG ABOUT USER CREATED SUCCESSFULLY */
-            if($this->auth->process_login ($email,$pass  ))
+            $a = new Account();
+            $a->email            = $this->input->post('email');
+            $a->password         = $this->input->post('password');
+            $a->config_password  = $this->input->post('passconf');
+            if (!$a->save())
             {
-                // Login successful, let's redirect.
-                $this->redirect('/user/index');
-                return;
+                $this->session->set_flashdata('errors', $a->error->all);
             }
         }
 

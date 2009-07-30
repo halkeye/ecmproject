@@ -28,7 +28,7 @@ class Auth
         if (!$u->login()) { return false; }
 
         // Our user exists, set session.
-        $this->CI->session->set_userdata('logged_user', $u->email());
+        $this->CI->session->set_userdata('logged_user', $u->email);
         $this->CI->session->set_userdata('user_name', $u->gname . ' '. $u->sname);
         return TRUE;
     }
@@ -79,7 +79,7 @@ class Auth
 
     function logout()
     {
-        $this->CI->session->sess_destroy();
+        $this->CI->session->destroy();
         return TRUE;
     }
 
