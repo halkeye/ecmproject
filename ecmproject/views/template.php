@@ -5,12 +5,14 @@ if (!isset($pageTitle))
 else
     $pageTitle = ' :: ' . $pageTitle;
 
-$messages = array();
-$errors = array();
+if (!isset($messages))
+    $messages = array();
+if (!isset($errors))
+    $errors = array();
 if ($this->session->flashdata('messages')) 
-	$messages = $this->session->flashdata('messages');
+	$messages = $messages + $this->session->flashdata('messages');
 if ($this->session->flashdata('errors')) 
-	$errorss = $this->session->flashdata('errors');
+	$errorss  = $errors + $this->session->flashdata('errors');
 
 ?><!DOCTYPE html 
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"

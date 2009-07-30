@@ -84,7 +84,9 @@ $autoload['plugin'] = array();
 |
 */
 
-$autoload['config'] = array();
+$autoload['config'] = array(
+        'ecmproject',
+);
 
 
 /*

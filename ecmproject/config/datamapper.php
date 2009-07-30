@@ -8,8 +8,8 @@
 
 $config['prefix'] = '';
 $config['join_prefix'] = '';
-$config['error_prefix'] = '<p class="errormsg">';
-$config['error_suffix'] = '</p>';
+$config['error_prefix'] = '';
+$config['error_suffix'] = '';
 $config['created_field'] = 'created';
 $config['updated_field'] = 'updated';
 $config['local_time'] = FALSE;
@@ -17,6 +17,10 @@ $config['unix_timestamp'] = FALSE;
 $config['auto_transaction'] = FALSE;
 $config['auto_populate_has_many'] = FALSE;
 $config['auto_populate_has_one'] = FALSE;
+// Uncomment to enable the production cache
+//$config['production_cache'] = 'datamapper/cache';
+$config['extensions_path'] = 'datamapper';
+$config['extensions'] = array();
 
 /* End of file datamapper.php */
 /* Location: ./application/config/datamapper.php */

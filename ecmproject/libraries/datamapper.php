@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Data Mapper Class
+ * Data Mapper Class, OverZealous Edition
  *
  * Transforms database tables into objects.
  *
- * @licence 	MIT Licence
+ * @license 	MIT License
  * @category	Models
- * @author  	Simon Stenhouse
- * @link    	http://stensi.com
- * @version 	1.6.0
+ * @author  	Simon Stenhouse, Phil DeJarnett
+ * @link    	http://www.overzealous.com/dmz/
+ * @version 	1.4.0 ($Rev: 174 $) (Based on DataMapper 1.6.0)
  */
 
 // --------------------------------------------------------------------------
@@ -27,9 +27,10 @@ spl_autoload_register('DataMapper::autoload');
  * Data Mapper Class
  */
 class DataMapper {
-
+	
 	static $config = array();
 	static $common = array();
+	static $global_extensions = array();
 
 	var $error;
 	var $stored;
@@ -55,24 +56,38 @@ class DataMapper {
 	var $has_many = array();
 	var $has_one = array();
 	var $query_related = array();
+	var $production_cache = FALSE;
+	var $extensions_path = '';
+	var $extensions = NULL;
+	var $free_result_threshold = 100;
+	var $default_order_by = NULL;
+	
+	// If true before a related get(), any extra fields on the join table will be added.
+	var $_include_join_fields = FALSE;
+	// If true before a save, this will force the next save to be new.
+	var $_force_save_as_new = FALSE;
+	// If true, the next where statement will not be prefixed with an AND or OR.
+	var $_where_group_started = FALSE;
 
 	/**
 	 * Constructor
 	 *
 	 * Initialize DataMapper.
 	 */
-	function DataMapper()
+	function DataMapper($id = NULL)
 	{
 		$this->_assign_libraries();
-
+	
 		$this->_load_languages();
 
 		$this->_load_helpers();
 
+		$common_key = singular(get_class($this));
+		
 		// Determine model name
 		if (empty($this->model))
 		{
-			$this->model = singular(get_class($this));
+			$this->model = $common_key;
 		}
 
 		// Load stored config settings by reference
@@ -86,7 +101,7 @@ class DataMapper {
 		}
 
 		// Load model settings if not in common storage
-		if ( ! array_key_exists($this->model, DataMapper::$common))
+		if ( ! array_key_exists($common_key, DataMapper::$common))
 		{
 			// If model is 'datamapper' then this is the initial autoload by CodeIgniter
 			if ($this->model == 'datamapper')
@@ -96,67 +111,221 @@ class DataMapper {
 
 				// Get and store config settings
 				DataMapper::$config = $this->config->item('datamapper');
+				
+				DataMapper::_load_extensions(DataMapper::$global_extensions, DataMapper::$config['extensions']);
+				unset(DataMapper::$config['extensions']);
 
 				return;
 			}
-
-			// Determine table name
-			if (empty($this->table))
+			
+			$loaded_from_cache = FALSE;
+			
+			// Load in the production cache for this model, if it exists
+			if( ! empty(DataMapper::$config['production_cache']))
 			{
-				$this->table = plural(get_class($this));
-			}
-
-			// Add prefix to table
-			$this->table = $this->prefix . $this->table;
-
-			// Convert validation into associative array by field name
-			$associative_validation = array();
-
-			foreach ($this->validation as $validation)
-			{
-				// Populate associative validation array
-				$associative_validation[$validation['field']] = $validation;
-			}
-
-			$this->validation = $associative_validation;
-
-            if (!isset($this->field_data))
-            {
-                // Get and store the table's field names and meta data
-                $fields = $this->db->field_data($this->table);
-            }
-            else
-            {
-                $fields = $this->field_data;
-            }
-
-			// Store only the field names and ensure validation list includes all fields
-			foreach ($fields as $field)
-			{
-				// Populate fields array
-				$this->fields[] = $field->name;
-
-				// Add validation if current field has none
-				if ( ! array_key_exists($field->name, $this->validation))
+				// attempt to load the production cache file
+				$cache_folder = APPPATH . DataMapper::$config['production_cache'];
+				if(file_exists($cache_folder) && is_dir($cache_folder) && is_writeable($cache_folder))
 				{
-					$this->validation[$field->name] = array('field' => $field->name, 'label' => '', 'rules' => array());
+					$cache_file = $cache_folder . '/' . $common_key . EXT;
+					if(file_exists($cache_file))
+					{
+						include($cache_file);
+						if(isset($cache))
+						{
+							DataMapper::$common[$common_key] =& $cache;
+							unset($cache);
+			
+							// allow subclasses to add initializations
+							if(method_exists($this, 'post_model_init'))
+							{
+								$this->post_model_init(TRUE);
+							}
+							
+							// Load extensions (they are not cacheable)
+							if(!empty($this->extensions))
+							{
+								$extensions = $this->extensions;
+								$this->extensions = array();
+								DataMapper::_load_extensions($this->extensions, $extensions);
+								DataMapper::$common[$common_key]['extensions'] = $this->extensions;
+							}
+							
+							$loaded_from_cache = TRUE;
+						}
+					}
 				}
 			}
+			
+			if(! $loaded_from_cache)
+			{
 
-			// Store common model settings
-			DataMapper::$common[$this->model]['table'] = $this->table;
-			DataMapper::$common[$this->model]['fields'] = $this->fields;
-			DataMapper::$common[$this->model]['validation'] = $this->validation;
+				// Determine table name
+				if (empty($this->table))
+				{
+					$this->table = plural(get_class($this));
+				}
+	
+				// Add prefix to table
+				$this->table = $this->prefix . $this->table;
+	
+				// Convert validation into associative array by field name
+				$associative_validation = array();
+	
+				foreach ($this->validation as $name => $validation)
+				{
+					if(is_string($name)) {
+						$validation['field'] = $name;
+					} else {
+						$name = $validation['field'];
+					}
+					
+					// clean up possibly missing fields
+					if( ! isset($validation['rules']))
+					{
+						$validation['rules'] = array();
+					}
+					if( ! isset($validation['label']))
+					{
+						$validation['label'] = $name;
+					}
+					// TODO: enable Localization of label
+					
+					// Populate associative validation array
+					$associative_validation[$name] = $validation;
+				}
+				
+				// set up id column, if not set
+				if(!isset($associative_validation['id']))
+				{
+					$associative_validation['id'] = array(
+						'field' => 'id',
+						'label' => 'Identifier',
+						'rules' => array('integer')
+					);
+				}
+	
+				$this->validation = $associative_validation;
+	
+				// Get and store the table's field names and meta data
+				$fields = $this->db->field_data($this->table);
+	
+				// Store only the field names and ensure validation list includes all fields
+				foreach ($fields as $field)
+				{
+					// Populate fields array
+					$this->fields[] = $field->name;
+	
+					// Add validation if current field has none
+					if ( ! array_key_exists($field->name, $this->validation))
+					{
+						$this->validation[$field->name] = array('field' => $field->name, 'label' => '', 'rules' => array());
+					}
+				}
+				
+				// convert simple has_one and has_many arrays into more advanced ones
+				foreach(array('has_one', 'has_many') as $arr)
+				{
+					$new = array();
+					foreach ($this->{$arr} as $key => $value)
+					{
+						// allow for simple (old-style) associations
+						if (is_int($key))
+						{
+							$key = $value;
+						}
+						// convert value into array if necessary
+						if ( ! is_array($value))
+						{
+							$value = array('class' => $value);
+						} else if ( ! isset($value['class']))
+						{
+							// if already an array, ensure that the class attribute is set
+							$value['class'] = $key;
+						}
+						if( ! isset($value['other_field']))
+						{
+							// add this model as the model to use in queries if not set
+							$value['other_field'] = $this->model;
+						}
+						if( ! isset($value['join_self_as']))
+						{
+							// add this model as the model to use in queries if not set
+							$value['join_self_as'] = $value['other_field'];
+						}
+						if( ! isset($value['join_other_as']))
+						{
+							// add the key as the model to use in queries if not set
+							$value['join_other_as'] = $key;
+						}
+						$new[$key] = $value;
+					}
+					// replace the old array
+					$this->{$arr} = $new;
+				}
+				
+				// allow subclasses to add initializations
+				if(method_exists($this, 'post_model_init'))
+				{
+					$this->post_model_init(FALSE);
+				}
+	
+				// Store common model settings
+				foreach (array('table', 'fields', 'validation', 'has_one', 'has_many') as $item)
+				{
+					DataMapper::$common[$common_key][$item] = $this->{$item};
+				}
+				
+				// if requested, store the item to the production cache
+				if( ! empty(DataMapper::$config['production_cache']))
+				{
+					// attempt to load the production cache file
+					$cache_folder = APPPATH . DataMapper::$config['production_cache'];
+					if(file_exists($cache_folder) && is_dir($cache_folder) && is_writeable($cache_folder))
+					{
+						$cache_file = $cache_folder . '/' . $common_key . EXT;
+						$cache = "<"."?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed'); \n";
+						
+						$cache .= '$cache = ' . var_export(DataMapper::$common[$common_key], TRUE) . ';';
+				
+						if ( ! $fp = @fopen($cache_file, 'w'))
+						{
+							show_error('Error creating production cache file: ' . $cache_file);
+						}
+						
+						flock($fp, LOCK_EX);	
+						fwrite($fp, $cache);
+						flock($fp, LOCK_UN);
+						fclose($fp);
+					
+						@chmod($cache_file, FILE_WRITE_MODE);
+					}
+				}
+				
+				// Load extensions last, so they aren't cached.
+				if(!empty($this->extensions))
+				{
+					$extentions = $this->extensions;
+					$this->extensions = array();
+					DataMapper::_load_extensions($this->extensions, $extensions);
+					DataMapper::$common[$common_key]['extensions'] = $this->extensions;
+				}
+			}
 		}
 
 		// Load stored common model settings by reference
-		foreach (array_keys(DataMapper::$common[$this->model]) as $key)
+		foreach (array_keys(DataMapper::$common[$common_key]) as $key)
 		{
-			$this->{$key} =& DataMapper::$common[$this->model][$key];
+			$this->{$key} =& DataMapper::$common[$common_key][$key];
 		}
 
 		// Clear object properties to set at default values
 		$this->clear();
+		
+		if( ! empty($id) && is_numeric($id))
+		{
+			$this->get_by_id(intval($id));
+		}
 	}
 
 	// --------------------------------------------------------------------
@@ -249,10 +418,112 @@ class DataMapper {
 			closedir($handle);
 		}
 	}
+	
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Loads in any extensions used by this class or globally.
+	 * @return 
+	 * @param object $extensions
+	 * @param object $name
+	 */
+	static function _load_extensions(&$extensions, $names)
+	{
+		foreach($names as $name => $options)
+		{
+			if( ! is_string($name))
+			{
+				$name = $options;
+				$options = NULL;
+			}
+			// only load an extension once per class or once globally
+			if(isset($extensions[$name]))
+			{
+				return;
+			}
+			else if(isset(DataMapper::$global_extensions[$name]))
+			{
+				return;
+			}
+			
+			if( ! isset($extensions['_methods']))
+			{
+				$extensions['_methods'] = array();
+			}
+			
+			// determine the file name and class name
+			if(strpos($name, '/') === FALSE)
+			{
+				$file = APPPATH . DataMapper::$config['extensions_path'] . '/' . $name . EXT;
+				$ext = $name;
+			}
+			else
+			{
+				$file = APPPATH . $name . EXT;
+				$ext = array_pop(explode('/', $name));
+			}
+			
+			if(!file_exists($file))
+			{
+				show_error('DataMapper Error: loading extension ' . $name . ': File not found.');
+			}
+			
+			// load class
+			include_once($file);
+			
+			// create class
+			if(is_null($options))
+			{
+				$o = new $ext();
+			}
+			else
+			{
+				$o = new $ext($options);
+			}
+			$extensions[$name] =& $o;
+			
+			// figure out which methods can be called on this class.
+			$methods = get_class_methods($ext);
+			foreach($methods as $m)
+			{
+				// do not load private methods or methods already loaded.
+				if($m[0] !== '_' &&
+						is_callable(array($o, $m)) &&
+						! array_key_exists($m, $extensions['_methods'])
+						) {
+					// store this method.
+					$extensions['_methods'][$m] = $name;
+				}
+			}
+		}
+	}
 
 	// --------------------------------------------------------------------
+	
+	/**
+	 * Dynamically load an extension when needed.
+	 * @param object $name Name of the extension (or array of extensions).
+	 */
+	function load_extension($name, $options = NULL)
+	{
+		if( ! is_array($name))
+		{
+			if( ! is_null($options))
+			{
+				$name = array($name => $options);
+			}
+			else
+			{
+				$name = array($name);
+			}
+		}
+		
+		DataMapper::_load_extensions(DataMapper::$global_extensions, $name);
+	}
 
-
+	// --------------------------------------------------------------------
+	
+	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                                                   *
 	 * Magic methods                                                     *
@@ -260,24 +531,6 @@ class DataMapper {
 	 * The following are methods to override the default PHP behaviour.  *
 	 *                                                                   *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Set
-	 *
-	 * Sets the value of the named property.
-	 *
-	 * @access	overload
-	 * @param	string
-	 * @param	string
-	 * @return	void
-	 */
-	function __set($name, $value)
-	{
-		$this->{$name} = $value;
-	}
 
 	// --------------------------------------------------------------------
 
@@ -293,24 +546,32 @@ class DataMapper {
 	 */
 	function __get($name)
 	{
-		// Return value of the named property
-		if (isset($this->{$name}))
+		// Special case to get form_validation when first accessed
+		if($name == 'form_validation')
 		{
-			return $this->{$name};
+			$CI =& get_instance();
+			if( ! isset($CI->form_validation))
+			{
+				$CI->load->library('form_validation');
+			}
+			$this->form_validation = $CI->form_validation;
+			$this->lang->load('form_validation');
+			return $this->form_validation;
 		}
 
-		$has_many = in_array($name, $this->has_many);
-		$has_one = in_array($name, $this->has_one);
+		$has_many = isset($this->has_many[$name]);
+		$has_one = isset($this->has_one[$name]);
 
 		// If named property is a "has many" or "has one" related item
 		if ($has_many OR $has_one)
 		{
+			$related_properties = $has_many ? $this->has_many[$name] : $this->has_one[$name];
 			// Instantiate it before accessing
-			$model = ucfirst($name);
-			$this->{$name} = new $model();
+			$class = $related_properties['class'];
+			$this->{$name} = new $class();
 
 			// Store parent data
-			$this->{$name}->parent = array('model' => $this->model, 'id' => $this->id);
+			$this->{$name}->parent = array('model' => $related_properties['other_field'], 'id' => $this->id);
 
 			// Check if Auto Populate for "has many" or "has one" is on
 			if (($has_many && $this->auto_populate_has_many) OR ($has_one && $this->auto_populate_has_one))
@@ -319,6 +580,15 @@ class DataMapper {
 			}
 
 			return $this->{$name};
+		}
+		
+		$name_single = singular($name);
+		if($name_single !== $name) {
+			// possibly return single form of name
+			$test = $this->{$name_single};
+			if(is_object($test)) {
+				return $test;
+			}
 		}
 
 		return NULL;
@@ -338,8 +608,9 @@ class DataMapper {
 	 */
 	function __call($method, $arguments)
 	{
+		
 		// List of watched method names
-		$watched_methods = array('get_by_related_', 'get_by_related', 'get_by_', '_related_', '_related');
+		$watched_methods = array('save_', 'delete_', 'get_by_related_', 'get_by_related', 'get_by_', '_related_', '_related', '_join_field');
 
 		foreach ($watched_methods as $watched_method)
 		{
@@ -347,7 +618,6 @@ class DataMapper {
 			if (strpos($method, $watched_method) !== FALSE)
 			{
 				$pieces = explode($watched_method, $method);
-
 				if ( ! empty($pieces[0]) && ! empty($pieces[1]))
 				{
 					// Watched method is in the middle
@@ -360,6 +630,44 @@ class DataMapper {
 				}
 			}
 		}
+		
+		// attempt to call an extension
+		$ext = NULL;
+		if($this->_extension_method_exists($method, 'local'))
+		{
+			$name = $this->extensions['_methods'][$method];
+			$ext = $this->extensions[$name];
+		}
+		else if($this->_extension_method_exists($method, 'global'))
+		{
+			$name = DataMapper::$global_extensions['_methods'][$method];
+			$ext = DataMapper::$global_extensions[$name];
+		}
+		if( ! is_null($ext))
+		{
+			array_unshift($arguments, $this);
+			return call_user_func_array(array($ext, $method), $arguments);
+		}
+		
+		// show an error, for debugging's sake.
+		throw new Exception("Unable to call the method \"$method\" on the class " . get_class($this));
+	}
+	
+	/**
+	 * Returns TRUE or FALSE if the method exists in the extensions.
+	 * @return TRUE if the method can be called.
+	 * @param object $method Method to look for.
+	 * @param object $which[optional] One of 'both', 'local', or 'global'
+	 */
+	function _extension_method_exists($method, $which = 'both') {
+		$found = FALSE;
+		if($which != 'global') {
+			$found =  ! empty($this->extensions) && array_key_exists($method, $this->extensions['_methods']);
+		}
+		if( ! $found && $which != 'local' ) {
+			$found =  ! empty(DataMapper::$global_extensions) && array_key_exists($method, DataMapper::$global_extensions['_methods']);
+		}
+		return $found;
 	}
 
 	// --------------------------------------------------------------------
@@ -400,7 +708,7 @@ class DataMapper {
 
 	// --------------------------------------------------------------------
 
-
+	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                                                   *
 	 * Main methods                                                      *
@@ -431,14 +739,11 @@ class DataMapper {
 			// Set limit and offset
 			$this->limit($limit, $offset);
 
-			// If this is a "has many" related item
-			if (in_array($this->parent['model'], $this->has_many))
-			{
-				$this->_get_relation($this->parent['model'], $this->parent['id']);
-			}
+			$has_many = array_key_exists($this->parent['model'], $this->has_many);
+			$has_one = array_key_exists($this->parent['model'], $this->has_one);
 
-			// If this is a "has one" related item
-			if (in_array($this->parent['model'], $this->has_one))
+			// If this is a "has many" or "has one" related item
+			if ($has_many || $has_one)
 			{
 				$this->_get_relation($this->parent['model'], $this->parent['id']);
 			}
@@ -460,6 +765,9 @@ class DataMapper {
 			{
 				// Clear this object to make way for new data
 				$this->clear();
+				
+				// Set up default order by (if available)
+				$this->_handle_default_order_by();
 
 				// Get by objects properties
 				$query = $this->db->get_where($this->table, $data, $limit, $offset);
@@ -467,7 +775,7 @@ class DataMapper {
 				if ($query->num_rows() > 0)
 				{
 					// Populate all with records as objects
-					$this->all = $this->_to_object($query->result(), $this->model);
+					$this->all = $this->_to_object($query->result(), get_class($this));
 
 					// Populate this object with values from first record
 					foreach ($query->row() as $key => $value)
@@ -475,12 +783,20 @@ class DataMapper {
 						$this->{$key} = $value;
 					}
 				}
+				
+				if($query->num_rows() > $this->free_result_threshold)
+				{
+					$query->free_result();
+				}
 			}
 		}
 		else
 		{
 			// Clear this object to make way for new data
 			$this->clear();
+				
+			// Set up default order by (if available)
+			$this->_handle_default_order_by();
 
 			// Get by built up query
 			$query = $this->db->get($this->table, $limit, $offset);
@@ -488,7 +804,7 @@ class DataMapper {
 			if ($query->num_rows() > 0)
 			{
 				// Populate all with records as objects
-				$this->all = $this->_to_object($query->result(), $this->model);
+				$this->all = $this->_to_object($query->result(), get_class($this));
 
 				// Populate this object with values from first record
 				foreach ($query->row() as $key => $value)
@@ -496,12 +812,32 @@ class DataMapper {
 					$this->{$key} = $value;
 				}
 			}
+			
+			if($query->num_rows() > $this->free_result_threshold)
+			{
+				$query->free_result();
+			}
 		}
 
 		$this->_refresh_stored_values();
 
 		// For method chaining
 		return $this;
+	}
+	
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Forces this object to be INSERTed, even if it has an ID.
+	 * 
+	 * @param object $object [optional]  See save.
+	 * @param object $related_field [optional] See save.
+	 * @return Result of the save.
+	 */
+	function save_as_new($object = '', $related_field = '')
+	{
+		$this->_force_save_as_new = TRUE;
+		return $this->save($object, $related_field);
 	}
 
 	// --------------------------------------------------------------------
@@ -516,19 +852,19 @@ class DataMapper {
 	 * @param	mixed
 	 * @return	bool
 	 */
-	function save($object = '')
+	function save($object = '', $related_field = '')
 	{
 		// Temporarily store the success/failure
 		$result = array();
 
 		// Validate this objects properties
-		$this->validate($object);
+		$this->validate($object, $related_field);
 
 		// If validation passed
 		if ($this->valid)
 		{
 			// Get current timestamp
-			$timestamp = ($this->local_time) ? date('Y-m-d H:i:s') : gmdate('Y-m-d H:i:s');
+			$timestamp = ($this->local_time) ? date('Y-m-d H:i:s O') : gmdate('Y-m-d H:i:s O');
 
 			// Check if unix timestamp
 			$timestamp = ($this->unix_timestamp) ? strtotime($timestamp) : $timestamp;
@@ -549,13 +885,34 @@ class DataMapper {
 				// Update updated datetime
 				$this->{$this->updated_field} = $timestamp;
 			}
+			
+			// SmartSave: if there are objects being saved, and they are stored
+			// as in-table foreign keys, we can save them at this step.
+			if( ! empty($object))
+			{
+				if(is_array($object))
+				{
+					$this->_save_itfk($object, $related_field);
+				}
+				else
+				{
+					// single objects are saved separately to allow clearing of $object.
+					$rf = empty($related_field) ? $object->model : $related_field;
+					if(array_key_exists($rf, $this->has_one) && in_array($rf . '_id', $this->fields))
+					{
+						// ITFK: store on the table
+						$this->{$rf . '_id'} = $object->id;
+						$object = '';
+					}
+				}
+			}
 
 			// Convert this object to array
 			$data = $this->_to_array();
 
 			if ( ! empty($data))
 			{
-				if ( ! empty($data['id']))
+				if ( ! $this->_force_save_as_new && ! empty($data['id']))
 				{
 					// Prepare data to send only changed fields
 					foreach ($data as $field => $value)
@@ -614,11 +971,14 @@ class DataMapper {
 					// Create new record
 					$this->db->insert($this->table, $data);
 
+					if( ! $this->_force_save_as_new)
+					{
+						// Assign new ID
+						$this->id = $this->db->insert_id();
+					}
+
 					// Complete auto transaction
 					$this->_auto_trans_complete('save (insert)');
-
-					// Assign new ID
-					$this->id = $this->db->insert_id();
 
 					// Reset validated
 					$this->validated = FALSE;
@@ -632,46 +992,109 @@ class DataMapper {
 			// Check if a relationship is being saved
 			if ( ! empty($object))
 			{
-				// Check if it is an array of relationships
-				if (is_array($object))
-				{
-					// Begin auto transaction
-					$this->_auto_trans_begin();
-
-					foreach ($object as $obj)
-					{
-						if (is_array($obj))
-						{
-							foreach ($obj as $o)
-							{
-								$result[] = $this->_save_relation($o);
-							}
-						}
-						else
-						{
-							$result[] = $this->_save_relation($obj);
-						}
-					}
-
-					// Complete auto transaction
-					$this->_auto_trans_complete('save (relationship)');
-				}
-				else
-				{
-					// Begin auto transaction
-					$this->_auto_trans_begin();
-
-					// Temporarily store the success/failure
-					$result[] = $this->_save_relation($object);
-
-					// Complete auto transaction
-					$this->_auto_trans_complete('save (relationship)');
-				}
+				// Begin auto transaction
+				$this->_auto_trans_begin();
+				
+				// save recursively
+				$this->_save_related_recursive($object, $related_field);
+				
+				// Complete auto transaction
+				$this->_auto_trans_complete('save (relationship)');
 			}
 		}
+		
+		$this->force_save_as_new = FALSE;
 
 		// If no failure was recorded, return TRUE
 		return ( ! empty($result) && ! in_array(FALSE, $result));
+	}
+	
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Recursively saves arrays of objects if they are In-Table Foreign Keys. 
+	 * @param object $objects Objects to save.  This array may be modified.
+	 * @param object $related_field Related Field name (empty is OK)
+	 */
+	function _save_itfk( &$objects, $related_field)
+	{
+		foreach($objects as $index => $o)
+		{
+			if(is_int($index))
+			{
+				$rf = $related_field;
+			}
+			else
+			{
+				$rf = $index;
+			}
+			if(is_array($o))
+			{
+				$this->_save_itfk($o, $rf);
+			}
+			else
+			{
+				if(empty($rf)) {
+					$rf = $o->model;
+				}
+				if(array_key_exists($rf, $this->has_one) && in_array($rf . '_id', $this->fields))
+				{
+					// ITFK: store on the table
+					$this->{$rf . '_id'} = $o->id;
+					
+					// unset, so that it doesn't get re-saved later.
+					unset($objects[$index]);
+				}
+			}
+		}
+	}
+	
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Recursively saves arrays of objects.
+	 * 
+	 * @param object $object Array of objects to save, or single object
+	 * @param object $related_field Default related field name (empty is OK)
+	 * @return TRUE or FALSE if an error occurred.
+	 */
+	function _save_related_recursive($object, $related_field)
+	{
+		if(is_array($object))
+		{
+			$success = TRUE;
+			foreach($object as $rk => $o)
+			{
+				if(is_int($rk))
+				{
+					$rk = $related_field;
+				}
+				$rec_success = $this->_save_related_recursive($o, $rk);
+				$success = $success && $rec_success;
+			}
+			return $success;
+		}
+		else
+		{
+			return $this->_save_relation($object, $related_field);
+		}
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * _Save
+	 *
+	 * Used by __call to process related saves.
+	 *
+	 * @access	private
+	 * @param	mixed
+	 * @param	mixed
+	 * @return	bool
+	 */
+	function _save($related_field, $arguments)
+	{
+		return $this->save($arguments[0], $related_field);
 	}
 
 	// --------------------------------------------------------------------
@@ -686,9 +1109,9 @@ class DataMapper {
 	 * @param	mixed
 	 * @return	bool
 	 */
-	function delete($object = '')
+	function delete($object = '', $related_field = '')
 	{
-		if (empty($object))
+		if (empty($object) && ! is_array($object))
 		{
 			if ( ! empty($this->id))
 			{
@@ -699,36 +1122,37 @@ class DataMapper {
 				$this->db->where('id', $this->id);
 				$this->db->delete($this->table);
 
-				// Delete all "has many" relations for this object
-				foreach ($this->has_many as $model)
-				{
-					// Prepare model
-					$model = ucfirst($model);
-					$object = new $model();
-
-					// Determine relationship table name
-					$relationship_table = $this->_get_relationship_table($object->prefix, $object->table, $object->model);
-
-					$data = array($this->model . '_id' => $this->id);
-
-					// Delete relation
-					$this->db->delete($relationship_table, $data);
-				}
-
-				// Delete all "has one" relations for this object
-				foreach ($this->has_one as $model)
-				{
-					// Prepare model
-					$model = ucfirst($model);
-					$object = new $model();
-
-					// Determine relationship table name
-					$relationship_table = $this->_get_relationship_table($object->prefix, $object->table, $object->model);
-
-					$data = array($this->model . '_id' => $this->id);
-
-					// Delete relation
-					$this->db->delete($relationship_table, $data);
+				// Delete all "has many" and "has one" relations for this object
+				foreach (array('has_many', 'has_one') as $type) {
+					foreach ($this->{$type} as $model => $properties)
+					{
+						// Prepare model
+						$class = $properties['class'];
+						$object = new $class();
+						
+						$this_model = $properties['join_self_as'];
+	
+						// Determine relationship table name
+						$relationship_table = $this->_get_relationship_table($object, $model);
+						
+						if ($relationship_table == $object->table)
+						{
+							$data = array($this_model . '_id' => NULL);
+							
+							// Update table to remove relationships
+							$this->db->where($this_model . '_id', $this->id);
+							$this->db->update($object->table, $data);
+						}
+						else if ($relationship_table != $this->table)
+						{
+	
+							$data = array($this_model . '_id' => $this->id);
+		
+							// Delete relation
+							$this->db->delete($relationship_table, $data);
+						}
+						// Else, no reason to delete the relationships on this table
+					}
 				}
 
 				// Complete auto transaction
@@ -748,18 +1172,26 @@ class DataMapper {
 			// Temporarily store the success/failure
 			$result = array();
 
-			foreach ($object as $obj)
+			foreach ($object as $rel_field => $obj)
 			{
+				if (is_int($rel_field))
+				{
+					$rel_field = $related_field;
+				}
 				if (is_array($obj))
 				{
-					foreach ($obj as $o)
+					foreach ($obj as $r_f => $o)
 					{
-						$result[] = $this->_delete_relation($o);
+						if (is_int($r_f))
+						{
+							$r_f = $rel_field;
+						}
+						$result[] = $this->_delete_relation($o, $r_f);
 					}
 				}
 				else
 				{
-					$result[] = $this->_delete_relation($obj);
+					$result[] = $this->_delete_relation($obj, $rel_field);
 				}
 			}
 
@@ -778,7 +1210,7 @@ class DataMapper {
 			$this->_auto_trans_begin();
 
 			// Temporarily store the success/failure
-			$result = $this->_delete_relation($object);
+			$result = $this->_delete_relation($object, $related_field);
 
 			// Complete auto transaction
 			$this->_auto_trans_complete('delete (relationship)');
@@ -787,6 +1219,23 @@ class DataMapper {
 		}
 
 		return FALSE;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * _Delete
+	 *
+	 * Used by __call to process related saves.
+	 *
+	 * @access	private
+	 * @param	mixed
+	 * @param	mixed
+	 * @return	bool
+	 */
+	function _delete($related_field, $arguments)
+	{
+		$this->delete($arguments[0], $related_field);
 	}
 
 	// --------------------------------------------------------------------
@@ -864,7 +1313,7 @@ class DataMapper {
 	 * @param	mixed
 	 * @return	object
 	 */
-	function validate($object = '')
+	function validate($object = '', $related_field = '')
 	{
 		// Return if validation has already been run
 		if ($this->validated)
@@ -895,7 +1344,7 @@ class DataMapper {
 			$rules = $validation['rules'];
 
 			// Will validate differently if this is for a related item
-			$related = (in_array($field, $this->has_many) OR in_array($field, $this->has_one));
+			$related = (array_key_exists($field, $this->has_many) OR array_key_exists($field, $this->has_one));
 
 			// Check if property has changed since validate last ran
 			if ($related OR ! isset($this->stored->{$field}) OR $this->{$field} !== $this->stored->{$field})
@@ -927,17 +1376,31 @@ class DataMapper {
 					{
 						// Prepare rule to use different language file lines
 						$rule = 'related_' . $rule;
+						
+						$arg = $object;
+						if( ! empty($related_field)) {
+							$arg = array($related_field => $object);
+						}
 
-						if (method_exists($this->model, '_' . $rule))
+						if (method_exists($this, '_' . $rule))
 						{
 							// Run related rule from DataMapper or the class extending DataMapper
-							$result = $this->{'_' . $rule}($object, $field, $param);
+							$result = $this->{'_' . $rule}($arg, $field, $param);
+						}
+						else if($this->_extension_method_exists('rule_' . $rule))
+						{
+							$result = $this->{'rule_' . $rule}($arg, $field, $param);
 						}
 					}
-					else if (method_exists($this->model, '_' . $rule))
+					else if (method_exists($this, '_' . $rule))
 					{
 						// Run rule from DataMapper or the class extending DataMapper
 						$result = $this->{'_' . $rule}($field, $param);
+					}
+					else if($this->_extension_method_exists('rule_' . $rule))
+					{
+						// Run an extension-based rule.
+						$result = $this->{'rule_' . $rule}($field, $param);
 					}
 					else if (method_exists($this->form_validation, $rule))
 					{
@@ -956,7 +1419,7 @@ class DataMapper {
 						// Get corresponding error from language file
 						if (FALSE === ($line = $this->lang->line($rule)))
 						{
-							$line = 'Unable to access an error message corresponding to your field name.';
+							$line = 'Unable to access an error message corresponding to your rule name: '.$rule.'.';
 						}
 
 						// Check if param is an array
@@ -981,6 +1444,9 @@ class DataMapper {
 
 						// Add error message
 						$this->error_message($field, sprintf($line, $label, $param));
+						
+						// Escape to prevent further error checks
+						break;
 					}
 				}
 			}
@@ -990,6 +1456,22 @@ class DataMapper {
 		$this->valid = empty($this->error->all);
 
 		// For method chaining
+		return $this;
+	}
+
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Skips validation for the next call to save.
+	 * Note that this also prevents the validation routine from running until the next get.
+	 * 
+	 * @return $this
+	 * @param object $skip[optional] If FALSE, re-enables validation.
+	 */
+	function skip_validation($skip = TRUE)
+	{
+		$this->validated = $skip;
+		$this->valid = $skip;
 		return $this;
 	}
 
@@ -1019,15 +1501,20 @@ class DataMapper {
 			$this->{$field} = NULL;
 			$this->error->{$field} = '';
 		}
+		
+		// Clear the auto transaction error
+		if($this->auto_transaction) {
+			$this->error->transaction = '';
+		}
 
 		// Clear this objects "has many" related objects
-		foreach ($this->has_many as $related)
+		foreach ($this->has_many as $related => $properties)
 		{
 			unset($this->{$related});
 		}
 
 		// Clear this objects "has one" related objects
-		foreach ($this->has_one as $related)
+		foreach ($this->has_one as $related => $properties)
 		{
 			unset($this->{$related});
 		}
@@ -1058,13 +1545,21 @@ class DataMapper {
 		if ( ! empty($this->parent))
 		{
 			// Prepare model
-			$model = ucfirst($this->parent['model']);
-			$object = new $model();
+			$related_field = $this->parent['model'];
+			$related_properties = $this->_get_related_properties($related_field);
+			$class = $related_properties['class'];
+			$other_model = $related_properties['join_other_as'];
+			$this_model = $related_properties['join_self_as'];
+			$object = new $class();
 
 			// Determine relationship table name
-			$relationship_table = $this->_get_relationship_table($object->prefix, $object->table, $object->model);
-
-			$this->db->where($this->parent['model'] . '_id', $this->parent['id']);
+			$relationship_table = $this->_get_relationship_table($object, $related_field);
+			if($relationship_table == $object->table) {
+				// has_one join on the other object's table
+				$this->db->where('id', $this->parent['id'])->where($this_model . '_id IS NOT NULL');
+			} else {
+				$this->db->where($other_model . '_id', $this->parent['id']);
+			}
 			$this->db->from($relationship_table);
 
 			// Return count
@@ -1116,7 +1611,7 @@ class DataMapper {
 		if ($query->num_rows() > 0)
 		{
 			// Populate all with records as objects
-			$this->all = $this->_to_object($query->result(), $this->model);
+			$this->all = $this->_to_object($query->result(), get_class($this));
 
 			// Populate this object with values from first record
 			foreach ($query->row() as $key => $value)
@@ -1124,11 +1619,35 @@ class DataMapper {
 				$this->{$key} = $value;
 			}
 		}
+		
+		if($query->num_rows() > $this->free_result_threshold)
+		{
+			$query->free_result();
+		}
 
 		$this->_refresh_stored_values();
 
 		// For method chaining
 		return $this;
+	}
+
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Check Last Query
+	 * Renders the last DB query performed.
+	 * 
+	 * @return formatted last db query as a string.
+	 */
+	function check_last_query($delims = array('<pre>', '</pre>'), $return_as_string = FALSE) {
+		$q = wordwrap($this->db->last_query(), 100, "\n\t");
+		if(!empty($delims)) {
+			$q = implode($q, $delims);
+		}
+		if($return_as_string === FALSE) {
+			echo $q;
+		}
+		return $q;
 	}
 
 	// --------------------------------------------------------------------
@@ -1255,6 +1774,52 @@ class DataMapper {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Add Table Name
+	 *
+	 * Adds the table name to a field if necessary
+	 *
+	 * @access	public
+	 * @param	string
+	 * @param	bool
+	 * @return	object
+	 */
+	function add_table_name($field, $only_if_no_parent = FALSE)
+	{
+		$empty = empty($this->parent) && empty($this->query_related);
+		if( ! ($only_if_no_parent && empty($this->parent) && empty($this->query_related)) )
+		{
+			// only add table if the field doesn't contain a dot (.), open parentheses, or comma
+			if (preg_match('/[\.\(]/', $field) == 0)
+			{
+				// split string into parts, add field
+				$field_parts = explode(',', $field);
+				$field = '';
+				foreach ($field_parts as $part)
+				{
+					if ( ! empty($field))
+					{
+						$field .= ', ';
+					}
+					$part = trim($part);
+					// handle comparison operators on where
+					$subparts = explode(' ', $part, 2);
+					if (in_array($subparts[0], $this->fields))
+					{
+						$field .= $this->table  . '.' . $part;
+					}
+					else
+					{
+						$field .= $part;
+					}
+				}
+			}
+		}
+		return $field;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Select
 	 *
 	 * Sets the SELECT portion of the query.
@@ -1266,16 +1831,12 @@ class DataMapper {
 	 */
 	function select($select = '*', $escape = NULL)
 	{
-		// Check if this is a related object
-		if ( ! empty($this->parent))
+		if ($escape !== FALSE)
 		{
-			$this->db->select($this->table . '.' . $select, $escape);
+			$select = $this->add_table_name($select, TRUE);
 		}
-		else
-		{
-			$this->db->select($select, $escape);
-		}
-
+		$this->db->select($select, $escape);
+		
 		// For method chaining
 		return $this;
 	}
@@ -1298,13 +1859,8 @@ class DataMapper {
 		if ( ! empty($this->parent))
 		{
 			$alias = ($alias != '') ? $alias : $select;
-
-			$this->db->select_max($this->table . '.' . $select, $alias);
 		}
-		else
-		{
-			$this->db->select_max($select, $alias);
-		}
+		$this->db->select_max($this->add_table_name($select, TRUE), $alias);
 
 		// For method chaining
 		return $this;
@@ -1328,13 +1884,8 @@ class DataMapper {
 		if ( ! empty($this->parent))
 		{
 			$alias = ($alias != '') ? $alias : $select;
-
-			$this->db->select_min($this->table . '.' . $select, $alias);
 		}
-		else
-		{
-			$this->db->select_min($select, $alias);
-		}
+		$this->db->select_min($this->add_table_name($select, TRUE), $alias);
 
 		// For method chaining
 		return $this;
@@ -1358,13 +1909,8 @@ class DataMapper {
 		if ( ! empty($this->parent))
 		{
 			$alias = ($alias != '') ? $alias : $select;
-
-			$this->db->select_avg($this->table . '.' . $select, $alias);
 		}
-		else
-		{
-			$this->db->select_avg($select, $alias);
-		}
+		$this->db->select_avg($this->add_table_name($select, TRUE), $alias);
 
 		// For method chaining
 		return $this;
@@ -1388,13 +1934,8 @@ class DataMapper {
 		if ( ! empty($this->parent))
 		{
 			$alias = ($alias != '') ? $alias : $select;
-
-			$this->db->select_sum($this->table . '.' . $select, $alias);
 		}
-		else
-		{
-			$this->db->select_sum($select, $alias);
-		}
+		$this->db->select_sum($this->add_table_name($select, TRUE), $alias);
 
 		// For method chaining
 		return $this;
@@ -1439,6 +1980,88 @@ class DataMapper {
 		return $this->get($limit, $offset);
 	}
 
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Starts a query group.
+	 * @param object $prefix [optional]  (Internal use only)
+	 * @return $this for chaining.
+	 */
+	function group_start($not = '', $type = 'AND ')
+	{
+		// in case groups are being nested
+		$type = $this->_get_prepend_type($type);
+		
+		$prefix = (count($this->db->ar_where) == 0 AND count($this->db->ar_cache_where) == 0) ? '' : $type;
+		$this->db->ar_where[] = $prefix . $not .  ' (';
+		$this->_where_group_started = TRUE;
+		return $this;
+	}
+	
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Starts a query group, but ORs the group
+	 * @return $this for chaining.
+	 */
+	function or_group_start()
+	{
+		return $this->group_start('', 'OR ');
+	}
+	
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Starts a query group, but NOTs the group
+	 * @return $this for chaining.
+	 */
+	function not_group_start()
+	{
+		return $this->group_start('NOT ', 'OR ');
+	}
+	
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Starts a query group, but OR NOTs the group
+	 * @return $this for chaining.
+	 */
+	function or_not_group_start()
+	{
+		return $this->group_start('NOT ', 'OR ');
+	}
+	
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Ends a query group.
+	 * @return $this for chaining. 
+	 */
+	function group_end()
+	{
+		$this->db->ar_where[] = ')';
+		$this->_where_group_started = FALSE;
+		return $this;
+	}
+	
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Private function to convert the AND or OR prefix to '' when starting
+	 * a group.
+	 * @param object $type Current type value
+	 * @return New type value
+	 */
+	function _get_prepend_type($type)
+	{
+		if($this->_where_group_started)
+		{
+			$type = '';
+			$this->_where_group_started = FALSE;
+		}
+		return $type;
+	}
+	
 	// --------------------------------------------------------------------
 
 	/**
@@ -1497,17 +2120,18 @@ class DataMapper {
 		{
 			$key = array($key => $value);
 		}
-
-		// Check if this is a related object
-		if ( ! empty($this->parent))
+		foreach ($key as $k => $v)
 		{
-			foreach ($key as $k => $v)
+			$new_k = $this->add_table_name($k, TRUE);
+			if ($new_k != $k)
 			{
-				$key[$this->table . '.' . $k] = $v;
+				$key[$new_k] = $v;
 				unset($key[$k]);
 			}
 		}
-
+		
+		$type = $this->_get_prepend_type($type);
+		
 		$this->db->_where($key, $value, $type, $escape);
 
 		// For method chaining
@@ -1601,16 +2225,10 @@ class DataMapper {
 	 * @return	object
 	 */
 	function _where_in($key = NULL, $values = NULL, $not = FALSE, $type = 'AND ')
-	{
-	 	// Check if this is a related object
-		if ( ! empty($this->parent))
-		{
-			$this->db->_where_in($this->table . '.' . $key, $values, $not, $type);
-		}
-		else
-		{
-			$this->db->_where_in($key, $values, $not, $type);
-		}
+	{	
+		$type = $this->_get_prepend_type($type);
+		
+	 	$this->db->_where_in($this->add_table_name($key, TRUE), $values, $not, $type);
 
 		// For method chaining
 		return $this;
@@ -1695,10 +2313,85 @@ class DataMapper {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Like
+	 * ILike
 	 *
-	 * Sets the %LIKE% portion of the query.
+	 * Sets the case-insensitive %LIKE% portion of the query.
+	 *
+	 * @access	public
+	 * @param	mixed
+	 * @param	mixed
+	 * @param	string
+	 * @return	object
+	 */
+	function ilike($field, $match = '', $side = 'both')
+	{
+		return $this->_like($field, $match, 'AND ', $side, '', TRUE);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Not ILike
+	 *
+	 * Sets the case-insensitive NOT LIKE portion of the query.
 	 * Separates multiple calls with AND.
+	 *
+	 * @access	public
+	 * @param	mixed
+	 * @param	mixed
+	 * @param	string
+	 * @return	object
+	 */
+	function not_ilike($field, $match = '', $side = 'both')
+	{
+		return $this->_like($field, $match, 'AND ', $side, 'NOT', TRUE);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Or Like
+	 *
+	 * Sets the case-insensitive %LIKE% portion of the query.
+	 * Separates multiple calls with OR.
+	 *
+	 * @access	public
+	 * @param	mixed
+	 * @param	mixed
+	 * @param	string
+	 * @return	object
+	 */
+	function or_ilike($field, $match = '', $side = 'both')
+	{
+		return $this->_like($field, $match, 'OR ', $side, '', TRUE);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Or Not Like
+	 *
+	 * Sets the case-insensitive NOT LIKE portion of the query.
+	 * Separates multiple calls with OR.
+	 *
+	 * @access	public
+	 * @param	mixed
+	 * @param	mixed
+	 * @param	string
+	 * @return	object
+	 */
+	function or_not_ilike($field, $match = '', $side = 'both')
+	{
+		return $this->_like($field, $match, 'OR ', $side, 'NOT', TRUE);
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * _Like
+	 *
+	 * Private function to do actual work.
+	 * NOTE: this does NOT use the built-in ActiveRecord LIKE function.
 	 *
 	 * @access	private
 	 * @param	mixed
@@ -1708,24 +2401,50 @@ class DataMapper {
 	 * @param	string
 	 * @return	object
 	 */
-	function _like($field, $match = '', $type = 'AND ', $side = 'both', $not = '')
+	function _like($field, $match = '', $type = 'AND ', $side = 'both', $not = '', $no_case = FALSE)
 	{
 		if ( ! is_array($field))
 		{
 			$field = array($field => $match);
 		}
 
-		// Check if this is a related object
-		if ( ! empty($this->parent))
+		foreach ($field as $k => $v)
 		{
-			foreach ($field as $k => $v)
+			$new_k = $this->add_table_name($k, TRUE);
+			if ($new_k != $k)
 			{
-				$field[$this->table . '.' . $k] = $v;
+				$field[$new_k] = $v;
 				unset($field[$k]);
 			}
 		}
+		
+		// Taken from CodeIgniter's Active Record because (for some reason)
+		// it is stored separately that normal where statements.
+ 	
+		foreach ($field as $k => $v)
+		{
+			if($no_case)
+			{
+				$k = 'UPPER(' . $this->db->_protect_identifiers($k) .')';
+				$v = strtoupper($v);
+			}
+			$f = "$k $not LIKE";
 
-		$this->db->_like($field, $match, $type, $side, $not);
+			if ($side == 'before')
+			{
+				$m = "%{$v}";
+			}
+			elseif ($side == 'after')
+			{
+				$m = "{$v}%";
+			}
+			else
+			{
+				$m = "%{$v}%";
+			}
+			
+			$this->_where($f, $m, $type);
+		}
 
 		// For method chaining
 		return $this;
@@ -1744,15 +2463,7 @@ class DataMapper {
 	 */
 	function group_by($by)
 	{
-		// Check if this is a related object
-		if ( ! empty($this->parent))
-		{
-			$this->db->group_by($this->table . '.' . $by);
-		}
-		else
-		{
-			$this->db->group_by($by);
-		}
+		$this->db->group_by($this->add_table_name($by, TRUE));
 
 		// For method chaining
 		return $this;
@@ -1812,16 +2523,8 @@ class DataMapper {
 	 * @return	object
 	 */
 	function _having($key, $value = '', $type = 'AND ', $escape = TRUE)
-	{
-		// Check if this is a related object
-		if ( ! empty($this->parent))
-		{
-			$this->db->_having($this->table . '.' . $key, $value, $type, $escape);
-		}
-		else
-		{
-			$this->db->_having($key, $value, $type, $escape);
-		}
+	{	
+		$this->db->_having($this->add_table_name($key, TRUE), $value, $type, $escape);
 
 		// For method chaining
 		return $this;
@@ -1841,18 +2544,46 @@ class DataMapper {
 	 */
 	function order_by($orderby, $direction = '')
 	{
-		// Check if this is a related object
-		if ( ! empty($this->parent))
-		{
-			$this->db->order_by($this->table . '.' . $orderby, $direction);
-		}
-		else
-		{
-			$this->db->order_by($orderby, $direction);
-		}
+		$this->db->order_by($this->add_table_name($orderby, TRUE), $direction);
 
 		// For method chaining
 		return $this;
+	}
+
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Adds in the defaut order_by items, if there are any, and
+	 * order_by hasn't been overridden. 
+	 */
+	function _handle_default_order_by()
+	{
+		if(empty($this->default_order_by))
+		{
+			return;
+		}
+		$sel = $this->table . '.' . '*';
+		$sel_protect = $this->db->_protect_identifiers($sel);
+		// only add the items if there isn't an existing order_by,
+		// AND the select statement is empty or includes * or table.* or `table`.*
+		if(empty($this->db->ar_orderby) &&
+			(
+				empty($this->db->ar_select) ||
+				in_array('*', $this->db->ar_select) ||
+				in_array($sel_protect, $this->db->ar_select) ||
+			 	in_array($sel, $this->db->ar_select)
+			 	
+			))
+		{
+			foreach($this->default_order_by as $k => $v) {
+				if(is_int($k)) {
+					$k = $v;
+					$v = '';
+				}
+				$k = $this->add_table_name($k, TRUE);
+				$this->order_by($k, $v);
+			}
+		}
 	}
 
 	// --------------------------------------------------------------------
@@ -1941,7 +2672,7 @@ class DataMapper {
 
 	// --------------------------------------------------------------------
 
-
+	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                                                   *
 	 * Transaction methods                                               *
@@ -2135,7 +2866,7 @@ class DataMapper {
 
 	// --------------------------------------------------------------------
 
-
+	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                                                   *
 	 * Related methods                                                   *
@@ -2143,6 +2874,252 @@ class DataMapper {
 	 * The following are methods used for managing related records.      *
 	 *                                                                   *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * get_related_properties
+	 *
+	 * Located the relationship properties for a given field or model
+	 * Can also optionally attempt to convert the $related_field to
+	 * singular, and look up on that.  It will modify the $related_field if
+	 * the conversion to singular returns a result.
+	 * 
+	 * $related_field can also be a deep relationship, such as
+	 * 'post/editor/group', in which case the $related_field will be processed
+	 * recursively, and the return value will be $user->has_NN['group']; 
+	 *
+	 * @access	private
+	 * @param	string
+	 * @return	object
+	 */
+	function _get_related_properties(&$related_field, $try_singular = FALSE)
+	{
+		// Handle deep relationships
+		if(strpos($related_field, '/') !== FALSE)
+		{
+			$rfs = explode('/', $related_field);
+			$last = $this;
+			$prop = NULL;
+			foreach($rfs as &$rf)
+			{
+				$prop = $last->_get_related_properties($rf, $try_singular);
+				if(is_null($prop))
+				{
+					break;
+				}
+				$last = $last->{$rf};
+			}
+			if( ! is_null($prop))
+			{
+				// update in case any items were converted to singular.
+				$related_field = implode('/', $rfs);
+			}
+			return $prop;
+		}
+		else
+		{
+			if (isset($this->has_many[$related_field]))
+			{
+				return $this->has_many[$related_field];
+			}
+			else if (isset($this->has_one[$related_field]))
+			{
+				return $this->has_one[$related_field];
+			}
+			else
+			{
+				if($try_singular)
+				{
+					$rf = singular($related_field);
+					$ret = $this->_get_related_properties($rf);
+					if( is_null($ret))
+					{
+						show_error("Unable to relate {$this->model} with $related_field.");
+					}
+					else
+					{
+						$related_field = $rf;
+						return $ret;
+					}
+				}
+				else
+				{
+					// not related
+					return NULL;
+				}
+			}
+		}
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Add Related Table
+	 *
+	 * Adds the table of a related item, and joins it to this class.
+	 * Returns the name of that table for further queries.
+	 * 
+	 * If $related_field is deep, then this adds all necessary relationships
+	 * to the query.
+	 *
+	 * @access	private
+	 * @param mixed $object The object (or related field) to look up.
+	 * @param string $related_field [optional] Related field anem for object
+	 * @param array $query_related [optional] Private, do not use.
+	 * @param string $name_prepend [optional] Private, do not use.
+	 * @param string $this_table [optional] Private, do not use.
+	 * @return String Name of the related table
+	 */
+	function _add_related_table($object, $related_field = '', &$query_related = NULL, $name_prepend = '', $this_table = NULL)
+	{
+		if ( is_string($object))
+		{
+			// only a model was passed in, not an object
+			$related_field = $object;
+			$object = NULL;
+		}
+		else if (empty($related_field))
+		{
+			// model was not passed, so get the Object's native model
+			$related_field = $object->model;
+		}
+		
+		$related_field = strtolower($related_field);
+		
+		// Handle deep relationships
+		if(strpos($related_field, '/') !== FALSE)
+		{
+			$rfs = explode('/', $related_field);
+			$last = $this;
+			$prepend = '';
+			$object_as = NULL;
+			foreach($rfs as $rf)
+			{
+				$object_as = $last->_add_related_table($rf, '', $this->query_related, $prepend, $object_as);
+				$prepend .= $rf . '_'; 
+				$last = $last->{$rf};
+			}
+			return $object_as;
+		}
+		
+		$related_properties = $this->_get_related_properties($related_field);
+		$class = $related_properties['class'];
+		$this_model = $related_properties['join_self_as'];
+		$other_model = $related_properties['join_other_as'];
+		
+		if (empty($object))
+		{
+			// no object was passed in, so create one
+			$object = new $class();
+		}
+		
+		if(is_null($query_related))
+		{
+			$query_related =& $this->query_related;
+		}
+		
+		if(is_null($this_table))
+		{
+			$this_table = $this->table;
+		}
+		
+		// Determine relationship table name
+		$relationship_table = $this->_get_relationship_table($object, $related_field);
+		
+		// only add $related_field to the table name if the 'class' and 'related_field' aren't equal
+		// and the related object is in a different table
+		if ( ($class == $related_field) && ($this->table != $object->table) )
+		{
+			$object_as = $name_prepend . $object->table;
+			$relationship_as = $name_prepend . $relationship_table;
+		}
+		else
+		{
+			$object_as = $name_prepend . $related_field . '_' . $object->table;
+			$relationship_as = $name_prepend . $related_field . '_' . $relationship_table;
+		}
+		
+		$other_column = $other_model . '_id';
+		$this_column = $this_model . '_id' ;
+		
+
+		// Force the selection of the current object's columns
+		if (empty($this->db->ar_select))
+		{
+			$this->db->select($this->table . '.*');
+		}
+		
+		// the extra in_array column check is for has_one self references
+		if ($relationship_table == $this->table && in_array($other_column, $this->fields))
+		{
+			// has_one relationship without a join table
+			if ( ! in_array($object_as, $query_related))
+			{
+				$this->db->join($object->table . ' as ' .$object_as, $object_as . '.id = ' . $this_table . '.' . $other_column, 'LEFT OUTER');
+				$query_related[] = $object_as;
+			}
+			$this_column = NULL;
+		}
+		// the extra in_array column check is for has_one self references
+		else if ($relationship_table == $object->table && in_array($this_column, $object->fields))
+		{
+			// has_one relationship without a join table
+			if ( ! in_array($object_as, $query_related))
+			{
+				$this->db->join($object->table . ' as ' .$object_as, $this_table . '.id = ' . $object_as . '.' . $this_column, 'LEFT OUTER');
+				$query_related[] = $object_as;
+			}
+			$other_column = NULL;
+		}
+		else
+		{
+			// has_one or has_many with a normal join table
+			
+			// Add join if not already included
+			if ( ! in_array($relationship_as, $query_related))
+			{
+				$this->db->join($relationship_table . ' as ' . $relationship_as, $this_table . '.id = ' . $relationship_as . '.' . $this_column, 'LEFT OUTER');
+				
+				if($this->_include_join_fields) {
+					$fields = $this->db->field_data($relationship_table);
+					foreach($fields as $key => $f) {
+						if($f->name == 'id' || $f->name == $this_column || $f->name == $other_column)
+						{
+							unset($fields[$key]);
+						}
+					}
+					// add all other fields
+					$selection = '';
+					foreach ($fields as $field)
+					{
+						$new_field = 'join_'.$field->name;
+						if (!empty($selection))
+						{
+							$selection .= ', ';
+						}
+						$selection .= $relationship_as.'.'.$field->name.' AS '.$new_field;
+					}
+					$this->db->select($selection);
+					
+					// now reset the flag
+					$this->_include_join_fields = FALSE;
+				}
+	
+				$query_related[] = $relationship_as;
+			}
+	
+			// Add join if not already included
+			if ( ! in_array($object_as, $query_related))
+			{
+				$this->db->join($object->table . ' as ' . $object_as, $object_as . '.id = ' . $relationship_as . '.' . $other_column, 'LEFT OUTER');
+
+				$query_related[] = $object_as;
+			}
+		}
+		
+		return $object_as;
+	}
 
 	// --------------------------------------------------------------------
 
@@ -2166,6 +3143,7 @@ class DataMapper {
 			if (is_object($arguments[0]))
 			{
 				$object = $arguments[0];
+				$related_field = $object->model; 
 
 				// Prepare field and value
 				$field = (isset($arguments[1])) ? $arguments[1] : 'id';
@@ -2173,69 +3151,133 @@ class DataMapper {
 			}
 			else
 			{
-				$model = ucfirst($arguments[0]);
-				$object = new $model();
-
-				// Prepare field and value
-				$field = (isset($arguments[1])) ? $arguments[1] : 'id';
-				$value = (isset($arguments[2])) ? $arguments[2] : NULL;
-			}
-
-			// Ignore if field and value is invalid
-			if ($field == 'id' && empty($value) OR $field != 'id' && $this->table == $object->table)
-			{
-				// For method chaining
-				return $this;
-			}
-
-			// Determine relationship table name
-			$relationship_table = $this->_get_relationship_table($object->prefix, $object->table, $object->model);
-
-			// Retrieve related records
-			if (empty($this->db->ar_select))
-			{
-				$this->db->select($this->table . '.*');
-			}
-
-			// Check if self referencing
-			if ($this->table == $object->table)
-			{
-				// Add join if not already included
-				if ( ! in_array($object->model, $this->query_related))
+				$related_field = $arguments[0];
+				// the TRUE allows conversion to singular
+				$related_properties = $this->_get_related_properties($related_field, TRUE);
+				$class = $related_properties['class'];
+				// enables where_related_{model}($object)
+				if(isset($arguments[1]) && is_object($arguments[1]))
 				{
-					$this->db->join($relationship_table, $object->table . '.id = ' . $relationship_table . '.' . $this->model . '_id', 'left');
-
-					$this->query_related[] = $object->model;
+					$object = $arguments[1];
+					// Prepare field and value
+					$field = (isset($arguments[2])) ? $arguments[2] : 'id';
+					$value = (isset($arguments[3])) ? $arguments[3] : $object->id;
 				}
-
-				// Add query clause
-				$this->db->{$query}($relationship_table . '.' . $object->model . '_id', $value);
-			}
-			else
-			{
-				// Add join if not already included
-				if ( ! in_array($object->model, $this->query_related))
+				else
 				{
-					$this->db->join($relationship_table, $this->table . '.id = ' . $relationship_table . '.' . $this->model . '_id', 'left');
-
-					$this->query_related[] = $object->model;
+					$object = new $class();
+					// Prepare field and value
+					$field = (isset($arguments[1])) ? $arguments[1] : 'id';
+					$value = (isset($arguments[2])) ? $arguments[2] : NULL;
 				}
-
-				// Add join if not already included
-				if ( ! in_array($object->table, $this->query_related))
-				{
-					$this->db->join($object->table, $object->table . '.id = ' . $relationship_table . '.' . $object->model . '_id', 'left');
-
-					$this->query_related[] = $object->table;
-				}
-
-				// Add query clause
-				$this->db->{$query}($object->table . '.' . $field, $value);
 			}
+
+			// Determine relationship table name, and join the tables
+			$object_table = $this->_add_related_table($object, $related_field);
+
+			// Add query clause
+			$this->{$query}($object_table . '.' . $field, $value);
 		}
 
 		// For method chaining
 		return $this;
+	}
+	
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Include Related
+	 *
+	 * Joins specified values of a has_one object into the current query
+	 * If $fields is NULL or '*', then all columns are joined (may require instantiation of the other object)
+	 * If $fields is a single string, then just that column is joined.
+	 * Otherwise, $fields should be an array of column names.
+	 * 
+	 * $append_name can be used to override the default name to append, or set it to FALSE to prevent appending.
+	 *
+	 * @return $this
+	 * @param object $related_field The related object or field name
+	 * @param object $fields[optional] The fields to join (NULL or '*' means all fields, or use a single field or array of fields)
+	 * @param object $append_name[optional] The name to use for joining (with '_'), or FALSE to disable.
+	 */
+	function include_related($related_field, $fields = NULL, $append_name = TRUE) {
+		if(is_null($fields) || $fields == '*') {
+			if(is_object($related_field)) {
+				$fields = $related_field->fields;
+			} else {
+				$fields = $this->{$related_field}->fields;
+			}
+		}
+		if ( ! is_array($fields))
+		{
+			$fields = array($fields);
+		}
+		
+		if (is_object($related_field))
+		{
+			$object = $related_field;
+			$related_field = $object->model;
+			$related_properties = $this->_get_related_properties($related_field);
+		}
+		else
+		{
+			// the TRUE allows conversion to singular
+			$related_properties = $this->_get_related_properties($related_field, TRUE);
+			$class = $related_properties['class'];
+			$object = new $class();
+		}
+		
+		$rfs = explode('/', $related_field);
+		$last = $this;
+		foreach($rfs as $rf)
+		{
+			if ( ! array_key_exists($rf, $last->has_one) )
+			{
+				show_error("Invalid request to include_related: $rf is not a has_one relationship to {$last->model}.");
+			}
+			$last = $last->{$rf};
+		}
+		
+		$table = $this->_add_related_table($object, $related_field);
+		
+		$append = '';
+		if($append_name !== FALSE) {
+			if($append_name === TRUE) {
+				$append = str_replace('/', '_', $related_field);
+			} else {
+				$append = $append_name;
+			}
+			$append .= '_';
+		}
+		
+		// now add fields
+		$selection = '';
+		foreach ($fields as $field)
+		{
+			$new_field = $append . $field;
+			// prevent collisions
+			if(in_array($new_field, $this->fields)) {
+				continue;
+			}
+			if (!empty($selection))
+			{
+				$selection .= ', ';
+			}
+			$selection .= $table.'.'.$field.' AS '.$new_field;
+		}
+		$this->db->select($selection);
+		
+		// For method chaining
+		return $this;
+	}
+	
+	/**
+	 * Legacy version of include_related
+	 * DEPRECATED: Will be removed by 2.0
+	 * @deprecated Please use include_related
+	 */
+	function join_related($related_field, $fields = NULL, $append_name = TRUE) {
+		return $this->include_related($related_field, $fields, $append_name);
 	}
 
 	// --------------------------------------------------------------------
@@ -2250,46 +3292,31 @@ class DataMapper {
 	 * @param	integer
 	 * @return	void
 	 */
-	function _get_relation($model, $id)
+	function _get_relation($related_field, $id)
 	{
 		// No related items
-		if (empty($model) OR empty($id))
+		if (empty($related_field) OR empty($id))
 		{
 			// Reset query
 			$this->db->_reset_select();
 
 			return;
 		}
-
-		// Prepare model
-		$model = ucfirst($model);
-		$object = new $model();
-
-		// Determine relationship table name
-		$relationship_table = $this->_get_relationship_table($object->prefix, $object->table, $object->model);
-
-		// Retrieve related records
-		if (empty($this->db->ar_select))
+		
+		// To ensure result integrity, group all previous queries
+		if( ! empty($this->db->ar_where))
 		{
-			$this->db->select($this->table . '.*');
+			array_unshift($this->db->ar_where, '( ');
+			$this->db->ar_where[] = ' )';
 		}
+		
+		// query all items related to the given model
+		$this->where_related($related_field, 'id', $id);
+				
+		// Set up default order by (if available)
+		$this->_handle_default_order_by();
 
-		// Check if self referencing
-		if ($this->table == $object->table)
-		{
-			$this->db->from($this->table);
-			$this->db->join($relationship_table, $object->table . '.id = ' . $relationship_table . '.' . $this->model . '_id', 'left');
-			$this->db->where($relationship_table . '.' . $object->model . '_id = ' . $id);
-		}
-		else
-		{
-			$this->db->from($this->table);
-			$this->db->join($relationship_table, $this->table . '.id = ' . $relationship_table . '.' . $this->model . '_id', 'left');
-			$this->db->join($object->table, $object->table . '.id = ' . $relationship_table . '.' . $object->model . '_id', 'left');
-			$this->db->where($object->table . '.id = ' . $id);
-		}
-
-		$query = $this->db->get();
+		$query = $this->db->get($this->table);
 
 		// Clear this object to make way for new data
 		$this->clear();
@@ -2297,13 +3324,18 @@ class DataMapper {
 		if ($query->num_rows() > 0)
 		{
 			// Populate all with records as objects
-			$this->all = $this->_to_object($query->result(), $this->model);
+			$this->all = $this->_to_object($query->result(), get_class($this));
 
 			// Populate this object with values from first record
 			foreach ($query->row() as $key => $value)
 			{
 				$this->{$key} = $value;
 			}
+		}
+		
+		if($query->num_rows() > $this->free_result_threshold)
+		{
+			$query->free_result();
 		}
 
 		$this->_refresh_stored_values();
@@ -2320,33 +3352,87 @@ class DataMapper {
 	 * @param	object
 	 * @return	bool
 	 */
-	function _save_relation($object)
+	function _save_relation($object, $related_field)
 	{
-		if ( ! empty($object->model) && ! empty($this->id) && ! empty($object->id))
+		if (empty($related_field))
 		{
+			$related_field = $object->model;
+		}
+		
+		// the TRUE allows conversion to singular
+		$related_properties = $this->_get_related_properties($related_field, TRUE);
+		
+		if ( ! empty($related_properties) && $this->exists() && $object->exists())
+		{
+			$this_model = $related_properties['join_self_as'];
+			$other_model = $related_properties['join_other_as'];
+			$other_field = $related_properties['other_field'];
+			
 			// Determine relationship table name
-			$relationship_table = $this->_get_relationship_table($object->prefix, $object->table, $object->model);
+			$relationship_table = $this->_get_relationship_table($object, $related_field);
 
-			$data = array($this->model . '_id' => $this->id, $object->model . '_id' => $object->id);
-
-			// Check if relation already exists
-			$query = $this->db->get_where($relationship_table, $data, NULL, NULL);
-
-			if ($query->num_rows() == 0)
+			if($relationship_table == $this->table)
 			{
-				// If this object has a "has many" relationship with the other object
-				if (in_array($object->model, $this->has_many))
+				// FIXME: should this re-query the existing object?
+				$this->{$other_model . '_id'} = $object->id;
+				return $this->save();
+			}
+			else if($relationship_table == $object->table)
+			{
+				// FIXME: should this re-query the existing object?
+				$object->{$this_model . '_id'} = $this->id;
+				return $object->save();
+			}
+			else
+			{
+				$data = array($this_model . '_id' => $this->id, $other_model . '_id' => $object->id);
+	
+				// Check if relation already exists
+				$query = $this->db->get_where($relationship_table, $data, NULL, NULL);
+	
+				if ($query->num_rows() == 0)
 				{
-					// If the other object has a "has one" relationship with this object
-					if (in_array($this->model, $object->has_one))
+					// If this object has a "has many" relationship with the other object
+					if (array_key_exists($related_field, $this->has_many))
+					{
+						// If the other object has a "has one" relationship with this object
+						if (array_key_exists($other_field, $object->has_one))
+						{
+							// And it has an existing relation
+							$query = $this->db->get_where($relationship_table, array($other_model . '_id' => $object->id), 1, 0);
+	
+							if ($query->num_rows() > 0)
+							{
+								// Find and update the other objects existing relation to relate with this object
+								$this->db->where($other_model . '_id', $object->id);
+								$this->db->update($relationship_table, $data);
+							}
+							else
+							{
+								// Add the relation since one doesn't exist
+								$this->db->insert($relationship_table, $data);
+							}
+	
+							return TRUE;
+						}
+						else if (array_key_exists($other_field, $object->has_many))
+						{
+							// We can add the relation since this specific relation doesn't exist, and a "has many" to "has many" relationship exists between the objects
+							$this->db->insert($relationship_table, $data);
+	
+							return TRUE;
+						}
+					}
+					// If this object has a "has one" relationship with the other object
+					else if (array_key_exists($related_field, $this->has_one))
 					{
 						// And it has an existing relation
-						$query = $this->db->get_where($relationship_table, array($object->model . '_id' => $object->id), 1, 0);
-
+						$query = $this->db->get_where($relationship_table, array($this_model . '_id' => $this->id), 1, 0);
+							
 						if ($query->num_rows() > 0)
 						{
 							// Find and update the other objects existing relation to relate with this object
-							$this->db->where($object->model . '_id', $object->id);
+							$this->db->where($this_model . '_id', $this->id);
 							$this->db->update($relationship_table, $data);
 						}
 						else
@@ -2354,43 +3440,33 @@ class DataMapper {
 							// Add the relation since one doesn't exist
 							$this->db->insert($relationship_table, $data);
 						}
-
-						return TRUE;
-					}
-					else if (in_array($this->model, $object->has_many))
-					{
-						// We can add the relation since this specific relation doesn't exist, and a "has many" to "has many" relationship exists between the objects
-						$this->db->insert($relationship_table, $data);
-
+	
 						return TRUE;
 					}
 				}
-				// If this object has a "has one" relationship with the other object
-				else if (in_array($object->model, $this->has_one))
+				else
 				{
-					// And it has an existing relation
-					$query = $this->db->get_where($relationship_table, array($this->model . '_id' => $this->id), 1, 0);
-						
-					if ($query->num_rows() > 0)
-					{
-						// Find and update the other objects existing relation to relate with this object
-						$this->db->where($this->model . '_id', $this->id);
-						$this->db->update($relationship_table, $data);
-					}
-					else
-					{
-						// Add the relation since one doesn't exist
-						$this->db->insert($relationship_table, $data);
-					}
-
+					// Relationship already exists
 					return TRUE;
 				}
 			}
+		}
+		else
+		{
+			if( ! $object->exists())
+			{
+				$msg = 'dm_save_rel_noobj';
+			}
+			else if( ! $this->exists())
+			{
+				$msg = 'dm_save_rel_nothis';
+			}
 			else
 			{
-				// Relationship already exists
-				return TRUE;
+				$msg = 'dm_save_rel_failed';
 			}
+			$msg = $this->lang->line($msg);
+			$this->error_message($related_field, sprintf($msg, $related_field));
 		}
 
 		return FALSE;
@@ -2407,20 +3483,44 @@ class DataMapper {
 	 * @param	object
 	 * @return	bool
 	 */
-	function _delete_relation($object)
+	function _delete_relation($object, $related_field)
 	{
-		if ( ! empty($object->model) && ! empty($this->id) && ! empty($object->id))
+		if (empty($related_field))
 		{
+			$related_field = $object->model;
+		}
+		
+		// the TRUE allows conversion to singular
+		$related_properties = $this->_get_related_properties($related_field, TRUE);
+		
+		if ( ! empty($related_properties) && ! empty($this->id) && ! empty($object->id))
+		{
+			$this_model = $related_properties['join_self_as'];
+			$other_model = $related_properties['join_other_as'];
+			
 			// Determine relationship table name
-			$relationship_table = $this->_get_relationship_table($object->prefix, $object->table, $object->model);
+			$relationship_table = $this->_get_relationship_table($object, $related_field);
 
-			$data = array($this->model . '_id' => $this->id, $object->model . '_id' => $object->id);
+			if ($relationship_table == $this->table)
+			{
+				$this->{$other_model . '_id'} = NULL;
+				$this->save();
+			}
+			else if ($relationship_table == $object->table)
+			{
+				$object->{$this_model . '_id'} = NULL;
+				$object->save();
+			}
+			else
+			{
+				$data = array($this_model . '_id' => $this->id, $other_model . '_id' => $object->id);
 
-			// Delete relation
-			$this->db->delete($relationship_table, $data);
+				// Delete relation
+				$this->db->delete($relationship_table, $data);
+			}
 
 			// Clear related object so it is refreshed on next access
-			$this->{$object->model} = NULL;
+			unset($this->{$related_field});
 
 			return TRUE;
 		}
@@ -2441,14 +3541,48 @@ class DataMapper {
 	 * @param	string
 	 * @return	string
 	 */
-	function _get_relationship_table($prefix, $table, $model)
+	function _get_relationship_table($object, $related_field)
 	{
-		$relationship_table = '';
+		$prefix = $object->prefix;
+		$table = $object->table;
+		
+		if (empty($related_field))
+		{
+			$related_field = $object->model;
+		}
+		
+		$related_properties = $this->_get_related_properties($related_field);
+		$this_model = $related_properties['join_self_as'];
+		$other_model = $related_properties['join_other_as'];
+		$other_field = $related_properties['other_field'];
+		
+		if (array_key_exists($related_field, $this->has_one))
+		{
+			// see if the relationship is in this table
+			if (in_array($other_model . '_id', $this->fields))
+			{
+				return $this->table;
+			}
+		}
+		
+		if (array_key_exists($other_field, $object->has_one))
+		{
+			// see if the relationship is in this table
+			if (in_array($this_model . '_id', $object->fields))
+			{
+				return $object->table;
+			}
+		}
 
-		// Check if self referencing
+		$relationship_table = '';
+		
+ 		// Check if self referencing
 		if ($this->table == $table)
 		{
-			$relationship_table = (plural($this->model) < plural($model)) ? plural($this->model) . '_' . plural($model) : plural($model) . '_' . plural($this->model);
+			// use the model names from related_properties
+			$p_this_model = plural($this_model);
+			$p_other_model = plural($other_model);
+			$relationship_table = ($p_this_model < $p_other_model) ? $p_this_model . '_' . $p_other_model : $p_other_model . '_' . $p_this_model;
 		}
 		else
 		{
@@ -2476,62 +3610,253 @@ class DataMapper {
 	 * @param	mixed
 	 * @return	integer
 	 */
-	function _count_related($model, $object = '')
+	function _count_related($related_field, $object = '')
 	{
 		$count = 0;
-
+		
+		// lookup relationship info
+		// the TRUE allows conversion to singular
+		$rel_properties = $this->_get_related_properties($related_field, TRUE);
+		$class = $rel_properties['class'];
+		
+		$ids = array();
+		
 		if ( ! empty($object))
 		{
-			if (is_array($object))
-			{
-				foreach ($object as $obj)
-				{
-					if (is_array($obj))
-					{
-						foreach ($obj as $o)
-						{
-							if ($o->model == $model)
-							{
-								$count++;
-							}
-						}
-					}
-					else
-					{
-						if ($obj->model == $model)
-						{
-							$count++;
-						}
-					}
-				}
-			}
-			else
-			{
-				if ($object->model == $model)
-				{
-					$count++;
-				}
-			}
+			$count = $this->_count_related_objects($related_field, $object, '', $ids);
+			$ids = array_unique($ids);
 		}
 
-		if ( ! empty($model) && ! empty($this->id))
+		if ( ! empty($related_field) && ! empty($this->id))
 		{
-			// Prepare model
-			$model = ucfirst($model);
-			$object = new $model();
-
-			// Store parent data
-			$object->parent = array('model' => $this->model, 'id' => $this->id);
-
-			$count += $object->count();
+			$one = array_key_exists($related_field, $this->has_one);
+			
+			// don't bother looking up relationships if this is a $has_one and we already have one.
+			if( (!$one) || empty($ids))
+			{
+				// Prepare model
+				$object = new $class();
+	
+				// Store parent data
+				$object->parent = array('model' => $rel_properties['other_field'], 'id' => $this->id);
+				
+				if( ! empty($ids)) {
+					$object->where_not_in('id', $ids);
+				}
+				
+				$count += $object->count();
+			}
 		}
 
 		return $count;
 	}
 
 	// --------------------------------------------------------------------
+	
+	/**
+	 * Private recursive function to count the number of objects
+	 * in a passed in array (or a single object)
+	 * 
+	 * @return # of items
+	 * @param object $compare related field (model) to compare to
+	 * @param object $object Object or array to count
+	 * @param object $related_field[optional] related field of $object
+	 */
+	function _count_related_objects($compare, $object, $related_field, &$ids)
+	{
+		$count = 0;
+		if (is_array($object))
+		{
+			// loop through array to check for objects
+			foreach ($object as $rel_field => $obj)
+			{
+				if ( ! is_string($rel_field))
+				{
+					// if this object doesn't have a related field, use the parent related field
+					$rel_field = $related_field;
+				}
+				$count += $this->_count_related_objects($compare, $obj, $rel_field, $ids);
+			}
+		}
+		else
+		{
+			// if this object doesn't have a related field, use the model
+			if (empty($related_field))
+			{
+				$related_field = $object->model;
+			}
+			// if this object is the same relationship type, it counts
+			if ($related_field == $compare && $object->exists())
+			{
+				$ids[] = $object->id;
+				$count++;
+			}
+		}
+		return $count;
+	}
 
+	// --------------------------------------------------------------------
 
+	/**
+	 * Include Join Fields
+	 *
+	 * If TRUE, the any extra fields on the join table will be included
+	 *
+	 * @access	private
+	 * @param	mixed
+	 * @param	mixed
+	 * @param	mixed
+	 * @param	mixed
+	 * @return	object
+	 */
+	function include_join_fields($include = TRUE)
+	{
+		$this->_include_join_fields = $include;
+		return $this;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Set Join Field
+	 *
+	 * Sets the value on a join table based on the related field
+	 * If $related_field is an array, then the array should be
+	 * in the form $related_field => $object or array($object)
+	 *
+	 * @access	private
+	 * @param	mixed
+	 * @param	mixed
+	 * @param	mixed
+	 * @param	mixed
+	 * @return	object
+	 */
+	function set_join_field($related_field, $field, $value = NULL, $object = NULL)
+	{
+		$related_ids = array();
+		
+		if (is_array($related_field))
+		{
+			// recursively call this on the array passed in.
+			foreach ($related_field as $key => $object)
+			{
+				$this->set_join_field($key, $field, $value, $object);
+			}
+			return;
+		}
+		else if (is_object($related_field))
+		{
+			$object = $related_field;
+			$related_field = $object->model; 
+			$related_ids[] = $object->id;
+			$related_properties = $this->_get_related_properties($related_field);
+		}
+		else
+		{
+			// the TRUE allows conversion to singular
+			$related_properties = $this->_get_related_properties($related_field, TRUE);
+			if (is_null($object))
+			{
+				$class = $related_properties['class'];
+				$object = new $class();
+			}
+		}
+		
+		// Determine relationship table name
+		$relationship_table = $this->_get_relationship_table($object, $related_field);
+		
+		if (empty($object))
+		{
+			// no object was passed in, so create one
+			$class = $related_properties['class'];
+			$object = new $class();
+		}
+		
+		$this_model = $related_properties['join_self_as'];
+		$other_model = $related_properties['join_other_as'];
+		
+		if (! is_array($field))
+		{
+			$field = array( $field => $value );
+		}
+		
+		if ( ! is_array($object))
+		{
+			$object = array($object);
+		}
+		
+		if (empty($object))
+		{
+			$this->db->where($this_model . '_id', $this->id);
+			$this->db->update($relationship_table, $field);
+		}
+		else
+		{
+			foreach ($object as $obj)
+			{
+				$this->db->where($this_model . '_id', $this->id);
+				$this->db->where($other_model . '_id', $obj->id);
+				$this->db->update($relationship_table, $field);
+			}
+		}
+		
+		// For method chaining
+		return $this;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Join Field
+	 *
+	 * Adds a query of a join table's extra field
+	 *
+	 * @access	private
+	 * @param	mixed
+	 * @param	mixed
+	 * @param	mixed
+	 * @return	object
+	 */
+	function _join_field($query, $arguments)
+	{
+		if ( ! empty($query) && count($arguments) >= 3)
+		{
+			$object = $field = $value = $option = NULL;
+
+			// Prepare model
+			if (is_object($arguments[0]))
+			{
+				$object = $arguments[0];
+				$related_field = $object->model; 
+			}
+			else
+			{
+				$related_field = $arguments[0];
+				// the TRUE allows conversion to singular
+				$related_properties = $this->_get_related_properties($related_field, TRUE);
+				$class = $related_properties['class'];
+				$object = new $class();
+			}
+			
+
+			// Prepare field and value
+			$field = $arguments[1];
+			$value = $arguments[2];
+
+			// Determine relationship table name, and join the tables
+			$rel_table = $this->_get_relationship_table($object, $related_field);
+
+			// Add query clause
+			$this->db->{$query}($rel_table . '.' . $field, $value);
+		}
+
+		// For method chaining
+		return $this;
+	}
+
+	// --------------------------------------------------------------------
+
+	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                                                   *
 	 * Related Validation methods                                        *
@@ -2598,7 +3923,7 @@ class DataMapper {
 
 	// --------------------------------------------------------------------
 
-
+	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                                                   *
 	 * Validation methods                                                *
@@ -2863,6 +4188,21 @@ class DataMapper {
 	{
 		return in_array($this->{$field}, $param);
 	}
+	
+	// --------------------------------------------------------------------
+	
+	/**
+	 * Boolean (pre-process)
+	 * 
+	 * Forces a field to be either TRUE or FALSE.
+	 * Uses PHP's built-in boolean conversion.
+	 * 
+	 * @param object $field 
+	 */
+	function _boolean($field)
+	{
+		$this->{$field} = (boolean)$this->{$field};
+	}
 
 	// --------------------------------------------------------------------
 
@@ -2952,7 +4292,7 @@ class DataMapper {
 
 	// --------------------------------------------------------------------
 
-
+	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                                                   *
 	 * Common methods                                                    *
@@ -3011,13 +4351,19 @@ class DataMapper {
 		{
 			$item = new $model();
 
+			// Populate this object with values from first record
+			foreach ($row as $key => $value)
+			{
+				$item->{$key} = $value;
+			}
+
 			foreach ($this->fields as $field)
 			{
-				if (isset($row->{$field}))
-				{
+				if (! isset($row->{$field}))
+				/*{
 					$item->{$field} = $row->{$field};
 				}
-				else
+				else */
 				{
 					$item->{$field} = NULL;
 				}
@@ -3074,20 +4420,6 @@ class DataMapper {
 	{
 		if ($CI =& get_instance())
 		{
-			// Load CodeIgniters form validation if not already loaded
-			if ( ! isset($CI->form_validation))
-			{
-				$CI->load->library('form_validation');
-			}
-			// Load CodeIgniters form validation if not already loaded
-            /*
-			if ( ! isset($CI->db))
-			{
-				$CI->load->database();
-			}
-            */
-
-			$this->form_validation = $CI->form_validation;
 			$this->lang = $CI->lang;
 			$this->load = $CI->load;
 			$this->db = $CI->db;
@@ -3107,8 +4439,6 @@ class DataMapper {
 	 */
 	function _load_languages()
 	{
-		// Load the form validation language file
-		$this->lang->load('form_validation');
 
 		// Load the DataMapper language file
 		$this->lang->load('datamapper');

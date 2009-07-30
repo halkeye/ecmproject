@@ -16,20 +16,65 @@ class Account extends DataMapper
         array(
             'field' => 'email',
             'label' => 'Email',
-            'rules' => array('required', 'trim', 'unique', 'valid_email', 'min_length' => 3, 'max_length' => 55),
+            'rules' => array('xss_clean', 'required', 'trim', 'unique', 'valid_email', 'min_length' => 3, 'max_length' => 55),
         ),
         array(
             'field' => 'password',
             'label' => 'Password',
-            'rules' => array('required', 'trim', 'min_length' => 5, 'encrypt'),
+            'rules' => array('xss_clean', 'required', 'trim', 'min_length' => 5, 'encrypt'),
         ),
         array(
             'field' => 'confirm_password',
             'label' => 'Confirm Password',
-            'rules' => array('encrypt', 'matches' => 'password'),
+            'rules' => array('xss_clean', 'required', 'encrypt', 'matches' => 'password'),
         ),
+        array(
+            'field' => 'gname',
+            'label' => 'Given Name',
+            'rules' => array('xss_clean', 'required', 'trim', 'max_length' => 55, 'alpha_dash_dot'),
+        ),
+        array(
+            'field' => 'sname',
+            'label' => 'Surname',
+            'rules' => array('xss_clean', 'required', 'trim', 'max_length' => 55, 'alpha_dash_dot'),
+        ),
+        array(
+            'field' => 'dob',
+            'label' => 'Date Of Birth',
+            'rules' => array('xss_clean', 'required', 'trim', 'valid_date'),
+        ),
+        array(
+            'field' => 'phone',
+            'label' => 'Phone Number',
+            'rules' => array('xss_clean', 'required', 'trim', /*'valid_phone_number'*/),
+        ),
+        array(
+            'field' => 'cell',
+            'label' => 'Cell Phone Number',
+            'rules' => array('xss_clean', 'trim', /*'valid_phone_number'*/),
+        ),
+        array(
+            'field' => 'address',
+            'label' => 'Address',
+            'rules' => array('xss_clean', 'trim'),
+        ),
+        array(
+            'field' => 'econtact',
+            'label' => 'Emergency Contact',
+            'rules' => array('xss_clean', 'required', 'trim', 'max_length' => 55, 'alpha_dash_dot'),
+        ),
+        array(
+            'field' => 'ephone',
+            'label' => 'Emergency Contact Phone',
+            'rules' => array('xss_clean', 'trim', /*'valid_phone_number'*/),
+        ),
+        /*
+   badge VARCHAR(55),
+   reg_status TINYINT NOT NULL,
+   */
     );
 
+    /*
     var $field_data = array(); 
 
     function Account()
@@ -52,6 +97,7 @@ class Account extends DataMapper
         $this->field_data[] = (object)array( 'name' => 'login', 'type' => 'datetime', 'default' => '', 'max_length' => 19, 'primary_key' => 0, );
         parent::DataMapper();
     }
+    */
 
     function login()
     {
