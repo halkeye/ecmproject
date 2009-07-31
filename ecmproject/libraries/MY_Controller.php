@@ -19,6 +19,5 @@ class Ecmproject_base_controller extends Controller
                     $this->auth->name()
             );
         }
-
     }
 }

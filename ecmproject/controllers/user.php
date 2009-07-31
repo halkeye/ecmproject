@@ -12,15 +12,13 @@ class user extends Ecmproject_Base_Controller
 
     function index()
     {
-        $this->load->model('Account_model');
-        #$user = $this->Account_model->findByEmail('halkeye@gmail.com');
-        
-        $this->data['todo'] = array(
-            'meow',
-            'meow2',
-            'meow3',
-        );
-
+        $this->data['todo'] = array();
+        $a = new Account();
+        $a->get();
+        foreach ($a->all as $account) 
+        {
+            $this->data['todo'][] = $account->gname . ' ' . $account->sname . ' -- ' . $account->email;
+        }
         $this->data['menu'] = array(
                 array('title'=>'Register', 'url'=>array('user','register')),
                 array('title'=>'Login',    'url'=>array('user','login')),
@@ -40,32 +38,21 @@ class user extends Ecmproject_Base_Controller
         $this->template->write('heading', 'User', TRUE);
         $this->template->write('subheading', 'Main Page', TRUE);
 
-        $this->load->library('auth');
         $this->auth->restrict(TRUE);
 
-        $this->load->library('form_validation');
-
-        $this->form_validation->set_rules('user','Email', "trim|xss_clean|required|min_length[3]|valid_email");
-        $this->form_validation->set_rules('pass','Password', "trim|xss_clean|required|min_length[5]");
-
-        if ($this->form_validation->run() !== FALSE)
+        $this->load->library('auth');
+        $user = $this->input->post('user');
+        $pass = $this->input->post('pass');
+        if($this->auth->process_login($user,$pass))
         {
-            $user = $this->input->post('user');
-            $pass = $this->input->post('pass');
-            if($this->auth->process_login($user,$pass))
-            {
-                // Login successful, let's redirect.
-                $this->redirect('/user/index');
-                return;
-            }
-            else
-            {
-                $data['error'] = 'Login failed, please try again';
-                $this->load->vars($data);
-            }
+            $this->session->set_flashdata('messages', array('Logged in sucessfully'));
+            // Login successful, let's redirect.
+            $this->redirect('/user/index');
+            return;
         }
+        $data['messages'] = array('Login failed, please try again');
 
-        $this->template->write_view('content', 'user/login_error', array(), TRUE);
+        $this->template->write_view('content', 'user/login_error', $data, TRUE);
         return $this->template->render();
     }
 
@@ -87,43 +74,47 @@ class user extends Ecmproject_Base_Controller
         $this->lang->load('recaptcha');
         $this->load->helper(array('form', 'url'));
 
-        $this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[5]|matches[passconf]');
-        $this->form_validation->set_rules('passconf', 'Password Confirmation', 'trim|required');
-        $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email|callback__check_duplicated_email');
-        $this->form_validation->set_rules('recaptcha_response_field',  'lang:recaptcha_field_name', 'required|callback__check_captcha');
-
-        if ($this->form_validation->run() == TRUE)
+        $this->output->enable_profiler(TRUE);
+        $a = new Account();
+        if ($this->input->post('registerUser'))
         {
-            $this->load->model('Account_model');
-            $email = $this->input->post('email');
-            $pass  = $this->input->post('pass');
-            $this->Account_model->register($email, $pass);
-            /* FIXME: ADD FLASH MSG ABOUT USER CREATED SUCCESSFULLY */
-            if($this->auth->process_login ($email,$pass  ))
+            $a->email             = $this->input->post('email');
+            $a->password          = $this->input->post('password');
+            $a->confirm_password  = $this->input->post('confirm_password');
+            foreach ($a->validation as $field) 
             {
-                // Login successful, let's redirect.
-                $this->redirect('/user/index');
+                $fieldName = $field['field'];
+                if ($fieldName == 'id') continue;
+
+                $a->$fieldName    = $this->input->post($fieldName);
+            }
+
+            $validated = 1;
+            if ($this->config->item('use_captcha'))
+            {
+                $validated = 0;
+                $this->form_validation->set_rules('recaptcha_response_field',  'lang:recaptcha_field_name', 'required|callback__check_captcha');
+                $validated = ($a->form_validation->run() == TRUE);
+                if (!$validated) 
+                {
+
+                    foreach ($this->form_validation->_error_array as $field=>$val)
+                        $a->error_message($field,$val); // FIXME, using form_validation array directly
+                }
+
+            }
+
+            if ($validated && $a->save())
+            {
+                $this->session->set_flashdata('messages', array('LANG: registration sucessful. Check email box blah blah'));
+                redirect('');
                 return;
             }
         }
 
-        $this->template->write_view('content', 'user/register', array(), TRUE);
+        $this->template->write_view('content', 'user/register', array('object'=>$a), TRUE);
         return $this->template->render();
     }
-
-    function _check_duplicated_email($email)
-    {
-        $this->load->model('Account_model');
-        $user = $this->Account_model->findByEmail($email);
-        if ($user)
-        {
-            $this->form_validation->set_message('_check_duplicated_email', 'Email address is unavailable');
-            return FALSE;
-        }
-
-        return TRUE;
-    }
-
 
     function _check_captcha($val) 
     {

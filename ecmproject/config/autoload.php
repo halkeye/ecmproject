@@ -42,6 +42,8 @@
 $autoload['libraries'] = array(
         'session',
         'template',
+        'database',
+        'DataMapper',
 );
 
 
@@ -82,7 +84,9 @@ $autoload['plugin'] = array();
 |
 */
 
-$autoload['config'] = array();
+$autoload['config'] = array(
+        'ecmproject',
+);
 
 
 /*
@@ -111,7 +115,9 @@ $autoload['language'] = array();
 |
 */
 
-$autoload['model'] = array('Account_model');
+$autoload['model'] = array(
+//        'Account_model'
+);
 
 
 
