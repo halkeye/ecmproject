@@ -11,8 +11,7 @@
 |
 */
 #$config['base_url']	= "http://barkdog/ecmproject/";
-$config['base_url']    = 'http://'.$_SERVER['HTTP_HOST'].'/ecmproject/';
-
+$config['base_url']    = 'http://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['SCRIPT_NAME']);
 /*
 |--------------------------------------------------------------------------
 | Index File
