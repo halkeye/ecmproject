@@ -1,0 +1,14 @@
+We are excited to welcome you to <?= $this->config->item('convention_name') ?>
+
+Please follow this link to validate your email: <?= site_url('/user/validate/ceaznrvf') ?> 
+
+Your <?= $this->config->item('convention_name') ?> login is (just in case you forgot) is <?= $email ?>  
+
+Questions? Head to the <?= $this->config->item('convention_name_short') ?> forum at <?= $this->config->item('convention_forum_url') ?> or email <?= $this->config->item('convention_contact_email') ?> 
+
+- <?= $this->config->item('convention_name') ?>  
+ <?= $this->config->item('convention_url') ?>
+
+--
+To stop receiving these notifications, head to the Privacy section at <?= site_url('/user/privacy') ?> 
+

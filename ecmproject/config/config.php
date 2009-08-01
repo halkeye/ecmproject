@@ -11,7 +11,7 @@
 |
 */
 #$config['base_url']	= "http://barkdog/ecmproject/";
-$config['base_url']	= "/ecmproject/";
+$config['base_url']    = 'http://'.$_SERVER['HTTP_HOST'].'/ecmproject/';
 
 /*
 |--------------------------------------------------------------------------

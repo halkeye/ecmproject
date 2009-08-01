@@ -107,6 +107,23 @@ class user extends Ecmproject_Base_Controller
             if ($validated && $a->save())
             {
                 $this->session->set_flashdata('messages', array('LANG: registration sucessful. Check email box blah blah'));
+                $emailVars = array(
+                    'email'=>$a->email
+                );
+                $this->load->library('email');
+
+                $this->email->from(
+                        $this->config->item('convention_outgoing_email_email'),
+                        $this->config->item('convention_outgoing_email_name') // lang?
+                );
+                $this->email->to($a->email); 
+                $this->email->subject('LANG: registration email subject');
+                $this->email->message(
+                        $this->load->view('user/register.email', $emailVars, TRUE)
+                );
+                $this->email->send();
+                echo $this->email->print_debugger();
+                return;
                 redirect('');
                 return;
             }
