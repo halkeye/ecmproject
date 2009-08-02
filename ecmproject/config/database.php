@@ -37,7 +37,10 @@
 $active_group = "default";
 $active_record = TRUE;
 
-$db['default']['hostname'] = "localhost";
+if (php_uname('n') == 'buzzbee.local') 
+{ $db['default']['hostname'] = "127.0.0.1"; }
+else
+{ $db['default']['hostname'] = "localhost"; }
 $db['default']['username'] = "root";
 $db['default']['password'] = "";
 $db['default']['database'] = "ecmproject";
