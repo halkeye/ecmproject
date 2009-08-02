@@ -7,9 +7,9 @@ class Account extends DataMapper
     var $table = 'accounts';
     var $saltLength = 10;
 
-    var $created_field = 'created';
+    var $created_field = '';
     var $updated_field = '';
-    var $has_many = array('book');
+    #var $has_many = array('book');
 /*
     var $has_one = array('country');
 
@@ -81,7 +81,9 @@ class Account extends DataMapper
     function Account()
 	{
         $this->CI =& get_instance();
-        return parent::DataMapper();
+        $ret = parent::DataMapper();
+        $this->created = time();
+        return $ret;
     }
 
     /*
@@ -109,30 +111,35 @@ class Account extends DataMapper
     }
     */
 
-    function login()
+    function login($email, $password)
     {
-        // Create a temporary user object
-        $u = new Account();
-
         // Get this users stored record via their username
-        $u->where('email', $this->email)->get();
+        $this->where('email', $email)->get();
 
         ## Not a valid user
-        if (!isset($u->id))
+        if (!isset($this->id))
             return false;
 
-        // Give this user their stored salt
-        $this->salt = $u->salt;
-
-        $this->_encrypt('password');
-
-        if ($u->password == $this->password)
+        if ($this->password == $this->_encryptValue($password))
         {
             // Login succeeded
             return TRUE;
         }
         return FALSE;
     }
+
+    function _encryptValue($value)
+    {
+        if (empty($value)) return;
+
+        // Generate a random salt if empty
+        if (empty($this->salt))
+        {
+            $this->salt = substr(md5(uniqid(rand(), true)), 0, $this->saltLength);
+        }
+        return sha1($this->salt . $value);
+    }
+
 
     // Validation prepping function to encrypt passwords
     // If you look at the $validation array, you will see the password field will use this function
@@ -141,13 +148,8 @@ class Account extends DataMapper
         // Don't encrypt an empty string
         if (!empty($this->{$field}))
         {
-            // Generate a random salt if empty
-            if (empty($this->salt))
-            {
-                $this->salt = substr(md5(uniqid(rand(), true)), 0, $this->saltLength);
-            }
+            $this->{$field} = $this->_encryptValue($this->{$field});
 
-            $this->{$field} = sha1($this->salt . $this->{$field});
         }
     }
 

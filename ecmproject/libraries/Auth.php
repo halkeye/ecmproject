@@ -15,19 +15,16 @@ class Auth
         $this->CI->lang->load('auth');
 	}
 
-    function processLogin($username, $password)
+    function processLogin($email, $password)
     {
         // A few safety checks
         // Our array has to be set
-        if(!$username && !$password)
+        if(!$email && !$password)
             return FALSE;
 
         $this->CI->load->model('Account');
         $u = new Account();
-        $u->email    = $username;
-        $u->password = $password;
-
-        if (!$u->login()) 
+        if (!$u->login($email, $password)) 
         { 
             return $this->CI->lang->line('auth_error_invalid_user_pass');
         }

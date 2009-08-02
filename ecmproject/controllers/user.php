@@ -44,6 +44,7 @@ class user extends Ecmproject_Base_Controller
 
     function login()
     {
+$this->output->enable_profiler(TRUE);
         $this->template->write('pageTitle', 'My Index Title', TRUE);
         $this->template->write('heading', 'User', TRUE);
         $this->template->write('subheading', 'Main Page', TRUE);
@@ -87,7 +88,7 @@ class user extends Ecmproject_Base_Controller
         $this->lang->load('recaptcha');
         $this->load->helper(array('form', 'url'));
 
-        $this->output->enable_profiler(TRUE);
+$this->output->enable_profiler(TRUE);
         $a = new Account();
         if ($this->input->post('registerUser'))
         {
@@ -184,7 +185,7 @@ $this->output->enable_profiler(TRUE);
             return redirect('');
         }
         /* FIXME: Move to account model */
-        $account->status = ACCOUNT_STATUS_ACTIVE;
+        $account->reg_status = ACCOUNT_STATUS_ACTIVE;
         $account->login = time();
         $account->save();
 
