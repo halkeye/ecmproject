@@ -42,8 +42,8 @@ CREATE TABLE accounts(
    password VARCHAR(40) NOT NULL,
    salt VARCHAR(10) NOT NULL,
    reg_status TINYINT NOT NULL,
-   created DATETIME NOT NULL,
-   login DATETIME
+   created INT NOT NULL,
+   login INT
 );
 
 DROP TABLE IF EXISTS `usergroups`;
