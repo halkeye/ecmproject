@@ -1,12 +1,14 @@
 <?php
 
+define('ACCOUNT_STATUS_ACTIVE', 1);
+
 class Account extends DataMapper 
 {
     var $table = 'accounts';
     var $saltLength = 10;
 
     var $created_field = 'created';
-    var $updated_field = 'login';
+    var $updated_field = '';
     var $has_many = array('book');
 /*
     var $has_one = array('country');
@@ -74,6 +76,14 @@ class Account extends DataMapper
    */
     );
 
+    var $CI = null;
+
+    function Account()
+	{
+        $this->CI =& get_instance();
+        return parent::DataMapper();
+    }
+
     /*
     var $field_data = array(); 
 
@@ -139,6 +149,36 @@ class Account extends DataMapper
 
             $this->{$field} = sha1($this->salt . $this->{$field});
         }
+    }
+
+    function isActive()
+    {
+        return $this->reg_status == ACCOUNT_STATUS_ACTIVE;
+    }
+
+    function userPassRehash($timestamp) { return md5($timestamp . $this->password . $this->login); }
+    function sendValidateEmail()
+    {
+        $timestamp = time();
+        $emailVars = array(
+                'account' => $this,
+                'email'=>$this->email,
+                'validationUrl'=>sprintf('/user/validate/%d/%d/%s', $this->id, $timestamp, $this->userPassRehash($timestamp)),
+        );
+
+        $this->CI->load->library('email');
+
+        $this->CI->email->from(
+                $this->CI->config->item('convention_outgoing_email_email'),
+                $this->CI->config->item('convention_outgoing_email_name') // lang?
+        );
+        $this->CI->email->to($this->email); 
+        $this->CI->email->subject('LANG: registration email subject');
+        $this->CI->email->message(
+                $this->CI->load->view('user/register.email', $emailVars, TRUE)
+        );
+        $this->CI->email->send();
+#        echo $this->CI->email->print_debugger();
     }
 }
 

@@ -12,7 +12,7 @@ if (!isset($errors))
 if ($this->session->flashdata('messages')) 
 	$messages = $messages + $this->session->flashdata('messages');
 if ($this->session->flashdata('errors')) 
-	$errorss  = $errors + $this->session->flashdata('errors');
+	$errors  = $errors + $this->session->flashdata('errors');
 
 ?><!DOCTYPE html 
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"

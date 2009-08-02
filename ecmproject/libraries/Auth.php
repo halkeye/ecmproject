@@ -12,9 +12,10 @@ class Auth
 		$this->CI->load->database();
 		$this->CI->load->helper('url');
         #$this->CI->load->model('Account_model');
+        $this->CI->lang->load('auth');
 	}
 
-    function process_login($username, $password)
+    function processLogin($username, $password)
     {
         // A few safety checks
         // Our array has to be set
@@ -25,11 +26,27 @@ class Auth
         $u = new Account();
         $u->email    = $username;
         $u->password = $password;
-        if (!$u->login()) { return false; }
 
+        if (!$u->login()) 
+        { 
+            return $this->CI->lang->line('auth_error_invalid_user_pass');
+        }
+
+        if (!$u->isActive())
+        {
+            return $this->CI->lang->line('auth_error_not_active');
+        }
+        $u->login = time();
+        $u->save();
+        return $this->loginUser($u);
+
+    }
+
+    function loginUser($account)
+    {
         // Our user exists, set session.
-        $this->CI->session->set_userdata('logged_user', $u->email);
-        $this->CI->session->set_userdata('user_name', $u->gname . ' '. $u->sname);
+        $this->CI->session->set_userdata('logged_user', $account->email);
+        $this->CI->session->set_userdata('user_name', $account->gname . ' '. $account->sname);
         return TRUE;
     }
 
@@ -88,7 +105,6 @@ class Auth
         if (!$this->logged_in()) return '';
         return $this->CI->session->userdata('user_name');
     }
-
 
 }
 // End of library class

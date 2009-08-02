@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * User Controller
+ * 
+ * All user related webpage and functionality.
+ * @author Gavin Mogan <ecm@gavinmogan.com>
+ * @version 1.0
+ * @package ecm
+ */
+
+
 class user extends Ecmproject_Base_Controller 
 {
     function __construct()
@@ -43,14 +53,17 @@ class user extends Ecmproject_Base_Controller
         $this->load->library('auth');
         $user = $this->input->post('user');
         $pass = $this->input->post('pass');
-        if($this->auth->process_login($user,$pass))
+
+        $authRet = $this->auth->processLogin($user,$pass);
+        if($authRet === TRUE)
         {
             $this->session->set_flashdata('messages', array('Logged in sucessfully'));
             // Login successful, let's redirect.
-            $this->redirect('/user/index');
+            $this->_redirect('/user/index');
             return;
         }
-        $data['messages'] = array('Login failed, please try again');
+
+        $data['errors'] = array($authRet);
 
         $this->template->write_view('content', 'user/login_error', $data, TRUE);
         return $this->template->render();
@@ -62,7 +75,7 @@ class user extends Ecmproject_Base_Controller
 
         if($this->auth->logout())
         {
-            $this->redirect('');
+            $this->_redirect('');
             return;
         }
     }
@@ -107,24 +120,8 @@ class user extends Ecmproject_Base_Controller
             if ($validated && $a->save())
             {
                 $this->session->set_flashdata('messages', array('LANG: registration sucessful. Check email box blah blah'));
-                $emailVars = array(
-                    'email'=>$a->email
-                );
-                $this->load->library('email');
-
-                $this->email->from(
-                        $this->config->item('convention_outgoing_email_email'),
-                        $this->config->item('convention_outgoing_email_name') // lang?
-                );
-                $this->email->to($a->email); 
-                $this->email->subject('LANG: registration email subject');
-                $this->email->message(
-                        $this->load->view('user/register.email', $emailVars, TRUE)
-                );
-                $this->email->send();
-                echo $this->email->print_debugger();
-                return;
-                redirect('');
+                $a->sendValidateEmail();
+                $this->_redirect('');
                 return;
             }
         }
@@ -133,26 +130,111 @@ class user extends Ecmproject_Base_Controller
         return $this->template->render();
     }
 
-    function _check_captcha($val) 
+    function validate($uid = 0, $timestamp = 0, $key = '')
     {
-        if ($this->recaptcha->check_answer($this->input->ip_address(),$this->input->post('recaptcha_challenge_field'),$val)) {
-            return TRUE;
-        } else {
-            $this->form_validation->set_message('_check_captcha',$this->lang->line('recaptcha_incorrect_response'));
-            return FALSE;
+        $timestamp = intval($timestamp);
+
+$this->output->enable_profiler(TRUE);
+        $account = new Account();
+        $account->where('id',$uid)->get();
+        //$account->login = 0; //time();
+        //$account->save();
+        //return;
+
+        if ($this->auth->logged_in())
+        {
+            $data['errors'][] = $this->lang->line('auth_error_expired_validate_link');
+            $this->session->set_flashdata('errors', $data['errors']);
+            //return redirect('');
         }
+
+        $account = new Account();
+
+        /* Get timeout value, defaults at 86400 */
+        $timeout = $this->config->item('validate_link_timeout');
+        if (!$timeout) { $timeout = 86400; }
+
+        $current = time();
+        
+        if ($uid > 0)
+        {
+            $account->where('id',$uid)->get();
+        }
+        if (!isset($account->id))
+        {
+            $data['errors'][] = $this->lang->line('auth_error_invalid_account');
+
+            $this->session->set_flashdata('errors', $data['errors']);
+            return redirect('');
+        }
+        $invalidLink = 0;
+        /*
+         * Make sure timestamp is earlier than now
+         * Make sure if they've logged in, that the url hasn't expired
+         */
+        if ($timestamp > $current) { $invalidLink = 1; }
+        if ($account->login) 
+            if ($current - $timestamp > $timeout || $timestamp < $account->login)
+                $invalidLink = 1; 
+
+        if ($invalidLink)
+        {
+            $data['errors'][] = $this->lang->line('auth_error_expired_validate_link');
+            $this->session->set_flashdata('errors', $data['errors']);
+            return redirect('');
+        }
+        /* FIXME: Move to account model */
+        $account->status = ACCOUNT_STATUS_ACTIVE;
+        $account->login = time();
+        $account->save();
+
+        $this->auth->loginUser($account);
+        $this->_redirect('');
     }
 
-    function redirect($where = '/user')
+
+    /**
+     * Redirect a user to a location, unless a session variable is set
+     * @param string $where Where to redirect the user if nothing else is set
+     */
+    function _redirect($where = '/user')
     {
         if ($this->session->userdata('redirected_from') == FALSE)
         {
             redirect($where);
+            return;
         } 
-        else 
+        redirect($this->session->userdata('redirected_from'));
+        return;
+    }
+
+
+    /**
+     * Form Validation callback for checking captcha
+     * @param string $val input to validate
+     * @return boolean true if the valid is successful 
+     */
+    function _check_captcha($val) 
+    {
+        if ($this->recaptcha->check_answer(
+                $this->input->ip_address(),
+                $this->input->post('recaptcha_challenge_field'),
+                $val
+            ))
         {
-            redirect($this->session->userdata('redirected_from'));
+            return TRUE;
         }
+
+        $this->form_validation->set_message('_check_captcha',$this->lang->line('recaptcha_incorrect_response'));
+        return FALSE;
+    }
+
+    function validationTest()
+    {
+        $a = new Account();
+        $a->where('email','halkeye@gmail.com')->get();
+        $a->sendValidateEmail();
+        $this->index();
     }
 
 }
