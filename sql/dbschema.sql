@@ -1,6 +1,6 @@
-﻿-- DROP DATABASE ecms;
--- CREATE DATABASE ecms;
--- USE ecms;
+﻿DROP DATABASE ecms;
+CREATE DATABASE ecms;
+USE ecms;
 
 
 DROP TABLE IF EXISTS `convention`;
@@ -50,7 +50,8 @@ DROP TABLE IF EXISTS `usergroups`;
 -- Expand on permissions later.
 CREATE TABLE usergroups(
    guid int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-   name VARCHAR(55) NOT NULL
+   name VARCHAR(55) NOT NULL,
+   description TEXT
 );
 
 DROP TABLE IF EXISTS `register`;
@@ -72,4 +73,17 @@ CREATE TABLE payment(
    reg_id INT UNSIGNED NOT NULL,
    type VARCHAR(55) NOT NULL,
    FOREIGN KEY (reg_id) REFERENCES register(reg_id)
+);
+
+CREATE TABLE permissions(
+   permission_id INT UNSIGNED PRIMARY KEY,
+   pkey VARCHAR(100) NOT NULL,
+   description TEXT
+);
+
+CREATE TABLE usergroup_permissions(
+   guid INT UNSIGNED,
+   permission_id INT UNSIGNED,
+   FOREIGN KEY (guid) REFERENCES usergroups(guid),
+   FOREIGN KEY (permission_id) REFERENCES permissions(permission_id)
 );
