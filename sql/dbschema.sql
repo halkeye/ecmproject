@@ -1,5 +1,5 @@
-﻿-- DROP DATABASE ecms;
--- CREATE DATABASE ecms;
+﻿DROP DATABASE ecms;
+CREATE DATABASE ecms;
 USE ecms;
 
 
@@ -76,15 +76,25 @@ CREATE TABLE payment(
    FOREIGN KEY (register_id) REFERENCES register(register_id)
 );
 
+DROP TABLE IF EXISTS `permissions`;
 CREATE TABLE permissions(
    permission_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    pkey VARCHAR(100) NOT NULL,
    description TEXT
 );
 
-CREATE TABLE usergroup_permissions(
+DROP TABLE IF EXISTS `usergroups_permissions`;
+CREATE TABLE usergroups_permissions(
    usergroups_id INT UNSIGNED,
    permission_id INT UNSIGNED,
    FOREIGN KEY (usergroups_id) REFERENCES usergroups(usergroups_id),
    FOREIGN KEY (permission_id) REFERENCES permissions(permission_id)
+);
+
+DROP TABLE IF EXISTS `accounts_usergroups`;
+CREATE TABLE accounts_usergroups(
+   usergroups_id INT UNSIGNED,
+   accounts_id INT UNSIGNED,
+   FOREIGN KEY (usergroups_id) REFERENCES usergroups(usergroups_id),
+   FOREIGN KEY (accounts_id) REFERENCES accounts(accounts_id)
 );
