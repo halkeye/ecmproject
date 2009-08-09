@@ -31,11 +31,28 @@ class User_Controller extends Controller
             $data['todo'][] = $account->gname . ' ' . $account->sname . ' -- ' . $account->email;
         }
 
-        $data['todo'][] = var_export($account->has(ORM::factory('usergroup',1 )),1);
-        foreach ($account->account_usergroups as $group)
+        foreach ($account->usergroups as $group)
+        {
             $data['todo'][] = $group->name;
-        $this->view->content = new View('user/user_view', $data);
+            foreach ($group->permissions as $p)
+            {
+                $data['todo'][] = $group->name . ' - ' . $p->pkey;
+            }
+        }
+        
+        $group = ORM::factory('usergroup', 1 );
+        $data['todo'][] = var_export($account->has($group),1);
 
+        $group = ORM::factory('usergroup');
+        $group->name = "Administrators";
+        $group->save();
+        
+        //$group = ORM::factory('usergroup', 'Administrators');
+        $account->add($group);
+        $account->save();
+
+
+        $this->view->content = new View('user/user_view', $data);
         $this->view->menu += array(
                 array('title'=>'Register', 'url'=>'user/register'),
                 array('title'=>'Login',    'url'=>'user/login'),
@@ -63,8 +80,7 @@ class User_Controller extends Controller
             return;
         }
 
-        $authRet = $this->auth->login($user, $this->input->post('pass'));
-        if ($authRet === TRUE) 
+        if ($this->auth->login($user, $this->input->post('pass')))
         {
             $this->addMessageFlash(Kohana::lang('auth.login_success'));
             //$this->addMessageFlash(Kohana::debug($user->roles));
@@ -72,7 +88,6 @@ class User_Controller extends Controller
             return;
         }
         $this->addError('Invalid username or password.');
-        $this->addError($authRet);
         $this->view->content = new View('user/login_error');
         return;
     }

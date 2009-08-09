@@ -6,18 +6,18 @@ class Account_Model extends ORM
 {
     // Account specific Stuff
     public $saltLength = 10;
+    //public $groups = array();
+    //public $permissions = array();
 
     // Current relationships
-    public $has_and_belongs_to_many = array('account_usergroups');
+    public $has_and_belongs_to_many = array('accounts_usergroups' => 'usergroups');
 
     // Table primary key and value
-    //protected $primary_key = 'accounts_id';
     protected $primary_key = 'id';
 
     // Model table information
-    protected $table_name    = 'accounts';
     protected $table_columns = array (
-            'accounts_id' => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, 'sequenced' => true, ),
+            'id'          => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, 'sequenced' => true, ),
             'email'       => array ( 'type' => 'string', 'length' => '55' ),
             'gname'       => array ( 'type' => 'string', 'length' => '55' ),
             'sname'       => array ( 'type' => 'string', 'length' => '55' ),
@@ -34,7 +34,7 @@ class Account_Model extends ORM
             'created'     => array ( 'type' => 'int',    'max' => 2147483647,    'unsigned' => false,  ),
             'login'       => array ( 'type' => 'int', 'max' => 2147483647, 'unsigned' => false, 'null' => true, ),
     );
-    protected $ignored_columns = array('confirm_password');
+    protected $ignored_columns = array('confirm_password', 'groups', 'permissions');
 
     var $validation = array(
         array(
@@ -201,7 +201,18 @@ class Account_Model extends ORM
             $array->add_error($field, 'email_exists');
         }
     }
+
+    /*
+    public function addGroup(Usergroup $group)
+    {
+        $this->groups[$group->name] = $group;
+    }
+    public function hasGroup($groupname)
+    {
+        return isset($this->groups[$groupname]);
+    }
     
+    */
 }
 
 /* End of file user.php */

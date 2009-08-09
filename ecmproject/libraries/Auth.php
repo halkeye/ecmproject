@@ -14,41 +14,43 @@ class Auth_Core {
 	// Session instance
 	protected $session;
 
-	// Configuration
-	protected $config;
-
-	/**
-	 * Create an instance of Auth.
-	 *
-	 * @return  object
-	 */
-	public static function factory($config = array())
-	{
-		return new Auth($config);
-	}
+    protected $account     = null;
+    protected $groups       = array();
+    protected $permissions = array();
 
 	/**
 	 * Return a static instance of Auth.
 	 *
 	 * @return  object
 	 */
-	public static function instance($config = array())
+	public static function instance()
 	{
 		static $instance;
 
 		// Load the Auth instance
-		empty($instance) and $instance = new Auth($config);
+		empty($instance) and $instance = new Auth();
 
 		return $instance;
 	}
 
 	/**
-	 * Loads Session and configuration options.
+	 * Loads Session and user options.
 	 */
-	public function __construct($config = array())
+	public function __construct()
 	{
 		// Load libraries
-		$this->session = Session::instance();
+		$this->session     = Session::instance();
+        /* User Stuff */
+        if ($this->is_logged_in())
+        {
+            $this->account     = $this->session->get('account');
+            $this->groups       = $this->session->get('account_groups');
+            $this->permissions = $this->session->get('account_perms');
+        }
+        else
+        {
+            $this->account    =  new StdClass;
+        }
 
 		Kohana::log('debug', 'Auth Library loaded');
 	}
@@ -65,6 +67,8 @@ class Auth_Core {
 	{
 		if (empty($password))
 			return FALSE;
+        if (!$account->isActive())
+            return FALSE;
 
 		// Create a hashed password using the salt from the stored password
         $password = sha1($account->salt . $password);
@@ -73,88 +77,22 @@ class Auth_Core {
         $this->complete_login($account);
 
         return TRUE;
-
-		// If the account has the "login" role and the passwords match, perform a login
-		if ($account->has_role('login') AND $account->password === $password)
-		{
-			// Finish the login
-			$this->complete_login($account);
-
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	/**
-	 * Attempt to automatically log a account in by using tokens.
-	 *
-	 * @return  bool
-	 */
-	public function auto_login()
-	{
-		if ($token = cookie::get('autologin'))
-		{
-			// Load the token and account
-			$token = new Account_Token_Model($token);
-			$account = new Account_Model($token->account_id);
-
-			if ($token->id != 0 AND $account->id != 0)
-			{
-				if ($token->account_agent === sha1(Kohana::$account_agent))
-				{
-					// Save the token to create a new unique token
-					$token->save();
-
-					// Set the new token
-					cookie::set('autologin', $token->token, $token->expires - time());
-
-					// Complete the login with the found data
-					$this->complete_login($account);
-
-					// Automatic login was successful
-					return TRUE;
-				}
-
-				// Token is invalid
-				$token->delete();
-			}
-		}
-
-		return FALSE;
 	}
 
 	/**
 	 * Log out a account by removing the related session variables.
 	 *
-	 * @param   bool   completely destroy the session
 	 * @return  bool
 	 */
-	public function logout($destroy = FALSE)
+	public function logout()
 	{
-		// Delete the autologin cookie if it exists
-		cookie::get('autologin') and cookie::delete('autologin');
-
-		if ($destroy == TRUE)
-		{
-			$this->session->destroy();
-		}
-		else
-		{
-			$this->session->delete(
-                    'account_id', 
-                    'account_name', 
-                    'account',
-                    'roles'
-            );
-		}
-
+        $this->session->destroy();
 		return TRUE;
 	}
 
 	/**
 	 * Complete the login for a account by incrementing the logins and setting
-	 * session data: account_id, accountname, roles
+	 * session data: account_id, accountname, groups
 	 *
 	 * @param   object   account model object
 	 * @return  void
@@ -167,13 +105,32 @@ class Auth_Core {
 		// Save the account
 		$account->save();
 
+        $this->groups = array();
+        $this->permissions = array();
+        foreach ($account->usergroups as $group)
+        {
+            $this->groups[$group->name] = 1;
+            foreach ($group->permissions as $p)
+            {
+                $this->permissions[$p->pkey] = 1;
+            }
+        }
+
+        /* FIXME: Make a constant or something out of here */
+        /* Load up registered group always */
+        foreach (ORM::factory('usergroup', 'registered')->permissions as $p)
+        {
+            $this->permissions[$p->pkey] = 1;
+        }
+
 		// Store session data
 		$this->session->set(array
 		(
-			'account_id'   => $account->id,
-			'account_name' => $account->gname . ' ' . $account->sname,
-            'account'      => (Object) $account->as_array(),
-			#'roles'        => $account->roles
+			'account_id'    => $account->id,
+			'account_name'  => $account->gname . ' ' . $account->sname,
+            'account'       => (Object) $account->as_array(),
+			'account_groups' => $this->groups, 
+			'account_perms' => $this->permissions, 
 		));
 	}
 
@@ -192,9 +149,10 @@ class Auth_Core {
 
     public function get_user()
     {
-        if (!$this->is_logged_in())
-            return new StdClass;
-        return $this->session->get('account');
+        return $this->account;
     }
+
+    public function has_perm($permission) { return isset($this->permissions[$permission]); }
+    public function has_group($group) { return isset($this->groups[$permission]); }
 
 } // End Auth
