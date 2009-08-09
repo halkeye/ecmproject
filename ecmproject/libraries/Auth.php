@@ -11,8 +11,8 @@
  */
 class Auth_Core {
 
-	// Session instance
-	protected $session;
+    // Session instance
+    protected $session;
 
     protected $account     = null;
     protected $groups       = array();
@@ -20,28 +20,28 @@ class Auth_Core {
 
     protected $errors = array();
 
-	/**
-	 * Return a static instance of Auth.
-	 *
-	 * @return  object
-	 */
-	public static function instance()
-	{
-		static $instance;
+    /**
+     * Return a static instance of Auth.
+     *
+     * @return  object
+     */
+    public static function instance()
+    {
+        static $instance;
 
-		// Load the Auth instance
-		empty($instance) and $instance = new Auth();
+        // Load the Auth instance
+        empty($instance) and $instance = new Auth();
 
-		return $instance;
-	}
+        return $instance;
+    }
 
-	/**
-	 * Loads Session and user options.
-	 */
-	public function __construct()
-	{
-		// Load libraries
-		$this->session     = Session::instance();
+    /**
+     * Loads Session and user options.
+     */
+    public function __construct()
+    {
+        // Load libraries
+        $this->session     = Session::instance();
         /* User Stuff */
         $this->account    =  new StdClass;
         if ($this->is_logged_in())
@@ -53,27 +53,27 @@ class Auth_Core {
 
         $this->clearErrors();
 
-		Kohana::log('debug', 'Auth Library loaded');
-	}
+        Kohana::log('debug', 'Auth Library loaded');
+    }
 
-	/**
-	 * Attempt to log in a account by using an ORM object and plain-text password.
-	 *
-	 * @param   object  account model object
-	 * @param   string  plain-text password to check against
-	 * @return  bool
-	 */
-	public function login($account, $password)
-	{
-		if (!$account || !$account->loaded)
+    /**
+     * Attempt to log in a account by using an ORM object and plain-text password.
+     *
+     * @param   object  account model object
+     * @param   string  plain-text password to check against
+     * @return  bool
+     */
+    public function login($account, $password)
+    {
+        if (!$account || !$account->loaded)
         {
             $this->addError(Kohana::lang('auth.invalid_user_pass'));
-			return FALSE;
+            return FALSE;
         }
-		if (empty($password))
+        if (empty($password))
         {
             $this->addError(Kohana::lang('auth.invalid_user_pass'));
-			return FALSE;
+            return FALSE;
         }
         if (!$account->isActive())
         {
@@ -81,44 +81,44 @@ class Auth_Core {
             return FALSE;
         }
 
-		// Create a hashed password using the salt from the stored password
+        // Create a hashed password using the salt from the stored password
         $password = sha1($account->salt . $password);
         if ($account->password !== $password)
         {
             $this->addError(Kohana::lang('auth.invalid_user_pass'));
             return FALSE;
         }
-			
+            
         $this->complete_login($account);
 
         return TRUE;
-	}
+    }
 
-	/**
-	 * Log out a account by removing the related session variables.
-	 *
-	 * @return  bool
-	 */
-	public function logout()
-	{
+    /**
+     * Log out a account by removing the related session variables.
+     *
+     * @return  bool
+     */
+    public function logout()
+    {
         $this->session->destroy();
-		return TRUE;
-	}
+        return TRUE;
+    }
 
-	/**
-	 * Complete the login for a account by incrementing the logins and setting
-	 * session data: account_id, accountname, groups
-	 *
-	 * @param   object   account model object
-	 * @return  void
-	 */
-	public function complete_login(Account_Model $account)
-	{
-		// Update the number of logins
-		$account->login = time();
+    /**
+     * Complete the login for a account by incrementing the logins and setting
+     * session data: account_id, accountname, groups
+     *
+     * @param   object   account model object
+     * @return  void
+     */
+    public function complete_login(Account_Model $account)
+    {
+        // Update the number of logins
+        $account->login = time();
 
-		// Save the account
-		$account->save();
+        // Save the account
+        $account->save();
 
         $this->groups = array();
         $this->permissions = array();
@@ -137,23 +137,25 @@ class Auth_Core {
         {
             $this->permissions[$p->pkey] = 1;
         }
+        // extra safety to prevent session fixation - http://en.wikipedia.org/wiki/Session_fixation
+        $this->session->regenerate();
 
-		// Store session data
-		$this->session->set(array
-		(
-			'account_id'    => $account->id,
-			'account_name'  => $account->gname . ' ' . $account->sname,
+        // Store session data
+        $this->session->set(array
+        (
+            'account_id'    => $account->id,
+            'account_name'  => $account->gname . ' ' . $account->sname,
             'account'       => (Object) $account->as_array(),
-			'account_groups'=> $this->groups, 
-			'account_perms' => $this->permissions, 
-		));
-	}
+            'account_groups'=> $this->groups, 
+            'account_perms' => $this->permissions, 
+        ));
+    }
 
-	/**
+    /**
      * Returns weither or not the account is logged in
      *
-	 * @return  boolean
-	 */
+     * @return  boolean
+     */
 
     public function is_logged_in()
     {
