@@ -1,9 +1,7 @@
-<?php
-$this->load->helper('url');
-?><ul> 
+<ul> 
     <li class="title">Login</li> 
 </ul>
-<form method="post" action="<?php echo site_url('user/login') ?>">
+<form method="post" action="<?php echo url::site('user/login') ?>">
 <p>
     <label for="user">Email: </label>
     <input type="text" name="user" id="user" />
@@ -17,5 +15,5 @@ $this->load->helper('url');
 <p class="submit">
 <input class="submit" type="submit" name="Submit" value="Login" />
 </p>
-<div><?php echo anchor('/user/register', 'Register'); ?></div>
+<div><?php echo html::anchor('/user/register', 'Register'); ?></div>
 </form>

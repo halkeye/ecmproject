@@ -9,10 +9,16 @@ if (!isset($messages))
     $messages = array();
 if (!isset($errors))
     $errors = array();
+$isLoggedIn = 0;
+$menu = array();
+$subheading = '';
+
+/*
 if ($this->session->flashdata('messages')) 
 	$messages = $messages + $this->session->flashdata('messages');
 if ($this->session->flashdata('errors')) 
 	$errors  = $errors + $this->session->flashdata('errors');
+*/
 
 ?><!DOCTYPE html 
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -20,10 +26,8 @@ if ($this->session->flashdata('errors'))
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
 <head> 
 <title>Electronic Convention Management (ECM)<?php echo $pageTitle ?></title> 
-<link href="<?php echo base_url() ?>css/main.css" rel="stylesheet" type="text/css" /> 
-<?= $_scripts ?>
-<?= $_styles ?>
-<script type="text/javascript" src="<?php echo base_url() ?>js/jquery-1.3.2.min.js"></script>
+<link href="<?php echo url::base() ?>css/main.css" rel="stylesheet" type="text/css" /> 
+<script type="text/javascript" src="<?php echo url::base() ?>js/jquery-1.3.2.min.js"></script>
 </head> 
  
 <body> 
@@ -35,25 +39,27 @@ if ($this->session->flashdata('errors'))
  
     <!-- Left Sidebar. --> 
     <div id="menu"> 
-        <?php if (!$isLoggedIn): ?>
-        <?php $this->load->view('global/loginBox'); ?>
-        <?php endif; ?>
-        <?php if ($menu || $isLoggedIn): ?>
+        <?php 
+        if (!$isLoggedIn)
+        {
+            $partial = new View('global/loginBox');
+            echo $partial->render(TRUE); 
+        }
+        ?>
         <ul> 
-            <li class="menuItem title"><a href="<?php base_url(); ?>">Menu</a></li>
+            <li class="menuItem title"><a href="<?php url::base(); ?>">Menu</a></li>
             <?php if ($isLoggedIn): ?>
             <li><b><?= htmlentities($user_name) ?></b></li>
             <li>&nbsp;</li>
             <?php endif; ?>
             <?php if($menu): ?><?php foreach ($menu as $m): ?>
-            <li><?php echo anchor($m['url'], $m['title']); ?></li> 
+            <li><?php echo html::anchor($m['url'], $m['title']); ?></li> 
             <?php endforeach; ?><?php endif ?>
 
             <?php if ($isLoggedIn): ?>
-            <li><?php echo anchor('user/logout', 'Logout'); ?></li>
+            <li><?php echo html::anchor('user/logout', 'Logout'); ?></li>
             <?php endif; ?>
         </ul>
-        <?php endif ?>
     </div> 
  
     <!-- Content Pane (Right side) --> 

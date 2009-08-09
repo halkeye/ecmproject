@@ -1,4 +1,4 @@
-<?php
+<?php  if ( ! defined('BASEPATH') && !defined('SYSPATH')) exit('No direct script access allowed');
 
 /**
  * Data Mapper Class, OverZealous Edition
