@@ -20,9 +20,6 @@ class User_Controller extends Controller
     function index()
     {
         $data['todo'] = array();
-        $account = ORM::factory('account')->find('halkeye@gmail.com');
-        $account = ORM::factory('account')->find(1);
-
 
         $accounts = ORM::factory('account')->find_all();
 
@@ -43,13 +40,17 @@ class User_Controller extends Controller
         $group = ORM::factory('usergroup', 1 );
         $data['todo'][] = var_export($account->has($group),1);
 
+        /*
         $group = ORM::factory('usergroup');
         $group->name = "Administrators";
         $group->save();
+        */
         
         //$group = ORM::factory('usergroup', 'Administrators');
+        /*
         $account->add($group);
         $account->save();
+        */
 
 
         $this->view->content = new View('user/user_view', $data);
@@ -67,28 +68,24 @@ class User_Controller extends Controller
 
         if ($this->auth->is_logged_in()) 
         {
-            $_SESSION['messages'][] = 'Already logged in';
-            url::redirect('');
+            $this->addMessageFlash(Kohana::lang('auth.already_logged_in'));
+            $this->_redirect('');
             return;
         }
 
         // Load the user
         $user = ORM::factory('account')->where('email', $this->input->post('user'))->find();
-        if (!$user) 
-        {
-            $this->addError('Invalid Email');
-            return;
-        }
-
         if ($this->auth->login($user, $this->input->post('pass')))
         {
             $this->addMessageFlash(Kohana::lang('auth.login_success'));
-            //$this->addMessageFlash(Kohana::debug($user->roles));
             url::redirect('');
             return;
         }
-        $this->addError('Invalid username or password.');
-        $this->view->content = new View('user/login_error');
+        foreach ($this->auth->errors() as $err) 
+            $this->addError($err);
+
+        $this->auth->clearErrors();
+
         return;
     }
 
@@ -96,16 +93,14 @@ class User_Controller extends Controller
     {
         if (!$this->auth->is_logged_in()) 
         {
-            $_SESSION['messages'][] = 'Not logged in yet.';
+            $this->addMessageFlash(Kohana::lang('auth.not_logged_in'));
             url::redirect('');
             return;
         }
 
-        if($this->auth->logout())
-        {
-            $this->_redirect('');
-            return;
-        }
+        $this->auth->logout();
+        $this->_redirect('');
+        return;
     }
 
     function register()

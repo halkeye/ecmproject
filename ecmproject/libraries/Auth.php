@@ -18,6 +18,8 @@ class Auth_Core {
     protected $groups       = array();
     protected $permissions = array();
 
+    protected $errors = array();
+
 	/**
 	 * Return a static instance of Auth.
 	 *
@@ -41,16 +43,15 @@ class Auth_Core {
 		// Load libraries
 		$this->session     = Session::instance();
         /* User Stuff */
+        $this->account    =  new StdClass;
         if ($this->is_logged_in())
         {
             $this->account     = $this->session->get('account');
             $this->groups       = $this->session->get('account_groups');
             $this->permissions = $this->session->get('account_perms');
         }
-        else
-        {
-            $this->account    =  new StdClass;
-        }
+
+        $this->clearErrors();
 
 		Kohana::log('debug', 'Auth Library loaded');
 	}
@@ -60,19 +61,33 @@ class Auth_Core {
 	 *
 	 * @param   object  account model object
 	 * @param   string  plain-text password to check against
-	 * @param   bool    to allow auto-login, or "remember me" feature
 	 * @return  bool
 	 */
-	public function login(Account_Model $account, $password, $remember = FALSE)
+	public function login($account, $password)
 	{
-		if (empty($password))
+		if (!$account || !$account->loaded)
+        {
+            $this->addError(Kohana::lang('auth.invalid_user_pass'));
 			return FALSE;
+        }
+		if (empty($password))
+        {
+            $this->addError(Kohana::lang('auth.invalid_user_pass'));
+			return FALSE;
+        }
         if (!$account->isActive())
+        {
+            $this->addError(Kohana::lang('auth.not_validated'));
             return FALSE;
+        }
 
 		// Create a hashed password using the salt from the stored password
         $password = sha1($account->salt . $password);
-        if ($account->password !== $password) return FALSE;
+        if ($account->password !== $password)
+        {
+            $this->addError(Kohana::lang('auth.invalid_user_pass'));
+            return FALSE;
+        }
 			
         $this->complete_login($account);
 
@@ -129,7 +144,7 @@ class Auth_Core {
 			'account_id'    => $account->id,
 			'account_name'  => $account->gname . ' ' . $account->sname,
             'account'       => (Object) $account->as_array(),
-			'account_groups' => $this->groups, 
+			'account_groups'=> $this->groups, 
 			'account_perms' => $this->permissions, 
 		));
 	}
@@ -154,5 +169,11 @@ class Auth_Core {
 
     public function has_perm($permission) { return isset($this->permissions[$permission]); }
     public function has_group($group) { return isset($this->groups[$permission]); }
+
+    /* Error functions */
+    public function clearErrors() { $this->errors = array(); }
+    public function addError($err) { $this->errors += $err; }
+    public function errors() { return $this->errors; }
+
 
 } // End Auth
