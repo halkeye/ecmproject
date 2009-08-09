@@ -159,7 +159,7 @@ class Auth_Core {
 	 * @param   object   account model object
 	 * @return  void
 	 */
-	protected function complete_login(Account_Model $account)
+	public function complete_login(Account_Model $account)
 	{
 		// Update the number of logins
 		$account->login = time();

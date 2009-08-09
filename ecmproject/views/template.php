@@ -47,7 +47,6 @@
     <?php foreach ($messages as $msg) { echo '<p class="msg">'.$msg.'</p>'; } ?>
     <?php foreach ($errors as $err) { echo '<p class="errormsg">'.$err.'</p>'; } ?>
 
-    <br />
     <!-- content start -->
     <?php print $content ?>
     <?php print $profiler ?>

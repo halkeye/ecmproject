@@ -89,7 +89,7 @@ class User_Controller extends Controller
         $authRet = $this->auth->login($user, $this->input->post('pass'));
         if ($authRet === TRUE) 
         {
-            $this->addMessageFlash('Login Success!');
+            $this->addMessageFlash(Kohana::lang('auth.login_success'));
             //$this->addMessageFlash(Kohana::debug($user->roles));
             url::redirect('');
             return;
@@ -151,31 +151,6 @@ class User_Controller extends Controller
                 // Pass the error message file name to the errors() method
                 $errors = arr::overwrite($errors, $post->errors('form_error_messages'));
             }
-        
-            /*
-
-            $validated = 1;
-            if ($this->config->item('use_captcha'))
-            {
-                $validated = 0;
-                $this->form_validation->set_rules('recaptcha_response_field',  'lang:recaptcha_field_name', 'required|callback__check_captcha');
-                $validated = ($a->form_validation->run() == TRUE);
-                if (!$validated) 
-                {
-
-                    foreach ($this->form_validation->_error_array as $field=>$val)
-                        $a->error_message($field,$val); // FIXME, using form_validation array directly
-                }
-
-            }
-
-            if ($validated && $a->save())
-            {
-                $this->session->set_flashdata('messages', array('LANG: registration sucessful. Check email box blah blah'));
-                $this->_redirect('');
-                return;
-            }
-            */
         }
         $this->view->content = new View('user/register', array('form'=>$form, 'errors'=>$errors));
     }
@@ -184,39 +159,26 @@ class User_Controller extends Controller
     {
         $timestamp = intval($timestamp);
 
-$this->output->enable_profiler(TRUE);
-        $account = new Account();
-        $account->where('id',$uid)->get();
-        //$account->login = 0; //time();
-        //$account->save();
-        //return;
+        $account = ORM::factory('account')->where(Account_Model::where_key(), $uid)->find();
 
-        if ($this->auth->logged_in())
+        if ($this->auth->is_logged_in())
         {
-            $data['errors'][] = $this->lang->line('auth_error_expired_validate_link');
-            $this->session->set_flashdata('errors', $data['errors']);
-            //return redirect('');
+            $this->addError(Kohana::lang('auth.expired_validate_link'));
+            return;
         }
 
-        $account = new Account();
-
         /* Get timeout value, defaults at 86400 */
-        $timeout = $this->config->item('validate_link_timeout');
+        $timeout = Kohana::config('ecmproject.validate_link_timeout', FALSE, FALSE);
         if (!$timeout) { $timeout = 86400; }
 
         $current = time();
         
-        if ($uid > 0)
+        if (!$account->loaded)
         {
-            $account->where('id',$uid)->get();
+            $this->addError(Kohana::lang('auth.bad_link'));
+            return;
         }
-        if (!isset($account->id))
-        {
-            $data['errors'][] = $this->lang->line('auth_error_invalid_account');
 
-            $this->session->set_flashdata('errors', $data['errors']);
-            return redirect('');
-        }
         $invalidLink = 0;
         /*
          * Make sure timestamp is earlier than now
@@ -229,16 +191,14 @@ $this->output->enable_profiler(TRUE);
 
         if ($invalidLink)
         {
-            $data['errors'][] = $this->lang->line('auth_error_expired_validate_link');
-            $this->session->set_flashdata('errors', $data['errors']);
-            return redirect('');
+            $this->addError(Kohana::lang('auth.bad_link'));
+            return;
         }
-        /* FIXME: Move to account model */
         $account->reg_status = ACCOUNT_STATUS_ACTIVE;
-        $account->login = time();
         $account->save();
 
-        $this->auth->loginUser($account);
+        $this->addMessageFlash(Kohana::lang('auth.login_success'));
+        $this->auth->complete_login($account);
         $this->_redirect('');
     }
 
@@ -259,46 +219,12 @@ $this->output->enable_profiler(TRUE);
     }
 
 
-    /**
-     * Form Validation callback for checking captcha
-     * @param string $val input to validate
-     * @return boolean true if the valid is successful 
-     */
-    function _check_captcha($val) 
-    {
-        if ($this->recaptcha->check_answer(
-                $this->input->ip_address(),
-                $this->input->post('recaptcha_challenge_field'),
-                $val
-            ))
-        {
-            return TRUE;
-        }
-
-        $this->form_validation->set_message('_check_captcha',$this->lang->line('recaptcha_incorrect_response'));
-        return FALSE;
-    }
-
     function validationTest()
     {
         $a = ORM::factory('account');
         $a->where('email','halkeye@gmail.com')->find();
         $a->sendValidateEmail();
         $this->index();
-    }
-
-    public function _pwd_check(Validation $post)
-    {
-        // If add->rules validation found any errors, get me out of here!
-        if (array_key_exists('password', $post->errors()))
-            return;
-
-        // only valid password is '123'
-        if ($post->password != '123')
-        {
-            // Add a validation error, this will cause $post->validate() to return FALSE
-            $post->add_error( 'password', 'pwd_check');
-        }
     }
 
 }
