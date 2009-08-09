@@ -16,7 +16,7 @@ CREATE TABLE conventions (
 DROP TABLE IF EXISTS `passes`;
 -- Table that describes the various passes. isPurchasable field is to allow for passes such as Vendors, Staff (an attendee
 -- shouldn't be able to get their hands on one. For passes like that, have system grant right for the user to register.
--- One-time use codes? 
+-- One-time use codes?
 CREATE TABLE passes(
    pass_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    name VARCHAR(100) NOT NULL,
@@ -60,10 +60,10 @@ CREATE TABLE registrations(
    register_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    convention_id INT UNSIGNED NOT NULL,
    pass_id INT UNSIGNED NOT NULL,
-   account_id INT UNSIGNED NOT NULL,
-   FOREIGN KEY (convention_id) REFERENCES conventions(convention_id),
-   FOREIGN KEY (pass_id) REFERENCES passes(pass_id),
-   FOREIGN KEY (account_id) REFERENCES accounts(account_id)
+   account_id INT UNSIGNED, -- Took out NOT NULL requirement for SET NULL trigger to work.
+   FOREIGN KEY (convention_id) REFERENCES conventions(convention_id) ON DELETE RESTRICT, -- Conventions shouldn't be deleted if in use already.
+   FOREIGN KEY (pass_id) REFERENCES passes(pass_id) ON DELETE RESTRICT, -- Passes shouldn't be deleted if in use already.
+   FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE SET NULL -- Even if an account is deleted, leave registrations for stat purposes.
 );
 
 DROP TABLE IF EXISTS `payments`;
@@ -73,7 +73,7 @@ CREATE TABLE payments(
    payment_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    register_id INT UNSIGNED NOT NULL,
    type VARCHAR(55) NOT NULL,
-   FOREIGN KEY (register_id) REFERENCES registrations(register_id)
+   FOREIGN KEY (register_id) REFERENCES registrations(register_id) ON DELETE RESTRICT -- Registrations with payment information shouldn't be deleted.
 );
 
 DROP TABLE IF EXISTS `permissions`;
@@ -87,14 +87,14 @@ DROP TABLE IF EXISTS `usergroups_permissions`;
 CREATE TABLE usergroups_permissions(
    usergroup_id INT UNSIGNED,
    permission_id INT UNSIGNED,
-   FOREIGN KEY (usergroup_id) REFERENCES usergroups(usergroup_id),
-   FOREIGN KEY (permission_id) REFERENCES permissions(permission_id)
+   FOREIGN KEY (usergroup_id) REFERENCES usergroups(usergroup_id) ON DELETE CASCADE,
+   FOREIGN KEY (permission_id) REFERENCES permissions(permission_id) ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS `accounts_usergroups`;
 CREATE TABLE accounts_usergroups(
    usergroup_id INT UNSIGNED,
    account_id INT UNSIGNED,
-   FOREIGN KEY (usergroup_id) REFERENCES usergroups(usergroup_id),
-   FOREIGN KEY (account_id) REFERENCES accounts(account_id)
+   FOREIGN KEY (usergroup_id) REFERENCES usergroups(usergroup_id) ON DELETE CASCADE, -- Users who were part of the delete group are removed from group.
+   FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE CASCADE -- If account was deleted, makes sense to clear this.
 );
