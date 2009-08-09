@@ -37,6 +37,7 @@ class DataMapper {
 	var $prefix = '';
 	var $join_prefix = '';
 	var $table = '';
+    var $pk_key = 'id';
 	var $model = '';
 	var $error_prefix = '';
 	var $error_suffix = '';
@@ -196,10 +197,10 @@ class DataMapper {
 				}
 				
 				// set up id column, if not set
-				if(!isset($associative_validation['id']))
+				if(!isset($associative_validation[$this->pk_key]))
 				{
-					$associative_validation['id'] = array(
-						'field' => 'id',
+					$associative_validation[$this->pk_key] = array(
+						'field' => $this->pk_key,
 						'label' => 'Identifier',
 						'rules' => array('integer')
 					);
@@ -571,7 +572,7 @@ class DataMapper {
 			$this->{$name} = new $class();
 
 			// Store parent data
-			$this->{$name}->parent = array('model' => $related_properties['other_field'], 'id' => $this->id);
+			$this->{$name}->parent = array('model' => $related_properties['other_field'], $this->pk_key => $this->{$this->pk_key});
 
 			// Check if Auto Populate for "has many" or "has one" is on
 			if (($has_many && $this->auto_populate_has_many) OR ($has_one && $this->auto_populate_has_one))
@@ -745,7 +746,7 @@ class DataMapper {
 			// If this is a "has many" or "has one" related item
 			if ($has_many || $has_one)
 			{
-				$this->_get_relation($this->parent['model'], $this->parent['id']);
+				$this->_get_relation($this->parent['model'], $this->parent[$this->pk_key]);
 			}
 
 			// For method chaining
@@ -901,7 +902,7 @@ class DataMapper {
 					if(array_key_exists($rf, $this->has_one) && in_array($rf . '_id', $this->fields))
 					{
 						// ITFK: store on the table
-						$this->{$rf . '_id'} = $object->id;
+						$this->{$rf . '_id'} = $object->{$object->pk_key};
 						$object = '';
 					}
 				}
@@ -912,7 +913,7 @@ class DataMapper {
 
 			if ( ! empty($data))
 			{
-				if ( ! $this->_force_save_as_new && ! empty($data['id']))
+				if ( ! $this->_force_save_as_new && ! empty($data[$this->pk_key]))
 				{
 					// Prepare data to send only changed fields
 					foreach ($data as $field => $value)
@@ -941,7 +942,7 @@ class DataMapper {
 						$this->_auto_trans_begin();
 
 						// Update existing record
-						$this->db->where('id', $this->id);
+						$this->db->where($this->pk_key, $this->{$this->pk_key});
 						$this->db->update($this->table, $data);
 
 						// Complete auto transaction
@@ -974,7 +975,7 @@ class DataMapper {
 					if( ! $this->_force_save_as_new)
 					{
 						// Assign new ID
-						$this->id = $this->db->insert_id();
+						$this->{$this->pk_key} = $this->db->insert_id();
 					}
 
 					// Complete auto transaction
@@ -1040,7 +1041,7 @@ class DataMapper {
 				if(array_key_exists($rf, $this->has_one) && in_array($rf . '_id', $this->fields))
 				{
 					// ITFK: store on the table
-					$this->{$rf . '_id'} = $o->id;
+					$this->{$rf . '_id'} = $o->{$o->pk_key};
 					
 					// unset, so that it doesn't get re-saved later.
 					unset($objects[$index]);
@@ -1113,13 +1114,13 @@ class DataMapper {
 	{
 		if (empty($object) && ! is_array($object))
 		{
-			if ( ! empty($this->id))
+			if ( ! empty($this->{$this->pk_key}))
 			{
 				// Begin auto transaction
 				$this->_auto_trans_begin();
 
 				// Delete this object
-				$this->db->where('id', $this->id);
+				$this->db->where($this->pk_key, $this->{$this->pk_key});
 				$this->db->delete($this->table);
 
 				// Delete all "has many" and "has one" relations for this object
@@ -1140,13 +1141,13 @@ class DataMapper {
 							$data = array($this_model . '_id' => NULL);
 							
 							// Update table to remove relationships
-							$this->db->where($this_model . '_id', $this->id);
+							$this->db->where($this_model . '_id', $this->{$this->pk_key});
 							$this->db->update($object->table, $data);
 						}
 						else if ($relationship_table != $this->table)
 						{
 	
-							$data = array($this_model . '_id' => $this->id);
+							$data = array($this_model . '_id' => $this->{$this->pk_key});
 		
 							// Delete relation
 							$this->db->delete($relationship_table, $data);
@@ -1254,7 +1255,7 @@ class DataMapper {
 		{
 			foreach ($this->all as $item)
 			{
-				if ( ! empty($item->id))
+				if ( ! empty($item->{$item->pk_key}))
 				{
 					$item->delete();
 				}
@@ -1288,7 +1289,7 @@ class DataMapper {
 
 			foreach ($this->all as $item)
 			{
-				if ( ! empty($item->id))
+				if ( ! empty($item->{$item->pk_key}))
 				{
 					$all[] = $item;
 				}
@@ -1556,9 +1557,9 @@ class DataMapper {
 			$relationship_table = $this->_get_relationship_table($object, $related_field);
 			if($relationship_table == $object->table) {
 				// has_one join on the other object's table
-				$this->db->where('id', $this->parent['id'])->where($this_model . '_id IS NOT NULL');
+				$this->db->where($this->pk_key, $this->parent[$this->pk_key])->where($this_model . '_id IS NOT NULL');
 			} else {
-				$this->db->where($other_model . '_id', $this->parent['id']);
+				$this->db->where($other_model . '_id', $this->parent[$this->pk_key]);
 			}
 			$this->db->from($relationship_table);
 
@@ -1586,7 +1587,7 @@ class DataMapper {
 	 */
 	function exists()
 	{
-		return ( ! empty($this->id));
+		return ( ! empty($this->{$this->pk_key}));
 	}
 
 	// --------------------------------------------------------------------
@@ -1706,7 +1707,7 @@ class DataMapper {
 	{
 		$copy = clone($this);
 
-		$copy->id = NULL;
+		$copy->{$copy->pk_key} = NULL;
 
 		return $copy;
 	}
@@ -3084,7 +3085,7 @@ class DataMapper {
 				if($this->_include_join_fields) {
 					$fields = $this->db->field_data($relationship_table);
 					foreach($fields as $key => $f) {
-						if($f->name == 'id' || $f->name == $this_column || $f->name == $other_column)
+						if($f->name == $this->pk_key || $f->name == $this_column || $f->name == $other_column)
 						{
 							unset($fields[$key]);
 						}
@@ -3146,8 +3147,8 @@ class DataMapper {
 				$related_field = $object->model; 
 
 				// Prepare field and value
-				$field = (isset($arguments[1])) ? $arguments[1] : 'id';
-				$value = (isset($arguments[2])) ? $arguments[2] : $object->id;
+				$field = (isset($arguments[1])) ? $arguments[1] : $object->pk_key;
+				$value = (isset($arguments[2])) ? $arguments[2] : $object->{$object->pk_key};
 			}
 			else
 			{
@@ -3160,14 +3161,14 @@ class DataMapper {
 				{
 					$object = $arguments[1];
 					// Prepare field and value
-					$field = (isset($arguments[2])) ? $arguments[2] : 'id';
-					$value = (isset($arguments[3])) ? $arguments[3] : $object->id;
+					$field = (isset($arguments[2])) ? $arguments[2] : $object->pk_key;
+					$value = (isset($arguments[3])) ? $arguments[3] : $object->{$object->pk_key};
 				}
 				else
 				{
 					$object = new $class();
 					// Prepare field and value
-					$field = (isset($arguments[1])) ? $arguments[1] : 'id';
+					$field = (isset($arguments[1])) ? $arguments[1] : $object->pk_key;
 					$value = (isset($arguments[2])) ? $arguments[2] : NULL;
 				}
 			}
@@ -3311,7 +3312,7 @@ class DataMapper {
 		}
 		
 		// query all items related to the given model
-		$this->where_related($related_field, 'id', $id);
+		$this->where_related($related_field, $this->pk_key, $id);
 				
 		// Set up default order by (if available)
 		$this->_handle_default_order_by();
@@ -3374,18 +3375,18 @@ class DataMapper {
 			if($relationship_table == $this->table)
 			{
 				// FIXME: should this re-query the existing object?
-				$this->{$other_model . '_id'} = $object->id;
+				$this->{$other_model . '_id'} = $object->{$object->pk_key};
 				return $this->save();
 			}
 			else if($relationship_table == $object->table)
 			{
 				// FIXME: should this re-query the existing object?
-				$object->{$this_model . '_id'} = $this->id;
+				$object->{$this_model . '_id'} = $this->{$object->pk_key};
 				return $object->save();
 			}
 			else
 			{
-				$data = array($this_model . '_id' => $this->id, $other_model . '_id' => $object->id);
+				$data = array($this_model . '_id' => $this->{$this->pk_key}, $other_model . '_id' => $object->id);
 	
 				// Check if relation already exists
 				$query = $this->db->get_where($relationship_table, $data, NULL, NULL);
@@ -3427,12 +3428,12 @@ class DataMapper {
 					else if (array_key_exists($related_field, $this->has_one))
 					{
 						// And it has an existing relation
-						$query = $this->db->get_where($relationship_table, array($this_model . '_id' => $this->id), 1, 0);
+						$query = $this->db->get_where($relationship_table, array($this_model . '_id' => $this->{$this->pk_key}), 1, 0);
 							
 						if ($query->num_rows() > 0)
 						{
 							// Find and update the other objects existing relation to relate with this object
-							$this->db->where($this_model . '_id', $this->id);
+							$this->db->where($this_model . '_id', $this->{$this->pk_key});
 							$this->db->update($relationship_table, $data);
 						}
 						else
@@ -3493,7 +3494,7 @@ class DataMapper {
 		// the TRUE allows conversion to singular
 		$related_properties = $this->_get_related_properties($related_field, TRUE);
 		
-		if ( ! empty($related_properties) && ! empty($this->id) && ! empty($object->id))
+		if ( ! empty($related_properties) && ! empty($this->{$this->pk_key}) && ! empty($object->id))
 		{
 			$this_model = $related_properties['join_self_as'];
 			$other_model = $related_properties['join_other_as'];
@@ -3513,7 +3514,7 @@ class DataMapper {
 			}
 			else
 			{
-				$data = array($this_model . '_id' => $this->id, $other_model . '_id' => $object->id);
+				$data = array($this_model . '_id' => $this->{$this->pk_key}, $other_model . '_id' => $object->id);
 
 				// Delete relation
 				$this->db->delete($relationship_table, $data);
@@ -3627,7 +3628,7 @@ class DataMapper {
 			$ids = array_unique($ids);
 		}
 
-		if ( ! empty($related_field) && ! empty($this->id))
+		if ( ! empty($related_field) && ! empty($this->{$this->pk_key}))
 		{
 			$one = array_key_exists($related_field, $this->has_one);
 			
@@ -3638,10 +3639,10 @@ class DataMapper {
 				$object = new $class();
 	
 				// Store parent data
-				$object->parent = array('model' => $rel_properties['other_field'], 'id' => $this->id);
+				$object->parent = array('model' => $rel_properties['other_field'], $this->pk_key => $this->{$this->pk_key});
 				
 				if( ! empty($ids)) {
-					$object->where_not_in('id', $ids);
+					$object->where_not_in($this->pk_key, $ids);
 				}
 				
 				$count += $object->count();
@@ -3787,14 +3788,14 @@ class DataMapper {
 		
 		if (empty($object))
 		{
-			$this->db->where($this_model . '_id', $this->id);
+			$this->db->where($this_model . '_id', $this->{$this->pk_key});
 			$this->db->update($relationship_table, $field);
 		}
 		else
 		{
 			foreach ($object as $obj)
 			{
-				$this->db->where($this_model . '_id', $this->id);
+				$this->db->where($this_model . '_id', $this->{$this->pk_key});
 				$this->db->where($other_model . '_id', $obj->id);
 				$this->db->update($relationship_table, $field);
 			}
@@ -4075,7 +4076,7 @@ class DataMapper {
 				$row = $query->row();
 
 				// If unique value does not belong to this object
-				if ($this->id != $row->id)
+				if ($this->{$this->pk_key} != $row->{$row->pk_key})
 				{
 					// Then it is not unique
 					return FALSE;
@@ -4111,7 +4112,7 @@ class DataMapper {
 				$row = $query->row();
 				
 				// If unique pair value does not belong to this object
-				if ($this->id != $row->id)
+				if ($this->{$this->pk_key} != $row->{$row->pk_key})
 				{
 					// Then it is not a unique pair
 					return FALSE;
@@ -4371,7 +4372,7 @@ class DataMapper {
 
 			$item->_refresh_stored_values();
 
-			$items[$item->id] = $item;
+			$items[$item->{$item->pk_key}] = $item;
 		}
 
 		return $items;
