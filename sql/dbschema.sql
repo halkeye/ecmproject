@@ -61,7 +61,7 @@ CREATE TABLE account_usergroups(
    account_id INT UNSIGNED NOT NULL,
    usergroup_id INT UNSIGNED NOT NULL,
    PRIMARY KEY (`account_id`,`usergroup_id`),
-   FOREIGN KEY (account_id) REFERENCES account(id)
+   FOREIGN KEY (account_id) REFERENCES account(id),
    FOREIGN KEY (usergroup_id) REFERENCES usergroup(id)
 );
 
