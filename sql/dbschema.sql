@@ -11,7 +11,7 @@ CREATE TABLE conventions (
    start_date DATETIME NOT NULL,
    end_date DATETIME NOT NULL,
    location VARCHAR(150)
-) ENGINE=Innodb;
+) ENGINE=Innodb DEFAULT CHARSET=utf8;;
 
 DROP TABLE IF EXISTS `passes`;
 -- Table that describes the various passes. isPurchasable field is to allow for passes such as Vendors, Staff (an attendee
@@ -23,7 +23,7 @@ CREATE TABLE passes(
    price DECIMAL NOT NULL,
    isPurchasable TINYINT NOT NULL,
    ageReq TINYINT UNSIGNED
-) ENGINE=Innodb;
+) ENGINE=Innodb DEFAULT CHARSET=utf8;;
 
 DROP TABLE IF EXISTS `accounts`;
 -- Reg form information among other things. Require email at a minimum.
@@ -45,7 +45,7 @@ CREATE TABLE accounts(
    reg_status TINYINT NOT NULL,
    created INT NOT NULL,
    login INT
-) ENGINE=Innodb;
+) ENGINE=Innodb DEFAULT CHARSET=utf8;;
 
 DROP TABLE IF EXISTS `usergroups`;
 -- Expand on permissions later.
@@ -53,7 +53,7 @@ CREATE TABLE usergroups(
    id int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    name VARCHAR(55) NOT NULL,
    description TEXT
-) ENGINE=Innodb;
+) ENGINE=Innodb DEFAULT CHARSET=utf8;;
 
 DROP TABLE IF EXISTS `registrations`;
 CREATE TABLE registrations(
@@ -64,7 +64,7 @@ CREATE TABLE registrations(
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE RESTRICT, -- Conventions shouldn't be deleted if in use already.
    FOREIGN KEY (pass_id) REFERENCES passes(id) ON DELETE RESTRICT, -- Passes shouldn't be deleted if in use already.
    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE SET NULL -- Even if an account is deleted, leave registrations for stat purposes.
-) ENGINE=Innodb;
+) ENGINE=Innodb DEFAULT CHARSET=utf8;;
 
 DROP TABLE IF EXISTS `payments`;
 -- Skip specific field details for now.
@@ -74,14 +74,14 @@ CREATE TABLE payments(
    register_id INT UNSIGNED NOT NULL,
    type VARCHAR(55) NOT NULL,
    FOREIGN KEY (register_id) REFERENCES registrations(id) ON DELETE RESTRICT -- Registrations with payment information shouldn't be deleted.
-) ENGINE=Innodb;
+) ENGINE=Innodb DEFAULT CHARSET=utf8;;
 
 DROP TABLE IF EXISTS `permissions`;
 CREATE TABLE permissions(
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    pkey VARCHAR(100) NOT NULL,
    description TEXT
-) ENGINE=Innodb;
+) ENGINE=Innodb DEFAULT CHARSET=utf8;;
 
 DROP TABLE IF EXISTS `usergroups_permissions`;
 CREATE TABLE usergroups_permissions(
@@ -90,7 +90,7 @@ CREATE TABLE usergroups_permissions(
    permission_id INT UNSIGNED,
    FOREIGN KEY (usergroup_id) REFERENCES usergroups(id) ON DELETE CASCADE,
    FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE
-) ENGINE=Innodb;
+) ENGINE=Innodb DEFAULT CHARSET=utf8;;
 
 DROP TABLE IF EXISTS `accounts_usergroups`;
 CREATE TABLE accounts_usergroups(
@@ -99,4 +99,4 @@ CREATE TABLE accounts_usergroups(
    account_id INT UNSIGNED,
    FOREIGN KEY (usergroup_id) REFERENCES usergroups(id) ON DELETE CASCADE, -- Users who were part of the delete group are removed from group.
    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE -- If account was deleted, makes sense to clear this.
-) ENGINE=Innodb;
+) ENGINE=Innodb DEFAULT CHARSET=utf8;;
