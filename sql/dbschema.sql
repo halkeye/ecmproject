@@ -6,7 +6,7 @@ USE ecms;
 DROP TABLE IF EXISTS `convention`;
 -- Table that describes a convention. Start/end times, name and location. Auto-incrementing integer ID.
 CREATE TABLE convention(
-   cid INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   convention_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    name VARCHAR(100) NOT NULL,
    start_date DATETIME NOT NULL,
    end_date DATETIME NOT NULL,
@@ -18,7 +18,8 @@ DROP TABLE IF EXISTS `passes`;
 -- shouldn't be able to get their hands on one. For passes like that, have system grant right for the user to register.
 -- One-time use codes? 
 CREATE TABLE passes(
-   name VARCHAR(100) NOT NULL PRIMARY KEY,
+   passes_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   name VARCHAR(100) NOT NULL,
    price DECIMAL NOT NULL,
    isPurchasable TINYINT NOT NULL,
    ageReq TINYINT UNSIGNED
@@ -28,7 +29,7 @@ DROP TABLE IF EXISTS `accounts`;
 -- Reg form information among other things. Require email at a minimum.
 -- Salt column, usergroups storing?
 CREATE TABLE accounts(
-   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+   accounts_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    email VARCHAR(55) NOT NULL UNIQUE,
    gname VARCHAR(55) NOT NULL,
    sname VARCHAR(55) NOT NULL,
@@ -49,7 +50,7 @@ CREATE TABLE accounts(
 DROP TABLE IF EXISTS `usergroups`;
 -- Expand on permissions later.
 CREATE TABLE usergroups(
-   guid int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   usergroups_id int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    name VARCHAR(55) NOT NULL,
    description TEXT
 );
@@ -66,34 +67,44 @@ CREATE TABLE account_usergroups(
 
 DROP TABLE IF EXISTS `register`;
 CREATE TABLE register(
-   reg_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-   cid INT UNSIGNED NOT NULL,
-   pass VARCHAR(100) NOT NULL,
-   account_id INT UNSIGNED NOT NULL,
-   FOREIGN KEY (cid) REFERENCES convention(cid),
-   FOREIGN KEY (pass) REFERENCES passes(name),
-   FOREIGN KEY (account_id) REFERENCES accounts(id)
+   register_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   convention_id INT UNSIGNED NOT NULL,
+   passes_id INT UNSIGNED NOT NULL,
+   accounts_id INT UNSIGNED NOT NULL,
+   FOREIGN KEY (convention_id) REFERENCES convention(convention_id),
+   FOREIGN KEY (passes_id) REFERENCES passes(passes_id),
+   FOREIGN KEY (accounts_id) REFERENCES accounts(accounts_id)
 );
 
 DROP TABLE IF EXISTS `payment`;
 -- Skip specific field details for now.
 -- Just store a string stating payment type?
 CREATE TABLE payment(
-   cid INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-   reg_id INT UNSIGNED NOT NULL,
+   payment_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   register_id INT UNSIGNED NOT NULL,
    type VARCHAR(55) NOT NULL,
-   FOREIGN KEY (reg_id) REFERENCES register(reg_id)
+   FOREIGN KEY (register_id) REFERENCES register(register_id)
 );
 
+DROP TABLE IF EXISTS `permissions`;
 CREATE TABLE permissions(
-   permission_id INT UNSIGNED PRIMARY KEY,
+   permission_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    pkey VARCHAR(100) NOT NULL,
    description TEXT
 );
 
-CREATE TABLE usergroup_permissions(
-   guid INT UNSIGNED,
+DROP TABLE IF EXISTS `usergroups_permissions`;
+CREATE TABLE usergroups_permissions(
+   usergroups_id INT UNSIGNED,
    permission_id INT UNSIGNED,
-   FOREIGN KEY (guid) REFERENCES usergroups(guid),
+   FOREIGN KEY (usergroups_id) REFERENCES usergroups(usergroups_id),
    FOREIGN KEY (permission_id) REFERENCES permissions(permission_id)
+);
+
+DROP TABLE IF EXISTS `accounts_usergroups`;
+CREATE TABLE accounts_usergroups(
+   usergroups_id INT UNSIGNED,
+   accounts_id INT UNSIGNED,
+   FOREIGN KEY (usergroups_id) REFERENCES usergroups(usergroups_id),
+   FOREIGN KEY (accounts_id) REFERENCES accounts(accounts_id)
 );
