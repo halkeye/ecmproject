@@ -2,8 +2,17 @@
 
 class UserGroup extends Model 
 {
-    var $table = 'usergroups';
-    var $pk_key = 'guid';
+    var $table_name = 'usergroups';
+    var $primary_key = 'guid';
+    
+    /**
+	 * Allows a model to be loaded by username or email address.
+	 */
+	protected function where_key($id = NULL)
+	{
+        return 'id';
+	}
+
 
     var $validation = array(
         array(

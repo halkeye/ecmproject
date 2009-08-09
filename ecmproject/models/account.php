@@ -2,14 +2,31 @@
 
 define('ACCOUNT_STATUS_ACTIVE', 1);
 
-class Account extends DataMapper 
+class Account_Model extends ORM 
 {
-    var $table = 'accounts';
     var $saltLength = 10;
-
-    var $created_field = '';
-    var $updated_field = '';
     var $has_many = array('usergroup');
+    protected $ignored_columns = array('confirm_password');
+
+    var $table_columns = array (
+            'id'    => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, 'sequenced' => true, ),
+            'email' => array ( 'type' => 'string', 'length' => '55' ),
+            'gname' => array ( 'type' => 'string', 'length' => '55' ),
+            'sname' => array ( 'type' => 'string', 'length' => '55' ),
+            'badge' => array ( 'type' => 'string', 'length' => '55', 'null' => true, ),
+            'dob'   => array ( 'type' => 'string', 'format' => '0000-00-00' ),
+            'phone' => array (    'type' => 'string',    'length' => '15',  ),
+            'cell' =>   array (    'type' => 'string',    'length' => '15',  ),
+            'address' =>   array (    'type' => 'string',    'null' => true,  ),
+            'econtact' =>   array (    'type' => 'string',    'length' => '55',  ),
+            'ephone' =>   array (    'type' => 'string',    'length' => '15',  ),
+            'password' =>   array (    'type' => 'string',    'length' => '40',  ),
+            'salt' =>   array (    'type' => 'string',    'length' => '10',  ),
+            'reg_status' =>   array (    'type' => 'int',    'max' => 127,    'unsigned' => false,  ),
+            'created' =>   array (    'type' => 'int',    'max' => 2147483647,    'unsigned' => false,  ),
+            'login' => array ( 'type' => 'int', 'max' => 2147483647, 'unsigned' => false, 'null' => true, ),
+    );
+
     var $validation = array(
         array(
             'field' => 'email',
@@ -72,15 +89,27 @@ class Account extends DataMapper
    */
     );
 
-    var $CI = null;
-
     function Account()
 	{
-        $this->CI =& get_instance();
-        $ret = parent::DataMapper();
+        $ret = parent::ORM();
         $this->created = time();
+        $this->salt = substr(md5(uniqid(rand(), true)), 0, $this->saltLength);
+
         return $ret;
     }
+	
+    public function __set($key, $value)
+	{
+		if ($key === 'password')
+		{
+			// Use Auth to hash the password
+            //
+            $value = $this->_encryptValue($value);
+		}
+
+		parent::__set($key, $value);
+	}
+
 
     /*
     var $field_data = array(); 
@@ -159,25 +188,91 @@ class Account extends DataMapper
     {
         $timestamp = time();
         $emailVars = array(
-                'account' => $this,
-                'email'=>$this->email,
-                'validationUrl'=>sprintf('/user/validate/%d/%d/%s', $this->id, $timestamp, $this->userPassRehash($timestamp)),
+                'email'                    => $this->email,
+                'validationUrl'            => sprintf('/user/validate/%d/%d/%s', $this->id, $timestamp, $this->userPassRehash($timestamp)),
+                'convention_name'          => Kohana::lang('ecmproject.convention_name'),
+                'convention_name_short'    => Kohana::lang('ecmproject.convention_name_short'),
+                'convention_forum_url'     => Kohana::lang('ecmproject.convention_forum_url'),
+                'convention_contact_email' => Kohana::lang('ecmproject.convention_contact_email'),
+                'convention_url'           => Kohana::lang('ecmproject.convention_url'),
         );
 
-        $this->CI->load->library('email');
+        $to      = $emailVars['email'];
+        $from    = Kohana::lang('ecmproject.outgoing_email_name');
+        $subject = Kohana::lang('ecmproject.registration_subject');
+ 
+        $view = new View('user/register_email', $emailVars);
+        $message = $view->render(FALSE);
 
-        $this->CI->email->from(
-                $this->CI->config->item('convention_outgoing_email_email'),
-                $this->CI->config->item('convention_outgoing_email_name') // lang?
-        );
-        $this->CI->email->to($this->email); 
-        $this->CI->email->subject('LANG: registration email subject');
-        $this->CI->email->message(
-                $this->CI->load->view('user/register.email', $emailVars, TRUE)
-        );
-        $this->CI->email->send();
-#        echo $this->CI->email->print_debugger();
+        email::send($to, $from, $subject, $message, TRUE);
     }
+
+    /**
+	 * Validates and optionally saves a new user record from an array.
+	 *
+	 * @param  array    values to check
+	 * @param  boolean  save[Optional] the record when validation succeeds
+	 * @return boolean
+	 */
+	public function validate(array & $array, $save = FALSE)
+	{
+		// Initialise the validation library and setup some rules
+		$array = Validation::factory($array);
+        // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
+        $array->pre_filter('trim');
+
+        // Add Rules
+        $array->add_rules('email', 'required', array('valid','email'));
+        $array->add_rules('password', 'required');
+
+        $array->add_rules('confirm_password', 'required');
+        $array->add_rules('confirm_password',  'matches[password]');
+
+        $array->add_rules('gname', 'required');
+        $array->add_rules('sname', 'required');
+
+        $array->add_rules('phone', 'required');
+        $array->add_rules('phone', array('valid', 'phone'));
+
+        // Email unique validation
+        $array->add_callbacks('email', array($this, '_unique_email'));
+        //$array->add_rules('name', 'required', array($this, '_name_exists'));
+
+ 
+		return parent::validate($array, $save);
+	}
+ 
+    
+	
+    /**
+	 * Allows a model to be loaded by username or email address.
+	 */
+	public function where_key($id = NULL)  { return 'id'; }
+	public function unique_key($id = NULL) { return 'email'; }
+    
+    /*
+     * Callback method that checks for uniqueness of email
+     *
+     * @param  Validation  $array   Validation object
+     * @param  string      $field   name of field being validated
+     */
+    public function _unique_email(Validation $array, $field)
+    {
+        $fields = array();
+        $fields['email'] = $array[$field];
+        if ($this->loaded)
+            $fields['id !='] = $this->id;
+
+        // check the database for existing records
+        $email_exists = (bool) ORM::factory('account')->where($fields)->count_all();
+
+        if ($email_exists)
+        {
+            // add error to validation object
+            $array->add_error($field, 'email_exists');
+        }
+    }
+    
 }
 
 /* End of file user.php */

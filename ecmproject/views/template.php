@@ -1,31 +1,8 @@
-<?php
-$this->load->helper('url');
-if (!isset($pageTitle))
-    $pageTitle = '';
-else
-    $pageTitle = ' :: ' . $pageTitle;
-
-if (!isset($messages))
-    $messages = array();
-if (!isset($errors))
-    $errors = array();
-$isLoggedIn = 0;
-$menu = array();
-$subheading = '';
-
-/*
-if ($this->session->flashdata('messages')) 
-	$messages = $messages + $this->session->flashdata('messages');
-if ($this->session->flashdata('errors')) 
-	$errors  = $errors + $this->session->flashdata('errors');
-*/
-
-?><!DOCTYPE html 
-     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
           "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
 <head> 
-<title>Electronic Convention Management (ECM)<?php echo $pageTitle ?></title> 
+<title>Electronic Convention Management (ECM)<?php echo $title ? "::$title" : "" ?></title> 
 <link href="<?php echo url::base() ?>css/main.css" rel="stylesheet" type="text/css" /> 
 <script type="text/javascript" src="<?php echo url::base() ?>js/jquery-1.3.2.min.js"></script>
 </head> 
@@ -47,9 +24,9 @@ if ($this->session->flashdata('errors'))
         }
         ?>
         <ul> 
-            <li class="menuItem title"><a href="<?php url::base(); ?>">Menu</a></li>
+            <li class="menuItem title"><a href="<?php echo url::base(); ?>">Menu</a></li>
             <?php if ($isLoggedIn): ?>
-            <li><b><?= htmlentities($user_name) ?></b></li>
+            <li><b><?= htmlentities($user->gname) ?></b></li>
             <li>&nbsp;</li>
             <?php endif; ?>
             <?php if($menu): ?><?php foreach ($menu as $m): ?>
@@ -67,12 +44,13 @@ if ($this->session->flashdata('errors'))
     <?php if ($heading) echo "<h2>$heading</h2>"; ?>
     <?php if ($subheading) echo "<h3>$subheading</h3>"; ?>
     
-<?php foreach ($messages as $msg) { echo '<p class="msg">'.$msg.'</p>'; } ?>
-<?php foreach ($errors as $err) { echo '<p class="errormsg">'.$err.'</p>'; } ?>
+    <?php foreach ($messages as $msg) { echo '<p class="msg">'.$msg.'</p>'; } ?>
+    <?php foreach ($errors as $err) { echo '<p class="errormsg">'.$err.'</p>'; } ?>
 
     <br />
     <!-- content start -->
     <?php print $content ?>
+    <?php print $profiler ?>
     <!-- content end -->
     <br />
 </div> 
@@ -82,4 +60,4 @@ if ($this->session->flashdata('errors'))
 </div> 
 </body> 
 </html> 
- 
+

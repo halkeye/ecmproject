@@ -1,109 +1,200 @@
-<?php  if ( ! defined('BASEPATH') && !defined('SYSPATH')) exit('No direct script access allowed');
+<?php defined('SYSPATH') or die('No direct script access.');
+/**
+ * User authorization library. Handles account login and logout, as well as secure
+ * password hashing.
+ *
+ * @package    User Management
+ * @depends    ORM
+ * @author     Kohana Team
+ * @copyright  (c) 2007 Kohana Team
+ * @license    http://kohanaphp.com/license.html
+ */
+class Auth_Core {
 
-class Auth 
-{
-    var $CI = null;
+	// Session instance
+	protected $session;
 
-	function Auth()
+	// Configuration
+	protected $config;
+
+	/**
+	 * Create an instance of Auth.
+	 *
+	 * @return  object
+	 */
+	public static function factory($config = array())
 	{
-        $this->CI =& get_instance();
-
-		$this->CI->load->library('session');
-		$this->CI->load->database();
-		$this->CI->load->helper('url');
-        #$this->CI->load->model('Account_model');
-        $this->CI->lang->load('auth');
+		return new Auth($config);
 	}
 
-    function processLogin($email, $password)
-    {
-        // A few safety checks
-        // Our array has to be set
-        if(!$email && !$password)
-            return FALSE;
+	/**
+	 * Return a static instance of Auth.
+	 *
+	 * @return  object
+	 */
+	public static function instance($config = array())
+	{
+		static $instance;
 
-        $this->CI->load->model('Account');
-        $u = new Account();
-        if (!$u->login($email, $password)) 
-        { 
-            return $this->CI->lang->line('auth_error_invalid_user_pass');
-        }
+		// Load the Auth instance
+		empty($instance) and $instance = new Auth($config);
 
-        if (!$u->isActive())
-        {
-            return $this->CI->lang->line('auth_error_not_active');
-        }
-        $u->login = time();
-        $u->save();
-        return $this->loginUser($u);
+		return $instance;
+	}
 
-    }
+	/**
+	 * Loads Session and configuration options.
+	 */
+	public function __construct($config = array())
+	{
+		// Load libraries
+		$this->session = Session::instance();
 
-    function loginUser($account)
-    {
-        // Our user exists, set session.
-        $this->CI->session->set_userdata('logged_user', $account->email);
-        $this->CI->session->set_userdata('user_name', $account->gname . ' '. $account->sname);
+		Kohana::log('debug', 'Auth Library loaded');
+	}
+
+	/**
+	 * Attempt to log in a account by using an ORM object and plain-text password.
+	 *
+	 * @param   object  account model object
+	 * @param   string  plain-text password to check against
+	 * @param   bool    to allow auto-login, or "remember me" feature
+	 * @return  bool
+	 */
+	public function login(Account_Model $account, $password, $remember = FALSE)
+	{
+		if (empty($password))
+			return FALSE;
+
+		// Create a hashed password using the salt from the stored password
+        $password = sha1($account->salt . $password);
+        if ($account->password !== $password) return FALSE;
+			
+        $this->complete_login($account);
+
         return TRUE;
-    }
 
-    /**
+		// If the account has the "login" role and the passwords match, perform a login
+		if ($account->has_role('login') AND $account->password === $password)
+		{
+			// Finish the login
+			$this->complete_login($account);
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+	/**
+	 * Attempt to automatically log a account in by using tokens.
+	 *
+	 * @return  bool
+	 */
+	public function auto_login()
+	{
+		if ($token = cookie::get('autologin'))
+		{
+			// Load the token and account
+			$token = new Account_Token_Model($token);
+			$account = new Account_Model($token->account_id);
+
+			if ($token->id != 0 AND $account->id != 0)
+			{
+				if ($token->account_agent === sha1(Kohana::$account_agent))
+				{
+					// Save the token to create a new unique token
+					$token->save();
+
+					// Set the new token
+					cookie::set('autologin', $token->token, $token->expires - time());
+
+					// Complete the login with the found data
+					$this->complete_login($account);
+
+					// Automatic login was successful
+					return TRUE;
+				}
+
+				// Token is invalid
+				$token->delete();
+			}
+		}
+
+		return FALSE;
+	}
+
+	/**
+	 * Log out a account by removing the related session variables.
+	 *
+	 * @param   bool   completely destroy the session
+	 * @return  bool
+	 */
+	public function logout($destroy = FALSE)
+	{
+		// Delete the autologin cookie if it exists
+		cookie::get('autologin') and cookie::delete('autologin');
+
+		if ($destroy == TRUE)
+		{
+			$this->session->destroy();
+		}
+		else
+		{
+			$this->session->delete(
+                    'account_id', 
+                    'account_name', 
+                    'account',
+                    'roles'
+            );
+		}
+
+		return TRUE;
+	}
+
+	/**
+	 * Complete the login for a account by incrementing the logins and setting
+	 * session data: account_id, accountname, roles
+	 *
+	 * @param   object   account model object
+	 * @return  void
+	 */
+	protected function complete_login(Account_Model $account)
+	{
+		// Update the number of logins
+		$account->login = time();
+
+		// Save the account
+		$account->save();
+
+		// Store session data
+		$this->session->set(array
+		(
+			'account_id'   => $account->id,
+			'account_name' => $account->gname . ' ' . $account->sname,
+            'account'      => (Object) $account->as_array(),
+			#'roles'        => $account->roles
+		));
+	}
+
+	/**
+     * Returns weither or not the account is logged in
      *
-     * This function restricts users from certain pages.
-     * use restrict(TRUE) if a user can't access a page when logged in
-     *
-     * @access  public
-     * @param   boolean wether the page is viewable when logged in
-     * @return  void
-     */
-    function restrict($logged_out = FALSE)
-    {
-        // If the user is logged in and he's trying to access a page
-        // he's not allowed to see when logged in,
-        // redirect him to the index!
-        if ($logged_out && $this->logged_in())
-        {
-            redirect('');
-        }
+	 * @return  boolean
+	 */
 
-        // If the user isn' logged in and he's trying to access a page
-        // he's not allowed to see when logged out,
-        // redirect him to the login page!
-        if ( ! $logged_out && ! $this->logged_in())
-        {
-            $this->CI->session->set_userdata(
-                    'redirected_from',
-                    $this->CI->uri->uri_string()
-            ); // We'll use this in our redirect method.
-            redirect('/user/login');
-        }
+    public function is_logged_in()
+    {
+        if (Session::instance()->get('account_id'))
+            return TRUE;
+        return FALSE;
     }
 
-    /**
-     *
-     * Checks if a user is logged in
-     *
-     * @access  public
-     * @return  boolean
-     */
-    function logged_in()
+    public function get_user()
     {
-        return $this->CI->session->userdata('logged_user');
+        if (!$this->is_logged_in())
+            return new StdClass;
+        return $this->session->get('account');
     }
 
-    function logout()
-    {
-        $this->CI->session->destroy();
-        return TRUE;
-    }
-
-    function name()
-    {
-        if (!$this->logged_in()) return '';
-        return $this->CI->session->userdata('user_name');
-    }
-
-}
-// End of library class
-// Location: system/application/libraries/Auth.php
-
+} // End Auth

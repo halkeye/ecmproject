@@ -10,29 +10,53 @@
  */
 
 
-class user extends Ecmproject_Base_Controller 
+class User_Controller extends Controller 
 {
     function __construct()
     {
         parent::__construct();
-        $this->load->library('auth');
-        $this->template->write('heading', 'User', TRUE);
-        $this->template->write('subheading', 'User Information', TRUE);
     }
 
     function index()
     {
-        $this->data['todo'] = array();
+        $data['todo'] = array();
+        $accounts = ORM::factory('account')->find_all();
+
+        foreach ($accounts as $account) 
+        {
+            $data['todo'][] = $account->gname . ' ' . $account->sname . ' -- ' . $account->email;
+        }
+
+        $this->view->content = new View('user/user_view', $data);
+
+        return;
+
+        $form = new Forge(NULL, 'User Login');
+
+        $form->input('username')->label(TRUE)->rules('required|length[4,32]');
+        $form->password('password')->label(TRUE)->rules('required|length[5,40]');
+        $form->submit('Attempt Login')->label(FALSE);
+		
+
+        if ($form->validate())
+        {
+        }
+
+        $this->view->content = $form->render();
+
+        /*
         $a = new Account();
         $a->get();
         foreach ($a->all as $account) 
         {
             $this->data['todo'][] = $account->gname . ' ' . $account->sname . ' -- ' . $account->email;
         }
-        $this->data['menu'] = array(
-                array('title'=>'Register', 'url'=>array('user','register')),
-                array('title'=>'Login',    'url'=>array('user','login')),
+        */
+        $this->view->menu += array(
+                array('title'=>'Register', 'url'=>'user/register'),
+                array('title'=>'Login',    'url'=>'user/login'),
         );
+        return;
 
         $this->load->vars($this->data);
         $this->template->write('pageTitle', 'My Index Title', TRUE);
@@ -44,35 +68,46 @@ class user extends Ecmproject_Base_Controller
 
     function login()
     {
-$this->output->enable_profiler(TRUE);
-        $this->template->write('pageTitle', 'My Index Title', TRUE);
-        $this->template->write('heading', 'User', TRUE);
-        $this->template->write('subheading', 'Main Page', TRUE);
+        $this->view->title      = 'My Index Title';
+        $this->view->subHeading = "Login Page";
 
-        $this->auth->restrict(TRUE);
-
-        $this->load->library('auth');
-        $user = $this->input->post('user');
-        $pass = $this->input->post('pass');
-
-        $authRet = $this->auth->processLogin($user,$pass);
-        if($authRet === TRUE)
+        if ($this->auth->is_logged_in()) 
         {
-            $this->session->set_flashdata('messages', array('Logged in sucessfully'));
-            // Login successful, let's redirect.
-            $this->_redirect('/user/index');
+            $_SESSION['messages'][] = 'Already logged in';
+            url::redirect('');
             return;
         }
 
-        $data['errors'] = array($authRet);
+        // Load the user
+        $user = ORM::factory('account')->where('email', $this->input->post('user'))->find();
+        if (!$user) 
+        {
+            $this->addError('Invalid Email');
+            return;
+        }
 
-        $this->template->write_view('content', 'user/login_error', $data, TRUE);
-        return $this->template->render();
+        $authRet = $this->auth->login($user, $this->input->post('pass'));
+        if ($authRet === TRUE) 
+        {
+            $this->addMessageFlash('Login Success!');
+            //$this->addMessageFlash(Kohana::debug($user->roles));
+            url::redirect('');
+            return;
+        }
+        $this->addError('Invalid username or password.');
+        $this->addError($authRet);
+        $this->view->content = new View('user/login_error');
+        return;
     }
 
     function logout()
     {
-        $this->auth->restrict();
+        if (!$this->auth->is_logged_in()) 
+        {
+            $_SESSION['messages'][] = 'Not logged in yet.';
+            url::redirect('');
+            return;
+        }
 
         if($this->auth->logout())
         {
@@ -83,25 +118,41 @@ $this->output->enable_profiler(TRUE);
 
     function register()
     {
-        $this->load->library('recaptcha');
-        $this->load->library('form_validation');
-        $this->lang->load('recaptcha');
-        $this->load->helper(array('form', 'url'));
+        // using the factory enables method chaining
+        $form = array(
+                'email'     => '',
+                'password'  => '',
+                'confirm_password'  => '',
+                'gname'     => '',
+                'sname'     => '',
+                'phone'     => '',
+        );
+        
+        $errors = $form;
 
-$this->output->enable_profiler(TRUE);
-        $a = new Account();
-        if ($this->input->post('registerUser'))
+        if ($post = $this->input->post())
         {
-            $a->email             = $this->input->post('email');
-            $a->password          = $this->input->post('password');
-            $a->confirm_password  = $this->input->post('confirm_password');
-            foreach ($a->validation as $field) 
+            $account = ORM::factory('Account');
+            if ($account->validate($post))
             {
-                $fieldName = $field['field'];
-                if ($fieldName == 'id') continue;
-
-                $a->$fieldName    = $this->input->post($fieldName);
+                $account->save();
+                $account->sendValidateEmail();
+                $this->addMessageFlash(Kohana::lang('ecmproject.registration_success_message'));
+                $this->_redirect('');
+                return;
             }
+            else
+            {
+                // repopulate the form fields
+                $form = arr::overwrite($form, $post->as_array());
+
+                // populate the error fields, if any
+                // We need to already have created an error message file, for Kohana to use
+                // Pass the error message file name to the errors() method
+                $errors = arr::overwrite($errors, $post->errors('form_error_messages'));
+            }
+        
+            /*
 
             $validated = 1;
             if ($this->config->item('use_captcha'))
@@ -121,14 +172,12 @@ $this->output->enable_profiler(TRUE);
             if ($validated && $a->save())
             {
                 $this->session->set_flashdata('messages', array('LANG: registration sucessful. Check email box blah blah'));
-                $a->sendValidateEmail();
                 $this->_redirect('');
                 return;
             }
+            */
         }
-
-        $this->template->write_view('content', 'user/register', array('object'=>$a), TRUE);
-        return $this->template->render();
+        $this->view->content = new View('user/register', array('form'=>$form, 'errors'=>$errors));
     }
 
     function validate($uid = 0, $timestamp = 0, $key = '')
@@ -200,12 +249,12 @@ $this->output->enable_profiler(TRUE);
      */
     function _redirect($where = '/user')
     {
-        if ($this->session->userdata('redirected_from') == FALSE)
+        if ($this->session->get('redirected_from') == FALSE)
         {
-            redirect($where);
+            url::redirect($where);
             return;
         } 
-        redirect($this->session->userdata('redirected_from'));
+        url::redirect($this->session->get('redirected_from'));
         return;
     }
 
@@ -232,10 +281,24 @@ $this->output->enable_profiler(TRUE);
 
     function validationTest()
     {
-        $a = new Account();
-        $a->where('email','halkeye@gmail.com')->get();
+        $a = ORM::factory('account');
+        $a->where('email','halkeye@gmail.com')->find();
         $a->sendValidateEmail();
         $this->index();
+    }
+
+    public function _pwd_check(Validation $post)
+    {
+        // If add->rules validation found any errors, get me out of here!
+        if (array_key_exists('password', $post->errors()))
+            return;
+
+        // only valid password is '123'
+        if ($post->password != '123')
+        {
+            // Add a validation error, this will cause $post->validate() to return FALSE
+            $post->add_error( 'password', 'pwd_check');
+        }
     }
 
 }
