@@ -54,7 +54,7 @@ class Controller extends Controller_Core
         if (isset($this->profiler))
         {
             $this->profiler->disable();
-            $this->view->profiler = $this->profiler->render(TRUE);
+       #     $this->view->profiler = $this->profiler->render(TRUE);
         }
         
         $session_messages = $this->session->get_once('messages');
@@ -66,6 +66,8 @@ class Controller extends Controller_Core
 
         // Displays the view
         $this->view->render(TRUE);
+        if (class_exists('Debug_Toolbar', TRUE))
+            echo Debug_Toolbar::render();
     }
 
     protected function addMessage($message)

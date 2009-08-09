@@ -4,64 +4,43 @@ define('ACCOUNT_STATUS_ACTIVE', 1);
 
 class Account_Model extends ORM 
 {
-    var $saltLength = 10;
-    var $has_many = array('usergroup');
+    // Account specific Stuff
+    public $saltLength = 10;
+
+    // Current relationships
+    public $has_and_belongs_to_many = array('account_usergroups');
+
+    // Table primary key and value
+    //protected $primary_key = 'accounts_id';
+    protected $primary_key = 'id';
+
+    // Model table information
+    protected $table_name    = 'accounts';
+    protected $table_columns = array (
+            'accounts_id' => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, 'sequenced' => true, ),
+            'email'       => array ( 'type' => 'string', 'length' => '55' ),
+            'gname'       => array ( 'type' => 'string', 'length' => '55' ),
+            'sname'       => array ( 'type' => 'string', 'length' => '55' ),
+            'badge'       => array ( 'type' => 'string', 'length' => '55', 'null' => true, ),
+            'dob'         => array ( 'type' => 'string', 'format' => '0000-00-00' ),
+            'phone'       => array ( 'type' => 'string', 'length' => '15',  ),
+            'cell'        => array ( 'type' => 'string', 'length' => '15',  ),
+            'address'     => array ( 'type' => 'string', 'null' => true,  ),
+            'econtact'    => array ( 'type' => 'string', 'length' => '55',  ),
+            'ephone'      => array ( 'type' => 'string', 'length' => '15',  ),
+            'password'    => array ( 'type' => 'string', 'length' => '40',  ),
+            'salt'        => array ( 'type' => 'string',    'length' => '10',  ),
+            'reg_status'  => array ( 'type' => 'int',    'max' => 127,    'unsigned' => false,  ),
+            'created'     => array ( 'type' => 'int',    'max' => 2147483647,    'unsigned' => false,  ),
+            'login'       => array ( 'type' => 'int', 'max' => 2147483647, 'unsigned' => false, 'null' => true, ),
+    );
     protected $ignored_columns = array('confirm_password');
 
-    var $table_columns = array (
-            'id'    => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, 'sequenced' => true, ),
-            'email' => array ( 'type' => 'string', 'length' => '55' ),
-            'gname' => array ( 'type' => 'string', 'length' => '55' ),
-            'sname' => array ( 'type' => 'string', 'length' => '55' ),
-            'badge' => array ( 'type' => 'string', 'length' => '55', 'null' => true, ),
-            'dob'   => array ( 'type' => 'string', 'format' => '0000-00-00' ),
-            'phone' => array (    'type' => 'string',    'length' => '15',  ),
-            'cell' =>   array (    'type' => 'string',    'length' => '15',  ),
-            'address' =>   array (    'type' => 'string',    'null' => true,  ),
-            'econtact' =>   array (    'type' => 'string',    'length' => '55',  ),
-            'ephone' =>   array (    'type' => 'string',    'length' => '15',  ),
-            'password' =>   array (    'type' => 'string',    'length' => '40',  ),
-            'salt' =>   array (    'type' => 'string',    'length' => '10',  ),
-            'reg_status' =>   array (    'type' => 'int',    'max' => 127,    'unsigned' => false,  ),
-            'created' =>   array (    'type' => 'int',    'max' => 2147483647,    'unsigned' => false,  ),
-            'login' => array ( 'type' => 'int', 'max' => 2147483647, 'unsigned' => false, 'null' => true, ),
-    );
-
     var $validation = array(
-        array(
-            'field' => 'email',
-            'label' => 'Email',
-            'rules' => array('xss_clean', 'required', 'trim', 'unique', 'valid_email', 'min_length' => 3, 'max_length' => 55),
-        ),
-        array(
-            'field' => 'password',
-            'label' => 'Password',
-            'rules' => array('xss_clean', 'required', 'trim', 'min_length' => 5, 'encrypt'),
-        ),
-        array(
-            'field' => 'confirm_password',
-            'label' => 'Confirm Password',
-            'rules' => array('xss_clean', 'required', 'encrypt', 'matches' => 'password'),
-        ),
-        array(
-            'field' => 'gname',
-            'label' => 'Given Name',
-            'rules' => array('xss_clean', 'required', 'trim', 'max_length' => 55, 'alpha_dash_dot'),
-        ),
-        array(
-            'field' => 'sname',
-            'label' => 'Surname',
-            'rules' => array('xss_clean', 'required', 'trim', 'max_length' => 55, 'alpha_dash_dot'),
-        ),
         array(
             'field' => 'dob',
             'label' => 'Date Of Birth',
             'rules' => array('xss_clean', 'required', 'trim', 'valid_date'),
-        ),
-        array(
-            'field' => 'phone',
-            'label' => 'Phone Number',
-            'rules' => array('xss_clean', 'required', 'trim', /*'valid_phone_number'*/),
         ),
         array(
             'field' => 'cell',
@@ -110,49 +89,6 @@ class Account_Model extends ORM
 		parent::__set($key, $value);
 	}
 
-
-    /*
-    var $field_data = array(); 
-
-    function Account()
-    {
-        $this->field_data[] = (object)array( 'name' => 'id', 'type' => 'int', 'default' => '', 'max_length' => 1, 'primary_key' => 1, );
-        $this->field_data[] = (object)array( 'name' => 'email', 'type' => 'string', 'default' => '', 'max_length' => 17, 'primary_key' => 0, );
-        $this->field_data[] = (object)array( 'name' => 'gname', 'type' => 'string', 'default' => '', 'max_length' => 0, 'primary_key' => 0, );
-        $this->field_data[] = (object)array( 'name' => 'sname', 'type' => 'string', 'default' => '', 'max_length' => 0, 'primary_key' => 0, );
-        $this->field_data[] = (object)array( 'name' => 'badge', 'type' => 'string', 'default' => '', 'max_length' => 0, 'primary_key' => 0, );
-        $this->field_data[] = (object)array( 'name' => 'dob', 'type' => 'date', 'default' => '', 'max_length' => 10, 'primary_key' => 0, );
-        $this->field_data[] = (object)array( 'name' => 'phone', 'type' => 'string', 'default' => '', 'max_length' => 0, 'primary_key' => 0, );
-        $this->field_data[] = (object)array( 'name' => 'cell', 'type' => 'string', 'default' => '', 'max_length' => 0, 'primary_key' => 0, );
-        $this->field_data[] = (object)array( 'name' => 'address', 'type' => 'blob', 'default' => '', 'max_length' => 0, 'primary_key' => 0, );
-        $this->field_data[] = (object)array( 'name' => 'econtact', 'type' => 'string', 'default' => '', 'max_length' => 0, 'primary_key' => 0, );
-        $this->field_data[] = (object)array( 'name' => 'ephone', 'type' => 'string', 'default' => '', 'max_length' => 0, 'primary_key' => 0, );
-        $this->field_data[] = (object)array( 'name' => 'password', 'type' => 'string', 'default' => '', 'max_length' => 40, 'primary_key' => 0, );
-        $this->field_data[] = (object)array( 'name' => 'salt', 'type' => 'string', 'default' => '', 'max_length' => 10, 'primary_key' => 0, );
-        $this->field_data[] = (object)array( 'name' => 'reg_status', 'type' => 'int', 'default' => '', 'max_length' => 1, 'primary_key' => 0, );
-        $this->field_data[] = (object)array( 'name' => 'created', 'type' => 'datetime', 'default' => '', 'max_length' => 19, 'primary_key' => 0, );
-        $this->field_data[] = (object)array( 'name' => 'login', 'type' => 'datetime', 'default' => '', 'max_length' => 19, 'primary_key' => 0, );
-        parent::DataMapper();
-    }
-    */
-
-    function login($email, $password)
-    {
-        // Get this users stored record via their username
-        $this->where('email', $email)->get();
-
-        ## Not a valid user
-        if (!isset($this->id))
-            return false;
-
-        if ($this->password == $this->_encryptValue($password))
-        {
-            // Login succeeded
-            return TRUE;
-        }
-        return FALSE;
-    }
-
     function _encryptValue($value)
     {
         if (empty($value)) return;
@@ -163,19 +99,6 @@ class Account_Model extends ORM
             $this->salt = substr(md5(uniqid(rand(), true)), 0, $this->saltLength);
         }
         return sha1($this->salt . $value);
-    }
-
-
-    // Validation prepping function to encrypt passwords
-    // If you look at the $validation array, you will see the password field will use this function
-    function _encrypt($field)
-    {
-        // Don't encrypt an empty string
-        if (!empty($this->{$field}))
-        {
-            $this->{$field} = $this->_encryptValue($this->{$field});
-
-        }
     }
 
     function isActive()
@@ -189,7 +112,7 @@ class Account_Model extends ORM
         $timestamp = time();
         $emailVars = array(
                 'email'                    => $this->email,
-                'validationUrl'            => sprintf('/user/validate/%d/%d/%s', $this->id, $timestamp, $this->userPassRehash($timestamp)),
+                'validationUrl'            => sprintf('/user/validate/%d/%d/%s', $this->primary_key_value, $timestamp, $this->userPassRehash($timestamp)),
                 'convention_name'          => Kohana::lang('ecmproject.convention_name'),
                 'convention_name_short'    => Kohana::lang('ecmproject.convention_name_short'),
                 'convention_forum_url'     => Kohana::lang('ecmproject.convention_forum_url'),
@@ -242,13 +165,19 @@ class Account_Model extends ORM
 		return parent::validate($array, $save);
 	}
  
-    
-	
-    /**
-	 * Allows a model to be loaded by username or email address.
-	 */
-	public function where_key($id = NULL)  { return 'id'; }
-	public function unique_key($id = NULL) { return 'email'; }
+	public function unique_key($id = NULL) 
+    {
+        if (empty($id))
+            return $this->primary_key;
+
+        if (is_string($id))
+            return 'email';
+        
+        if (is_numeric($id))
+            return $this->primary_key;
+
+        return parent::unique_key($id);
+    }
     
     /*
      * Callback method that checks for uniqueness of email
@@ -261,7 +190,7 @@ class Account_Model extends ORM
         $fields = array();
         $fields['email'] = $array[$field];
         if ($this->loaded)
-            $fields['id !='] = $this->id;
+            $fields[$this->primary_key.' !='] = $this->primary_key_value;
 
         // check the database for existing records
         $email_exists = (bool) ORM::factory('account')->where($fields)->count_all();

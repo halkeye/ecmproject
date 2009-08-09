@@ -123,4 +123,5 @@ $config['modules'] = array
 	// MODPATH.'archive',   // Archive utility
 	// MODPATH.'payment',   // Online payments
 	// MODPATH.'unit_test', // Unit testing
+	MODPATH.'debug_toolbar', // Unit testing
 );

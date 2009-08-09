@@ -20,6 +20,10 @@ class User_Controller extends Controller
     function index()
     {
         $data['todo'] = array();
+        $account = ORM::factory('account')->find('halkeye@gmail.com');
+        $account = ORM::factory('account')->find(1);
+
+
         $accounts = ORM::factory('account')->find_all();
 
         foreach ($accounts as $account) 
@@ -27,43 +31,16 @@ class User_Controller extends Controller
             $data['todo'][] = $account->gname . ' ' . $account->sname . ' -- ' . $account->email;
         }
 
+        $data['todo'][] = var_export($account->has(ORM::factory('usergroup',1 )),1);
+        foreach ($account->account_usergroups as $group)
+            $data['todo'][] = $group->name;
         $this->view->content = new View('user/user_view', $data);
 
-        return;
-
-        $form = new Forge(NULL, 'User Login');
-
-        $form->input('username')->label(TRUE)->rules('required|length[4,32]');
-        $form->password('password')->label(TRUE)->rules('required|length[5,40]');
-        $form->submit('Attempt Login')->label(FALSE);
-		
-
-        if ($form->validate())
-        {
-        }
-
-        $this->view->content = $form->render();
-
-        /*
-        $a = new Account();
-        $a->get();
-        foreach ($a->all as $account) 
-        {
-            $this->data['todo'][] = $account->gname . ' ' . $account->sname . ' -- ' . $account->email;
-        }
-        */
         $this->view->menu += array(
                 array('title'=>'Register', 'url'=>'user/register'),
                 array('title'=>'Login',    'url'=>'user/login'),
         );
         return;
-
-        $this->load->vars($this->data);
-        $this->template->write('pageTitle', 'My Index Title', TRUE);
-        $this->template->write('heading', 'User', TRUE);
-        $this->template->write('subheading', 'Main Page', TRUE);
-        $this->template->write_view('content', 'user/user_view', $this->data, TRUE);
-        $this->template->render();
     }
 
     function login()

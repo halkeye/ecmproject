@@ -22,7 +22,7 @@ $config['default'] = array
 (
 	'benchmark'     => TRUE,
 	'persistent'    => FALSE,
-	'connection'    => 'mysql://root:@127.0.0.1/ecmproject',
+	'connection'    => 'mysql://root:@127.0.0.1/ecms',
 	'character_set' => 'utf8',
 	'table_prefix'  => '',
 	'object'        => TRUE,

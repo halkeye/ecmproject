@@ -1,18 +1,11 @@
 <?php
 
-class UserGroup extends Model 
+class Usergroup_Model extends orm 
 {
     var $table_name = 'usergroups';
-    var $primary_key = 'guid';
+    #var $primary_key = 'usergroups_id';
     
-    /**
-	 * Allows a model to be loaded by username or email address.
-	 */
-	protected function where_key($id = NULL)
-	{
-        return 'id';
-	}
-
+    /*
 
     var $validation = array(
         array(
@@ -31,6 +24,7 @@ class UserGroup extends Model
             'rules' => array('xss_clean', 'trim'),
         ),
     );
+    */
 
 }
 
