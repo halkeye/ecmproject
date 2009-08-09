@@ -1,6 +1,6 @@
 <?php
 
-class UserGroup extends DataMapper 
+class UserGroup extends Model 
 {
     var $table = 'usergroups';
     var $pk_key = 'guid';

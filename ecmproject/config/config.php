@@ -1,4 +1,4 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php  if ( ! defined('BASEPATH') && !defined('SYSPATH')) exit('No direct script access allowed');
 /*
 |--------------------------------------------------------------------------
 | Base Site URL
@@ -10,19 +10,25 @@
 |	http://example.com/
 |
 */
-#$config['base_url']	= "http://barkdog/ecmproject/";
-$config['base_url']    = 'http://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['SCRIPT_NAME']);
-/*
-|--------------------------------------------------------------------------
-| Index File
-|--------------------------------------------------------------------------
-|
-| Typically this will be your index.php file, unless you've renamed it to
-| something else. If you are using mod_rewrite to remove the page set this
-| variable so that it is blank.
-|
-*/
-$config['index_page'] = "index.php";
+
+/**
+ * Domain name, with the installation directory. Default: localhost/kohana/
+ */
+$config['site_domain']    = $_SERVER['HTTP_HOST'].dirname($_SERVER['SCRIPT_NAME']);
+/**
+ * Default protocol used to access the website. Default: http
+ */
+$config['site_protocol'] = 'http';
+
+$config['base_url']    = $config['site_protocol'] . $config['site_domain'];
+
+
+/**
+ * Name of the front controller for this application. Default: index.php
+ *
+ * This can be removed by using URL rewriting.
+ */
+$config['index_page'] = 'index2.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -172,7 +178,7 @@ $config['directory_trigger'] 	= 'd'; // experimental not currently in use
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = 1;
+$config['log_threshold'] = 0;
 
 /*
 |--------------------------------------------------------------------------
@@ -255,17 +261,6 @@ $config['cookie_path']		= "/";
 
 /*
 |--------------------------------------------------------------------------
-| Global XSS Filtering
-|--------------------------------------------------------------------------
-|
-| Determines whether the XSS filter is always active when GET, POST or
-| COOKIE data is encountered
-|
-*/
-$config['global_xss_filtering'] = TRUE;
-
-/*
-|--------------------------------------------------------------------------
 | Output Compression
 |--------------------------------------------------------------------------
 |
@@ -322,6 +317,63 @@ $config['rewrite_short_tags'] = FALSE;
 |
 */
 $config['proxy_ips'] = '';
+
+/**
+ * Additional resource paths, or "modules". Each path can either be absolute
+ * or relative to the docroot. Modules can include any resource that can exist
+ * in your application directory, configuration files, controllers, views, etc.
+ */
+$config['modules'] = array
+(
+	// 'modules/auth',   // Authentication
+	// 'modules/forge',  // Form generation
+	// 'modules/kodoc',  // Self-generating documentation
+	// 'modules/media',  // Media caching and compression
+);
+
+/**
+ * Libraries and models to be automatically preloaded into every controller. Use
+ * a comma-separated list to set multiple items.
+ */
+$config['preload'] = array
+(
+	'libraries' => '',
+	'models'    => '',
+);
+
+/**
+ * Enable or disable gzip output compression. This can dramatically decrease
+ * server bandwidth usage, at the cost of slightly higher CPU usage. Set to
+ * the compression level (1-9) that you want to use, or FALSE to disable.
+ *
+ * Do not enable this option if you are using output compression in php.ini!
+ */
+$config['output_compression'] = FALSE;
+
+/**
+ * Enable or disable global XSS filtering of GET, POST, and SERVER data. This
+ * option also accepts a string to specify a specific XSS filtering tool.
+ */
+$config['global_xss_filtering'] = TRUE;
+
+/**
+ * Enable or disable dynamic setting of configuration options. By default, all
+ * configuration options are read-only.
+ */
+$config['allow_config_set'] = FALSE;
+
+/**
+ * Enable or display displaying of Kohana error pages. This will not affect
+ * logging. Turning this off will disable ALL error pages.
+ */
+$config['display_errors'] = TRUE;
+
+/**
+ * Filename prefixed used to determine extensions. For example, an
+ * extension to the Controller class would be named MY_Controller.php.
+ */
+$config['extension_prefix'] = 'MY_';
+
 
 /* End of file config.php */
 /* Location: ./system/application/config/config.php */

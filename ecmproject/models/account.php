@@ -10,10 +10,6 @@ class Account extends DataMapper
     var $created_field = '';
     var $updated_field = '';
     var $has_many = array('usergroup');
-/*
-    var $has_one = array('country');
-
-*/
     var $validation = array(
         array(
             'field' => 'email',
