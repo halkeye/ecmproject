@@ -82,7 +82,7 @@ $config['enable_hooks'] = FALSE;
  *  3 - Notices
  *  4 - Debugging
  */
-$config['log_threshold'] = 1;
+$config['log_threshold'] = 4;
 
 /**
  * Message logging directory.
@@ -123,5 +123,11 @@ $config['modules'] = array
 	// MODPATH.'archive',   // Archive utility
 	// MODPATH.'payment',   // Online payments
 	// MODPATH.'unit_test', // Unit testing
-	MODPATH.'debug_toolbar', // Unit testing
 );
+	
+if (!IN_PRODUCTION) 
+{
+    $config['modules'][]  = MODPATH.'debug_toolbar';
+    $config['enable_hooks'] = TRUE;
+}
+

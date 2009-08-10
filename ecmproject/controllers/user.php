@@ -12,11 +12,6 @@
 
 class User_Controller extends Controller 
 {
-    function __construct()
-    {
-        parent::__construct();
-    }
-
     function index()
     {
         $data['todo'] = array();
@@ -28,12 +23,23 @@ class User_Controller extends Controller
             $data['todo'][] = $account->gname . ' ' . $account->sname . ' -- ' . $account->email;
         }
 
-        foreach ($account->usergroups as $group)
+        $account = ORM::factory('account',1);
+        if ($account->has(ORM::factory('Usergroup'), TRUE))
         {
-            $data['todo'][] = $group->name;
-            foreach ($group->permissions as $p)
+            foreach ($account->usergroups as $group)
             {
-                $data['todo'][] = $group->name . ' - ' . $p->pkey;
+                if ($group->has(ORM::factory('Permission'), TRUE))
+                {
+                    $data['todo'][] = $group->name . ' - ' . $group->permissions->count();
+                    foreach ($group->permissions as $p)
+                    {
+                        $data['todo'][] = $group->name . ' - ' . $p->pkey;
+                    }
+                }
+                else
+                {
+                    $data['todo'][] = $group->name . ' - ' . 0;
+                }
             }
         }
         

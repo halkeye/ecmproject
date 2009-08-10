@@ -18,7 +18,7 @@
 		<!-- Kohana link -->
 		<?php echo html::image(
 			Kohana::config('debug_toolbar.icon_path').'/kohana.png',
-			array('onclick' => 'debugToolbar.collapse()')
+			array('onclick' => 'debugToolbar.collapse()', 'alt'=>'kohana')
 		) ?>
 		
 		<!-- Kohana icon -->

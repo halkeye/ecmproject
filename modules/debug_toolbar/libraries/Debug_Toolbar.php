@@ -105,7 +105,7 @@ class Debug_Toolbar_Core {
 		}
 		
 		// Javascript for toolbar
-		$template->set('scripts', file_get_contents(Kohana::find_file('views', 'toolbar', TRUE, 'js')));
+		$template->set('scripts', "<!--\n" . file_get_contents(Kohana::find_file('views', 'toolbar', TRUE, 'js')) . "\n-->");
 		
 		// CSS for toolbar
 		$styles = file_get_contents(Kohana::find_file('views', 'toolbar', FALSE, 'css'));

@@ -59,8 +59,6 @@ class Controller extends Controller_Core
 
         // Displays the view
         $this->view->render(TRUE);
-        if (!IN_PRODUCTION && class_exists('Debug_Toolbar', TRUE ))
-            echo Debug_Toolbar::render();
     }
 
     protected function addMessage($message)

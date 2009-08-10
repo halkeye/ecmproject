@@ -5,7 +5,7 @@
  * NOTE: if IN_PRODUCTION is set to TRUE, the toolbar will
  * not automatically render, even if auto_render is TRUE
  */
-$config['auto_render'] = FALSE;
+$config['auto_render'] = TRUE;
 
 /* 
  * If true, the toolbar will default to the minimized position
@@ -53,3 +53,4 @@ $config['align'] = 'right';
  * Secret Key
  */ 
 $config['secret_key'] = FALSE;
+
