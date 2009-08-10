@@ -19,12 +19,14 @@ DROP TABLE IF EXISTS `passes`;
 -- One-time use codes?
 CREATE TABLE passes(
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   convention_id INT UNSIGNED NOT NULL,
    name VARCHAR(100) NOT NULL,
    price DECIMAL NOT NULL,
    isPurchasable TINYINT NOT NULL,
    ageReq TINYINT UNSIGNED,
    startDate DATE,
-   endDate DATE
+   endDate DATE,
+   FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE CASCADE -- Cascade deletion of passes. Will (should) still fail if registrations have started.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `accounts`;
