@@ -227,7 +227,7 @@ class User_Controller extends Controller
         $this->index();
     }
 
-    function paypalTest()
+    function paypalTest1()
     {
         if (!$this->auth->is_logged_in()) 
         {
@@ -239,7 +239,32 @@ class User_Controller extends Controller
         /* FIXME: Get account / get real account */
         $account = $this->auth->get_user();
 
-        $p = new Paypal();
+        
+
+        $passes = ORM::factory('pass')->find_all();
+        $content = '';
+        foreach ($passes as $pass)
+        {
+            $p = new Paypal();
+            $view = $p->paypalView();
+            $view->itemName = $pass->name;
+            $view->itemId   = $pass->id;
+            $view->price    = $pass->price;
+
+            $content .= $view->render(FALSE);
+        }
+
+        if ($content)
+        {
+            $this->view->content = $content;
+        }
+        else
+        {
+            $this->view->content = Kohana::lang('ecm.no_passes_available');
+        }
+        return;
+
+
         $p->add_field('buisiness',     'AE10_1249882783_biz@gavinmogan.com');
         $p->add_field('account_id',    $account->id);
         

@@ -41,4 +41,9 @@ class Paypal
         }
         return $this;
     }
+
+    public function paypalView() 
+    { 
+        return new View('paypal'); 
+    }
 }
