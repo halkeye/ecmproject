@@ -72,7 +72,7 @@ class Account_Model extends ORM
 	{
         if (!isset($this->created))
             $this->created = time();
-        return $ret;
+        return parent::save();
     }
 	
     public function __set($key, $value)

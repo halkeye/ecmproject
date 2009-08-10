@@ -220,8 +220,7 @@ class User_Controller extends Controller
     {
         if (!$this->auth->is_logged_in()) 
         {
-            $this->addMessageFlash('FIXME: make $auth->requre_login()');
-            url::redirect('');
+            $this->addMessage('FIXME: make $auth->requre_login()');
             return;
         }
 
