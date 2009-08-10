@@ -31,7 +31,7 @@ CREATE TABLE passes(
 
 DROP TABLE IF EXISTS `accounts`;
 -- Reg form information among other things. Require email at a minimum.
--- Salt column, usergroups storing?
+-- Salt column, usergroups storing?  
 CREATE TABLE accounts(
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    email VARCHAR(55) NOT NULL UNIQUE,
