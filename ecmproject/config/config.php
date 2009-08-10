@@ -131,3 +131,4 @@ if (!IN_PRODUCTION)
     $config['enable_hooks'] = TRUE;
 }
 
+$config['modules'][]  = MODPATH.'paypal';

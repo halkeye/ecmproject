@@ -123,13 +123,17 @@ class Auth_Core {
         $this->groups = array();
         $this->permissions = array();
         if ($account->has(ORM::factory('Usergroup'), TRUE))
+        {
             foreach ($account->usergroups as $group)
+            {
                 if ($group->has(ORM::factory('Permission'), TRUE))
                 {
                     $this->groups[$group->name] = 1;
                     foreach ($group->permissions as $p)
                         $this->permissions[$p->pkey] = 1;
                 }
+            }
+        }
 
         /* FIXME: Make a constant or something out of here */
         /* Load up registered group always */
@@ -137,15 +141,18 @@ class Auth_Core {
         {
             $this->permissions[$p->pkey] = 1;
         }
+
         // extra safety to prevent session fixation - http://en.wikipedia.org/wiki/Session_fixation
         $this->session->regenerate();
+
+        $this->account = (Object) $account->as_array();
 
         // Store session data
         $this->session->set(array
         (
             'account_id'    => $account->id,
             'account_name'  => $account->gname . ' ' . $account->sname,
-            'account'       => (Object) $account->as_array(),
+            'account'       => $this->account,
             'account_groups'=> $this->groups, 
             'account_perms' => $this->permissions, 
         ));

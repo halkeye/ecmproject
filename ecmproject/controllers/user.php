@@ -14,6 +14,13 @@ class User_Controller extends Controller
 {
     function index()
     {
+
+        $this->view->content = "this is a junk page, we need to fill it out later. Try " .
+            html::anchor('/user/junk','junkie') . " for the old junk page";
+    }
+
+    function junk()
+    {
         $data['todo'] = array();
 
         $accounts = ORM::factory('account')->find_all();
@@ -220,5 +227,31 @@ class User_Controller extends Controller
         $this->index();
     }
 
+    function paypalTest()
+    {
+        if (!$this->auth->is_logged_in()) 
+        {
+            $this->addMessageFlash('FIXME: make $auth->requre_login()');
+            url::redirect('');
+            return;
+        }
+
+        /* FIXME: Get account / get real account */
+        $account = $this->auth->get_user();
+
+        $p = new Paypal();
+        $p->add_field('buisiness',     'AE10_1249882783_biz@gavinmogan.com');
+        $p->add_field('account_id',    $account->id);
+        
+
+        $p->add_field('return',        url::site('/user/pay_success'));
+        $p->add_field('cancel_return', url::site('/user/pay_success'));
+        $p->add_field('notify_url',    'http://barkdog.halkeye.net:8080/ipn.php');
+        $p->add_field('item_name',     'Paypal Test Transaction');
+        $p->add_field('amount',        '1.99');
+
+        $this->view = null;
+        $p->submit_paypal_post();
+    }
 }
 

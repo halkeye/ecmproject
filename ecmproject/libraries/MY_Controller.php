@@ -45,6 +45,9 @@ class Controller extends Controller_Core
 
     public function renderTemplate()
     {
+        if (!$this->view)
+            return; // Don't do anything now
+
         if (!isset($this->view->heading))
             $this->view->heading = ucfirst(Router::$controller);
         if (!isset($this->view->subheading))
