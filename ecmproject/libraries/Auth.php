@@ -181,7 +181,7 @@ class Auth_Core {
 
     /* Error functions */
     public function clearErrors() { $this->errors = array(); }
-    public function addError($err) { $this->errors += $err; }
+    public function addError($err) { $this->errors[] = $err; }
     public function errors() { return $this->errors; }
 
 

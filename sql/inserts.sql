@@ -14,7 +14,8 @@ TRUNCATE `permissions`;
 TRUNCATE `usergroups_permissions`;
 
 INSERT INTO `accounts` VALUES (1,'halkeye@gmail.com','Gavin','Mogan','0','1982-12-18','(604) 505-8034','','705-6622 Southoaks Cres','blah','blah','c1537a66964e2acbb3a8232a20b6d8338cb206c5','3e215344f1',1,1249191871,1249793436);
-INSERT INTO `usergroups` VALUES (1,'registered',NULL);
+INSERT INTO `accounts` VALUES (2,'test@test.com','Gavin','Mogan','0','1982-12-18','(604) 505-8034','','705-6622 Southoaks Cres','blah','blah','e210db43253621986ec02d035fb80e5308298cae','132d32a79d',1,1249888283,1249888291);
+INSERT INTO `usergroups` VALUES(1, 'Registered', 'All registered users get this group');
 INSERT INTO `accounts_usergroups` VALUES (NULL,1,1);
 INSERT INTO `permissions` VALUES (1,'can_do_stuff',NULL);
 INSERT INTO `usergroups_permissions` VALUES (NULL,1,1);

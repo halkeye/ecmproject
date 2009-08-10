@@ -68,9 +68,9 @@ class Account_Model extends ORM
    */
     );
 
-    function Account()
+    function __construct()
 	{
-        $ret = parent::ORM();
+        $ret = parent::__construct();
         $this->created = time();
         $this->salt = substr(md5(uniqid(rand(), true)), 0, $this->saltLength);
 
@@ -170,7 +170,7 @@ class Account_Model extends ORM
         if (empty($id))
             return $this->primary_key;
 
-        if (is_string($id))
+        if (is_string($id) && !ctype_digit($id))
             return 'email';
         
         if (is_numeric($id))
@@ -201,18 +201,6 @@ class Account_Model extends ORM
             $array->add_error($field, 'email_exists');
         }
     }
-
-    /*
-    public function addGroup(Usergroup $group)
-    {
-        $this->groups[$group->name] = $group;
-    }
-    public function hasGroup($groupname)
-    {
-        return isset($this->groups[$groupname]);
-    }
-    
-    */
 }
 
 /* End of file user.php */

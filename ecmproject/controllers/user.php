@@ -159,8 +159,6 @@ class User_Controller extends Controller
     {
         $timestamp = intval($timestamp);
 
-        $account = ORM::factory('account')->where(Account_Model::where_key(), $uid)->find();
-
         if ($this->auth->is_logged_in())
         {
             $this->addError(Kohana::lang('auth.expired_validate_link'));
@@ -173,6 +171,7 @@ class User_Controller extends Controller
 
         $current = time();
         
+        $account = ORM::factory('account')->find($uid);
         if (!$account->loaded)
         {
             $this->addError(Kohana::lang('auth.bad_link'));
@@ -186,8 +185,10 @@ class User_Controller extends Controller
          */
         if ($timestamp > $current) { $invalidLink = 1; }
         if ($account->login) 
+        {
             if ($current - $timestamp > $timeout || $timestamp < $account->login)
                 $invalidLink = 1; 
+        }
 
         if ($invalidLink)
         {
@@ -195,10 +196,9 @@ class User_Controller extends Controller
             return;
         }
         $account->reg_status = ACCOUNT_STATUS_ACTIVE;
-        $account->save();
 
-        $this->addMessageFlash(Kohana::lang('auth.login_success'));
         $this->auth->complete_login($account);
+        $this->addMessageFlash(Kohana::lang('auth.login_success'));
         $this->_redirect('');
     }
 
