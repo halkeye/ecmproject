@@ -1,11 +1,12 @@
-USE ecms;
-
+﻿USE ecms;
 
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
 /*!40000 ALTER TABLE `usergroups` DISABLE KEYS */;
 /*!40000 ALTER TABLE `accounts_usergroups` DISABLE KEYS */;
 /*!40000 ALTER TABLE `permissions` DISABLE KEYS */;
 /*!40000 ALTER TABLE `usergroups_permissions` DISABLE KEYS */;
+TRUNCATE `conventions`;
+TRUNCATE `passes`;
 TRUNCATE `accounts`;
 TRUNCATE `usergroups`;
 TRUNCATE `accounts_usergroups`;
@@ -17,6 +18,12 @@ INSERT INTO `usergroups` VALUES (1,'registered',NULL);
 INSERT INTO `accounts_usergroups` VALUES (NULL,1,1);
 INSERT INTO `permissions` VALUES (1,'can_do_stuff',NULL);
 INSERT INTO `usergroups_permissions` VALUES (NULL,1,1);
+
+INSERT INTO `conventions` VALUES(1, 'Anime Evolution 2010', '2010-09-20', '2010-09-22', 'University of British Columbia');
+
+INSERT INTO `passes` VALUES (1,1, '3-day adult pass', 40.00, 1, 19, '2009-09-09', NULL); -- Effective forever after start date.
+INSERT INTO `passes` VALUES (1,1, '3-day adult pass PRE-REG', 40.00, 1, 19, '2009-08-09', '2009-09-09'); -- Start date, end (expiry) date.
+
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 /*!40000 ALTER TABLE `usergroups` ENABLE KEYS */;
 /*!40000 ALTER TABLE `accounts_usergroups` ENABLE KEYS */;
