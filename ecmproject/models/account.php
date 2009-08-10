@@ -68,12 +68,10 @@ class Account_Model extends ORM
    */
     );
 
-    function __construct()
+	public function save()
 	{
-        $ret = parent::__construct();
-        $this->created = time();
-        $this->salt = substr(md5(uniqid(rand(), true)), 0, $this->saltLength);
-
+        if (!isset($this->created))
+            $this->created = time();
         return $ret;
     }
 	

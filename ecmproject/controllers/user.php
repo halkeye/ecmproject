@@ -27,7 +27,7 @@ class User_Controller extends Controller
 
         foreach ($accounts as $account) 
         {
-            $data['todo'][] = $account->gname . ' ' . $account->sname . ' -- ' . $account->email;
+            $data['todo'][] = 'Account - ' . $account->gname . ' ' . $account->sname . ' -- ' . $account->email;
         }
 
         $account = ORM::factory('account',1);
@@ -37,10 +37,10 @@ class User_Controller extends Controller
             {
                 if ($group->has(ORM::factory('Permission'), TRUE))
                 {
-                    $data['todo'][] = $group->name . ' - ' . $group->permissions->count();
+                    $data['todo'][] = 'Group - ' . $group->name . ' - ' . $group->permissions->count();
                     foreach ($group->permissions as $p)
                     {
-                        $data['todo'][] = $group->name . ' - ' . $p->pkey;
+                        $data['todo'][] = 'Permission - ' . $p->pkey;
                     }
                 }
                 else
@@ -50,21 +50,10 @@ class User_Controller extends Controller
             }
         }
         
+        /*
         $group = ORM::factory('usergroup', 1 );
         $data['todo'][] = var_export($account->has($group),1);
-
-        /*
-        $group = ORM::factory('usergroup');
-        $group->name = "Administrators";
-        $group->save();
         */
-        
-        //$group = ORM::factory('usergroup', 'Administrators');
-        /*
-        $account->add($group);
-        $account->save();
-        */
-
 
         $this->view->content = new View('user/user_view', $data);
         $this->view->menu += array(
