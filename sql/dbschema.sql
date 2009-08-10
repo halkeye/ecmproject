@@ -8,8 +8,8 @@ DROP TABLE IF EXISTS `conventions`;
 CREATE TABLE conventions (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    name VARCHAR(100) NOT NULL,
-   start_date DATETIME NOT NULL,
-   end_date DATETIME NOT NULL,
+   start_date INT UNSIGNED NOT NULL,
+   end_date INT UNSIGNED NOT NULL,
    location VARCHAR(150)
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
@@ -24,14 +24,14 @@ CREATE TABLE passes(
    price DECIMAL NOT NULL,
    isPurchasable TINYINT NOT NULL,
    ageReq TINYINT UNSIGNED,
-   startDate DATE,
-   endDate DATE,
+   startDate INT UNSIGNED,
+   endDate INT UNSIGNED,
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE CASCADE -- Cascade deletion of passes. Will (should) still fail if registrations have started.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `accounts`;
 -- Reg form information among other things. Require email at a minimum.
--- Salt column, usergroups storing?  
+-- Salt column, usergroups storing?
 CREATE TABLE accounts(
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    email VARCHAR(55) NOT NULL UNIQUE,
