@@ -31,7 +31,7 @@ $kohana_application = 'ecmproject';
  *
  * This path can be absolute or relative to this file.
  */
-$kohana_modules = 'kohana/modules';
+$kohana_modules = 'modules';
 
 /**
  * Kohana system directory. This directory should contain the core/ directory,

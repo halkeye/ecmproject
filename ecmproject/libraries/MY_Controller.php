@@ -40,7 +40,6 @@ class Controller extends Controller_Core
         /* Errors to show */
         $this->view->errors = array();
 
-        $this->profiler = new Profiler;
         $this->view->profiler = '';
     }
 
@@ -51,12 +50,6 @@ class Controller extends Controller_Core
         if (!isset($this->view->subheading))
             $this->view->subheading = ucfirst(Router::$method);
 
-        if (isset($this->profiler))
-        {
-            $this->profiler->disable();
-       #     $this->view->profiler = $this->profiler->render(TRUE);
-        }
-        
         $session_messages = $this->session->get_once('messages');
         if ($session_messages) 
             $this->view->messages = array_merge($session_messages, $this->view->messages);
@@ -66,7 +59,7 @@ class Controller extends Controller_Core
 
         // Displays the view
         $this->view->render(TRUE);
-        if (class_exists('Debug_Toolbar', TRUE))
+        if (!IN_PRODUCTION && class_exists('Debug_Toolbar', TRUE ))
             echo Debug_Toolbar::render();
     }
 
