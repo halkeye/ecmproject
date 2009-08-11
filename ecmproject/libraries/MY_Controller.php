@@ -91,4 +91,17 @@ class Controller extends Controller_Core
         $errors[] = $error;
         $this->session->set_flash('errors',  $errors);
     }
+
+    /**
+     * Redirect a user to a location, unless a session variable is set
+     * @param string $where Where to redirect the user if nothing else is set
+     */
+    function _redirect($where = '')
+    {
+        $location = $this->session->get_once('redirected_from');
+        if (!$location) $location = $where;
+        url::redirect($location);
+        return;
+    }
+
 }

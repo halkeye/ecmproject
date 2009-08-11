@@ -191,23 +191,6 @@ class User_Controller extends Controller
         $this->_redirect('');
     }
 
-
-    /**
-     * Redirect a user to a location, unless a session variable is set
-     * @param string $where Where to redirect the user if nothing else is set
-     */
-    function _redirect($where = '/user')
-    {
-        if ($this->session->get('redirected_from') == FALSE)
-        {
-            url::redirect($where);
-            return;
-        } 
-        url::redirect($this->session->get('redirected_from'));
-        return;
-    }
-
-
     function validationTest()
     {
         $a = ORM::factory('account');
