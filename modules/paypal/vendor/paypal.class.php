@@ -183,7 +183,7 @@ class paypal_class {
       $post_string.="cmd=_notify-validate"; // append ipn command
 
       // open the connection to paypal
-      $fp = fsockopen($url_parsed[host],"80",$err_num,$err_str,30); 
+      $fp = fsockopen($url_parsed['host'],"80",$err_num,$err_str,30); 
       if(!$fp) {
           
          // could not open the connection.  If loggin is on, the error message
@@ -195,8 +195,8 @@ class paypal_class {
       } else { 
  
          // Post the data back to paypal
-         fputs($fp, "POST $url_parsed[path] HTTP/1.1\r\n"); 
-         fputs($fp, "Host: $url_parsed[host]\r\n"); 
+         fputs($fp, "POST ".$url_parsed['path']." HTTP/1.1\r\n"); 
+         fputs($fp, "Host: ".$url_parsed['host']."\r\n"); 
          fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n"); 
          fputs($fp, "Content-length: ".strlen($post_string)."\r\n"); 
          fputs($fp, "Connection: close\r\n\r\n"); 

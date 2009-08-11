@@ -80,12 +80,12 @@ class User_Controller extends Controller
         if ($this->auth->login($user, $this->input->post('pass')))
         {
             $this->addMessageFlash(Kohana::lang('auth.login_success'));
-            url::redirect('');
+            $this->_redirect('');
             return;
         }
+
         foreach ($this->auth->errors() as $err) 
             $this->addError($err);
-
         $this->auth->clearErrors();
 
         return;
@@ -216,55 +216,54 @@ class User_Controller extends Controller
         $this->index();
     }
 
-    function paypalTest1()
+    function paypalTest()
     {
         if (!$this->auth->is_logged_in()) 
         {
             $this->addMessage('FIXME: make $auth->requre_login()');
+            $this->session->set('redirected_from', Router::$current_uri);
             return;
         }
 
         /* FIXME: Get account / get real account */
         $account = $this->auth->get_user();
+        
+        $this->view->content = Kohana::lang('ecm.no_passes_available');
 
         
+        $data = array();
+        /* FIXME */
+        $data['notify_url'] = 'http://barkdog.halkeye.net:6080/ecmproject/index.php/user/paypal_ipn'; //url::site('/user/paypal_ipn');
+        $data['return_url'] = url::site('/user/paypal_return');
+        $data['cancel_url'] = url::site('/user/paypal_cancel');
+        
+        $data['passes'] = ORM::factory('pass')->find_all_for_account($account);
 
-        $passes = ORM::factory('pass')->find_all();
-        $content = '';
-        foreach ($passes as $pass)
+        if ($data['passes'])
         {
-            $p = new Paypal();
-            $view = $p->paypalView();
-            $view->itemName = $pass->name;
-            $view->itemId   = $pass->id;
-            $view->price    = $pass->price;
-
-            $content .= $view->render(FALSE);
-        }
-
-        if ($content)
-        {
-            $this->view->content = $content;
-        }
-        else
-        {
-            $this->view->content = Kohana::lang('ecm.no_passes_available');
+            $this->view->content = new View('user/passes', $data);
         }
         return;
+    }
+    
+    function paypal_ipn()
+    {
+        $p = new Paypal();
+        if (!$p->validate_ipn()) 
+        {
+            $this->addError("Unable to validate ipn: " . $p->getLastError());
+            return;
+        }
+        $data = $p->getIpnData();
+        $content  =  "An instant payment notification was successfully recieved\n";
+        $content .= "from ".$data['payer_email']." on ".date('m/d/Y');
+        $content .= " at ".date('g:i A')."\n\nDetails:\n";
+        foreach ($data as $key => $value) { $content .= "\n$key: $value"; }
 
-
-        $p->add_field('buisiness',     'AE10_1249882783_biz@gavinmogan.com');
-        $p->add_field('account_id',    $account->id);
-        
-
-        $p->add_field('return',        url::site('/user/pay_success'));
-        $p->add_field('cancel_return', url::site('/user/pay_success'));
-        $p->add_field('notify_url',    'http://barkdog.halkeye.net:8080/ipn.php');
-        $p->add_field('item_name',     'Paypal Test Transaction');
-        $p->add_field('amount',        '1.99');
-
+        file_put_contents('/tmp/ipn', $content);
         $this->view = null;
-        $p->submit_paypal_post();
+        return;
+
     }
 }
 
