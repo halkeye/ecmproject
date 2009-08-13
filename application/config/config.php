@@ -132,3 +132,4 @@ if (!IN_PRODUCTION)
 }
 
 $config['modules'][]  = MODPATH.'paypal';
+$config['modules'][]  = MODPATH.'ecmproject';
