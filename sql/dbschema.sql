@@ -76,11 +76,14 @@ CREATE TABLE registrations(
 DROP TABLE IF EXISTS `payments`;
 -- Skip specific field details for now.
 -- Just store a string stating payment type?
+-- Aside from paypal details
 CREATE TABLE payments(
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    register_id INT UNSIGNED NOT NULL,
+   last_modified INT UNSIGNED, -- Track the last account to add/edit a payment manually to allow for reg. manager/board to give out a badge, fix payment, etc. NULL if last person who touched it wasn't human. Think of a better solution.
    type VARCHAR(55) NOT NULL,
-   FOREIGN KEY (register_id) REFERENCES registrations(id) ON DELETE RESTRICT -- Registrations with payment information shouldn't be deleted.
+   FOREIGN KEY (register_id) REFERENCES registrations(id) ON DELETE RESTRICT, -- Registrations with payment information shouldn't be deleted.
+   FOREIGN KEY (last_modified) REFERENCES accounts(account_id) ON DELETE RESTRICT
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `permissions`;
