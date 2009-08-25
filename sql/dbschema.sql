@@ -35,20 +35,11 @@ DROP TABLE IF EXISTS `accounts`;
 CREATE TABLE accounts(
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    email VARCHAR(55) NOT NULL UNIQUE,
-   gname VARCHAR(55) NOT NULL,
-   sname VARCHAR(55) NOT NULL,
-   badge VARCHAR(55),
-   dob DATE NOT NULL,
-   phone VARCHAR(15) NOT NULL,
-   cell VARCHAR(15) NOT NULL,
-   address TEXT,
-   econtact VARCHAR(55) NOT NULL,
-   ephone VARCHAR(15) NOT NULL,
    password VARCHAR(40) NOT NULL,
    salt VARCHAR(10) NOT NULL,
-   reg_status TINYINT NOT NULL,
-   created INT NOT NULL,
-   login INT
+   reg_status TINYINT NOT NULL, -- Status of account (unverified, verified, banned, etc)
+   created INT NOT NULL, -- Creation date
+   login INT -- Last login.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `usergroups`;
@@ -65,6 +56,18 @@ CREATE TABLE registrations(
    convention_id INT UNSIGNED NOT NULL,
    pass_id INT UNSIGNED NOT NULL,
    account_id INT UNSIGNED, -- Took out NOT NULL requirement for SET NULL trigger to work.
+   gname VARCHAR(55) NOT NULL, -- Given name
+   sname VARCHAR(55) NOT NULL, -- Surname
+   badge VARCHAR(55),
+   dob DATE NOT NULL,
+   phone VARCHAR(15) NOT NULL,
+   cell VARCHAR(15) NOT NULL,
+   address TEXT,
+   email VARCHAR(55) NOT NULL, -- Account email can be the same as this one...
+   econtact VARCHAR(55) NOT NULL,
+   ephone VARCHAR(15) NOT NULL,
+   heard_from TEXT,
+   attendance_reason TEXT,
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE RESTRICT, -- Conventions shouldn't be deleted if in use already.
    FOREIGN KEY (pass_id) REFERENCES passes(id) ON DELETE RESTRICT, -- Passes shouldn't be deleted if in use already.
    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE SET NULL -- Even if an account is deleted, leave registrations for stat purposes.
