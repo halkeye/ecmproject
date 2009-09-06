@@ -151,7 +151,7 @@ class Auth_Core {
         $this->session->set(array
         (
             'account_id'    => $account->id,
-            'account_name'  => $account->gname . ' ' . $account->sname,
+            'account_name'  => '--', # $account->gname . ' ' . $account->sname,
             'account'       => $this->account,
             'account_groups'=> $this->groups, 
             'account_perms' => $this->permissions, 

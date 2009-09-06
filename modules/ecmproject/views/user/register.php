@@ -13,9 +13,6 @@ $fields = array(
     'email' => 'Email',
     'password' => 'Password',
     'confirm_password' => 'Password Confirm',
-    'gname' => 'Given Name',
-    'sname' => 'Surname',
-    'phone' => 'Phone',
 );
 
 foreach ($fields as $field => $name)

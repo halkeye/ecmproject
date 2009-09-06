@@ -27,7 +27,7 @@ class User_Controller extends Controller
 
         foreach ($accounts as $account) 
         {
-            $data['todo'][] = 'Account - ' . $account->gname . ' ' . $account->sname . ' -- ' . $account->email;
+            $data['todo'][] = 'Account - ' . $account->email;
         }
 
         $account = ORM::factory('account',1);
@@ -112,9 +112,6 @@ class User_Controller extends Controller
                 'email'     => '',
                 'password'  => '',
                 'confirm_password'  => '',
-                'gname'     => '',
-                'sname'     => '',
-                'phone'     => '',
         );
         
         $errors = $form;

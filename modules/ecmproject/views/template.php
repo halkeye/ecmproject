@@ -26,7 +26,7 @@
         <ul> 
             <li class="menuItem title"><a href="<?php echo url::base(); ?>">Menu</a></li>
             <?php if ($isLoggedIn): ?>
-            <li><b><?= htmlentities($user->gname) ?></b></li>
+            <li><b><?= htmlentities($user->email) ?></b></li>
             <li>&nbsp;</li>
             <?php endif; ?>
             <?php if($menu): ?><?php foreach ($menu as $m): ?>
