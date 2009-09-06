@@ -32,34 +32,6 @@ class Account_Model extends ORM
     );
     protected $ignored_columns = array('confirm_password', 'groups', 'permissions');
 
-    var $validation = array(
-        array(
-            'field' => 'dob',
-            'label' => 'Date Of Birth',
-            'rules' => array('xss_clean', 'required', 'trim', 'valid_date'),
-        ),
-        array(
-            'field' => 'cell',
-            'label' => 'Cell Phone Number',
-            'rules' => array('xss_clean', 'trim', /*'valid_phone_number'*/),
-        ),
-        array(
-            'field' => 'address',
-            'label' => 'Address',
-            'rules' => array('xss_clean', 'trim'),
-        ),
-        array(
-            'field' => 'econtact',
-            'label' => 'Emergency Contact',
-            'rules' => array('xss_clean', 'required', 'trim', 'max_length' => 55, 'alpha_dash_dot'),
-        ),
-        array(
-            'field' => 'ephone',
-            'label' => 'Emergency Contact Phone',
-            'rules' => array('xss_clean', 'trim', /*'valid_phone_number'*/),
-        ),
-    );
-
 	public function save()
 	{
         if (!isset($this->created))
