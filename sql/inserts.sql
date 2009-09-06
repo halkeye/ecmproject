@@ -20,7 +20,7 @@ INSERT INTO `accounts` SET
     email      = 'halkeye@gmail.com',
     password   = 'c1537a66964e2acbb3a8232a20b6d8338cb206c5',
     salt       = '3e215344f1',
-    reg_status = 1,
+    status     = 0,
     created    = 1249191871,
     login      = 1249793436
 ;
@@ -29,7 +29,7 @@ INSERT INTO `accounts` SET
     email      = 'test@test.com',
     password   = 'e210db43253621986ec02d035fb80e5308298cae',
     salt       = '132d32a79d',
-    reg_status = 1,
+    status     = 0,
     created    = 1249888283,
     login      = 1249888291
 ;

@@ -70,14 +70,16 @@ class Auth_Core {
             $this->addError(Kohana::lang('auth.invalid_user_pass'));
             return FALSE;
         }
+
         if (empty($password))
         {
             $this->addError(Kohana::lang('auth.invalid_user_pass'));
             return FALSE;
         }
-        if (!$account->isActive())
+
+        if ($account->isBanned())
         {
-            $this->addError(Kohana::lang('auth.not_validated'));
+            $this->addError(Kohana::lang('auth.banned'));
             return FALSE;
         }
 

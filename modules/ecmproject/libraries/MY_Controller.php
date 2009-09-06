@@ -41,6 +41,20 @@ class Controller extends Controller_Core
         $this->view->errors = array();
 
         $this->view->profiler = '';
+        
+        if ($this->auth->is_logged_in())
+        {
+            $user = $this->auth->get_user();
+            if ($user->status != Account_Model::ACCOUNT_STATUS_VERIFIED)
+            {
+                /* check the database not the cached version for determining if they are cached or not
+                 * Maybe we can get away with not doing this 
+                 */
+                $user = ORM::factory('Account', array('id'=>$user->id));
+                if ($user->status != Account_Model::ACCOUNT_STATUS_VERIFIED)
+                    $this->view->errors[] = Kohana::lang('ecmproject.not_validated');
+            }
+        }
     }
 
     public function renderTemplate()
@@ -66,26 +80,12 @@ class Controller extends Controller_Core
 
     protected function addMessage($message)
     {
-        $messages = $this->view->errors;
-        $messages[] = $message;
-        $this->view->messages = $messages;
-    }
-    
-    protected function addMessageFlash($message)
-    {
         $messages = $this->session->get('messages') or array();
         $messages[] = $message;
         $this->session->set_flash('messages',  $messages);
     }
-
-    protected function addError($error)
-    {
-        $errors = $this->view->errors;
-        $errors[] = $error;
-        $this->view->errors = $errors;
-    }
     
-    protected function addErrorFlash($error)
+    protected function addError($error)
     {
         $errors = $this->session->get('errors') or array();
         $errors[] = $error;
@@ -102,6 +102,16 @@ class Controller extends Controller_Core
         if (!$location) $location = $where;
         url::redirect($location);
         return;
+    }
+
+    protected function requireLogin()
+    {
+        if (!$this->auth->is_logged_in()) 
+        {
+            $this->session->set('redirected_from', url::current());
+            url::redirect('/user/loginOrRegister');
+            return;
+        }
     }
 
 }

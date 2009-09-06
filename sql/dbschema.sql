@@ -37,7 +37,7 @@ CREATE TABLE accounts(
    email VARCHAR(55) NOT NULL UNIQUE,
    password VARCHAR(40) NOT NULL,
    salt VARCHAR(10) NOT NULL,
-   reg_status TINYINT NOT NULL, -- Status of account (unverified, verified, banned, etc)
+   status TINYINT NOT NULL, -- Status of account (unverified, verified, banned, etc)
    created INT NOT NULL, -- Creation date
    login INT -- Last login.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;

@@ -1,9 +1,11 @@
 <?php
 
-define('ACCOUNT_STATUS_ACTIVE', 1);
-
 class Account_Model extends ORM 
 {
+    const ACCOUNT_STATUS_UNVERIFIED =  0;
+    const ACCOUNT_STATUS_VERIFIED   =  1;
+    const ACCOUNT_STATUS_BANNED     = 99;
+
     // Account specific Stuff
     public $saltLength = 10;
     //public $groups = array();
@@ -18,11 +20,12 @@ class Account_Model extends ORM
     // Model table information
     protected $table_columns = array (
             'id'          => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, 'sequenced' => true, ),
-            'email'       => array ( 'type' => 'string', 'length' => '55' ),
-            'salt'        => array ( 'type' => 'string',    'length' => '10',  ),
-            'reg_status'  => array ( 'type' => 'int',    'max' => 127,    'unsigned' => false,  ),
-            'created'     => array ( 'type' => 'int',    'max' => 2147483647,    'unsigned' => false,  ),
-            'login'       => array ( 'type' => 'int', 'max' => 2147483647, 'unsigned' => false, 'null' => true, ),
+            'email'       => array ( 'type' => 'string', 'length' => '55'                                              ),
+            'password'    => array ( 'type' => 'string', 'length' => '40'                                              ),
+            'salt'        => array ( 'type' => 'string', 'length' => '10',                                             ),
+            'status'      => array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                     ),
+            'created'     => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => false,                     ),
+            'login'       => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => false, 'null' => true,     ),
     );
     protected $ignored_columns = array('confirm_password', 'groups', 'permissions');
 
@@ -52,10 +55,6 @@ class Account_Model extends ORM
             'label' => 'Emergency Contact Phone',
             'rules' => array('xss_clean', 'trim', /*'valid_phone_number'*/),
         ),
-        /*
-   badge VARCHAR(55),
-   reg_status TINYINT NOT NULL,
-   */
     );
 
 	public function save()
@@ -89,10 +88,8 @@ class Account_Model extends ORM
         return sha1($this->salt . $value);
     }
 
-    function isActive()
-    {
-        return $this->reg_status == ACCOUNT_STATUS_ACTIVE;
-    }
+    function isBanned()   { return $this->status == Account_model::ACCOUNT_STATUS_BANNED; }
+    function isVerified() { return $this->status == Account_model::ACCOUNT_STATUS_VERIFIED; }
 
     function userPassRehash($timestamp) { return md5($timestamp . $this->password . $this->login); }
     function sendValidateEmail()
@@ -114,8 +111,10 @@ class Account_Model extends ORM
  
         $view = new View('user/register_email', $emailVars);
         $message = $view->render(FALSE);
-
-        email::send($to, $from, $subject, $message, TRUE);
+        if (php_uname('n') == 'barkdog')
+            file_put_contents("/var/www/emails.html", "<pre>To: $to\nFrom: $from\nSubject: Subject\n\n$message\n=======================================================================\n\n", FILE_APPEND);
+        else
+            email::send($to, $from, $subject, $message, TRUE);
     }
 
     /**
@@ -139,11 +138,13 @@ class Account_Model extends ORM
         $array->add_rules('confirm_password', 'required');
         $array->add_rules('confirm_password',  'matches[password]');
 
+        /*
         $array->add_rules('gname', 'required');
         $array->add_rules('sname', 'required');
 
         $array->add_rules('phone', 'required');
         $array->add_rules('phone', array('valid', 'phone'));
+        */
 
         // Email unique validation
         $array->add_callbacks('email', array($this, '_unique_email'));

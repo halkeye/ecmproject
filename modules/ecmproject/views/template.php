@@ -16,13 +16,6 @@
  
     <!-- Left Sidebar. --> 
     <div id="menu"> 
-        <?php 
-        if (!$isLoggedIn)
-        {
-            $partial = new View('global/loginBox');
-            echo $partial->render(TRUE); 
-        }
-        ?>
         <ul> 
             <li class="menuItem title"><a href="<?php echo url::base(); ?>">Menu</a></li>
             <?php if ($isLoggedIn): ?>
@@ -46,6 +39,7 @@
     
     <?php foreach ($messages as $msg) { echo '<p class="msg">'.$msg.'</p>'; } ?>
     <?php foreach ($errors as $err) { echo '<p class="errormsg">'.$err.'</p>'; } ?>
+    <?php if ($messages || $errors) { echo '<br />'; } ?>
 
     <!-- content start -->
     <?php print $content ?>

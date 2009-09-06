@@ -14,47 +14,12 @@ class User_Controller extends Controller
 {
     function index()
     {
-
-        $this->view->content = "this is a junk page, we need to fill it out later. Try " .
-            html::anchor('/user/junk','junkie') . " for the old junk page";
+        $this->requireLogin();
+        $this->view->content = "This page is 'main page' from the flow diagram. What does it do, I don't know.";
     }
 
     function junk()
     {
-        $data['todo'] = array();
-
-        $accounts = ORM::factory('account')->find_all();
-
-        foreach ($accounts as $account) 
-        {
-            $data['todo'][] = 'Account - ' . $account->email;
-        }
-
-        $account = ORM::factory('account',1);
-        if ($account->has(ORM::factory('Usergroup'), TRUE))
-        {
-            foreach ($account->usergroups as $group)
-            {
-                if ($group->has(ORM::factory('Permission'), TRUE))
-                {
-                    $data['todo'][] = 'Group - ' . $group->name . ' - ' . $group->permissions->count();
-                    foreach ($group->permissions as $p)
-                    {
-                        $data['todo'][] = 'Permission - ' . $p->pkey;
-                    }
-                }
-                else
-                {
-                    $data['todo'][] = $group->name . ' - ' . 0;
-                }
-            }
-        }
-        
-        /*
-        $group = ORM::factory('usergroup', 1 );
-        $data['todo'][] = var_export($account->has($group),1);
-        */
-
         $this->view->content = new View('user/user_view', $data);
         $this->view->menu += array(
                 array('title'=>'Register', 'url'=>'user/register'),
@@ -70,16 +35,16 @@ class User_Controller extends Controller
 
         if ($this->auth->is_logged_in()) 
         {
-            $this->addMessageFlash(Kohana::lang('auth.already_logged_in'));
+            $this->addMessage(Kohana::lang('auth.already_logged_in'));
             $this->_redirect('');
             return;
         }
 
         // Load the user
-        $user = ORM::factory('account')->where('email', $this->input->post('user'))->find();
-        if ($this->auth->login($user, $this->input->post('pass')))
+        $user = ORM::factory('account')->where('email', $this->input->post('email'))->find();
+        if ($this->auth->login($user, $this->input->post('password')))
         {
-            $this->addMessageFlash(Kohana::lang('auth.login_success'));
+            $this->addMessage(Kohana::lang('auth.login_success'));
             $this->_redirect('');
             return;
         }
@@ -95,7 +60,7 @@ class User_Controller extends Controller
     {
         if (!$this->auth->is_logged_in()) 
         {
-            $this->addMessageFlash(Kohana::lang('auth.not_logged_in'));
+            $this->addMessage(Kohana::lang('auth.not_logged_in'));
             url::redirect('');
             return;
         }
@@ -123,7 +88,8 @@ class User_Controller extends Controller
             {
                 $account->save();
                 $account->sendValidateEmail();
-                $this->addMessageFlash(Kohana::lang('ecmproject.registration_success_message'));
+                $this->auth->complete_login($account);
+                $this->addMessage(Kohana::lang('ecmproject.registration_success_message'));
                 $this->_redirect('');
                 return;
             }
@@ -145,11 +111,13 @@ class User_Controller extends Controller
     {
         $timestamp = intval($timestamp);
 
+        /*
         if ($this->auth->is_logged_in())
         {
             $this->addError(Kohana::lang('auth.expired_validate_link'));
             return;
         }
+        */
 
         /* Get timeout value, defaults at 86400 */
         $timeout = Kohana::config('ecmproject.validate_link_timeout', FALSE, FALSE);
@@ -181,19 +149,11 @@ class User_Controller extends Controller
             $this->addError(Kohana::lang('auth.bad_link'));
             return;
         }
-        $account->reg_status = ACCOUNT_STATUS_ACTIVE;
+        $account->status = Account_Model::ACCOUNT_STATUS_VERIFIED;
 
         $this->auth->complete_login($account);
-        $this->addMessageFlash(Kohana::lang('auth.login_success'));
+        $this->addMessage(Kohana::lang('auth.login_success'));
         $this->_redirect('');
-    }
-
-    function validationTest()
-    {
-        $a = ORM::factory('account');
-        $a->where('email','halkeye@gmail.com')->find();
-        $a->sendValidateEmail();
-        $this->index();
     }
 
     function paypalTest()
@@ -244,6 +204,14 @@ class User_Controller extends Controller
         $this->view = null;
         return;
 
+    }
+
+    function loginOrRegister()
+    {
+        $data = array();
+
+        $this->view->content = new View('user/loginOrRegister', $data);
+        return;
     }
 }
 
