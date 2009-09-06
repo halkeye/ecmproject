@@ -44,6 +44,7 @@ class Controller extends Controller_Core
         
         if ($this->auth->is_logged_in())
         {
+            $this->verifiedAccount = TRUE;
             $user = $this->auth->get_user();
             if ($user->status != Account_Model::ACCOUNT_STATUS_VERIFIED)
             {
@@ -52,7 +53,10 @@ class Controller extends Controller_Core
                  */
                 $user = ORM::factory('Account', array('id'=>$user->id));
                 if ($user->status != Account_Model::ACCOUNT_STATUS_VERIFIED)
+                {
+                    $this->verifiedAccount = FALSE;
                     $this->view->errors[] = Kohana::lang('ecmproject.not_validated');
+                }
             }
         }
     }
@@ -110,6 +114,16 @@ class Controller extends Controller_Core
         {
             $this->session->set('redirected_from', url::current());
             url::redirect('/user/loginOrRegister');
+            return;
+        }
+    }
+
+    protected function requireVerified()
+    {
+        if ($this->auth->is_logged_in() && !$this->verifiedAccount ) 
+        {
+            $this->session->set('redirected_from', url::current());
+            url::redirect('/user/verified');
             return;
         }
     }

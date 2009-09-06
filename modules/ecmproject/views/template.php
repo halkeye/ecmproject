@@ -4,7 +4,7 @@
 <head> 
 <title>Electronic Convention Management (ECM)<?php echo $title ? "::$title" : "" ?></title> 
 <?php echo html::stylesheet(array('css/main.css')); ?>
-<?php echo html::script(array('js/jquery-1.3.2.min.js','js/jquery.form.js')); ?>
+<?php echo html::script(array('js/jquery-1.3.2.min.js')); ?>
 </head> 
  
 <body> 
