@@ -41,10 +41,27 @@ INSERT INTO `accounts_usergroups` VALUES (NULL,1,1);
 INSERT INTO `permissions` VALUES (1,'can_do_stuff',NULL);
 INSERT INTO `usergroups_permissions` VALUES (NULL,1,1);
 
-INSERT INTO `conventions` VALUES(1, 'Anime Evolution 2010', 1284966000, 1285138800, 'University of British Columbia');
+INSERT INTO `conventions` VALUES(1, 'Anime Evolution 2010', UNIX_TIMESTAMP('2009-07-31'), UNIX_TIMESTAMP('2010-08-31'), 'University of British Columbia');
 
 INSERT INTO `passes` VALUES (1,1, '3-day adult pass', 40.00, 1, 19, 1252393200, NULL); -- Effective forever after start date.
 INSERT INTO `passes` VALUES (2,1, '3-day adult pass PRE-REG', 40.00, 1, 19, 1252393200, 1284015600); -- Start date, end (expiry) date.
+
+INSERT INTO registrations SET
+    convention_id = 1,
+    pass_id = 2,
+    account_id = 2,
+    gname = 'Gavin',
+    sname = 'Mogan',
+    badge = 'halkeye',
+    dob   = '1982-12-18',
+    phone = '604-555-5555',
+    cell  = '604-555-6666',
+    address = 'This is my address',
+    email = 'halkeye@gmail.com',
+    econtact = 'ME ME ME ME',
+    ephone = '604-555-7777',
+    heard_from = 'The best person ever!!!! GAVIN!!!!',
+    attendance_reason = 'Um, what goes here?';
 
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 /*!40000 ALTER TABLE `usergroups` ENABLE KEYS */;
