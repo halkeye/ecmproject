@@ -6,6 +6,9 @@ class Account_Model extends ORM
     const ACCOUNT_STATUS_VERIFIED   =  1;
     const ACCOUNT_STATUS_BANNED     = 99;
 
+    /* On unserialize never check the db */
+    protected $reload_on_wakeup = false;
+
     // Account specific Stuff
     public $saltLength = 10;
     //public $groups = array();

@@ -46,8 +46,8 @@ class Auth_Core {
         $this->account    =  new StdClass;
         if ($this->is_logged_in())
         {
-            $this->account     = $this->session->get('account');
-            $this->groups       = $this->session->get('account_groups');
+            $this->account     = unserialize($this->session->get('account'));
+            $this->groups      = $this->session->get('account_groups');
             $this->permissions = $this->session->get('account_perms');
         }
 
@@ -147,7 +147,7 @@ class Auth_Core {
         // extra safety to prevent session fixation - http://en.wikipedia.org/wiki/Session_fixation
         $this->session->regenerate();
 
-        $this->account = (Object) $account->as_array();
+        $this->account = serialize($account);
 
         // Store session data
         $this->session->set(array
