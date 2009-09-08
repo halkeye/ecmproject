@@ -18,16 +18,6 @@ class User_Controller extends Controller
         $this->view->content = "This page is 'main page' from the flow diagram. What does it do, I don't know.";
     }
 
-    function junk()
-    {
-        $this->view->content = new View('user/user_view', $data);
-        $this->view->menu += array(
-                array('title'=>'Register', 'url'=>'user/register'),
-                array('title'=>'Login',    'url'=>'user/login'),
-        );
-        return;
-    }
-
     function login()
     {
         $this->view->title      = 'My Index Title';
@@ -58,6 +48,7 @@ class User_Controller extends Controller
 
     function logout()
     {
+        $this->requireLogin();
         if (!$this->auth->is_logged_in()) 
         {
             $this->addMessage(Kohana::lang('auth.not_logged_in'));
@@ -87,7 +78,10 @@ class User_Controller extends Controller
             if ($account->validate($post))
             {
                 $account->save();
-                $account->sendValidateEmail();
+
+                $code = $account->generateVerifyCode();
+                $account->sendValidateEmail($code);
+
                 $this->auth->complete_login($account);
                 $this->addMessage(Kohana::lang('ecmproject.registration_success_message'));
                 $this->_redirect('');
@@ -107,53 +101,55 @@ class User_Controller extends Controller
         $this->view->content = new View('user/register', array('form'=>$form, 'errors'=>$errors));
     }
 
-    function validate($uid = 0, $timestamp = 0, $key = '')
+    function validate($uid = 0, $key = '')
     {
-        $timestamp = intval($timestamp);
+        $this->view->title = "Verification";
 
-        /*
-        if ($this->auth->is_logged_in())
+        if (!$uid) 
         {
-            $this->addError(Kohana::lang('auth.expired_validate_link'));
-            return;
+            $this->requireLogin();
+            $account = $this->auth->getAccount();
+            if ($account) { $uid = $account->id; }
         }
-        */
+        else 
+        {
+            $account = ORM::factory('account')->find($uid); 
+        }
+        if (!$key) { $key = $this->input->post('verifyCode'); }
 
-        /* Get timeout value, defaults at 86400 */
-        $timeout = Kohana::config('ecmproject.validate_link_timeout', FALSE, FALSE);
-        if (!$timeout) { $timeout = 86400; }
+        /* Validate incomingness */
+        if (!$account)
+            $this->_badVerify();
+        if (!$key) 
+            $this->_badVerify();
+        $code = ORM::Factory('verificationcode', sha1($account->salt.$key));
 
-        $current = time();
+        /* We have no account */
+        if (!$account->loaded) 
+            $this->_badVerify();
         
-        $account = ORM::factory('account')->find($uid);
-        if (!$account->loaded)
-        {
-            $this->addError(Kohana::lang('auth.bad_link'));
-            return;
-        }
+        /* We don't have a valid code */
+        if (!$code || !$code->loaded || 
+             $code->account_id != $account->id)
+            $this->_badVerify();
 
-        $invalidLink = 0;
-        /*
-         * Make sure timestamp is earlier than now
-         * Make sure if they've logged in, that the url hasn't expired
-         */
-        if ($timestamp > $current) { $invalidLink = 1; }
-        if ($account->login) 
-        {
-            if ($current - $timestamp > $timeout || $timestamp < $account->login)
-                $invalidLink = 1; 
-        }
-
-        if ($invalidLink)
-        {
-            $this->addError(Kohana::lang('auth.bad_link'));
-            return;
-        }
+        /* Verify the account */
         $account->status = Account_Model::ACCOUNT_STATUS_VERIFIED;
-
+        /* Complete login saves the account when it updates the login time */
         $this->auth->complete_login($account);
-        $this->addMessage(Kohana::lang('auth.login_success'));
+        /* Delete the code */
+        $code->delete();
+
+        /* Show a message that they logged in, and goto the default page */
+        /* FIXME */
+        $this->addMessage(Kohana::lang('auth.verification_success'));
         $this->_redirect('');
+    }
+        
+    function _badVerify()
+    {
+        $this->addError(Kohana::lang('auth.bad_link')); 
+        return url::redirect('/user/verifyMenu');
     }
     
     function loginOrRegister()
@@ -164,21 +160,77 @@ class User_Controller extends Controller
         return;
     }
 
-    function verified()
+    function verifyMenu()
     {
+        $this->view->title = "Require Verification";
+        $this->requireLogin();
         $data = array();
 
-        $this->view->content = text::auto_p("
-            You can't go any furthur until email address is verified.
-
-            * Enter code
-            [input box]
-
-            * Resent Email
-            * Change Email
-        ");
-
+        $this->view->content = new View('user/verifyMenu', $data);
         return;
+    }
+
+    function resendVerification()
+    {
+        /* Set page title */
+        $this->view->title = "Require Verification";
+        /* Require login */
+        $this->requireLogin();
+
+        /* Get logged in account */
+        $account = $this->auth->getAccount();
+        /* Generate new code */
+        $code = $account->generateVerifyCode();
+        /* Send email */
+        $account->sendValidateEmail($code);
+
+        /* FIXME: Send Verification Message */
+        $this->addMessage(Kohana::lang('auth.sendVerificationMessage')); 
+        return url::redirect('/user/verifyMenu');
+    }
+
+    function changeEmail()
+    {
+        /* Set page title */
+        $this->view->title = "Change Email";
+        /* Require login */
+        $this->requireLogin();
+
+        /* Get logged in account */
+        $account = $this->auth->getAccount();
+        
+        $form = Formo::factory('changeEmail');
+        $form->plugin('table');
+        $form->plugin('csrf');
+        $form->plugin('required');
+
+        $form->add('text', 'old_email', array('value'=>$account->email, 'readonly'=>1))->label('Old Email');
+        $form->add('text', 'email')->label('New Email');
+        $form->add_rule('new_email', array($account,'_unique_email_formo'), Kohana::lang('auth.existingEmail'));
+        $form->add('submit');
+
+        if ( $form->validate())
+        {
+            $values = $form->get_values();
+            $account->email  = $values['email'];
+
+            /* FIXME: Log email change */
+            /* FIXME: if we have a working one, keep the working one until the new one is verified? */
+
+            /* Reset verification status */
+            $account->status = Account_Model::ACCOUNT_STATUS_UNVERIFIED;
+            /* Generate new code */
+            $code = $account->generateVerifyCode();
+            /* Send out verification Email */
+            $account->sendValidateEmail($code);
+            /* Update cached session object */
+            $this->auth->complete_login($account);
+            /* Tell the user what happened */
+            $this->addMessage(Kohana::lang('auth.emailChangeSuccess'));
+            /* Redirect to main page */
+            $this->_redirect('');
+        }
+        $this->view->content = $form->get();
     }
 
 }

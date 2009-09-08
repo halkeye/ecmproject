@@ -4,5 +4,9 @@ $lang = array(
         'login_success'             => 'Login Success!',
         /* Expired and/or already logged in and/or other stuff */
         'bad_link'                  => 'Bad authentication Link',
+        /* Email address already exists */
+        'existingEmail'             => 'Email address is already associated with another account',
+        /* After emails are changed */
+        'emailChangeSuccess'        => 'Email sucessfully changed, please check your email for verification email',
 
 );

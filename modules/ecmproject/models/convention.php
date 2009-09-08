@@ -17,7 +17,7 @@ class Convention_Model extends ORM
             'name'          => array ( 'type' => 'string', 'length' => '100' ),
             'name'          => array ( 'type' => 'string', 'length' => '150' ),
             'start_date'    => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, ),
-            'end_date  '    => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, ),
+            'end_date'      => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, ),
     );
 
     public function getCurrentConvention()

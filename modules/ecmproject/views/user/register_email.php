@@ -1,11 +1,13 @@
 <p>We are excited to welcome you to <?= $convention_name ?></p>
 
-<p>Please follow this link to validate your email: <?= html::anchor($validationUrl) ?> 
+<p>Please follow this link to validate your email: <?= html::anchor($validationUrl) ?></p>
 
-<p>Your <?= $convention_name ?> login is (just in case you forgot) is <?= $email ?>  
+<p>Or enter the code: <b><?= $validationCode ?></b></p>
+
+<p>Your <?= $convention_name ?> login is (just in case you forgot) is <?= $email ?></p>
 
 <p>Questions? Head to the <?= $convention_name ?> forums at <?= html::anchor($convention_forum_url) ?> 
-    or email <?= $convention_contact_email ?> 
+    or email <?= $convention_contact_email ?> </p>
 
 <p>- <?= $convention_name ?><br />
  <?= html::anchor($convention_url) ?></p>

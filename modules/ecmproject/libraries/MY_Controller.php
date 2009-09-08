@@ -56,6 +56,9 @@ class Controller extends Controller_Core
                 {
                     $this->verifiedAccount = FALSE;
                     $this->view->errors[] = Kohana::lang('ecmproject.not_validated');
+                    $this->view->menu += array(
+                            array('title'=>'Verify Account', 'url'=>'/user/verifyMenu'),
+                    );
                 }
             }
         }
@@ -122,8 +125,11 @@ class Controller extends Controller_Core
     {
         if ($this->auth->is_logged_in() && !$this->verifiedAccount ) 
         {
+            /* FIXME: Add lang file */
+            /* You can't go any furthur until email address is verified. */
+            $this->addError(Kohana::lang('auth.not_validated')); 
             $this->session->set('redirected_from', url::current());
-            url::redirect('/user/verified');
+            url::redirect('/user/verifiedMenu');
             return;
         }
     }

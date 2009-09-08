@@ -124,10 +124,13 @@ body {
   border-top: 3px solid #8A0917;
   border-left: 1px solid #BBB; 
   padding: 10px;  
-  margin-left: 160px;
   margin-right: 0px;  
-  top: 0;  
+  margin-left: 160px;
   background-color: #FFF;
+}
+#content.contentNoMenu
+{
+  margin-left: auto;
 }
 
 #content h2 {  
@@ -144,7 +147,7 @@ body {
   font-size: 10px;
 }
 
-#content p {  
+#content p , #content ul{  
   font-size: 12px;
   padding-top: 10px;  
   padding-bottom: 2px;  

@@ -15,10 +15,10 @@ class Auth_Core {
     protected $session;
 
     protected $account     = null;
-    protected $groups       = array();
+    protected $groups      = array();
     protected $permissions = array();
 
-    protected $errors = array();
+    protected $errors      = array();
 
     /**
      * Return a static instance of Auth.
@@ -150,10 +150,8 @@ class Auth_Core {
         $this->account = serialize($account);
 
         // Store session data
-        $this->session->set(array
-        (
+        $this->session->set(array(
             'account_id'    => $account->id,
-            'account_name'  => '--', # $account->gname . ' ' . $account->sname,
             'account'       => $this->account,
             'account_groups'=> $this->groups, 
             'account_perms' => $this->permissions, 
@@ -173,10 +171,8 @@ class Auth_Core {
         return FALSE;
     }
 
-    public function get_user()
-    {
-        return $this->account;
-    }
+    public function getAccount() { return $this->account; }
+    public function get_user() { return $this->getAccount(); }
 
     public function has_perm($permission) { return isset($this->permissions[$permission]); }
     public function has_group($group) { return isset($this->groups[$permission]); }

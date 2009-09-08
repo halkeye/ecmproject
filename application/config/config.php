@@ -127,8 +127,8 @@ $config['modules'] = array
 	
 if (!IN_PRODUCTION) 
 {
-//    $config['modules'][]  = MODPATH.'debug_toolbar';
-//    $config['enable_hooks'] = TRUE;
+    $config['modules'][]  = MODPATH.'debug_toolbar';
+    $config['enable_hooks'] = TRUE;
 }
 
 $config['modules'][]  = MODPATH.'formo';

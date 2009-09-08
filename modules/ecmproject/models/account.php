@@ -66,13 +66,13 @@ class Account_Model extends ORM
     function isBanned()   { return $this->status == Account_model::ACCOUNT_STATUS_BANNED; }
     function isVerified() { return $this->status == Account_model::ACCOUNT_STATUS_VERIFIED; }
 
-    function userPassRehash($timestamp) { return md5($timestamp . $this->password . $this->login); }
-    function sendValidateEmail()
+    function sendValidateEmail($code)
     {
         $timestamp = time();
         $emailVars = array(
                 'email'                    => $this->email,
-                'validationUrl'            => sprintf('/user/validate/%d/%d/%s', $this->primary_key_value, $timestamp, $this->userPassRehash($timestamp)),
+                'validationUrl'            => sprintf('/user/validate/%d/%s', $this->id, $code),
+                'validationCode'           => $code,
                 'convention_name'          => Kohana::lang('ecmproject.convention_name'),
                 'convention_name_short'    => Kohana::lang('ecmproject.convention_name_short'),
                 'convention_forum_url'     => Kohana::lang('ecmproject.convention_forum_url'),
@@ -86,6 +86,7 @@ class Account_Model extends ORM
  
         $view = new View('user/register_email', $emailVars);
         $message = $view->render(FALSE);
+
         if (php_uname('n') == 'barkdog')
             file_put_contents("/var/www/emails.html", "<pre>To: $to\nFrom: $from\nSubject: Subject\n\n$message\n=======================================================================\n\n", FILE_APPEND);
         else
@@ -122,7 +123,7 @@ class Account_Model extends ORM
         */
 
         // Email unique validation
-        $array->add_callbacks('email', array($this, '_unique_email'));
+        $array->add_callbacks('email', array($this, '_unique_email_validation'));
         //$array->add_rules('name', 'required', array($this, '_name_exists'));
 
  
@@ -149,20 +150,49 @@ class Account_Model extends ORM
      * @param  Validation  $array   Validation object
      * @param  string      $field   name of field being validated
      */
-    public function _unique_email(Validation $array, $field)
+    public function _unique_email_validation(Validation $array, $field)
+    {
+        if (!$this->_unique_email($array[$field]))
+        {
+            // add error to validation object
+            $array->add_error($field, 'email_exists');
+        }
+    }
+
+    public function _unique_email_formo($email)
+    {
+        return $this->_unique_email($email);
+    }
+
+    private function _unique_email($email)
     {
         $fields = array();
-        $fields['email'] = $array[$field];
+        $fields['email'] = $email;
         if ($this->loaded)
             $fields[$this->primary_key.' !='] = $this->primary_key_value;
 
         // check the database for existing records
         $email_exists = (bool) ORM::factory('account')->where($fields)->count_all();
+        return !$email_exists;
 
-        if ($email_exists)
+    }
+
+
+    public function generateVerifyCode()
+    {
+        $vcode = ORM::Factory('verificationcode')->where('account_id', $this->id)->delete_all();
+        while (true)
         {
-            // add error to validation object
-            $array->add_error($field, 'email_exists');
+            try 
+            {
+                $code = substr(md5(uniqid(rand(), true)), 0, 10);
+                $vcode = ORM::Factory('verificationcode');
+                $vcode->account_id = $this->id;
+                $vcode->code = sha1($this->salt. $code);
+                $vcode->save();
+                return $code;
+            }
+            catch (Kohana_Database_Exception $e) {}
         }
     }
 }
