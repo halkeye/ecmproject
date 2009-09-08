@@ -34,13 +34,13 @@ class Account_Model extends ORM
 
 	public function __construct($id = NULL)
 	{
+        parent::__construct($id);
         if (!$this->loaded)
         {
             $this->created = time();
         /* Set a default status on new user creation */
             $this->status = Account_Model::ACCOUNT_STATUS_UNVERIFIED;
         }
-        return parent::__construct($id);
     }
 	
     public function __set($key, $value)
