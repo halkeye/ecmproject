@@ -32,11 +32,15 @@ class Account_Model extends ORM
     );
     protected $ignored_columns = array('confirm_password', 'groups', 'permissions');
 
-	public function save()
+	public function __construct($id = NULL)
 	{
-        if (!isset($this->created))
+        if (!$this->loaded)
+        {
             $this->created = time();
-        return parent::save();
+        /* Set a default status on new user creation */
+            $this->status = Account_Model::ACCOUNT_STATUS_UNVERIFIED;
+        }
+        return parent::__construct($id);
     }
 	
     public function __set($key, $value)
@@ -59,11 +63,6 @@ class Account_Model extends ORM
         if (empty($this->salt))
         {
             $this->salt = substr(md5(uniqid(rand(), true)), 0, $this->saltLength);
-        }
-        /* Set a default status on new user creation */
-        if (!isset($this->status))
-        {
-            $this->status = Account_Model::ACCOUNT_STATUS_UNVERIFIED;
         }
         return sha1($this->salt . $value);
     }
