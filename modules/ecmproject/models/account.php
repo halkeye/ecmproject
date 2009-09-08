@@ -60,6 +60,11 @@ class Account_Model extends ORM
         {
             $this->salt = substr(md5(uniqid(rand(), true)), 0, $this->saltLength);
         }
+        /* Set a default status on new user creation */
+        if (!isset($this->status))
+        {
+            $this->status = Account_Model::ACCOUNT_STATUS_UNVERIFIED;
+        }
         return sha1($this->salt . $value);
     }
 
