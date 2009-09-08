@@ -87,9 +87,9 @@ class Account_Model extends ORM
         $view = new View('user/register_email', $emailVars);
         $message = $view->render(FALSE);
 
-        if (php_uname('n') == 'barkdog')
+/*        if (php_uname('n') == 'barkdog')
             file_put_contents("/var/www/emails.html", "<pre>To: $to\nFrom: $from\nSubject: Subject\n\n$message\n=======================================================================\n\n", FILE_APPEND);
-        else
+        else*/
             email::send($to, $from, $subject, $message, TRUE);
     }
 

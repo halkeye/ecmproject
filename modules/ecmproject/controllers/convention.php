@@ -28,7 +28,7 @@ class Convention_Controller extends Controller
                 array('title'=>'Add Registration', 'url'=>Convention_Controller::STEP1),
         );
         $regs = Registration_Model::getByAccount($this->auth->get_user()->id);
-        if (!$regs->count()) { url::redirect($this->STEP1); }
+        if (!$regs->count()) { url::redirect(Convention_Controller::STEP1); }
 
         $data['conventions'] = array();
         foreach ($regs as $row) 
