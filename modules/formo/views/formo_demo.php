@@ -57,7 +57,7 @@
 </style>
 </head>
 <body>
-	<?=$content?>
+	<?php echo$content?>
 	<div style="margin-top:30px">Executed in {execution_time}</div>
 </body>
 </html>
