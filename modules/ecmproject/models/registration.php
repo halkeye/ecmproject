@@ -42,6 +42,8 @@ class Registration_Model extends ORM
             'dob'   => array( 'type'  => 'text', 'label' => 'Date of Birth' ),
             'cell'  => array( 'type'  => 'text', 'label' => 'Cell Phone', 'required' => false),
             'address' => array( 'type'  => 'textarea', 'rows'  => 4, 'label' => 'Address', ),
+            'econtact'  => array( 'type'  => 'text', 'label' => 'Emergency Contact Name', 'required' => true),
+            'ephone'  => array( 'type'  => 'text', 'label' => 'Emergency Contact Phone', 'required' => true),
             'heard_from' => array( 'type'  => 'text', 'label' => 'Heard from', 'required'=>false ),
             'attendance_reason' => array( 'type'  => 'textarea', 'rows'  => 10, 'label' => 'Reason For Attendance', 'required'=>false),
     );
@@ -59,8 +61,6 @@ class Registration_Model extends ORM
             'ephone'=>array(
                 array('phone', 'Invalid emergency contact phone')
             ),
-            'gname'=>array('required', 'Given name is required'),
-            'sname'=>array('required', 'Surname is required'),
     );
 
 
