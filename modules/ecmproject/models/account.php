@@ -66,7 +66,7 @@ class Account_Model extends ORM
         }
         return sha1($this->salt . $value);
     }
-
+	
     function isBanned()   { return $this->status == Account_model::ACCOUNT_STATUS_BANNED; }
     function isVerified() { return $this->status == Account_model::ACCOUNT_STATUS_VERIFIED; }
 
@@ -199,6 +199,18 @@ class Account_Model extends ORM
             catch (Kohana_Database_Exception $e) {}
         }
     }
+	
+	
+	public function statusToString() {
+		if ($this->status == Account_Model::ACCOUNT_STATUS_UNVERIFIED)
+			return 'UNVERIFIED';
+		else if ($this->status == Account_Model::ACCOUNT_STATUS_VERIFIED)
+			return 'VERIFIED';
+		else if ($this->status == Account_Model::ACCOUNT_STATUS_BANNED)
+			return 'BANNED';
+		else
+			return 'UNKNOWN STATUS';
+	}
 }
 
 /* End of file user.php */

@@ -30,7 +30,7 @@ class Admin_Controller extends Controller
 		$this->view->title = 'Administration Area';
 		$this->view->heading = 'Administration Area';
 		$this->view->subheading = 'Manage conventions, passes, permissions and other details';
-				
+					
 		$this->view->content = new View('admin/index');
 	}
 
@@ -49,16 +49,8 @@ class Admin_Controller extends Controller
 			$data['entries'][$row->id] = array();
 			$data['entries'][$row->id]['id'] = $row->id;
 			$data['entries'][$row->id]['email'] = $row->email;
-			
-			if ($row->status == Account_Model::ACCOUNT_STATUS_UNVERIFIED)
-				$data['entries'][$row->id]['status'] = 'UNVERIFIED';
-			else if ($row->status == Account_Model::ACCOUNT_STATUS_VERIFIED)
-				$data['entries'][$row->id]['status'] = 'VERIFIED';
-			else if ($row->status == Account_Model::ACCOUNT_STATUS_BANNED)
-				$data['entries'][$row->id]['status'] = 'BANNED';
-			else
-				$data['entries'][$row->id]['status'] = 'UNKNOWN STATUS';
-				
+			$data['entries'][$row->id]['status'] = $row->statusToString();
+							
 			//$data['entries'][$row->id]['created'] = date("M j, Y g:i a", $row->created);
 			
 			/* Replace with a : ?*/
@@ -70,9 +62,11 @@ class Admin_Controller extends Controller
 		
 		//Actions to print beside each entry.
 		$data['actions'] = array();
-		$data['actions']['edit'] = html::image('img/edit-copy.png', 'Edit this account');
+		$data['actions']['edit']->linktext = html::image('img/edit-copy.png', 'Edit this account');
+		$data['actions']['edit']->action = 'user/editUser';
 		
-		$data['actions']['delete'] = html::image('img/edit-delete.png', 'Delete this account');
+		$data['actions']['delete']->linktext = html::image('img/edit-delete.png', 'Delete this account');
+		$data['actions']['delete']->action = 'admin/deleteUser';
 		
 		$this->view->content = new View('admin/list', $data);
 	}
