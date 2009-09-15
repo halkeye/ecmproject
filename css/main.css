@@ -6,6 +6,7 @@ html,body,div,span,object,iframe, h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,cite
 a { text-decoration: none; }
 a:hover { text-decoration: none; }
 a:visited { text-decoration: none; }
+
 body {   
   background-color: #20232B; 
   line-height:1; 
@@ -128,6 +129,7 @@ body {
   margin-left: 160px;
   background-color: #FFF;
 }
+
 #content.contentNoMenu
 {
   margin-left: auto;
@@ -198,6 +200,35 @@ body {
 	font-size: 14px;
 	font-weight: bold;
 	color: #8A0917;
+}
+
+#content table {
+	text-align: center;
+	font-size: 12px;
+}
+
+/* We can do *proper* styling another time */
+#content th.header {	
+	background-color: #DDD;
+	padding: 5px;
+}
+
+#content td {
+	padding-top: 5px;
+	padding-bottom: 10px;
+}
+
+#content table a {	
+	color: #00275E;
+	text-decoration: underline;
+}
+
+#content table a:hover {
+
+}
+
+#content table a:visited {
+	color: #00275E;
 }
 
 /*
