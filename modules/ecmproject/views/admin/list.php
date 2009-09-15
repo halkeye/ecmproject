@@ -16,7 +16,7 @@
 		<?php endforeach; ?>
 		<!-- Also output actions as well -->
 		<?php foreach ($actions as $action): ?>
-		<td><?php echo $action ?></a></td>
+		<td><?php echo $action ?></td>
 		<?php endforeach; ?>
 	</tr>
 	<?php endforeach; ?>

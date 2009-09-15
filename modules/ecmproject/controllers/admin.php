@@ -60,13 +60,10 @@ class Admin_Controller extends Controller
 				$data['entries'][$row->id]['login'] = '--';
 		}
 		
-		//Actions to print beside each entry.
+		/* Actions to print beside each entry. */
 		$data['actions'] = array();
-		$data['actions']['edit']->linktext = html::image('img/edit-copy.png', 'Edit this account');
-		$data['actions']['edit']->action = 'user/editUser';
-		
-		$data['actions']['delete']->linktext = html::image('img/edit-delete.png', 'Delete this account');
-		$data['actions']['delete']->action = 'admin/deleteUser';
+		$data['actions']['edit'] = html::anchor('user/editUser', html::image('img/edit-copy.png', 'Edit this account'));		
+		$data['actions']['delete'] = html::anchor('admin/deleteAccount', html::image('img/edit-delete.png', 'Edit this account'));
 		
 		$this->view->content = new View('admin/list', $data);
 	}
