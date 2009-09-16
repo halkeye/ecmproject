@@ -130,6 +130,11 @@ body {
   background-color: #FFF;
 }
 
+#content strong{
+  font-size: 14px;
+  font-weight: bold;
+}
+
 #content.contentNoMenu
 {
   margin-left: auto;
@@ -229,6 +234,15 @@ body {
 
 #content table a:visited {
 	color: #00275E;
+}
+
+#content button {
+	padding: 2px 10px 2px 10px;
+}
+
+#content button.wide {
+	margin-left: 10px;
+	padding: 2px 20px 2px 20px;
 }
 
 /*
