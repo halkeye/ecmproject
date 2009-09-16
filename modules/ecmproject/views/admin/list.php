@@ -14,10 +14,6 @@
 		<?php foreach ($rows as $column): ?>
 		<td><?php echo $column ?></td>
 		<?php endforeach; ?>
-		<!-- Also output actions as well -->
-		<?php foreach ($actions as $action): ?>
-		<td><?php echo $action ?></td>
-		<?php endforeach; ?>
 	</tr>
 	<?php endforeach; ?>
 </table>
