@@ -1,18 +1,16 @@
 <br />
 <!-- CONTENT -->
-<table width='97%'>	
+<table width='97%' class='login'>	
 	<tr>
 		<th class='header' width='50%'>Create Log-in ID</th>
 		<th class='header' width='50%'>Log-in with Existing ID</th>
 	</tr>
 	<tr>
 		<td>
+			<p>Please enter your e-mail address and a password of your choice and click <strong>Continue</strong>.  
+			The e-mail address will serve as your login ID when you return to this site.</p>
 			<?php echo form::open('/user/register'); ?>
 				<fieldset>
-					<div><p>
-						Please enter your e-mail address and a password of your choice and click <strong>Continue</strong>.  
-						The e-mail address will serve as your login ID when you return to this site.
-					</p></div>
 					<table cellspacing="0" cellpadding="2" border="0">
 						<tr><td colspan="3">&nbsp;</td></tr>
 						<tr>
@@ -40,9 +38,9 @@
 				<?php echo form::close(); ?>
 		</td>
 		<td>
+		<p>Please enter your e-mail address and password and click <strong>Continue</strong>.</p>
 		<?php echo form::open('/user/login'); ?>
-			<fieldset>				
-				<div><p>Please enter your e-mail address and password and click <strong>Continue</strong>.</p></div>
+			<fieldset>					
 				<table cellspacing="0" cellpadding="2" border="0">
 					<tr><td colspan="3">&nbsp;</td></tr>
 					<tr>
