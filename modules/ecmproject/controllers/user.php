@@ -56,8 +56,13 @@ class User_Controller extends Controller
             return;
         }
 
-        $this->auth->logout();
-        $this->_redirect('');
+        $this->view->content = new View('user/logout');
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST')
+        {
+            $this->auth->logout();
+            $this->_redirect('');
+        }
         return;
     }
 
