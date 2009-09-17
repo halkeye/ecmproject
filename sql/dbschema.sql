@@ -71,7 +71,7 @@ CREATE TABLE registrations(
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE RESTRICT, -- Conventions shouldn't be deleted if in use already.
    FOREIGN KEY (pass_id) REFERENCES passes(id) ON DELETE RESTRICT, -- Passes shouldn't be deleted if in use already.
    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE SET NULL, -- Even if an account is deleted, leave registrations for stat purposes.
-   UNIQUE `convention_badge_name` (convention_id, badge) -- only allow one unique badge name per convention? 
+   UNIQUE `convention_badge_name` (convention_id, badge) -- only allow one unique badge name per convention?
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `payments`;
@@ -83,6 +83,12 @@ CREATE TABLE payments(
    register_id INT UNSIGNED NOT NULL,
    last_modified INT UNSIGNED, -- Track the last account to add/edit a payment manually to allow for reg. manager/board to give out a badge, fix payment, etc. NULL if last person who touched it wasn't human. Think of a better solution.
    type VARCHAR(55) NOT NULL,
+   mc_gross DECIMAL(10,2) NOT NULL,
+   payer_id VARCHAR(13) NOT NULL,
+   payment_date INT UNSIGNED NOT NULL,
+   payment_status VARCHAR(17) NOT NULL,
+   txn_id VARCHAR(17) NOT NULL, -- txn_id is 17 characters alphanumeric.
+   receipt_id VARCHAR(19) NOT NULL, -- reciept id is in form XXXX-XXXX-XXXX-XXXX (19 characters)
    FOREIGN KEY (register_id) REFERENCES registrations(id) ON DELETE RESTRICT, -- Registrations with payment information shouldn't be deleted.
    FOREIGN KEY (last_modified) REFERENCES accounts(id) ON DELETE RESTRICT
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
@@ -116,10 +122,26 @@ CREATE TABLE accounts_usergroups(
 DROP TABLE IF EXISTS `verificationcodes`;
 CREATE TABLE `verificationcodes` (
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-   account_id INT UNSIGNED NOT NULL, 
+   account_id INT UNSIGNED NOT NULL,
    code VARCHAR(40) NOT NULL, 
    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
    UNIQUE (`account_id`),
    UNIQUE (`code`)
 );
 
+DROP TABLE IF EXISTS `logs`;
+CREATE TABLE `logs` (
+   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+   modifier_id INT UNSIGNED,
+   target_account INT UNSIGNED,
+   target_registration INT UNSIGNED,
+   target_badge INT UNSIGNED,
+   method VARCHAR(50),
+   description TEXT,
+   mod_time INT UNSIGNED,
+   ip VARCHAR(39),
+   FOREIGN KEY (modifier_id) REFERENCES accounts(id) ON DELETE SET NULL,
+   FOREIGN KEY (target_account) REFERENCES accounts(id) ON DELETE SET NULL,
+   FOREIGN KEY (target_registration) REFERENCES registrations(id) ON DELETE SET NULL,
+   FOREIGN KEY (target_badge) REFERENCES passes(id) ON DELETE SET NULL
+ ) ENGINE=Innodb DEFAULT CHARSET=utf8;
