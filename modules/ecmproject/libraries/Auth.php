@@ -174,8 +174,8 @@ class Auth_Core {
     public function getAccount() { return $this->account; }
     public function get_user() { return $this->getAccount(); }
 
-    public function has_perm($permission) { return isset($this->permissions[$permission]); }
-    public function has_group($group) { return isset($this->groups[$permission]); }
+    public function hasPermission($permission) { return isset($this->permissions[$permission]); }
+    public function hasUserGroup($group) { return isset($this->groups[$permission]); }
 
     /* Error functions */
     public function clearErrors() { $this->errors = array(); }

@@ -17,10 +17,7 @@ class Admin_Controller extends Controller
 		parent::__construct();
 		$this->requireLogin();
 	
-		$this->view->menu += array(
-			array('title'=>'Register', 'url'=>'convention'),
-			array('title'=>'Administration', 'url'=>'admin'),
-		);
+		$this->addMenuItem(array('title'=>'Register', 'url'=>'convention'));
 
 		return;
 	}

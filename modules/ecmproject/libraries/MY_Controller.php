@@ -56,10 +56,14 @@ class Controller extends Controller_Core
                 {
                     $this->verifiedAccount = FALSE;
                     $this->view->errors[] = Kohana::lang('ecmproject.not_validated');
-                    $this->view->menu += array(
-                            array('title'=>'Verify Account', 'url'=>'/user/verifyMenu'),
-                    );
+                    $this->addMenuItem(array('title'=>'Verify Account', 'url'=>'/user/verifyMenu'));
                 }
+            }
+
+            if ($this->auth->hasPermission('admin'))
+            {
+                $this->addMenuItem(array('title'=>'Administration', 'url'=>'admin'));
+                $this->addMenuItem(array('seperator'=>1));
             }
         }
     }
@@ -80,6 +84,9 @@ class Controller extends Controller_Core
         $session_errors = $this->session->get_once('errors');
         if ($session_errors) 
             $this->view->errors = array_merge($session_errors, $this->view->errors);
+
+        if ($this->view->isLoggedIn)
+            $this->addMenuItem(array('url'=>'user/logout', 'title'=>'Logout'));
 
         // Displays the view
         $this->view->render(TRUE);
@@ -132,6 +139,16 @@ class Controller extends Controller_Core
             url::redirect('/user/verifyMenu');
             return;
         }
+    }
+
+    protected function requirePermission($permission) {}
+    protected function requireGroup($group) {}
+
+    protected function addMenuItem($item)
+    {
+        $items = $this->view->menu;
+        $items[] = $item;
+        $this->view->menu = $items;
     }
 
 }

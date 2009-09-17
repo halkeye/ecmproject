@@ -23,13 +23,8 @@
             <li><b><?php echo htmlentities($user->email) ?></b></li>
             <li>&nbsp;</li>
             <?php endif; ?>
-            <?php if($menu): ?><?php foreach ($menu as $m): ?>
-            <li><?php echo html::anchor($m['url'], $m['title']); ?></li> 
-            <?php endforeach; ?><?php endif ?>
 
-            <?php if ($isLoggedIn): ?>
-            <li><?php echo html::anchor('user/logout', 'Logout'); ?></li>
-            <?php endif; ?>
+            <?php if($menu) { echo View::Factory('global/menu', array('menu'=>$menu)); } ?>
         </ul>
     </div> 
     <?php endif; ?>
