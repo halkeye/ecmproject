@@ -17,7 +17,10 @@ class Admin_Controller extends Controller
 		parent::__construct();
 		$this->requireLogin();
 	
-		$this->addMenuItem(array('title'=>'Register', 'url'=>'convention'));
+		$this->view->menu += array(
+			array('title'=>'Register', 'url'=>'convention'),
+			array('title'=>'Administration', 'url'=>'admin'),
+		);
 
 		return;
 	}
@@ -58,38 +61,43 @@ class Admin_Controller extends Controller
 				$data['entries'][$row->id]['login'] = '--';
 				
 			/* Actions to print beside each entry. */
-			$data['entries'][$row->id]['actionEdit'] = html::anchor('user/editUser?id=' . $row->id, html::image('img/edit-copy.png', 'Edit this account'));		
-			$data['entries'][$row->id]['actionDelete'] = html::anchor('admin/deleteAccount?id=' . $row->id, html::image('img/edit-delete.png', 'Delete this account'));
+			$data['entries'][$row->id]['actionEdit'] = html::anchor('user/editUser/'. $row->id, html::image('img/edit-copy.png', 'Edit this account'));		
+			$data['entries'][$row->id]['actionDelete'] = html::anchor('admin/deleteAccount/' . $row->id, html::image('img/edit-delete.png', 'Delete this account'));
 		}	
 		
 		$this->view->content = new View('admin/list', $data);
 	}
 	
-	function deleteAccount() {
-		//Better way to do this...?
-		$id = $this->input->get('id');
-		$val = $this->input->post('Yes');
+	function deleteAccount($id = NULL) {
+	
+		if (isset($id))
+			$row = ORM::factory('Account')->find($id);			
 		
-		if (isset($val))
+		/* If row is defined (only if ID was set) and row was loaded... */
+		if (isset($row) && $row->loaded)
 		{
-			$id = $this->input->post('id');
-			if (ORM::factory('Account')->delete( $id )) 
+			/* POST value YES ... do delete */
+			if ($val = $this->input->post('Yes'))
 			{
-				$this->addMessage("Account with ID: $id was deleted.");				
-				url::redirect('admin/manageAccounts');
-			}
-			else
+				if ($row->delete()) 
+				{
+					$this->addMessage("Account with ID: $id was deleted.");				
+					url::redirect('admin/manageAccounts');
+				}
+				else
+				{
+					$this->addMessage("Failed to delete account with ID: $id! Please try again.");				
+					url::redirect('admin/manageAccounts');
+				}	
+			}		
+			/* User changed mind. */
+			else if ($val = $this->input->post('No'))
 			{
-				$this->addMessage("Failed to delete account with ID: $id!");				
 				url::redirect('admin/manageAccounts');
-			}				
-		}
-		else if (isset($id))
-		{
-			//Fetch the account to be deleted. 			
-			$row = ORM::factory('Account')->find( $id ); 
+			}			
 			
-			if ($row->loaded == TRUE) 
+			/* User needs confirm screen. */
+			else if ($row->loaded)				
 			{
 				$this->view->title = 'Admin: Delete Account';
 				$this->view->heading = 'ARE YOU SURE?';
@@ -99,17 +107,12 @@ class Admin_Controller extends Controller
 				$data['entityType'] = 'account';
 				$data['entityName'] = $row->email;
 				$this->view->content = new View('admin/delete', $data);
-			}
-			else 
-			{
-				$this->view->title = 'Admin: Delete Account';
-				$this->view->heading = 'Delete Account';
-				$this->view->subheading = 'Administration Area';
-				$this->view->content = '<p>The account requested for deletion does not exist.</p>';		
-			}
-		}	
-		else
-		{							
+			}			
+		}
+		
+		/* Row not defined/id was not set/deletion of a non existant ID. */
+		else {
+			$this->addMessage("The specified account no longer exists.");	
 			url::redirect('admin/manageAccounts');
 		}
 	}
