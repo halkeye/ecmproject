@@ -314,3 +314,6 @@ span.required {
 span.emphasis {
 	font-weight: bold;
 }
+
+.row_odd { background-color: #ddd; }
+.row_even { background-color: #eee; }

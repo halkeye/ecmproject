@@ -1,20 +1,12 @@
-<table>
+<ul>
 <?php
-$colsPerRow = 4;
-$count = 0;
-foreach ($passes as $pass) 
+foreach ($passes as $pass)
 {
-    if (($count++ % $colsPerRow) == 0) echo '<tr>';
-
-    echo '<td>';
-    echo $pass->paypalButton($notify_url, $return_url, $cancel_url); 
-    echo '<br />';
-    echo '<b>'. $pass->name . '</b>';
-    echo '</td>';
-
-    if (($count % $colsPerRow) == 0) echo '</tr>';
+    $class_row = text::alternate('row_odd','row_even');
+    echo '<li class="'.$class_row.'">';
+    echo html::specialchars($pass->name);
+    echo '</li>';
 }
-if (($count % $colsPerRow) != 0) echo '</tr>';
 ?>
-</table>
+</ul>
 

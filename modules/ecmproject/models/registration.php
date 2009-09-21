@@ -2,6 +2,10 @@
 
 class Registration_Model extends ORM 
 {
+    const STATUS_UNPROCESSED = 0;
+    const STATUS_PROCESSING  = 1; // Waiting for Paypal to respond
+    const STATUS_PAID        = 99; // Fully working and paid
+
     /* On unserialize never check the db */
     protected $reload_on_wakeup = false;
 
@@ -32,9 +36,10 @@ class Registration_Model extends ORM
             'ephone'        => array ( 'type' => 'string', 'length' => '15', 'null' => true                              ),
             'heard_from'    => array ( 'type' => 'text',                     'null' => true,                             ),
             'attendance_reason'    => array ( 'type' => 'text',              'null' => true,                             ),
+            'status'      => array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                       ),
     );
 
-    public $formo_ignores = array('id', 'convention_id', 'pass_id', 'account_id', );
+    public $formo_ignores = array('id', 'convention_id', 'pass_id', 'account_id', 'status');
 
     public $formo_defaults = array(
             'gname' => array( 'type'  => 'text', 'label' => 'Given Name' ),
@@ -181,6 +186,18 @@ class Registration_Model extends ORM
                     account_id = ? AND $conventionWhere
                 ", $vars);
         return $result;
+    }
+
+    public function getPossiblePassesQuery()
+    {
+        return ORM::Factory('pass')
+            ->orwhere(array(
+                'enddate >' => time(),
+                'enddate ' => null,
+                ))
+            ->where('startdate <', time())
+            /* $passes->where('ageReq', ) FIXME */
+            ->where('convention_id', $this->convention_id);
     }
 
 }

@@ -147,6 +147,13 @@ class Auth_Core {
         // extra safety to prevent session fixation - http://en.wikipedia.org/wiki/Session_fixation
         $this->session->regenerate();
 
+
+        $this->storeAccount($account);
+
+    }
+
+    function storeAccount($account)
+    {
         $this->account = serialize($account);
 
         // Store session data

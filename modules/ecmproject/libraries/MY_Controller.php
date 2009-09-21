@@ -37,7 +37,7 @@ class Controller extends Controller_Core
         
         if ($this->auth->is_logged_in())
         {
-            $this->view->verifiedAccount = $this->verifiedAccount = TRUE;
+            $this->isVerifiedAccount = TRUE;
             $user = $this->auth->get_user();
             if ($user->status != Account_Model::ACCOUNT_STATUS_VERIFIED)
             {
@@ -47,9 +47,14 @@ class Controller extends Controller_Core
                 $user = ORM::factory('Account', array('id'=>$user->id));
                 if ($user->status != Account_Model::ACCOUNT_STATUS_VERIFIED)
                 {
-                    $this->view->verifiedAccount = $this->verifiedAccount = FALSE;
+                    $this->isVerifiedAccount = FALSE;
                     $this->view->errors[] = Kohana::lang('ecmproject.not_validated');
                     $this->addMenuItem(array('title'=>'Verify Account', 'url'=>'/user/verifyMenu'));
+                }
+                else
+                {
+                    /* Store the updated account if we've been verified */
+                    $this->auth->storeAccount($user);
                 }
             }
 
@@ -80,7 +85,7 @@ class Controller extends Controller_Core
 
         /* Are you logged in? */
         $this->view->set_global('isLoggedIn', $this->auth->is_logged_in());
-        $this->view->set_global('verifiedAccount', $this->verifiedAccount);
+        $this->view->set_global('isVerifiedAccount', isset($this->isVerifiedAccount) ? $this->isVerifiedAccount : FALSE);
         /* store the user */
         $this->view->set_global('account', $this->auth->getAccount());
         
@@ -135,7 +140,7 @@ class Controller extends Controller_Core
 
     protected function requireVerified()
     {
-        if ($this->auth->is_logged_in() && !$this->verifiedAccount ) 
+        if ($this->auth->is_logged_in() && !$this->isVerifiedAccount ) 
         {
             /* FIXME: Add lang file */
             /* You can't go any furthur until email address is verified. */

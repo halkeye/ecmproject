@@ -68,6 +68,7 @@ CREATE TABLE registrations(
    ephone VARCHAR(15) NOT NULL,
    heard_from TEXT,
    attendance_reason TEXT,
+   status TINYINT NOT NULL, -- Status of account (unprocessed, processing, accepted, etc)
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE RESTRICT, -- Conventions shouldn't be deleted if in use already.
    FOREIGN KEY (pass_id) REFERENCES passes(id) ON DELETE RESTRICT, -- Passes shouldn't be deleted if in use already.
    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE SET NULL, -- Even if an account is deleted, leave registrations for stat purposes.

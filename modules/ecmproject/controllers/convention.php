@@ -19,14 +19,14 @@ class Convention_Controller extends Controller
     {
         parent::__construct();
         $this->requireLogin();
+        $this->addMenuItem(
+                array('title'=>'Add Registration', 'url'=>Convention_Controller::STEP1)
+        );
         return;
     }
 
     function index()
     {
-        $this->view->menu += array(
-                array('title'=>'Add Registration', 'url'=>Convention_Controller::STEP1),
-        );
         $regs = Registration_Model::getByAccount($this->auth->get_user()->id);
         if (!$regs->count()) { url::redirect(Convention_Controller::STEP1); }
 
@@ -64,22 +64,27 @@ class Convention_Controller extends Controller
             
         $form->mval('registration', 'mval');
         $form->add_rule('badge', array($reg,'_unique_badge_form'), 'Non unique badge name');
+        
+
+        $passesQuery = $reg->getPossiblePassesQuery();
+        $form->add_select('pass_id',  $passesQuery->select_list('id', 'name'))
+             ->label(Kohana::lang('registration.pass_id'));
 
         $form->add('submit');
 
         if ( $form->validate())
         {
-            $reg = $form->get_model('registration');
-            $form->save();
-            $id = $reg->id;
-            url::redirect(Convention_Controller::STEP2.'/'.$id);
+            $form->get_model('registration')->save();
+            url::redirect('/convention/checkout');
         }
-        $this->view->content = $form->get();
+
+        $this->view->content = $form;
     }
     
     function badgeChoice($reg_id)
     {
         $this->requireVerified();
+        $data = array();
 
         $reg_id = intval($reg_id);
         $reg = ORM::Factory('registration')
@@ -88,17 +93,9 @@ class Convention_Controller extends Controller
             ->find($reg_id);
         $convention = $reg->convention;
         $account = $reg->account;
-        
-        $data = array();
 
-        /* FIXME */
-        $data['notify_url'] = url::site('/paypal/registrationPaypalIPN/' .$reg->id);
-        $data['return_url'] = url::site('/convention/registrationReturn/'.$reg->id);
-        $data['cancel_url'] = url::site('/convention/registrationCancel/'.$reg->id);
-
-        $passes = ORM::Factory('pass')->where('convention_id', $convention->id);
-        /* $passes->where('ageReq', ); */
-        $data['passes'] = $passes->find_all();
+        $passesQuery = $reg->getPossiblePassesQuery();
+        $data['passes'] = $passesQuery->find_all();
         $this->view->content = new View('convention/badgeChoice', $data);
     }
 
@@ -109,27 +106,93 @@ class Convention_Controller extends Controller
         $this->view->content = "cancel/fail page";
     }
     
-    function registrationReturn($reg_id)
+    function registrationReturn()
     {
-        $reg_id = intval($reg_id);
-        $reg = ORM::Factory('registration')->find($reg_id);
-        $this->view->content = "success page";
+        $regids = array();
+        /* Pull out some of the data returned from paypal success link */
+        $count = 1;
+        while ($this->input->get('item_number'.$count))
+        {
+            $data = explode('|', $this->input->get('item_number'.$count));
+            $regids[$data[0]] = array('id' => $data[0], 'pass_id' => $data[1]);
+            $count++;
+        }
+
+        $registrations = ORM::factory('registration')
+            ->with('account')
+            ->with('pass')
+            ->in('registrations.id', array_keys($regids))
+            ->find_all();
+        foreach ($registrations as $reg)
+        {
+            /* We don't really trust this data so lets make sure people havn't messed with the params at all */
+            if ($regids[$reg->id]['pass_id'] != $reg->pass->id)
+                throw Exception('Data has been tampered with');
+            /* Now if the status was unprocessed before, mark it as being processed (Anything else is handled by other handlers */
+            if ($reg->status == Registration_Model::STATUS_UNPROCESSED)
+                $reg->status = Registration_Model::STATUS_PROCESSING;
+            /* Update modules if they've been changed */
+            $reg->save();
+        }
+
+        $this->view->content = "success page".
+            var_export($regids,1).
+        "";
+    }
+
+
+    private function _getReg()
+    {
+        /* FIXME - Maybe limit to this convention also, so any outstanding entries will be ignored */
+        return ORM::Factory('registration')
+            ->with('convention')
+            ->with('pass')
+            ->where('account_id', $this->auth->getAccount()->id)
+            ->where('status', Registration_Model::STATUS_UNPROCESSED) /* Only grab one we havn't heard back from yet */
+            ->find_all();
     }
 
     function checkout()
     {
-        $data = Kohana::config('paypal');
-        $data['registrations'] = ORM::Factory('registration')
-            ->with('convention')
-            ->with('pass')
-            ->where('account_id', $this->auth->getAccount()->id)
-            ->find_all();
-        $data['paypal_url'] = $data['url'];
-        $data['notify_url'] = url::site('/paypal/registrationPaypalIPN');
-        $data['return_url'] = url::site('/convention/registrationReturn');
-        $data['cancel_url'] = url::site('/convention/registrationCancel');
-        $this->view->content = new View('convention/checkout', $data);
+        $this->requireVerified();
+        
+        $data['registrations'] = $this->_getReg();
+        if (!$data['registrations']->count()) 
+        {
+            $this->addError('FIXME - No registrations to process');
+            return;
+        }
 
+        /* Our "checkout template" */
+        $this->view->content = new View('convention/checkout', $data);
+    }
+
+    function checkoutPaypal()
+    {
+        $this->requireVerified();
+
+        $data = Kohana::config('paypal');
+        /* get all the registrations we need */
+        $data['registrations'] = $this->_getReg();
+
+        /* Config file is currently 'url', lets map it to 'paypal_url' incase any other url is used */
+        $data['paypal_url'] = $data['url'];
+        unset($data['url']);
+
+        /* Where paypal should tell us about successful transactions */
+        $data['notify_url'] = url::site('/paypal/registrationPaypalIPN');
+        ### FIXME - This needs an external url, so can't be localhost
+        if (strpos($data['notify_url'], 'localhost') !== FALSE) {
+            $data['notify_url'] = 'http://barkdog.halkeye.net:6080/ecmproject/index.php/paypal/registrationPaypalIPN';
+        }
+
+        /* Where to send the user when we complete */ 
+        $data['return_url'] = url::site('/convention/registrationReturn');
+        /* where to send the user if they back out */
+        $data['cancel_url'] = url::site('/convention/registrationCancel');
+
+        /* Our "checkout template" */
+        $this->view->content = new View('convention/checkoutPaypal', $data);
     }
 
 }
