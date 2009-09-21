@@ -26,13 +26,6 @@ class Controller extends Controller_Core
         $this->view->title = "";
         /* Menu options */
         $this->view->menu    = array();
-        /* Are you logged in? */
-        $this->view->isLoggedIn = $this->auth->is_logged_in();
-        $this->view->user = new StdClass;
-        if ($this->view->isLoggedIn)
-        {
-            $this->view->user = $this->auth->get_user();
-        }
 
         /* Messages to show */
         $this->view->messages = array();
@@ -44,7 +37,7 @@ class Controller extends Controller_Core
         
         if ($this->auth->is_logged_in())
         {
-            $this->verifiedAccount = TRUE;
+            $this->view->verifiedAccount = $this->verifiedAccount = TRUE;
             $user = $this->auth->get_user();
             if ($user->status != Account_Model::ACCOUNT_STATUS_VERIFIED)
             {
@@ -54,7 +47,7 @@ class Controller extends Controller_Core
                 $user = ORM::factory('Account', array('id'=>$user->id));
                 if ($user->status != Account_Model::ACCOUNT_STATUS_VERIFIED)
                 {
-                    $this->verifiedAccount = FALSE;
+                    $this->view->verifiedAccount = $this->verifiedAccount = FALSE;
                     $this->view->errors[] = Kohana::lang('ecmproject.not_validated');
                     $this->addMenuItem(array('title'=>'Verify Account', 'url'=>'/user/verifyMenu'));
                 }
@@ -85,8 +78,20 @@ class Controller extends Controller_Core
         if ($session_errors) 
             $this->view->errors = array_merge($session_errors, $this->view->errors);
 
+        /* Are you logged in? */
+        $this->view->set_global('isLoggedIn', $this->auth->is_logged_in());
+        $this->view->set_global('verifiedAccount', $this->verifiedAccount);
+        /* store the user */
+        $this->view->set_global('account', $this->auth->getAccount());
+        
         if ($this->view->isLoggedIn)
+        {
+            $this->addMenuItem(array('url'=>'convention/checkout', 'title'=>'Checkout'));
+            $this->addMenuItem(array('seperator'=>1));
+
+
             $this->addMenuItem(array('url'=>'user/logout', 'title'=>'Logout'));
+        }
 
         // Displays the view
         $this->view->render(TRUE);

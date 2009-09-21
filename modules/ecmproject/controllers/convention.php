@@ -116,4 +116,20 @@ class Convention_Controller extends Controller
         $this->view->content = "success page";
     }
 
+    function checkout()
+    {
+        $data = Kohana::config('paypal');
+        $data['registrations'] = ORM::Factory('registration')
+            ->with('convention')
+            ->with('pass')
+            ->where('account_id', $this->auth->getAccount()->id)
+            ->find_all();
+        $data['paypal_url'] = $data['url'];
+        $data['notify_url'] = url::site('/paypal/registrationPaypalIPN');
+        $data['return_url'] = url::site('/convention/registrationReturn');
+        $data['cancel_url'] = url::site('/convention/registrationCancel');
+        $this->view->content = new View('convention/checkout', $data);
+
+    }
+
 }

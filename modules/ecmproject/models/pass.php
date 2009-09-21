@@ -12,21 +12,6 @@ class Pass_Model extends orm
     );
     */
 
-    function paypalButton($notify_url = null, $return_url = null, $cancel_url = null)
-    {
-        $p = new Paypal();
-        $p->itemName = $this->name;
-        $p->itemId   = $this->id;
-        $p->price    = $this->price;
-        if ($notify_url)
-            $p->addField('notify_url',    $notify_url);
-        if ($return_url)
-            $p->addField('return',        $return_url);
-        if ($cancel_url)
-            $p->addField('cancel_return', $cancel_url);
-        return $p->paypalView();
-    }
-
     public static function find_all_for_account($account)
     {
         $orm = ORM::factory('pass');

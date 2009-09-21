@@ -32,7 +32,7 @@ body {
 }
 
 /* Left navigation #4B050D */
-#menu{
+#sidebar{
   float: left;
   border-top: 3px solid #445772;    
   border-bottom: 1px solid #BBB;
@@ -46,42 +46,42 @@ body {
   font-size: 12px; 
 }
 
-#menu ul {
+#sidebar ul {
   list-style: none;
   background-color: #FFF;
 }
 
-#menu a {
+#sidebar a {
 	color: #000;
 	width: auto;
 	display: block;
 }
 
-#menu li  {
+#sidebar li  {
   color: #000;   
   padding: 5px; 
 }
 
-#menu li:hover.menuItem {  
+#sidebar li:hover.menuItem {  
   font-weight: bold;    
   text-decoration: none;
   background-color: #FC0; 
 }
 
-#menu .title , #menu .title a{
+#sidebar .title , #sidebar .title a{
   color: #8A0917; 
 }
-#menu .title {
+#sidebar .title {
   font-size: 16px;
   font-weight: bold;
   border-bottom: 1px solid #BBB;
 }
 
-#menu .title:hover { 
+#sidebar .title:hover { 
   background-color: #FFF;  
 }
 
-#menu li.current {    
+#sidebar li.current {    
   color: #FFF;
   background-color: #BBB;  
 }
@@ -96,26 +96,26 @@ body {
 	line-height: 1.5;	
 }
 
-#menu label
+#sidebar label
 {	
 	width: 4em;	
 	text-align: left;	
 	display: block;
 }
 
-#menu input 
+#sidebar input 
 {	
     padding: 0px;
 	width: 145px;
 	display: block;	
 }
 
-#menu input.submit {
+#sidebar input.submit {
     padding: 0px;
 	width: 50px
 }
 
-#menu p.submit
+#sidebar p.submit
 {
 	margin-top: 4px;
 } 

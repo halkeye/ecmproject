@@ -16,16 +16,18 @@
  
     <!-- Left Sidebar. --> 
     <?php if ($isLoggedIn || $menu): ?>
-    <div id="menu"> 
-        <ul> 
-            <li class="menuItem title"><a href="<?php echo url::base(); ?>">Menu</a></li>
-            <?php if ($isLoggedIn): ?>
-            <li><b><?php echo htmlentities($user->email) ?></b></li>
-            <li>&nbsp;</li>
-            <?php endif; ?>
+    <div id="sidebar">
+        <div id="menu"> 
+            <ul> 
+                <li class="menuItem title"><a href="<?php echo url::base(); ?>">Menu</a></li>
+                <?php if ($isLoggedIn): ?>
+                <li><b><?php echo htmlentities($account->email) ?></b></li>
+                <li>&nbsp;</li>
+                <?php endif; ?>
 
-            <?php if($menu) { echo View::Factory('global/menu', array('menu'=>$menu)); } ?>
-        </ul>
+                <?php if($menu) { echo View::Factory('global/menu', array('menu'=>$menu)); } ?>
+            </ul>
+        </div>
     </div> 
     <?php endif; ?>
  
@@ -48,6 +50,7 @@
 <!-- Page rendered in {elapsed_time} seconds -->
  
 </div> 
+
 </body> 
 </html> 
 
