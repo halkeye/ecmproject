@@ -12,16 +12,9 @@ class Pass_Model extends orm
     );
     */
 
-    public static function find_all_for_account($account)
+    public function __toString()
     {
-        $orm = ORM::factory('pass');
-        $orm->orwhere(array(
-                'enddate >' => time(),
-                'enddate ' => null,
-        ));
-        $orm->where(array('startdate <' => time()));
-        return $orm->find_all();
-
+        return $this->name . ' - ' . sprintf('$%01.2F', $this->price);
     }
 }
 

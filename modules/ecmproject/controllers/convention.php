@@ -12,8 +12,8 @@
 
 class Convention_Controller extends Controller 
 {
-    const STEP1 = "convention/generalInfo";
-    const STEP2 = "convention/badgeChoice";
+    const STEP1 = "convention/editReg";
+    const STEP2 = "convention/checkout";
 
     function __construct()
     {
@@ -43,7 +43,7 @@ class Convention_Controller extends Controller
         return;
     }
 
-    function generalInfo($reg_id = NULL)
+    function editReg($reg_id = NULL)
     {
         $reg_id = isset($reg_id) ? intval($reg_id) : NULL;
 
@@ -53,10 +53,17 @@ class Convention_Controller extends Controller
             $reg->convention_id = ORM::Factory('convention')->getCurrentConvention();
             $reg->account_id    = $this->auth->get_user()->id;
         }
+        else
+        {
+            if ($reg->status != Registration_Model::STATUS_UNPROCESSED)
+            {
+                $this->addError(Kohana::lang('convention.registration_already_processed_unable_to_edit'));
+                url::redirect('/convention/viewReg/'.$reg_id);
+                return;
+            }
+        }
         $passesQuery = $reg->getPossiblePassesQuery();
             
-        #$form->add_rule('badge', array($reg,'_unique_badge_form'), 'Non unique badge name');
-        
         $fields = $reg->formo_defaults;
         $form = array();
         foreach (array_keys($fields) as $field) 
@@ -64,7 +71,10 @@ class Convention_Controller extends Controller
             $form[$field] = $reg->$field; 
             $errors[$field] = '';
         }
-        $fields['pass_id']['values'] = $passesQuery->select_list('id', 'name');
+        foreach ($passesQuery->find_all() as $pass)
+        {
+            $fields['pass_id']['values'][$pass->id] = $pass;
+        }
 
         if ($post = $this->input->post())
         {
@@ -72,7 +82,7 @@ class Convention_Controller extends Controller
             {
                 $reg->save();
 
-                url::redirect('/convention/checkout');
+                url::redirect(Convention_Controller::STEP2);
                 return;
             }
             // repopulate the form fields
@@ -85,37 +95,8 @@ class Convention_Controller extends Controller
             $errors = $post->errors('form_error_messages');
         }
         $this->view->content = new View('convention/register', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
-        return;
-        
-
-
-        $form->add('submit');
-
-        if ( $form->validate())
-        {
-        }
-
-        $this->view->content = $form;
     }
     
-    function badgeChoice($reg_id)
-    {
-        $this->requireVerified();
-        $data = array();
-
-        $reg_id = intval($reg_id);
-        $reg = ORM::Factory('registration')
-            ->with('convention')
-            ->with('account')
-            ->find($reg_id);
-        $convention = $reg->convention;
-        $account = $reg->account;
-
-        $passesQuery = $reg->getPossiblePassesQuery();
-        $data['passes'] = $passesQuery->find_all();
-        $this->view->content = new View('convention/badgeChoice', $data);
-    }
-
     function registrationCancel($reg_id)
     {
         $reg_id = intval($reg_id);
@@ -157,23 +138,11 @@ class Convention_Controller extends Controller
         "";
     }
 
-
-    private function _getReg()
-    {
-        /* FIXME - Maybe limit to this convention also, so any outstanding entries will be ignored */
-        return ORM::Factory('registration')
-            ->with('convention')
-            ->with('pass')
-            ->where('account_id', $this->auth->getAccount()->id)
-            ->where('status', Registration_Model::STATUS_UNPROCESSED) /* Only grab one we havn't heard back from yet */
-            ->find_all();
-    }
-
-    function checkout()
+    public function checkout()
     {
         $this->requireVerified();
         
-        $data['registrations'] = $this->_getReg();
+        $data['registrations'] = ORM::Factory('registration')->getForAccount($this->auth->getAccount()->id);
         if (!$data['registrations']->count()) 
         {
             $this->addError('FIXME - No registrations to process');
@@ -184,13 +153,13 @@ class Convention_Controller extends Controller
         $this->view->content = new View('convention/checkout', $data);
     }
 
-    function checkoutPaypal()
+    public function checkoutPaypal()
     {
         $this->requireVerified();
 
         $data = Kohana::config('paypal');
         /* get all the registrations we need */
-        $data['registrations'] = $this->_getReg();
+        $data['registrations'] = ORM::Factory('registration')->getForAccount($this->auth->getAccount()->id);
 
         /* Config file is currently 'url', lets map it to 'paypal_url' incase any other url is used */
         $data['paypal_url'] = $data['url'];

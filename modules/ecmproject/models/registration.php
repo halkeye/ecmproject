@@ -39,8 +39,6 @@ class Registration_Model extends ORM
             'status'      => array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                       ),
     );
 
-    public $formo_ignores = array('id', 'convention_id', 'pass_id', 'account_id', 'status');
-
     public $formo_defaults = array(
             'gname' => array( 'type'  => 'text', 'label' => 'Given Name', 'required'=>true ),
             'sname' => array( 'type'  => 'text', 'label' => 'Surname', 'required'=>true    ),
@@ -56,6 +54,11 @@ class Registration_Model extends ORM
             'heard_from' => array( 'type'  => 'text', 'label' => 'Heard from', 'required'=>false ),
             'attendance_reason' => array( 'type'  => 'textarea', 'rows'  => 10, 'label' => 'Reason For Attendance', 'required'=>false),
     );
+
+    public function __toString()
+    {
+        return $this->pass . ' - ' . $this->badge;
+    }
 
     /**
 	 * Validates and optionally saves a new user record from an array.
@@ -185,6 +188,18 @@ class Registration_Model extends ORM
             /* $passes->where('ageReq', ) FIXME */
             ->where('convention_id', $this->convention_id);
     }
+
+    public function getForAccount($account_id)
+    {
+        /* FIXME - Maybe limit to this convention also, so any outstanding entries will be ignored */
+        return $this 
+            ->with('convention')
+            ->with('pass')
+            ->where('account_id', $account_id)
+            ->where('status', Registration_Model::STATUS_UNPROCESSED) /* Only grab one we havn't heard back from yet */
+            ->find_all();
+    }
+
 
 }
 

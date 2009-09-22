@@ -2,7 +2,7 @@
 
 echo "\n";
 
-echo '<fieldset><legend accesskey="N">User Registration</legend>';
+echo '<fieldset><legend accesskey="N">Registration</legend>';
 echo "\n";
 
 echo form::open();
