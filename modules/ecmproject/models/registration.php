@@ -42,33 +42,20 @@ class Registration_Model extends ORM
     public $formo_ignores = array('id', 'convention_id', 'pass_id', 'account_id', 'status');
 
     public $formo_defaults = array(
-            'gname' => array( 'type'  => 'text', 'label' => 'Given Name' ),
-            'sname' => array( 'type'  => 'text', 'label' => 'Surname'    ),
-            'dob'   => array( 'type'  => 'text', 'label' => 'Date of Birth' ),
+            'gname' => array( 'type'  => 'text', 'label' => 'Given Name', 'required'=>true ),
+            'sname' => array( 'type'  => 'text', 'label' => 'Surname', 'required'=>true    ),
+            'badge' => array( 'type'  => 'text', 'label' => 'Badge', 'required'=>true    ),
+            'pass_id' => array( 'type'  => 'select', 'label' => 'Pass', 'required'=>true    ),
+            'dob'   => array( 'type'  => 'text', 'label' => 'Date of Birth', 'required'=>true ),
+            'email' => array( 'type'  => 'text', 'label' => 'Email', 'required'=>true ),
+            'phone' => array( 'type'  => 'text', 'label' => 'Phone', 'required' => true),
             'cell'  => array( 'type'  => 'text', 'label' => 'Cell Phone', 'required' => false),
-            'address' => array( 'type'  => 'textarea', 'rows'  => 4, 'label' => 'Address', ),
+            'address' => array( 'type'  => 'textarea', 'rows'  => 4, 'label' => 'Address', 'required' => true ),
             'econtact'  => array( 'type'  => 'text', 'label' => 'Emergency Contact Name', 'required' => true),
             'ephone'  => array( 'type'  => 'text', 'label' => 'Emergency Contact Phone', 'required' => true),
             'heard_from' => array( 'type'  => 'text', 'label' => 'Heard from', 'required'=>false ),
             'attendance_reason' => array( 'type'  => 'textarea', 'rows'  => 10, 'label' => 'Reason For Attendance', 'required'=>false),
     );
-
-    public $formo_rules = array(
-            'email'=>array(
-                array('email', 'Invalid email')
-            ),
-            'cell'=>array(
-                array('phone', 'Invalid cell number')
-            ),
-            'phone'=>array(
-                array('phone', 'Invalid phone number')
-            ),
-            'ephone'=>array(
-                array('phone', 'Invalid emergency contact phone')
-            ),
-    );
-
-
 
     /**
 	 * Validates and optionally saves a new user record from an array.
@@ -91,22 +78,21 @@ class Registration_Model extends ORM
     {
         $form->pre_filter('trim');
 
+        $fields = $this->formo_defaults;
+        foreach ($fields as $field => $fieldData)
+        {
+            if (isset($fieldData['required']) && $fieldData['required'])
+            {
+                $form->add_rules($field, 'required');
+            }
+        }
+
         // Add Rules
         $form->add_rules('email', 'required', array('valid','email'));
-
-        $form->add_rules('gname', 'required');
-        $form->add_rules('sname', 'required');
-
-        $form->add_rules('phone', 'required');
         $form->add_rules('phone', array('valid', 'phone'));
-        
         $form->add_rules('cell', array('valid', 'phone'));
-
+        $form->add_rules('ephone', array('valid', 'phone'));
         $form->add_rules('dob', array('valid', 'date'));
-
-        /* Neither ephone or econtact is required */
-        $form->add_rules('ephone', array('valid', 'date'));
-
         $form->add_callbacks('badge', array($this, '_unique_badge'));
     }
     
@@ -133,7 +119,7 @@ class Registration_Model extends ORM
     {
         $fields = array();
         $fields['badge'] = $array[$field];
-        var_dump($array,$field,$this);
+        return; // FIXME
         if ($this->loaded)
             $fields[$this->primary_key.' !='] = $this->primary_key_value;
 

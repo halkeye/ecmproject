@@ -218,6 +218,21 @@ body {
 	padding: 5px;
 }
 
+#content th.fieldHeader {	
+	background-color: #DDD;
+	padding: 5px;
+}
+
+#content td.fieldContent {	
+	padding: 5px;
+    text-align: left;
+}
+
+#content td.fieldError {	
+	padding: 5px;
+    text-align: left;
+}
+
 #content td {
 	padding-top: 5px;
 	padding-bottom: 10px;

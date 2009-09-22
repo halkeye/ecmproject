@@ -147,6 +147,7 @@ class Auth_Core {
         // extra safety to prevent session fixation - http://en.wikipedia.org/wiki/Session_fixation
         $this->session->regenerate();
 
+        $this->account = serialize($account);
 
         $this->storeAccount($account);
 
@@ -154,8 +155,6 @@ class Auth_Core {
 
     function storeAccount($account)
     {
-        $this->account = serialize($account);
-
         // Store session data
         $this->session->set(array(
             'account_id'    => $account->id,

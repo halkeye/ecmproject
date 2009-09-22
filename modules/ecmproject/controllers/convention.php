@@ -45,37 +45,54 @@ class Convention_Controller extends Controller
 
     function generalInfo($reg_id = NULL)
     {
-        $reg_id = intval($reg_id);
-        $form = Formo::factory();
-        $form->plugin('table');
-        $form->plugin('orm');
-        $form->plugin('csrf');
-        $form->plugin('required');
+        $reg_id = isset($reg_id) ? intval($reg_id) : NULL;
 
-        if ($reg_id) { $form->orm('registration', $reg_id); }
-        else { $form->orm('registration'); }
-        $reg = $form->get_model('registration');
-
+        $reg = ORM::factory('registration', $reg_id);
         if (!$reg->loaded)
         {
             $reg->convention_id = ORM::Factory('convention')->getCurrentConvention();
             $reg->account_id    = $this->auth->get_user()->id;
         }
+        $passesQuery = $reg->getPossiblePassesQuery();
             
-        $form->mval('registration', 'mval');
-        $form->add_rule('badge', array($reg,'_unique_badge_form'), 'Non unique badge name');
+        #$form->add_rule('badge', array($reg,'_unique_badge_form'), 'Non unique badge name');
+        
+        $fields = $reg->formo_defaults;
+        $form = array();
+        foreach (array_keys($fields) as $field) 
+        { 
+            $form[$field] = $reg->$field; 
+            $errors[$field] = '';
+        }
+        $fields['pass_id']['values'] = $passesQuery->select_list('id', 'name');
+
+        if ($post = $this->input->post())
+        {
+            if ($reg->validate($post))
+            {
+                $reg->save();
+
+                url::redirect('/convention/checkout');
+                return;
+            }
+            // repopulate the form fields
+            $form = arr::overwrite($form, $post->as_array());
+
+            // populate the error fields, if any
+            // We need to already have created an error message file, for Kohana to use
+            // Pass the error message file name to the errors() method
+            //$errors = arr::overwrite($errors, $post->errors('form_error_messages'));
+            $errors = $post->errors('form_error_messages');
+        }
+        $this->view->content = new View('convention/register', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
+        return;
         
 
-        $passesQuery = $reg->getPossiblePassesQuery();
-        $form->add_select('pass_id',  $passesQuery->select_list('id', 'name'))
-             ->label(Kohana::lang('registration.pass_id'));
 
         $form->add('submit');
 
         if ( $form->validate())
         {
-            $form->get_model('registration')->save();
-            url::redirect('/convention/checkout');
         }
 
         $this->view->content = $form;
