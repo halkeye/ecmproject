@@ -43,9 +43,10 @@ class Formo_shortcuts {
 		'bool'	=> 'bool',
 		'cap'	=> 'captcha',
 		'file'	=> 'file',
+		'res'	=> 'reset',
 	);
 
-	public function __construct( & $form)
+	public function __construct($form)
 	{
 		$this->form = $form;
 		foreach (self::$shortcuts as $short => $long)
@@ -54,7 +55,7 @@ class Formo_shortcuts {
 		}
 	}
 
-	public static function load( & $form)
+	public static function load($form)
 	{
 		return new Formo_shortcuts($form);
 	}

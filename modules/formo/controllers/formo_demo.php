@@ -13,7 +13,7 @@ class Formo_demo_Controller extends Template_Controller {
 
 	public $template = 'formo_template';
 	
-	protected $title = "Formo Version 1.1.6";
+	protected $title = "Formo Version 1.1.8.1";
 	protected $scripts = FALSE;
 	protected $header;
 	protected $content;

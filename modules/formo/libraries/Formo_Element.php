@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
 /*
-	Version 1.1.6
+	Version 1.1.8.1
 	avanthill.com/formo_manual/
 	
 	Requires Formo and Formo_Group
@@ -418,11 +418,11 @@ class Formo_Element_Core {
 	}
 	
 	// runs filter on value
-	public function pre_filter($filter)
+	public function run_filter($filter)
 	{
 		$this->value(call_user_func($filter, $this->value));
 	}
-
+	
 	// label method. returns formatted label
 	public function label($value=NULL)
 	{

@@ -12,7 +12,7 @@ class Formo_image_Driver extends Formo_Element {
 	public static function shortcut($defs, $name, $src, $info = array())
 	{
 		$info = self::process_info($defs, $info);
-		$info['src'] = $info;
+		$info['src'] = $src;
 		
 		return new Formo_image_Driver($name, $info);
 	}

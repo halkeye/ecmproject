@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
 /* 
-	Version 1.1.6
+	Version 1.1.8.1
 	avanthill.com/formo_manual/
 		
 	Requires Formo_Element and Formo_Group
@@ -379,34 +379,34 @@ class Formo_Core {
 		}
 
 		// first run all "all" filters, then "some" if necessary
-		( ! $this->_all_pre_filters() AND $this->_some_pre_filters());
+		( ! $this->_all_filters('pre') AND $this->_some_filters('pre'));
 
 		Event::run('formo.post_addpost');
 
 		$this->_post_added = TRUE;
 		$this->_sent = TRUE;
 	}	
-	 		 			
-	private function _all_pre_filters()
+	
+	private function _all_filters($type)
 	{
-		if (empty($this->_pre_filters))
+		if (empty($this->{'_'.$type.'_filters'}))
 			return FALSE;
 			
-		if (empty($this->_pre_filters['all']))
+		if (empty($this->{'_'.$type.'_filters'}['all']))
 			return FALSE;
 			
 		foreach ($this->find_elements(TRUE) as $element)
 		{
-			foreach ($this->_pre_filters['all'] as $filter)
+			foreach ($this->{'_'.$type.'_filters'}['all'] as $filter)
 			{
-				$this->$element->pre_filter($filter);
+				$this->$element->run_filter($filter);
 			}
 			
-			if (isset($this->_pre_filters[$element]))
+			if (isset($this->{'_'.$type.'_filters'}[$element]))
 			{
-				foreach ($this->_pre_filters[$element] as $filter)
+				foreach ($this->{'_'.$type.'_filters'}[$element] as $filter)
 				{
-					$this->$element->pre_filter($filter);
+					$this->$element->{'_'.$type.'_filters'}($filter);
 				}
 			}
 		}
@@ -414,19 +414,19 @@ class Formo_Core {
 		return TRUE;
 	}
 	
-	private function _some_pre_filters()
+	private function _some_filters($type)
 	{
-		if (empty($this->_pre_filters))
+		if (empty($this->{'_'.$type.'_filters'}))
 			return;
 
-		foreach ($this->_pre_filters as $element => $filters)
+		foreach ($this->{'_'.$type.'_filters'} as $element => $filters)
 		{
 			foreach ($filters as $filter)
 			{
 				if ( ! isset($this->$element))
 					continue;
 					
-				$this->$element->pre_filter($filter);
+				$this->$element->run_filter($filter);
 			}
 		}
 	}		
@@ -450,7 +450,9 @@ class Formo_Core {
 		else
 		{
 			$formo_var = (isset($this->$tag)) ? $tag : '_'.$tag;
-			$value = (is_array($this->$formo_var)) ? $value : $value;
+			
+			$value = (isset($this->$formo_var) AND is_array($this->$formo_var)) ? $value : $value;			
+			
 			$this->$formo_var = $value;
 		}
 		return $this;
@@ -681,6 +683,28 @@ class Formo_Core {
 		}		
 		
 		return $this;
+	}
+	
+	public function post_filter($element, $function='')
+	{
+		$this->_post_filters[$element][] = $function;
+		
+		return $this;
+	}
+	
+	public function post_filters($function, $elements)
+	{
+		$_functions = self::splitby($function);
+		$_elements = self::splitby($elements);
+		
+		foreach ($_functionas as $_function)
+		{
+			foreach ($_elements as $_element)
+			{
+				$_element = trim($_element);
+				$this->pre_filter(trim($_element), $_function);
+			}
+		}
 	}
 	
 	public function rule($rule, $message='')
@@ -1017,6 +1041,9 @@ class Formo_Core {
 	public function get()
 	{
 		$this->add_posts();
+
+		// first run all "all" filters, then "some" if necessary
+		( ! $this->_all_filters('post') AND $this->_some_filters('post'));
 
 		Event::run('formo.pre_render');
 

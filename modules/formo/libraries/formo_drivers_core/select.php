@@ -56,13 +56,14 @@ class Formo_select_Driver extends Formo_Element {
 		return "\t\t".'<option value="'.$v.'"'.$selected.'>'.$k.'</option>'."\n";
 	}
 	
-	public function pre_filter($filter)
+	public function run_filter($filter)
 	{
 		$keys = array_keys($this->values);
 		$values = array_values($this->values);
-		foreach ($keys as $k=>$key)
+				
+		foreach ($values as $k=>$val)
 		{
-			$keys[$k] = call_user_func($filter, $key);
+			$values[$k] = call_user_func($filter, $val);
 		}
 		
 		if ($keys AND $values)

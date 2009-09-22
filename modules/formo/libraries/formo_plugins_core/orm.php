@@ -21,10 +21,9 @@ class Formo_orm {
 	
 	protected $save_id = array();
 	
-	public function __construct( & $form)
+	public function __construct($form)
 	{
 		Event::add('formo.pre_addpost', array($this, 'pre_addpost'));
-		Event::add('formo.post_addpost', array($this, 'post_addpost'));
 		Event::add('formo.post_validate', array($this, 'auto_save'));
 		Event::add('formo.pre_render', array($this, 'check_cleared'));
 		
@@ -39,7 +38,7 @@ class Formo_orm {
 			->bind('model', $this->model);
 	}
 	
-	public static function load( & $form)
+	public static function load($form)
 	{
 		return new Formo_orm($form);
 	}
@@ -96,7 +95,8 @@ class Formo_orm {
 			'formo_rules'			=> 'auto_rules',
 			'formo_label_filters'	=> 'label_filters',
 			'formo_order'			=> 'order',
-			'formo_pre_filters'		=> 'pre_filters'
+			'formo_pre_filters'		=> 'pre_filters',
+			'formo_post_filters'	=> 'post_filters'
 		);
 		
 		// first let's set auto save to auto_save, same for habtm
@@ -115,6 +115,7 @@ class Formo_orm {
 			if ( ! empty($this->model[$_model]->$orm_name))
 			{
 				$formo_val = (isset($this->form->$name)) ? $name : '_'.$name;
+				
 				$this->form->$formo_val = array_merge($this->form->$formo_val, $this->model[$_model]->$orm_name);
 			}
 		}
@@ -131,6 +132,8 @@ class Formo_orm {
 	
 	private function load_elements($_model)
 	{
+		$columns = $this->model[$_model]->table_columns;
+		
 		foreach ($this->model[$_model]->table_columns as $field => $value)
 		{
 			$alias_field = $field;
@@ -155,6 +158,17 @@ class Formo_orm {
 
 				$this->form->add_select($alias_field,$values,array('value'=>$this->model[$_model]->$field));
 			}
+			elseif (isset($columns[$field]['length']) AND preg_match("/'[a-zA-Z0-9_]+'/", $columns[$field]['length']))
+			{
+				$_values = str_replace("'", '', $columns[$field]['length']);
+				$_values = explode(',', $_values);
+				$values = array(''=>'_blank_');
+				foreach($_values as $value)
+				{
+					$values[$value] = $value;
+				}
+				$this->form->add_select($field, $values);
+			}
 			else
 			{
 				$this->form->add($alias_field, array('value'=>$this->model[$_model]->$field));
@@ -172,8 +186,8 @@ class Formo_orm {
 			$this->form->_post_added = TRUE;
 		}
 	}
-	
-    public function post_addpost()
+		
+    protected function fill_models()
     {
         if ( ! $this->form->_post_type)
             return;
@@ -212,7 +226,7 @@ class Formo_orm {
                 else
                 {
                 	// set the model value equal to the form field value
-                    $this->model[$model]->$model_field = $post->$type($form_field);
+                    $this->model[$model]->$model_field = $this->form->$form_field();
                 }
             }
         }        
@@ -221,6 +235,8 @@ class Formo_orm {
 	public function save($name = '')
 	{
 		Event::run('formo.orm_pre_save');
+		
+		$this->fill_models();
 		
 		if ($name)
 		{
@@ -241,6 +257,8 @@ class Formo_orm {
 	
 	public function get_model($name = NULL)
 	{
+		$this->fill_models();
+		
 		return ($name) ? $this->model[$name] : $this->model;
 	}
 	

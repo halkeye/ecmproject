@@ -29,7 +29,7 @@ class Formo_table {
 	
 	public function set_form_tags()
 	{
-		$this->form->_open = '<form action="{action}" method="{method}" class="{class}" name="{name}"><table>';
+		$this->form->_open = '<form action="{action}" method="{method}" class="{class}"><table>';
 		$this->form->_close = '</table></form>';
 	}
 	

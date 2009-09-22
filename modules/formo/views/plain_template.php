@@ -4,16 +4,16 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="keywords" content="utah web design, utah, salt lake city, web firm, utah search engine optimization, utah seo" />
 <meta name="Description" content="Avant Hill Design is one of Utah's cutting-edge web design and development companies." />
-<link href='<?php echourl::base()?>modules/formo/assets/css/formo.css' rel='stylesheet' type='text/css' />
-<title><?php echo$title?></title>
+<link href='<?=url::base()?>modules/formo/assets/css/formo.css' rel='stylesheet' type='text/css' />
+<title><?=$title?></title>
 </head>
 
 <body style="background:#222">
 
 <div class="container padded" id="hcon">
-	<?php echo$header?>
+	<?=$header?>
 	<div id='hbox'>
-		<?php echo$content?>
+		<?=$content?>
 		<div style="margin-top:20px">Executed in {execution_time} seconds.</div>
 	</div>
 </div>
