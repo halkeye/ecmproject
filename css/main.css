@@ -197,14 +197,16 @@ body {
 }
 
 #content fieldset {	
-	margin-top: 10px;
-	border: 0px solid #000;
+	margin-left: 5px;
+	padding: 5px;
+	border: 1px solid #000;
 }
 
 #content legend {
-	font-size: 14px;
-	font-weight: bold;
-	color: #8A0917;
+	font-size: 12px;
+	background-color: #DDD;
+	padding: 5px 50px 5px 50px;
+	margin-bottom: 10px;
 }
 
 #content table {
@@ -260,43 +262,72 @@ body {
 	padding: 2px 20px 2px 20px;
 }
 
-/*
-#content label {
+/* NEW FORM STYLING. Phase out the old styling. */
+#newform td {
+	vertical-align: top;
+}
+
+#newform form {
+	text-align: left;
+}
+
+#newform form h1 {
+	padding: 7px 0px 7px 5px;
 	font-weight: bold;
-	text-align: left;	
-    width: 10em;
-	float: left;	
-	clear: both;
+	background-color: #DDD;
+	text-align: center;
 }
 
-#content label.type2 {
-	width: 17em;	
+#newform form p {
+	margin: 0px 10px 20px 10px;
+	text-align: center;
+	height: 50px;
 }
 
-#content input {
-	padding: 0px;
-	margin: 0px;
+#newform fieldset {
+	border: 0px;
+	margin-bottom: 10px;
+}
+
+#newform fieldset.fixed {
+	margin-bottom: 10px;
+	height: 100px;
+}
+
+#newform fieldset.right {
+	text-align: right;
+}
+
+#newform label {
+	float: left;
+	text-align: left;
+	display: block;
+	margin-right: 1em;
+	width: 130px;
+}
+
+#newform input {
+	display: block;
+	margin: 0px 0px 5px 0px;
+	padding: 4px 2px;
 	width: 200px;
 }
 
-#content textarea {
-	padding: 0px;
-	margin: 0px;
-	width: 200px;
-	height: 90px;
+#newform select {
+	display: block;
+	margin: 0px 0px 5px 0px;
+	width: 200px;	
 }
 
-#content input.check {
-	padding: 0px;
-	margin: 0px;
-	width: auto;
+#newform button {
+	padding: 4px 20px 4px 20px;
 }
 
-#content input.submit {
-	padding: 1px;
-	width: 75px
+#newform span.small {
+	font-size: 9px;
+	color: #888;
+	display: block;
 }
-*/
 
 /* Footer pane */
 #footer {   
@@ -328,6 +359,12 @@ span.required {
 
 span.emphasis {
 	font-weight: bold;
+}
+
+span.filler {
+	display: block;
+	margin: 0px 0px 5px 0px;
+	padding: 5px 2px;
 }
 
 .row_odd { background-color: #ddd; }
