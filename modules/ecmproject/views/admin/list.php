@@ -1,8 +1,11 @@
 <p>
 <?php
-	foreach ($commands as $cmd):
-		print $cmd;
-	endforeach;
+	if (isset($commands))
+	{
+		foreach ($commands as $cmd):
+			print $cmd;
+		endforeach;
+	}	
 ?>
 </p>
 
