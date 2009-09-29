@@ -30,7 +30,7 @@
 				<input name="email" type="text" />
 				<label for="password">Password <span class="small">Min. size 6 characters</span></label>
 				<input name="password" type="password" />	
-				<label><?php echo html::anchor("/user/lostPassword", "Forgot your password?"); ?></label>	
+				<p><?php echo html::anchor("/user/lostPassword", "Forgot your password?"); ?></p>	
 			</fieldset>			
 			<fieldset class='right'>				
 				<button type="submit">Continue</button>
