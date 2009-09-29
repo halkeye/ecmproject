@@ -1,4 +1,11 @@
-<br />
+<p>
+<?php
+	foreach ($commands as $cmd):
+		print $cmd;
+	endforeach;
+?>
+</p>
+
 <!-- CONTENT: TODO: Renaming variables to something general. -->
 <table width='100%'>	
 	<tr>	
