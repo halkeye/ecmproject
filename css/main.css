@@ -263,6 +263,10 @@ body {
 }
 
 /* NEW FORM STYLING. Phase out the old styling. */
+#newform {
+	font-size: 12px;
+}
+
 #newform td {
 	vertical-align: top;
 }
@@ -279,6 +283,11 @@ body {
 }
 
 #newform form p {
+	margin: 0px 10px 20px 10px;
+	text-align: left;
+}
+
+#newform form p.fixed {
 	margin: 0px 10px 20px 10px;
 	text-align: center;
 	height: 50px;
@@ -309,7 +318,7 @@ body {
 #newform input {
 	display: block;
 	margin: 0px 0px 5px 0px;
-	padding: 4px 2px;
+	padding: 2px 2px;
 	width: 200px;
 }
 
