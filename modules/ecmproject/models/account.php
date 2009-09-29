@@ -133,6 +133,29 @@ class Account_Model extends ORM
  
 		return parent::validate($array, $save);
 	}
+	
+	public function validate_admin(array & $array, $save = FALSE)
+	{
+		// Initialise the validation library and setup some rules
+		$array = Validation::factory($array);
+        // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
+        $array->pre_filter('trim');
+		
+		$array->add_rules('email', 'required', array('valid','email')); //Email is always required. 
+		
+		/* If password is filled in, set additional rules. */
+		if (isset($array->password) && isset($array->confirm_password) 
+				&& !empty($array->password) || !empty($array->password))
+		{
+			$array->add_rules('password', 'required');
+			
+			$array->add_rules('confirm_password', 'required');
+			$array->add_rules('confirm_password',  'matches[password]');
+		}
+		
+		/* Password is not required, but if it is...the new passwords should match. */		
+		return parent::validate($array, $save);
+	}
  
 	public function unique_key($id = NULL) 
     {
@@ -200,7 +223,6 @@ class Account_Model extends ORM
         }
     }
 	
-	
 	public function statusToString() {
 		if ($this->status == Account_Model::ACCOUNT_STATUS_UNVERIFIED)
 			return 'UNVERIFIED';
@@ -211,6 +233,16 @@ class Account_Model extends ORM
 		else
 			return 'UNKNOWN STATUS';
 	}
+	
+	public function stringToStatus($status) {
+		if (strcmp($status, 'UNVERIFIED') == 0)
+			return Account_Model::ACCOUNT_STATUS_UNVERIFIED;
+		else if (strcmp($status, 'VERIFIED') == 0)
+			return Account_Model::ACCOUNT_STATUS_VERIFIED;
+		else
+			return Account_Model::ACCOUNT_STATUS_BANNED;	
+	
+	}	
 }
 
 /* End of file user.php */
