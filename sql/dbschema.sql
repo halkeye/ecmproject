@@ -24,6 +24,7 @@ CREATE TABLE passes(
    price DECIMAL NOT NULL,
    isPurchasable TINYINT NOT NULL,
    ageReq TINYINT UNSIGNED,
+   maxAge TINYINT UNSIGNED,
    startDate INT UNSIGNED,
    endDate INT UNSIGNED,
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE CASCADE -- Cascade deletion of passes. Will (should) still fail if registrations have started.
