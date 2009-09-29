@@ -27,9 +27,9 @@ class Admin_Controller extends Controller
 
 	function index()
 	{
-		$this->view->title = 'Administration Area';
-		$this->view->heading = 'Administration Area';
-		$this->view->subheading = 'Manage conventions, passes, permissions and other details';
+		$this->view->title = Kohana::lang('admin.admin_area');
+		$this->view->heading = Kohana::lang('admin.admin_area');
+		$this->view->subheading = Kohana::lang('admin.admin_area_desc');
 					
 		$this->view->content = new View('admin/index');
 	}
@@ -37,35 +37,71 @@ class Admin_Controller extends Controller
 	//TODO: Add new account feature, search, paged viewing. Implement delete account, edit account.
 	function manageAccounts()
 	{
-		$this->view->title = 'Admin: Manage Accounts';
-		$this->view->heading = 'Account Management';
-		$this->view->subheading = 'Administration Area';
+		$this->view->title = Kohana::lang('admin.admin_accounts');
+		$this->view->heading = Kohana::lang('admin.admin_accounts');
+		$this->view->subheading = Kohana::lang('admin.admin_area');
 		
 		$data['entries'] = array();
 		$rows = ORM::factory('Account')->find_all();		//Move to account model.
 
-		/* Go through each object in the iterator. */
+		$data['headers']['id'] = array('width' => '10%', 'name' => 'ID');
+		$data['headers']['email'] = array('width' => '35%', 'name' => 'Email');
+		$data['headers']['status'] = array('width' => '15%', 'name' => 'Status');
+		$data['headers']['last'] = array('width' => '30%', 'name' => 'Last Login');
+		$data['headers']['edit'] = array('width' => '5%', 'name' => 'Edit');
+		$data['headers']['delete'] = array('width' => '5%', 'name' => 'Delete');
+			
+		/* Modify view/controller so we do this once. */
 		foreach ($rows as $row)
 		{
-			$data['entries'][$row->id] = array();
-			$data['entries'][$row->id]['id'] = $row->id;
-			$data['entries'][$row->id]['email'] = $row->email;
-			$data['entries'][$row->id]['status'] = $row->statusToString();
-							
-			//$data['entries'][$row->id]['created'] = date("M j, Y g:i a", $row->created);
-			
-			/* Replace with a : ?*/
-			if (isset($row->login))
-				$data['entries'][$row->id]['login'] = date("M j, Y H:i", $row->login);		
-			else
-				$data['entries'][$row->id]['login'] = '--';
+			$data['actions']['edit'] = html::anchor('admin/editAccount/'. $row->id, html::image('img/edit-copy.png', Kohana::lang('admin.edit_account')));
+			$data['actions']['delete'] = html::anchor('admin/deleteAccount/' . $row->id, html::image('img/edit-delete.png', Kohana::lang('admin.delete_account')));
+			$data['entries'][$row->id] = new View('lists/account', array('row' => $row, 'actions' => $data['actions']));			
+		}	
+
+		$this->view->content = new View('admin/list', $data);
+	}
+	
+	function editAccount($id = NULL) {	
+		if (isset($id))
+			$row = ORM::factory('Account')->find($id);		
 				
-			/* Actions to print beside each entry. */
-			$data['entries'][$row->id]['actionEdit'] = html::anchor('user/editUser/'. $row->id, html::image('img/edit-copy.png', 'Edit this account'));		
-			$data['entries'][$row->id]['actionDelete'] = html::anchor('admin/deleteAccount/' . $row->id, html::image('img/edit-delete.png', 'Delete this account'));
+		$data = array();
+		
+		if (isset($row) && $row->loaded)
+		{ 
+			if ($post = $this->input->post())
+			{			
+				if ($row->validate_admin($post))
+				{				
+					$row->status = $row->stringToStatus($post->status);
+					$row->save();
+					$this->addMessage("The changes were applied successfully."); //TODO: Lang it.
+					url::redirect('admin/manageAccounts');
+				}
+				else
+				{
+					$errors = $post->errors('form_error_messages');
+					foreach ($errors as $error)
+						$this->addError($error);
+						
+					$data['row'] = $row;	
+					$data['row']->email = $post->email;
+					$data['row']->status = $row->stringToStatus($post->status);
+				}			
+			}
+			else 
+			{	
+				$data['row'] = $row;							
+			}			
+		}		
+		else
+		{
+			$this->addError(Kohana::lang('admin.account_not_exist'));	
+			url::redirect('admin/manageAccounts');
 		}	
 		
-		$this->view->content = new View('admin/list', $data);
+		$this->view->content = new View('admin/editAccount', $data);
 	}
 	
 	function deleteAccount($id = NULL) {
@@ -86,7 +122,7 @@ class Admin_Controller extends Controller
 				}
 				else
 				{
-					$this->addMessage("Failed to delete account with ID: $id! Please try again.");				
+					$this->addError("Failed to delete account with ID: $id! Please try again.");				
 					url::redirect('admin/manageAccounts');
 				}	
 			}		
@@ -112,29 +148,125 @@ class Admin_Controller extends Controller
 		
 		/* Row not defined/id was not set/deletion of a non existant ID. */
 		else {
-			$this->addMessage("The specified account no longer exists.");	
+			$this->addMessage(Kohana::lang('admin.account_not_exist'));	
 			url::redirect('admin/manageAccounts');
 		}
 	}
 	
 	function manageRegistrations()
 	{
-		$this->view->title = 'Admin: Manage Registrations';
-		$this->view->heading = 'Registration Management';
-		$this->view->subheading = 'Administration Area';
+		$this->view->title = Kohana::lang('admin.admin_registrations');
+		$this->view->heading = Kohana::lang('admin.admin_registrations');
+		$this->view->subheading = Kohana::lang('admin.admin_area');
+	}
+	
+	function editRegistrations()
+	{
+	
 	}
 	
 	function managePasses() 
 	{
-		$this->view->title = 'Admin: Manage Passes';
-		$this->view->heading = 'Pass Management';
-		$this->view->subheading = 'Administration Area';
+		$this->view->title = Kohana::lang('admin.admin_passes');
+		$this->view->heading = Kohana::lang('admin.admin_passes');
+		$this->view->subheading = Kohana::lang('admin.admin_area');
+		
+		$data['entries'] = array();
+		$rows = ORM::factory('Pass')->find_all();
+		
+		$data['headers']['name'] = array('width' => '40%', 'name' => 'Name');
+		$data['headers']['price'] = array('width' => '10%', 'name' => 'Price');
+		$data['headers']['startDate'] = array('width' => '20%', 'name' => 'Start Date');
+		$data['headers']['endDate'] = array('width' => '20%', 'name' => 'End Date');
+		$data['headers']['edit'] = array('width' => '5%', 'name' => 'Edit');
+		$data['headers']['delete'] = array('width' => '5%', 'name' => 'Delete');
+		
+		foreach ($rows as $row)
+		{
+			$data['actions']['edit'] = html::anchor('admin/editPass/'. $row->id, html::image('img/edit-copy.png', Kohana::lang('admin.edit_account')));
+			$data['actions']['delete'] = html::anchor('admin/deletePass/' . $row->id, html::image('img/edit-delete.png', Kohana::lang('admin.delete_account')));
+			$data['entries'][$row->id] = new View('lists/pass', array('row' => $row, 'actions' => $data['actions']));	
+		}		
+		
+		$this->view->content = new View('admin/list', $data);
 	}
 	
 	function manageConventions()
 	{
-		$this->view->title = 'Admin: Manage Conventions';
-		$this->view->heading = 'Convention Management';
-		$this->view->subheading = 'Administration Area';
+		$this->view->title = Kohana::lang('admin.admin_conventions');
+		$this->view->heading = Kohana::lang('admin.admin_conventions');
+		$this->view->subheading = Kohana::lang('admin.admin_area');
+		
+		$data['entries'] = array();
+		$rows = ORM::factory('Convention')->find_all();
+		
+		$data['headers']['name'] = array('width' => '40%', 'name' => 'Name');
+		$data['headers']['location'] = array('width' => '50%', 'name' => 'Location');
+		$data['headers']['edit'] = array('width' => '5%', 'name' => 'Edit');
+		$data['headers']['delete'] = array('width' => '5%', 'name' => 'Delete');
+		
+		foreach ($rows as $row)
+		{
+			$data['actions']['edit'] = html::anchor('admin/editConvention/'. $row->id, html::image('img/edit-copy.png', Kohana::lang('admin.edit_account')));
+			$data['actions']['delete'] = html::anchor('admin/deleteConvention/' . $row->id, html::image('img/edit-delete.png', Kohana::lang('admin.delete_account')));
+			$data['entries'][$row->id] = new View('lists/convention', array('row' => $row, 'actions' => $data['actions']));	
+		}		
+		
+		$this->view->content = new View('admin/list', $data);
+	}	
+	
+	function editConvention()
+	{
+		/* Can change all fields. */	
+	}
+	
+	function deleteConvention($id = NULL)
+	{
+		if (isset($id))
+			$row = ORM::factory('Convention')->find($id);			
+		
+		/* If row is defined (only if ID was set) and row was loaded... */
+		if (isset($row) && $row->loaded)
+		{
+			/* POST value YES ... do delete */
+			if ($val = $this->input->post('Yes'))
+			{
+				if ($row->delete()) 
+				{
+					$this->addMessage("Convention with ID: $id was deleted.");				
+					url::redirect('admin/manageConventions');
+				}
+				else
+				{
+					$this->addError("Failed to delete convention with ID: $id! Please try again.");				
+					url::redirect('admin/manageConventions');
+				}	
+			}		
+			/* User changed mind. */
+			else if ($val = $this->input->post('No'))
+			{
+				url::redirect('admin/manageConventions');
+			}			
+			
+			/* User needs confirm screen. */
+			else if ($row->loaded)				
+			{
+				$this->view->title = 'Admin: Delete Account';
+				$this->view->heading = 'ARE YOU SURE?';
+				$this->view->subheading = 'Deleting anything is not to be taken lightly.';
+				
+				$data['id'] = $row->id;
+				$data['entityType'] = 'convention';
+				$data['entityName'] = $row->name;
+				$this->view->content = new View('admin/delete', $data);
+			}			
+		}
+		
+		/* Row not defined/id was not set/deletion of a non existant ID. */
+		else {
+			$this->addMessage(Kohana::lang('admin.account_not_exist'));	
+			url::redirect('admin/manageConventions');
+		}
+	
 	}
 }
