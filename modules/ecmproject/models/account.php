@@ -134,7 +134,7 @@ class Account_Model extends ORM
 		return parent::validate($array, $save);
 	}
 	
-	public function validate_admin(array & $array, $save = FALSE)
+	public function validate_admin(array & $array, $save = FALSE, $passRequired = FALSE)
 	{
 		// Initialise the validation library and setup some rules
 		$array = Validation::factory($array);
@@ -145,7 +145,7 @@ class Account_Model extends ORM
 		
 		/* If password is filled in, set additional rules. */
 		if (isset($array->password) && isset($array->confirm_password) 
-				&& !empty($array->password) || !empty($array->password))
+				&& (!empty($array->password) || !empty($array->password) || $passRequired))
 		{
 			$array->add_rules('password', 'required');
 			

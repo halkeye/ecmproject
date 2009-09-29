@@ -44,6 +44,7 @@ class Admin_Controller extends Controller
 		$data['entries'] = array();
 		$rows = ORM::factory('Account')->find_all();		//Move to account model.
 
+		$data['commands']['create'] = html::anchor('admin/createAccount', 'Create new Account', 'Create new Account');
 		$data['headers']['id'] = array('width' => '10%', 'name' => 'ID');
 		$data['headers']['email'] = array('width' => '35%', 'name' => 'Email');
 		$data['headers']['status'] = array('width' => '15%', 'name' => 'Status');
@@ -60,6 +61,43 @@ class Admin_Controller extends Controller
 		}	
 
 		$this->view->content = new View('admin/list', $data);
+	}
+	
+	function createAccount() 
+	{
+		if ($post = $this->input->post())
+		{			 
+			$account = ORM::factory('Account');
+            if ($account->validate_admin($post, FALSE, TRUE))
+            {
+				$account->status = $account->stringToStatus($post->status);
+                $account->save();
+
+				if ($account->status == Account_Model::ACCOUNT_STATUS_UNVERIFIED)
+				{
+					$code = $account->generateVerifyCode();
+					$account->sendValidateEmail($code);
+				}
+				
+				$this->addMessage("Account " . $account->email . " was created successfully."); //TODO: Lang it.
+				url::redirect('admin/manageAccounts');
+			}
+			else
+				{
+					$errors = $post->errors('form_error_messages');
+					foreach ($errors as $error)
+						$this->addError($error);
+						
+					$data['row']->email = $post->email;
+					$data['row']->status = $post->status;
+				}			
+		} else
+		{
+			$data['row']->email = '';
+			$data['row']->status = 'UNVERIFIED';
+		}
+		
+		$this->view->content = new View('admin/createAccount', $data);			
 	}
 	
 	function editAccount($id = NULL) {	
