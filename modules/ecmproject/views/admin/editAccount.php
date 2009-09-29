@@ -3,7 +3,7 @@
 <!-- CONTENT -->
 <?php echo form::open("admin/editAccount/$row->id"); ?>
 	<h1>General Information</h1>
-	<p>You must revalidate your email if you change it.</p>		
+	<p>Please be advised that admin changes will not trigger a validation email to be sent to the new email address.</p>		
 	<fieldset>		
 		<label for="email">Email Address <span class="small">Must be a valid email address</span></label>
 		<?php print form::input('email', $row->email); ?>
@@ -19,8 +19,7 @@
 	</fieldset>	
 
 	<h1>Validation Status</h1>
-	<p>Allows the overriding of an account's email validation status. NOTE: If the email address was changed above, status
-	is automatically set to UNVERIFIED regardless of the setting here.</p>
+	<p>Allows the overriding of an account's email validation status. You can also ban the user by setting his/her email status to BANNED.</p>
 	<fieldset>
 		<label for="status">Verification Status: <span class="small">Current password here.</span></label>
 		<?php 

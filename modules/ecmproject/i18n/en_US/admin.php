@@ -7,7 +7,7 @@ $lang = array(
         'admin_passes'         => 'Manage Passes',
         'admin_registrations'               => 'Manage Registrations',       
 
-        'edit_account'            => 'Edit this account',
+        'edit_account'            => 'Editing account',
         'delete_account'                => 'Delete this account',
         'add_account'                => 'Add account',
 		

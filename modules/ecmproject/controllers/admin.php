@@ -101,6 +101,10 @@ class Admin_Controller extends Controller
 			url::redirect('admin/manageAccounts');
 		}	
 		
+		$this->view->title = Kohana::lang('admin.edit_account');
+		$this->view->heading = Kohana::lang('admin.edit_account') . ' : ' . $row->email;
+		$this->view->subheading = "Careful now...";
+		
 		$this->view->content = new View('admin/editAccount', $data);
 	}
 	
