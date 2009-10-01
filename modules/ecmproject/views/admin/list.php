@@ -8,7 +8,7 @@
 	}	
 ?>
 </p>
-
+<br />
 <!-- CONTENT: TODO: Renaming variables to something general. -->
 <table width='100%'>	
 	<tr>	
