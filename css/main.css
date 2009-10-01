@@ -294,6 +294,7 @@ body {
 }
 
 #newform fieldset {
+	text-align: left;
 	border: 0px;
 	margin-bottom: 10px;
 }
@@ -320,6 +321,20 @@ body {
 	margin: 0px 0px 5px 0px;
 	padding: 2px 2px;
 	width: 200px;
+}
+
+#newform input.datebox {
+	width: 50px;
+	display: inline;
+	margin: 0px 0px 5px 0px;
+	padding: 2px 2px;
+}
+
+#newform input.checkbox {
+	display: block;
+	margin: 0px 0px 5px 0px;
+	padding: 2px 2px;
+	width: 200px; 
 }
 
 #newform select {
