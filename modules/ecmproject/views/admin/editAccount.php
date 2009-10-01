@@ -6,7 +6,7 @@
 	<p>Please be advised that admin changes will not trigger a validation email to be sent to the new email address.</p>		
 	<fieldset>		
 		<label for="email">Email Address <span class="small">Must be a valid email address</span></label>
-		<?php print form::input('email', $row->email); ?>
+		<?php print form::input('email', $row['email']); ?>
 	</fieldset>
 	
 	<h1>Change Password</h1>
