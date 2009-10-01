@@ -182,7 +182,7 @@ class Admin_Controller extends Controller
 				$this->view->subheading = 'Deleting anything is not to be taken lightly.';
 				
 				$data['id'] = $row->id;
-				$data['entityType'] = 'account';
+				$data['entityType'] = 'Account';
 				$data['entityName'] = $row->email;
 				$this->view->content = new View('admin/delete', $data);
 			}			
@@ -216,6 +216,7 @@ class Admin_Controller extends Controller
 		$data['entries'] = array();
 		$rows = ORM::factory('Pass')->find_all();
 		
+		$data['commands']['create'] = html::anchor('admin/createPass', 'Create new Pass', 'Create new Pass');
 		$data['headers']['name'] = array('width' => '40%', 'name' => 'Name');
 		$data['headers']['price'] = array('width' => '10%', 'name' => 'Price');
 		$data['headers']['startDate'] = array('width' => '20%', 'name' => 'Start Date');
@@ -231,6 +232,105 @@ class Admin_Controller extends Controller
 		}		
 		
 		$this->view->content = new View('admin/list', $data);
+	}
+	
+	
+	function createPass($cid = NULL)
+	{
+		$pass = ORM::factory('Pass');
+		if ($post = $this->input->post())		
+		{			
+            if ($pass->validate_admin($post))
+            {
+				$pass->convention_id = $cid;
+				
+				if (!isset($post->isPurchasable)) 				
+					$pass->isPurchasable = 0; //Force it to zero.				
+				else				
+					$pass->isPurchasable = 1;
+								
+				if (strlen($post->startDate) != 0)				
+					$pass->startDate = strtotime($post->startDate);
+				
+				if (strlen($post->endDate) != 0) 
+					$pass->endDate = strtotime($post->endDate);
+				
+                $pass->save();
+
+				$this->addMessage("The pass, " . $pass->name . " was created successfully."); //TODO: Lang it.
+				url::redirect('admin/managePasses');
+			}
+			else
+				{
+					$errors = $post->errors('form_error_messages');
+					foreach ($errors as $error)
+						$this->addError($error);
+						
+					$data['cid'] = $cid;
+					$data['row'] = $post->as_array();
+				}			
+		} else
+		{
+			$data['cid'] = 1;
+			$data['row'] = $pass->as_array(); //Will be blank.
+		}
+		
+		$this->view->content = new View('admin/Pass', $data);				
+	}
+	
+	function editPass($id = NULL)
+	{
+	
+	
+	}
+	
+	function deletePass($id = NULL)
+	{
+		if (isset($id))
+			$row = ORM::factory('Pass')->find($id);			
+		
+		/* If row is defined (only if ID was set) and row was loaded... */
+		if (isset($row) && $row->loaded)
+		{
+			/* POST value YES ... do delete */
+			if ($val = $this->input->post('Yes'))
+			{
+				if ($row->delete()) 
+				{
+					$this->addMessage("Pass with ID: $id was deleted.");				
+					url::redirect('admin/managePasses');
+				}
+				else
+				{
+					$this->addError("Failed to delete pass with ID: $id! Please try again.");				
+					url::redirect('admin/managePasses');
+				}	
+			}		
+			/* User changed mind. */
+			else if ($val = $this->input->post('No'))
+			{
+				url::redirect('admin/managePasses');
+			}			
+			
+			/* User needs confirm screen. */
+			else if ($row->loaded)				
+			{
+				$this->view->title = 'Admin: Delete Passes';
+				$this->view->heading = 'ARE YOU SURE?';
+				$this->view->subheading = 'Deleting anything is not to be taken lightly.';
+				
+				$data['id'] = $row->id;
+				$data['entityType'] = 'Pass';
+				$data['entityName'] = $row->name;
+				$this->view->content = new View('admin/delete', $data);
+			}			
+		}
+		
+		/* Row not defined/id was not set/deletion of a non existant ID. */
+		else {
+			$this->addMessage(Kohana::lang('admin.account_not_exist'));	
+			url::redirect('admin/manageConventions');
+		}	
 	}
 	
 	function manageConventions()
@@ -298,7 +398,7 @@ class Admin_Controller extends Controller
 				$this->view->subheading = 'Deleting anything is not to be taken lightly.';
 				
 				$data['id'] = $row->id;
-				$data['entityType'] = 'convention';
+				$data['entityType'] = 'Convention';
 				$data['entityName'] = $row->name;
 				$this->view->content = new View('admin/delete', $data);
 			}			
@@ -308,7 +408,6 @@ class Admin_Controller extends Controller
 		else {
 			$this->addMessage(Kohana::lang('admin.account_not_exist'));	
 			url::redirect('admin/manageConventions');
-		}
-	
+		}	
 	}
 }
