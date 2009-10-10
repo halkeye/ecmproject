@@ -178,7 +178,30 @@ class Registration_Model extends ORM
             ->where('status', Registration_Model::STATUS_UNPROCESSED) /* Only grab one we havn't heard back from yet */
             ->find_all();
     }
+	
+    public function save()
+	{
+        $changed = $this->changed;
+		$ret = parent::save();
 
+		if ( ! empty($changed))
+		{
+			foreach ($changed as $column)
+			{
+				// Compile changed data
+                $log = ORM::Factory('log');
+                $log->modifier_id = $this->account_id;
+                $log->target_account_id = $this->account_id;
+                $log->target_registration_id = $this->id;
+                $log->target_badge_id = $this->pass_id;
+                $log->method = 'FIXME - i donno what you are - ' . $column . ' - ' . $this->object[$column];
+                $log->description = 'or u actually';
+                $log->mod_time = time();
+                $log->ip = $_SERVER['REMOTE_ADDR'];
+                $log->save();
+			}
+        }
+    }
 
 }
 

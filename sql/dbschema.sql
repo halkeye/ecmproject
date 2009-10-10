@@ -135,15 +135,15 @@ DROP TABLE IF EXISTS `logs`;
 CREATE TABLE `logs` (
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    modifier_id INT UNSIGNED,
-   target_account INT UNSIGNED,
-   target_registration INT UNSIGNED,
-   target_badge INT UNSIGNED,
+   target_account_id INT UNSIGNED,
+   target_registration_id INT UNSIGNED,
+   target_badge_id INT UNSIGNED,
    method VARCHAR(50),
    description TEXT,
    mod_time INT UNSIGNED,
    ip VARCHAR(39),
    FOREIGN KEY (modifier_id) REFERENCES accounts(id) ON DELETE SET NULL,
-   FOREIGN KEY (target_account) REFERENCES accounts(id) ON DELETE SET NULL,
-   FOREIGN KEY (target_registration) REFERENCES registrations(id) ON DELETE SET NULL,
-   FOREIGN KEY (target_badge) REFERENCES passes(id) ON DELETE SET NULL
+   FOREIGN KEY (target_account_id) REFERENCES accounts(id) ON DELETE SET NULL,
+   FOREIGN KEY (target_registration_id) REFERENCES registrations(id) ON DELETE SET NULL,
+   FOREIGN KEY (target_badge_id) REFERENCES passes(id) ON DELETE SET NULL
  ) ENGINE=Innodb DEFAULT CHARSET=utf8;
