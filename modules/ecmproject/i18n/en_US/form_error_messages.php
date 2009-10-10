@@ -34,4 +34,9 @@ $lang = array(
         'required' => 'You must supply a given name.',
         'default' => 'Invalid Input.',
     ),
+  'pass_id' => Array
+    (
+        'default' => 'Invalid pass, please try again.',
+        'invalid_pass_age' => 'That pass is not available for your age, please choose another selection.',
+    ),
 );

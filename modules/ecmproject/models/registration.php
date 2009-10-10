@@ -44,7 +44,7 @@ class Registration_Model extends ORM
             'sname' => array( 'type'  => 'text', 'label' => 'Surname', 'required'=>true    ),
             'badge' => array( 'type'  => 'text', 'label' => 'Badge', 'required'=>true    ),
             'pass_id' => array( 'type'  => 'select', 'label' => 'Pass', 'required'=>true    ),
-            'dob'   => array( 'type'  => 'text', 'label' => 'Date of Birth', 'required'=>true ),
+            'dob'   => array( 'type'  => 'date', 'label' => 'Date of Birth', 'required'=>true ),
             'email' => array( 'type'  => 'text', 'label' => 'Email', 'required'=>true ),
             'phone' => array( 'type'  => 'text', 'label' => 'Phone', 'required' => true),
             'cell'  => array( 'type'  => 'text', 'label' => 'Cell Phone', 'required' => false),
@@ -101,18 +101,22 @@ class Registration_Model extends ORM
 
     public function _valid_pass_for_account(Validation $array, $field)
     {
-        $yearsOld = 19;
+        $ageTime = strftime($array['dob']);
+        $t = $this->convention->start_date; // Store current time for consistency
+        $age = ($ageTime < 0) ? ( $t + ($ageTime * -1) ) : $t - $ageTime;
+        $yearsOld = intval(floor($age / (60 * 60 * 24 * 365)));
+
         // If add->rules validation found any errors, get me out of here!
 //        if (array_key_exists('pass_id', $array->errors()))
 //            return;
         $query = $this->getPossiblePassesQuery();
-        $query->where('minAge >=', $yearsOld);
-        $query->where('maxAge <=', $yearsOld);
-        if ((bool)$query->count_all())
+        $query->where('minAge <=', $yearsOld);
+        $query->where('maxAge >=', $yearsOld);
+        $query->where('id', $array['pass_id']);
+        if (!(bool)$query->count_all())
         {
-            $array->add_error($field, 'invalid_pass');
+            $array->add_error($field, 'invalid_pass_age');
         }
-
     }
 
     /**
@@ -159,12 +163,8 @@ class Registration_Model extends ORM
     public function getPossiblePassesQuery()
     {
         return ORM::Factory('pass')
-            ->orwhere(array(
-                'enddate >' => time(),
-                'enddate ' => null,
-                ))
+            ->where('enddate >',   time())
             ->where('startdate <', time())
-            /* $passes->where('ageReq', ) FIXME */
             ->where('convention_id', $this->convention_id);
     }
 

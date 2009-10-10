@@ -78,6 +78,11 @@ class Convention_Controller extends Controller
 
         if ($post = $this->input->post())
         {
+            foreach ($fields as $fieldName=>$fieldData)
+            {
+                if ($fieldData['type'] == 'date')
+                    $post[$fieldName] = implode('-', array(@$post[$fieldName . '-year'], @$post[$fieldName . '-month'], @$post[$fieldName . '-day']));
+            }
             if ($reg->validate($post))
             {
                 $reg->save();
