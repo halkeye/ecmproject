@@ -17,7 +17,7 @@ foreach ($fields as $field => $fieldData)
     echo "<th class='fieldHeader fieldHeader$classRow'>";
     echo form::label($field, $fieldData['label']);
     if (isset($fieldData['required']) && $fieldData['required'])
-        echo '<span class="required">*</span>';
+        echo ' <span class="required">*</span>';
     echo '</th>';
 
     echo "<td class='fieldContent fieldContent$classRow'>";

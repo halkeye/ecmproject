@@ -43,8 +43,9 @@ INSERT INTO `usergroups_permissions` VALUES (NULL,1,1);
 
 INSERT INTO `conventions` VALUES(1, 'Anime Evolution 2010', UNIX_TIMESTAMP('2009-07-31'), UNIX_TIMESTAMP('2010-08-31'), 'University of British Columbia');
 
-INSERT INTO `passes` VALUES (1,1, '3-day adult pass', 40.00, 1, 19, 1252393200, NULL); -- Effective forever after start date.
-INSERT INTO `passes` VALUES (2,1, '3-day adult pass PRE-REG', 40.00, 1, 19, 1252393200, 1284015600); -- Start date, end (expiry) date.
+INSERT INTO `passes` VALUES (1,1, '3-day adult pass',         40.00, 1, 19  , NULL, 1252393200, UNIX_TIMESTAMP('2010-08-01'));
+INSERT INTO `passes` VALUES (2,1, '3-day adult pass PRE-REG', 40.00, 1, 19  , NULL, 1252393200, 1284015600); -- Start date, end (expiry) date.
+INSERT INTO `passes` VALUES (3,1, '3-day minor pass PRE-REG', 25.00, 1, NULL, 19  , 1252393200, UNIX_TIMESTAMP('2010-08-01'));
 
 INSERT INTO registrations SET
     convention_id = 1,

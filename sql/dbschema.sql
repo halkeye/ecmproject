@@ -73,7 +73,6 @@ CREATE TABLE registrations(
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE RESTRICT, -- Conventions shouldn't be deleted if in use already.
    FOREIGN KEY (pass_id) REFERENCES passes(id) ON DELETE RESTRICT, -- Passes shouldn't be deleted if in use already.
    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE SET NULL, -- Even if an account is deleted, leave registrations for stat purposes.
-   UNIQUE `convention_badge_name` (convention_id, badge) -- only allow one unique badge name per convention?
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `payments`;

@@ -96,44 +96,23 @@ class Registration_Model extends ORM
         $form->add_rules('cell', array('valid', 'phone'));
         $form->add_rules('ephone', array('valid', 'phone'));
         $form->add_rules('dob', array('valid', 'date'));
-        $form->add_callbacks('badge', array($this, '_unique_badge'));
-    }
-    
-    public function _unique_badge_form()
-    {
-        $orm = ORM::Factory('registration');
-
-        $orm->where('convention_id !=', $this->convention_id);
-        if ($this->loaded)
-        {
-            $orm->where('id !=', $this->id);
-        }
-        $orm->where('badge !=', $this->badge);
-        return !(bool) $orm->count_all();
+        $form->add_callbacks('pass_id', array($this, '_valid_pass_for_account'));
     }
 
-    /*
-     * Callback method that checks for uniqueness of email
-     *
-     * @param  Validation  $array   Validation object
-     * @param  string      $field   name of field being validated
-     */
-    public function _unique_badge(Validation $array, $field)
+    public function _valid_pass_for_account(Validation $array, $field)
     {
-        $fields = array();
-        $fields['badge'] = $array[$field];
-        return; // FIXME
-        if ($this->loaded)
-            $fields[$this->primary_key.' !='] = $this->primary_key_value;
-
-        // check the database for existing records
-        $email_exists = (bool) ORM::factory('registration')->where($fields)->count_all();
-
-        if ($email_exists)
+        $yearsOld = 19;
+        // If add->rules validation found any errors, get me out of here!
+//        if (array_key_exists('pass_id', $array->errors()))
+//            return;
+        $query = $this->getPossiblePassesQuery();
+        $query->where('minAge >=', $yearsOld);
+        $query->where('maxAge <=', $yearsOld);
+        if ((bool)$query->count_all())
         {
-            // add error to validation object
-            $array->add_error($field, 'badge_exists');
+            $array->add_error($field, 'invalid_pass');
         }
+
     }
 
     /**
