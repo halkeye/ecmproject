@@ -74,7 +74,18 @@ class Registration_Model extends ORM
         // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
         $this->addValidationRules($array);
 
-		return parent::validate($array, $save);
+        /* Keep track of what really changed so we don't update fields we havn't changed */
+        $realChanged = $this->changed;
+        foreach ($array->safe_array() as $field=>$value)
+        {
+            if ($this->$field != $value) 
+            {
+                $realChanged[$field] = $this->$field; 
+            }
+        }
+		$ret = parent::validate($array, $save);
+        $this->changed = $realChanged;
+        return $ret;
 	}
 
     private function addValidationRules($form)
@@ -181,12 +192,13 @@ class Registration_Model extends ORM
 	
     public function save()
 	{
-        $changed = $this->changed;
+        $originalChanged = $this->changed;
+        $this->changed = array_keys($this->changed);
 		$ret = parent::save();
 
-		if ( ! empty($changed))
+		if ( ! empty($originalChanged))
 		{
-			foreach ($changed as $column)
+			foreach ($originalChanged as $column=>$oldValue)
 			{
 				// Compile changed data
                 $log = ORM::Factory('log');
@@ -194,10 +206,10 @@ class Registration_Model extends ORM
                 $log->target_account_id = $this->account_id;
                 $log->target_registration_id = $this->id;
                 $log->target_badge_id = $this->pass_id;
-                $log->method = 'FIXME - i donno what you are - ' . $column . ' - ' . $this->object[$column];
-                $log->description = 'or u actually';
+                $log->method = url::current(TRUE);
+                $log->description = sprintf("%s => %s => %s", $column, ($column == $oldValue ? '--unknown--' : $oldValue), $this->$column);
                 $log->mod_time = time();
-                $log->ip = $_SERVER['REMOTE_ADDR'];
+                $log->ip = input::instance()->ip_address();
                 $log->save();
 			}
         }

@@ -81,7 +81,13 @@ class Convention_Controller extends Controller
             foreach ($fields as $fieldName=>$fieldData)
             {
                 if ($fieldData['type'] == 'date')
-                    $post[$fieldName] = implode('-', array(@$post[$fieldName . '-year'], @$post[$fieldName . '-month'], @$post[$fieldName . '-day']));
+                    $post[$fieldName] = implode('-', 
+                        array(
+                            @sprintf("%04d", $post[$fieldName . '-year']), 
+                            @sprintf("%02d", $post[$fieldName . '-month']), 
+                            @sprintf("%02d", $post[$fieldName . '-day'])
+                        )
+                    );
             }
             if ($reg->validate($post))
             {
