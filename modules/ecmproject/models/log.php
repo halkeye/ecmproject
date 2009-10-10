@@ -20,5 +20,25 @@ class Log_Model extends ORM
             'end_date'      => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, ),
     );
     */
-
+    
+    /**
+     * Prepares the model database connection and loads the object.
+     *
+     * @param   mixed  parameter for find or object to load
+     * @return  void
+     */
+    public function __construct($id = NULL)
+    {
+        $ret = parent::__construct($id);
+        if (!$id || !$this->loaded)
+        {
+            $this->mod_time = time();
+            $this->ip = input::instance()->ip_address();
+            $this->method = url::current(TRUE);
+            if (Auth::instance()->is_logged_in())
+            {
+                $this->modifier_id = Auth::instance()->getAccount();
+            }
+        }
+    }
 }

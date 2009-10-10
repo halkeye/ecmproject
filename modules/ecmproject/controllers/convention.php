@@ -81,6 +81,7 @@ class Convention_Controller extends Controller
             foreach ($fields as $fieldName=>$fieldData)
             {
                 if ($fieldData['type'] == 'date')
+                {
                     $post[$fieldName] = implode('-', 
                         array(
                             @sprintf("%04d", $post[$fieldName . '-year']), 
@@ -88,14 +89,18 @@ class Convention_Controller extends Controller
                             @sprintf("%02d", $post[$fieldName . '-day'])
                         )
                     );
+                    unset($post[$fieldName.'-year']);
+                    unset($post[$fieldName.'-month']);
+                    unset($post[$fieldName.'-day']);
+                }
             }
             if ($reg->validate($post))
             {
                 $reg->save();
-
                 url::redirect(Convention_Controller::STEP2);
                 return;
             }
+
             // repopulate the form fields
             $form = arr::overwrite($form, $post->as_array());
 

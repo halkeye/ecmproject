@@ -61,16 +61,16 @@ class Registration_Model extends ORM
     }
 
     /**
-	 * Validates and optionally saves a new user record from an array.
-	 *
-	 * @param  array    values to check
-	 * @param  boolean  save[Optional] the record when validation succeeds
-	 * @return boolean
-	 */
-	public function validate(array & $array, $save = FALSE)
-	{
-		// Initialise the validation library and setup some rules
-		$array = Validation::factory($array);
+     * Validates and optionally saves a new user record from an array.
+     *
+     * @param  array    values to check
+     * @param  boolean  save[Optional] the record when validation succeeds
+     * @return boolean
+     */
+    public function validate(array & $array, $save = FALSE)
+    {
+        // Initialise the validation library and setup some rules
+        $array = Validation::factory($array);
         // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
         $this->addValidationRules($array);
 
@@ -83,10 +83,10 @@ class Registration_Model extends ORM
                 $realChanged[$field] = $this->$field; 
             }
         }
-		$ret = parent::validate($array, $save);
+        $ret = parent::validate($array, $save);
         $this->changed = $realChanged;
         return $ret;
-	}
+    }
 
     private function addValidationRules($form)
     {
@@ -102,6 +102,8 @@ class Registration_Model extends ORM
         }
 
         // Add Rules
+        $form->add_rules('heard_from', 'standard_text');
+        $form->add_rules('attendance_reason', array($this, '_true'));
         $form->add_rules('email', 'required', array('valid','email'));
         $form->add_rules('phone', array('valid', 'phone'));
         $form->add_rules('cell', array('valid', 'phone'));
@@ -189,31 +191,30 @@ class Registration_Model extends ORM
             ->where('status', Registration_Model::STATUS_UNPROCESSED) /* Only grab one we havn't heard back from yet */
             ->find_all();
     }
-	
+    
     public function save()
-	{
+    {
         $originalChanged = $this->changed;
         $this->changed = array_keys($this->changed);
-		$ret = parent::save();
+        $ret = parent::save();
 
-		if ( ! empty($originalChanged))
-		{
-			foreach ($originalChanged as $column=>$oldValue)
-			{
-				// Compile changed data
+        if ( ! empty($originalChanged))
+        {
+            foreach ($originalChanged as $column=>$oldValue)
+            {
+                // Compile changed data
                 $log = ORM::Factory('log');
-                $log->modifier_id = $this->account_id;
                 $log->target_account_id = $this->account_id;
                 $log->target_registration_id = $this->id;
                 $log->target_badge_id = $this->pass_id;
-                $log->method = url::current(TRUE);
                 $log->description = sprintf("%s => %s => %s", $column, ($column == $oldValue ? '--unknown--' : $oldValue), $this->$column);
-                $log->mod_time = time();
-                $log->ip = input::instance()->ip_address();
                 $log->save();
-			}
+            }
         }
     }
+
+    /* for validation */
+    public function _true() { return TRUE; }
 
 }
 
