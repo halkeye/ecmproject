@@ -44,6 +44,7 @@ class Admin_Controller extends Controller
 		$data['entries'] = array();
 		$rows = ORM::factory('Account')->find_all();		//Move to account model.
 
+		$data['cmd_target'] = 'manageAccounts';
 		$data['commands']['create'] = html::anchor('admin/createAccount', 'Create new Account', 'Create new Account');
 		$data['headers']['id'] = array('width' => '10%', 'name' => 'ID');
 		$data['headers']['email'] = array('width' => '35%', 'name' => 'Email');
@@ -200,6 +201,8 @@ class Admin_Controller extends Controller
 		$this->view->title = Kohana::lang('admin.admin_registrations');
 		$this->view->heading = Kohana::lang('admin.admin_registrations');
 		$this->view->subheading = Kohana::lang('admin.admin_area');
+		
+		$data['cmd_target'] = 'manageRegistrations';
 	}
 	
 	function editRegistrations()
@@ -207,16 +210,41 @@ class Admin_Controller extends Controller
 	
 	}
 	
-	function managePasses() 
+	function managePasses($convention_id = NULL) 
 	{
 		$this->view->title = Kohana::lang('admin.admin_passes');
 		$this->view->heading = Kohana::lang('admin.admin_passes');
 		$this->view->subheading = Kohana::lang('admin.admin_area');
 		
-		$data['entries'] = array();
-		$rows = ORM::factory('Pass')->find_all();
+		$data['entries'] = array();		
+		$data['hack'] = true; //Hack!
 		
-		$data['commands']['create'] = html::anchor('admin/createPass', 'Create new Pass', 'Create new Pass');
+		// Get all conventions, set $convention_id from FORM.
+		$crows = ORM::factory('Convention')->find_all();
+				
+		$convention_id = $this->input->post('convention_id');
+		
+		// If no convention_id was specified (FORM), use first one.
+		if (!isset($convention_id) && ($row = current($crows->as_array())))
+		{		
+			$convention_id = $row->id;
+		}
+		else if (!isset($convention_id))
+		{
+			// TODO: Replace with something useful (or nicer looking).
+			die("No conventions found. Replace this message with something else.");
+		}
+						
+		// Okay we're done figuring out what convention to use for displaying passes. Make a select list and get our passes.
+		$crows = $crows->select_list('id', 'name');
+		$rows = ORM::factory('Pass')->where("convention_id = $convention_id")->find_all();
+				
+		// Specify commands. Needs better formatting.
+		$data['cmd_target'] = 'managePasses';
+		$data['commands']['create'] = html::anchor("admin/createPass/$convention_id", html::image('img/document-new.png', 'New Pass') . 'New Pass') ; 			
+		$data['commands']['select_convention'] = form::dropdown('convention_id', $crows, $this->input->post('convention_id'));
+		
+		// Specify headers.
 		$data['headers']['name'] = array('width' => '40%', 'name' => 'Name');
 		$data['headers']['price'] = array('width' => '10%', 'name' => 'Price');
 		$data['headers']['startDate'] = array('width' => '20%', 'name' => 'Start Date');
@@ -224,37 +252,46 @@ class Admin_Controller extends Controller
 		$data['headers']['edit'] = array('width' => '5%', 'name' => 'Edit');
 		$data['headers']['delete'] = array('width' => '5%', 'name' => 'Delete');
 		
+		// Per row, set actions.
 		foreach ($rows as $row)
 		{
 			$data['actions']['edit'] = html::anchor('admin/editPass/'. $row->id, html::image('img/edit-copy.png', Kohana::lang('admin.edit_account')));
 			$data['actions']['delete'] = html::anchor('admin/deletePass/' . $row->id, html::image('img/edit-delete.png', Kohana::lang('admin.delete_account')));
+			
 			$data['entries'][$row->id] = new View('lists/pass', array('row' => $row, 'actions' => $data['actions']));	
 		}		
 		
+		// Main view.
 		$this->view->content = new View('admin/list', $data);
 	}
 	
 	
-	function createPass($cid = NULL)
+	function createPass($convention_id = NULL)
 	{
-		$pass = ORM::factory('Pass');
+		$pass = ORM::factory('Pass');	
+		$data['callback'] = "createPass/$convention_id";		
+		
 		if ($post = $this->input->post())		
 		{			
             if ($pass->validate_admin($post))
-            {
-				$pass->convention_id = $cid;
-				
+            {			
 				if (!isset($post->isPurchasable)) 				
 					$pass->isPurchasable = 0; //Force it to zero.				
 				else				
-					$pass->isPurchasable = 1;
-								
-				if (strlen($post->startDate) != 0)				
+					$pass->isPurchasable = 1;												
+					
+				if (!isset($post->startDate) || empty($post->startDate)) {
+					$pass->startDate = time();
+				} else {			
 					$pass->startDate = strtotime($post->startDate);
+				}
 				
-				if (strlen($post->endDate) != 0) 
+				if (!isset($post->endDate) || empty($post->endDate)) {
+					$pass->endDate = ORM::factory('Convention')->find($convention_id)->end_date;
+				} else {			
 					$pass->endDate = strtotime($post->endDate);
-				
+				}
+													
                 $pass->save();
 
 				$this->addMessage("The pass, " . $pass->name . " was created successfully."); //TODO: Lang it.
@@ -266,22 +303,85 @@ class Admin_Controller extends Controller
 					foreach ($errors as $error)
 						$this->addError($error);
 						
-					$data['cid'] = $cid;
+					$data['convention_id'] = $this->input->post('convention_id');
 					$data['row'] = $post->as_array();
+					$data['crows'] = ORM::factory('Convention')->find_all()->select_list('id', 'name');
 				}			
 		} else
 		{
-			$data['cid'] = 1;
+			$data['convention_id'] = $convention_id;
 			$data['row'] = $pass->as_array(); //Will be blank.
+			$data['crows'] = ORM::factory('Convention')->find_all()->select_list('id', 'name');
 		}
 		
 		$this->view->content = new View('admin/Pass', $data);				
 	}
 	
 	function editPass($id = NULL)
-	{
-	
-	
+	{		
+		// If id is not set, we cannot proceed.
+		if (!isset($id) || empty($id))
+		{
+			$this->addMessage("Speak friend and enter. I cannot let you pass.");
+			url::redirect('admin/managePasses');
+		}
+		
+		// If pass id was invalid, we cannot proceed.
+		$pass = ORM::factory('Pass')->find($id);
+		if ( !$pass->loaded )
+		{
+			$this->addMessage("Oops. Invalid pass selected - perhaps someone deleted it? Please try again.");
+			url::redirect('admin/managePasses');
+		}
+		
+		$data['callback'] = "editPass/$id";
+		
+		if ($post = $this->input->post())		
+		{			
+            if ($pass->validate_admin($post))
+            {			
+				if (!isset($post->isPurchasable)) 				
+					$pass->isPurchasable = 0; //Force it to zero.				
+				else				
+					$pass->isPurchasable = 1;												
+					
+				if (!isset($post->startDate) || empty($post->startDate)) {
+					$pass->startDate = time();
+				} else {			
+					$pass->startDate = strtotime($post->startDate);
+				}
+				
+				if (!isset($post->endDate) || empty($post->endDate)) {
+					$pass->endDate = ORM::factory('Convention')->find($this->input->post('convention_id'))->end_date;
+				} else {			
+					$pass->endDate = strtotime($post->endDate);
+				}
+													
+                $pass->save();
+
+				$this->addMessage("The pass, " . $pass->name . " was created successfully."); //TODO: Lang it.
+				url::redirect('admin/managePasses');
+			}
+			else
+				{
+					$errors = $post->errors('form_error_messages');
+					foreach ($errors as $error)
+						$this->addError($error);
+						
+					$data['convention_id'] = $this->input->post('convention_id');
+					$data['row'] = $post->as_array();
+					$data['crows'] = ORM::factory('Convention')->find_all()->select_list('id', 'name');
+				}			
+		}
+		else
+		{
+			$data['convention_id'] = $pass->convention_id;
+			$data['row'] = $pass->as_array();		
+			$data['crows'] = ORM::factory('Convention')->find_all()->select_list('id', 'name');
+			
+			$this->view->content = new View('admin/Pass', $data);	
+		
+		}		
 	}
 	
 	function deletePass($id = NULL)
@@ -342,6 +442,7 @@ class Admin_Controller extends Controller
 		$data['entries'] = array();
 		$rows = ORM::factory('Convention')->find_all();
 		
+		$data['cmd_target'] = 'manageConventions';
 		$data['headers']['name'] = array('width' => '40%', 'name' => 'Name');
 		$data['headers']['location'] = array('width' => '50%', 'name' => 'Location');
 		$data['headers']['edit'] = array('width' => '5%', 'name' => 'Edit');
