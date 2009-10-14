@@ -1,8 +1,8 @@
 <div id='newform'>
 <br />
 <!-- CONTENT: Expect initial convention id for this pass to be associated to. -->
-<?php 
-	echo form::open("admin/createPass/$cid"); 
+<?php 	
+	echo form::open("admin/$callback"); 
 ?>
 	<h1>General Information</h1>
 	<p>At a minimum, a badge requires a name, and a price. Upon creation, this badge will be available for purchase through
@@ -12,6 +12,8 @@
 		<?php print form::input('name', $row['name']); ?>
 		<label for="price">Price <span class="small">Dollars and Cents.</span></label>
 		<?php print form::input('price', $row['price']); ?>
+		<label for="cid">Convention <span class='small'>The convention this badge will belong to</span></label>
+		<?php print form::dropdown('convention_id', $crows, $convention_id); ?>
 	</fieldset>
 	<h1>Availability</h1>
 	<p>A badge can be set to be available for a period of time. For instance, a badge can be set so that it is only purchasable from October 23rd, 2009 to
@@ -19,9 +21,19 @@
 	<fieldset>		
 		<!-- Change to three fields -->
 		<label for="startDate">Start Date <span class="small">Format: MM/DD/YYYY</span></label>
-		<?php print form::input('startDate', $row['startDate']); ?>
+		<?php 
+			if (isset($row['startDate']) && !empty($row['startDate']))
+				print form::input('startDate', date("m/d/Y", $row['startDate'])); 
+			else
+				print form::input('startDate', ''); ?>
 		<label for="endDate">End Date <span class="small">Format:  MM/DD/YYYY</span></label>
-		<?php print form::input('endDate', $row['endDate']); ?>
+		
+		<?php 
+			if (isset($row['endDate']) && !empty($row['endDate']))
+				print form::input('endDate', date("m/d/Y", $row['endDate'])); 
+			else
+				print form::input('endDate', '');
+		?>
 	</fieldset>
 	<h1>Restrictions</h1>
 	<p>A badge can also be set to require a minimum age and/or a maximum age in which one can buy the pass. Useful for minor badges. Badges can
