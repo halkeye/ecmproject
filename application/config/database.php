@@ -21,10 +21,14 @@
 $config['default'] = array
 (
 	'benchmark'     => TRUE,
-	'persistent'    => FALSE,
+	'persistent'    => TRUE,
 	'connection'    => 'mysql://root:@127.0.0.1/ecms',
 	'character_set' => 'utf8',
 	'table_prefix'  => '',
 	'object'        => TRUE,
 	'cache'         => FALSE
 );
+if (file_exists('database-local.php'))
+{
+    include_once('database-local.php');
+}
