@@ -1,4 +1,4 @@
-﻿DROP DATABASE ecms;
+DROP DATABASE ecms;
 CREATE DATABASE ecms;
 USE ecms;
 
@@ -17,7 +17,7 @@ DROP TABLE IF EXISTS `passes`;
 -- Table that describes the various passes. isPurchasable field is to allow for passes such as Vendors, Staff (an attendee
 -- shouldn't be able to get their hands on one. For passes like that, have system grant right for the user to register.
 -- One-time use codes?
-CREATE TABLE passes(
+CREATE TABLE passes (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    convention_id INT UNSIGNED NOT NULL,
    name VARCHAR(100) NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE passes(
 DROP TABLE IF EXISTS `accounts`;
 -- Reg form information among other things. Require email at a minimum.
 -- Salt column, usergroups storing?
-CREATE TABLE accounts(
+CREATE TABLE accounts (
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    email VARCHAR(55) NOT NULL UNIQUE,
    password VARCHAR(40) NOT NULL,
@@ -45,14 +45,14 @@ CREATE TABLE accounts(
 
 DROP TABLE IF EXISTS `usergroups`;
 -- Expand on permissions later.
-CREATE TABLE usergroups(
+CREATE TABLE usergroups (
    id int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    name VARCHAR(55) NOT NULL,
    description TEXT
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `registrations`;
-CREATE TABLE registrations(
+CREATE TABLE registrations (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    convention_id INT UNSIGNED NOT NULL,
    pass_id INT UNSIGNED NOT NULL,
@@ -72,14 +72,14 @@ CREATE TABLE registrations(
    status TINYINT NOT NULL, -- Status of account (unprocessed, processing, accepted, etc)
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE RESTRICT, -- Conventions shouldn't be deleted if in use already.
    FOREIGN KEY (pass_id) REFERENCES passes(id) ON DELETE RESTRICT, -- Passes shouldn't be deleted if in use already.
-   FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE SET NULL, -- Even if an account is deleted, leave registrations for stat purposes.
+   FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE SET NULL -- Even if an account is deleted, leave registrations for stat purposes.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `payments`;
 -- Skip specific field details for now.
 -- Just store a string stating payment type?
 -- Aside from paypal details
-CREATE TABLE payments(
+CREATE TABLE payments (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    register_id INT UNSIGNED NOT NULL,
    last_modified INT UNSIGNED, -- Track the last account to add/edit a payment manually to allow for reg. manager/board to give out a badge, fix payment, etc. NULL if last person who touched it wasn't human. Think of a better solution.
@@ -96,14 +96,14 @@ CREATE TABLE payments(
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `permissions`;
-CREATE TABLE permissions(
+CREATE TABLE permissions (
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    pkey VARCHAR(100) NOT NULL,
    description TEXT
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `usergroups_permissions`;
-CREATE TABLE usergroups_permissions(
+CREATE TABLE usergroups_permissions (
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    usergroup_id INT UNSIGNED,
    permission_id INT UNSIGNED,
@@ -112,7 +112,7 @@ CREATE TABLE usergroups_permissions(
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `accounts_usergroups`;
-CREATE TABLE accounts_usergroups(
+CREATE TABLE accounts_usergroups (
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    usergroup_id INT UNSIGNED,
    account_id INT UNSIGNED,
