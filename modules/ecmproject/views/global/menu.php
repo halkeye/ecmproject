@@ -1,16 +1,17 @@
-<?php foreach ($menu as $m): ?>
-<li>
 <?php
-if (isset($m['seperator'])) 
-{ 
-    echo '-----'; 
-}
-else
+foreach ($menu as $m)
 {
-    $attributes = array();
-    if ($m['url'] == url::current()) { $attributes['class'] = 'currentMenuChoice'; }
-    echo html::anchor($m['url'], $m['title'], $attributes); 
+    if (isset($m['seperator'])) 
+    { 
+        echo '<li>-----</li>'; 
+        continue;
+    }
+
+    $attributes = array(
+            'class'=>'menuitem',
+    );
+    if ($m['url'] == url::current()) { $attributes['class'] .= ' currentMenuChoice'; }
+    echo '<li ' . html::attributes($attributes) . '>';
+    echo html::anchor($m['url'], $m['title']); 
+    echo '</li>';
 }
-?>
-</li>
-<?php endforeach; ?>
