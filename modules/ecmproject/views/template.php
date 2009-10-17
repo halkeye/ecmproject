@@ -30,7 +30,7 @@
     <?php endif; ?>
  
     <!-- Content Pane (Right side) --> 
-    <div id="content"<?php if ($isLoggedIn || $menu) { echo " class='contentMenu'"; }?>>
+    <div id="content"<?php if ($isLoggedIn || $menu) { echo " class='contentMenu'"; } else { echo " class='contentNoMenu'"; }?>>
     <?php if ($heading) echo "<h2>$heading</h2>"; ?>
     <?php if ($subheading) echo "<h3>$subheading</h3>"; ?>
     
