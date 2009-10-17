@@ -157,25 +157,17 @@ class Convention_Controller extends Controller
     public function checkout()
     {
         $this->requireVerified();
-        
+        $this->view->heading    = Kohana::lang('convention.checkout_heading');
+        $this->view->subheading = Kohana::lang('convention.checkout_subheading'); 
+
+        $data = Kohana::config('paypal');
+        /* get all the registrations we need */
         $data['registrations'] = ORM::Factory('registration')->getForAccount($this->auth->getAccount()->id);
         if (!$data['registrations']->count()) 
         {
             $this->addError('FIXME - No registrations to process');
             return;
         }
-
-        /* Our "checkout template" */
-        $this->view->content = new View('convention/checkout', $data);
-    }
-
-    public function checkoutPaypal()
-    {
-        $this->requireVerified();
-
-        $data = Kohana::config('paypal');
-        /* get all the registrations we need */
-        $data['registrations'] = ORM::Factory('registration')->getForAccount($this->auth->getAccount()->id);
 
         /* Config file is currently 'url', lets map it to 'paypal_url' incase any other url is used */
         $data['paypal_url'] = $data['url'];
@@ -194,7 +186,7 @@ class Convention_Controller extends Controller
         $data['cancel_url'] = url::site('/convention/registrationCancel');
 
         /* Our "checkout template" */
-        $this->view->content = new View('convention/checkoutPaypal', $data);
+        $this->view->content = new View('convention/checkout', $data);
     }
 
 }

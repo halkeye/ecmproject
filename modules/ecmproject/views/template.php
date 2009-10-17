@@ -17,22 +17,20 @@
     <!-- Left Sidebar. --> 
     <?php if ($isLoggedIn || $menu): ?>
     <div id="sidebar">
-        <div id="menu"> 
-            <ul> 
-                <li class="menuItem title"><a href="<?php echo url::base(); ?>">Menu</a></li>
-                <?php if ($isLoggedIn): ?>
-                <li><b><?php echo htmlentities($account->email) ?></b></li>
-                <li>&nbsp;</li>
-                <?php endif; ?>
+        <ul> 
+            <li class="title"><a href="<?php echo url::base(); ?>">Welcome</a></li>
+            <?php if ($isLoggedIn): ?>
+            <li><b><?php echo htmlentities($account->email) ?></b></li>
+            <li>&nbsp;</li>
+            <?php endif; ?>
 
-                <?php if($menu) { echo View::Factory('global/menu', array('menu'=>$menu)); } ?>
-            </ul>
-        </div>
+            <?php if($menu) { echo View::Factory('global/menu', array('menu'=>$menu)); } ?>
+        </ul>
     </div> 
     <?php endif; ?>
  
     <!-- Content Pane (Right side) --> 
-    <div id="content"<?php if (!$isLoggedIn && !$menu) { echo " class='contentNoMenu'"; }?>>
+    <div id="content"<?php if ($isLoggedIn || $menu) { echo " class='contentMenu'"; }?>>
     <?php if ($heading) echo "<h2>$heading</h2>"; ?>
     <?php if ($subheading) echo "<h3>$subheading</h3>"; ?>
     
