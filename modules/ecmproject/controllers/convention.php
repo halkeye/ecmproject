@@ -52,6 +52,7 @@ class Convention_Controller extends Controller
         {
             $reg->convention_id = ORM::Factory('convention')->getCurrentConvention();
             $reg->account_id    = $this->auth->get_user()->id;
+            $reg->email         = $this->auth->getAccount()->email;
         }
         else
         {

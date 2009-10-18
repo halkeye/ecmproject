@@ -14,4 +14,18 @@ $lang = array(
         'registration_select_pass_header' => 'Select a Pass',
         'registration_select_pass_desc'   => 'Please select the pass you wish to register for below. Keep in mind that certain passes, such as pre-registration passes, are only available for registration at certain times and that only passes that can be purchased will be listed below.',
 
+        'registration_field_gname'        => 'Given Name',
+        'registration_field_sname'        => 'Surname',
+        'registration_field_badge'        => 'Nickname',
+        'registration_field_pass_id'      => 'Pass',
+        'registration_field_dob'          => 'Date of Birth',
+        'registration_field_email'        => 'Email',
+        'registration_field_phone'        => 'Phone',
+        'registration_field_cell'         => 'Cell Phone',
+        'registration_field_address'      => 'Address',
+        'registration_field_econtact'     => 'Emergency Contact Name',
+        'registration_field_ephone'       => 'Emergency Contact Phone',
+        'registration_field_heard_from'   => 'Heard from',
+        'registration_field_attendance_reason' => 'Reason For Attendance',
+
 );

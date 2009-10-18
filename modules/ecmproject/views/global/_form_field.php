@@ -2,7 +2,7 @@
 if (!isset($fieldData['type'])) { $fieldData['type'] = 'text'; }
 $classRow = text::alternate('odd','even');
 
-$label = $fieldData['label'];
+$label = Kohana::lang('convention.registration_field_' . $field);
 if (isset($fieldData['required']) && $fieldData['required'])
     $label .= ' <span class="required">*</span>';
 
