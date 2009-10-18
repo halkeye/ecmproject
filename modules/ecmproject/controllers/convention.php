@@ -38,7 +38,7 @@ class Convention_Controller extends Controller
             $data['conventions'][$row->convention_id]->id = $row->convention_id;
             $data['conventions'][$row->convention_id]->regs[] = $row;
         }
-        $this->view->content = new View('convention/registrations', $data);
+        $this->view->content = new View('convention/index', $data);
         
         return;
     }
@@ -66,10 +66,12 @@ class Convention_Controller extends Controller
             
         $fields = $reg->formo_defaults;
         $form = array();
+        $errors = array();
+
         foreach (array_keys($fields) as $field) 
         { 
             $form[$field] = $reg->$field; 
-            $errors[$field] = '';
+            /*$errors[$field] = '';*/
         }
         foreach ($passesQuery->find_all() as $pass)
         {

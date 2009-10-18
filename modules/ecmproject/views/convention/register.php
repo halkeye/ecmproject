@@ -1,18 +1,42 @@
 <?php
 
-echo "\n";
+if (count($errors))
+{
+    foreach ($errors as $field => $error)
+    {
+        if (!$error) { continue; /* just incase of empty error */ }
+        echo '<p class="errormsg">';
+        echo $error;
+        echo '</p>';
+    }
+}
 
-echo '<fieldset><legend accesskey="N">Registration</legend>';
-echo "\n";
-
+echo '<div id="form">';
 echo form::open();
-echo "\n";
+echo '<h1>'.html::specialchars(Kohana::lang('convention.registration_form_header')) . '</h1>';
+echo '<p>'.html::specialchars(Kohana::lang('convention.form_required')) . '</p>';
 
-echo new View('global/_form', array('fields'=>$fields, 'errors'=>$errors, 'form'=>$form));
-
-echo form::submit(null,'Submit');
-echo form::close();
-
+echo "<fieldset>";
+foreach (array('gname','sname', 'badge', 'dob', 'email', 'phone','cell', 'address', 'econtact', 'ephone', 'heard_from', 'attendance_reason') as $field)
+{
+    echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $form[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
+}
 echo '</fieldset>';
 
-echo '<!-- ' . var_export($errors, 1) . ' -->';
+    
+echo '<h1>'.html::specialchars(Kohana::lang('convention.registration_select_pass_header')) . '</h1>';
+echo '<p>'.html::specialchars(Kohana::lang('convention.registration_select_pass_desc')) . '</p>';
+
+echo '<fieldset>';
+{
+    $field = 'pass_id';
+    echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $form[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
+}
+echo '</fieldset>';
+        
+echo "<fieldset class='left'>";
+echo form::submit(null,Kohana::lang('convention.registration_submit'));
+echo '</fieldset>'; 
+
+echo form::close();
+
