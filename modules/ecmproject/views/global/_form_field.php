@@ -1,15 +1,23 @@
 <?php
+if (!isset($fieldData['type'])) { $fieldData['type'] = 'text'; }
 $classRow = text::alternate('odd','even');
 
 $label = $fieldData['label'];
 if (isset($fieldData['required']) && $fieldData['required'])
     $label .= ' <span class="required">*</span>';
 
-echo form::label($field, $label);
+
+switch ($fieldData['type'])
+{
+    case 'date':
+        echo form::label($field.'-year', $label);
+        break;
+    default:
+        echo form::label($field, $label);
+}
 $attributes = '';
 if ($hasError) { $attributes = 'class="fieldError"'; }
 
-if (!isset($fieldData['type'])) { $fieldData['type'] = 'text'; }
 switch ($fieldData['type'])
 {
     case 'password':
@@ -20,10 +28,12 @@ switch ($fieldData['type'])
         break;
     case 'select':
         $values = $fieldData['values'];
-        array_unshift($values, "");
+        $values[-1] = "";
+        asort($values);
         echo form::dropdown($field, $values, $value, $attributes);
         break;
     case 'date':
+        $months[-1] = '';
         ### Generate list of years
         foreach (date::months() as $month)
         {
@@ -41,13 +51,14 @@ switch ($fieldData['type'])
             $month = date('n', $date);
             $day = date('d', $date);
         }
-        $years = array_values(array_reverse(date::years(1900, date('Y', time()))));
+        $years = array_values(date::years(1900, date('Y', time())));
         $years = array_combine($years, $years);
-        $days = array_combine(range(1,31),range(1,31));
+        $years[-1] = "";
+        ksort($years);
+        $days = array_merge(array(-1=>" "), array_combine(range(1,31),range(1,31)));
+        $days[-1] = "";
+        ksort($years);
 
-        array_unshift($years, "");
-        array_unshift($months, "");
-        array_unshift($days, "");
         echo form::dropdown($field.'-year', $years, $year, $attributes );
         echo ' ';
         echo form::dropdown($field.'-month', $months, $month, $attributes );

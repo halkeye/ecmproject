@@ -39,4 +39,5 @@ echo form::submit(null,Kohana::lang('convention.registration_submit'));
 echo '</fieldset>'; 
 
 echo form::close();
+echo '</div>';
 
