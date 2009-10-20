@@ -5,7 +5,7 @@ $classRow = text::alternate('odd','even');
 /* ex: View::set_global('field_lang_prefix', 'ecmproject.formtest_');
  * This is generating the label from the lang files 
  */
-if (!$field_lang_prefix) { $field_lang_prefix = 'convention.registration_field_'; }
+if (!isset($field_lang_prefix)) { $field_lang_prefix = 'convention.registration_field_'; }
 $label = Kohana::lang($field_lang_prefix . $field);
 if (isset($fieldData['required']) && $fieldData['required'])
     $label .= ' <span class="required">*</span>';

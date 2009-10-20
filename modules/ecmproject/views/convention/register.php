@@ -1,5 +1,7 @@
 <?php
 
+View::set_global('field_lang_prefix', 'convention.registration_field_');
+
 if (count($errors))
 {
     foreach ($errors as $field => $error)
