@@ -2,14 +2,20 @@
 if (!isset($fieldData['type'])) { $fieldData['type'] = 'text'; }
 $classRow = text::alternate('odd','even');
 
-$label = Kohana::lang((@$field_lang_prefix ? $field_lang_prefix : 'convention.registration_field_') . $field);
+/* ex: View::set_global('field_lang_prefix', 'ecmproject.formtest_');
+ * This is generating the label from the lang files 
+ */
+if (!$field_lang_prefix) { $field_lang_prefix = 'convention.registration_field_'; }
+$label = Kohana::lang($field_lang_prefix . $field);
 if (isset($fieldData['required']) && $fieldData['required'])
     $label .= ' <span class="required">*</span>';
 
 
 switch ($fieldData['type'])
 {
+    case 'radio':
     case 'hidden':
+        /* Don't show a label because we'll do something else */
         break;
     case 'date':
         echo form::label($field.'-year', $label);
@@ -22,6 +28,17 @@ if ($hasError) { $attributes = 'class="fieldError"'; }
 
 switch ($fieldData['type'])
 {
+    case 'radio':
+        if ($fieldData['values'])
+        {
+            foreach ($fieldData['values'] as $radioValue => $label)
+            {
+                print form::label($field.'_'.$radioValue, $label);
+                print form::radio($field.'_'.$radioValue, $radioValue, $value == $radioValue);
+                print " ";
+            }
+        }
+        break;
     case 'hidden':
         echo form::hidden($field, $value);
         break;
