@@ -191,5 +191,17 @@ class Convention_Controller extends Controller
         /* Our "checkout template" */
         $this->view->content = new View('convention/checkout', $data);
     }
+    
+    public function checkoutOther()
+    {
+        $this->requireVerified();
+        $this->view->heading    = Kohana::lang('convention.checkout_other_heading');
+        $this->view->subheading = Kohana::lang('convention.checkout_other_subheading'); 
+
+        $data = array();
+        /* Our "checkout template" */
+        $this->view->content = new View('convention/checkoutOther', $data);
+    }
+
 
 }
