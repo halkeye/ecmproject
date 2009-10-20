@@ -20,7 +20,7 @@ INSERT INTO `accounts` SET
     email      = 'halkeye@gmail.com',
     password   = 'c1537a66964e2acbb3a8232a20b6d8338cb206c5',
     salt       = '3e215344f1',
-    status     = 0,
+    status     = 1,
     created    = 1249191871,
     login      = 1249793436
 ;
@@ -44,14 +44,14 @@ INSERT INTO `usergroups_permissions` VALUES (NULL,1,1);
 INSERT INTO `conventions` VALUES(1, 'Anime Evolution 2010', UNIX_TIMESTAMP('2009-07-31'), UNIX_TIMESTAMP('2010-08-31'), 'University of British Columbia');
 INSERT INTO `conventions` VALUES(2, 'Anime Evolution 2010-2', UNIX_TIMESTAMP('2009-07-31'), UNIX_TIMESTAMP('2010-08-31'), 'University of British Columbia');
 
-INSERT INTO `passes` VALUES (1,1, '3-day adult pass',         40.00, 1, 19  , NULL, 1252393200, UNIX_TIMESTAMP('2010-08-01'));
-INSERT INTO `passes` VALUES (2,1, '3-day adult pass PRE-REG', 40.00, 1, 19  , NULL, 1252393200, 1284015600); -- Start date, end (expiry) date.
-INSERT INTO `passes` VALUES (3,1, '3-day minor pass PRE-REG', 25.00, 1, NULL, 19  , 1252393200, UNIX_TIMESTAMP('2010-08-01'));
+INSERT INTO `passes` VALUES (1,1, '3-day adult pass',         40.00, 1, 19, 255, 1252393200, UNIX_TIMESTAMP('2010-08-01'));
+INSERT INTO `passes` VALUES (2,1, '3-day adult pass PRE-REG', 40.00, 1, 19, 255, 1252393200, 1284015600); -- Start date, end (expiry) date.
+INSERT INTO `passes` VALUES (3,1, '3-day minor pass PRE-REG', 25.00, 1, 0 , 19 , 1252393200, UNIX_TIMESTAMP('2010-08-01'));
 
 INSERT INTO registrations SET
     convention_id = 1,
     pass_id = 2,
-    account_id = 2,
+    account_id = 1,
     gname = 'Gavin',
     sname = 'Mogan',
     badge = 'halkeye',

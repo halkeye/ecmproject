@@ -18,7 +18,7 @@ $config['site_protocol'] = '';
  *
  * This can be removed by using URL rewriting.
  */
-$config['index_page'] = 'index.php';
+$config['index_page'] = basename($_SERVER['SCRIPT_NAME']);
 
 /**
  * Fake file extension that will be added to all generated URLs. Example: .html
@@ -52,7 +52,7 @@ $config['internal_cache_encrypt'] = FALSE;
  *
  * The cache is deleted when/if the key changes.
  */
-$config['internal_cache_key'] = 'foobar-changeme';
+$config['internal_cache_key'] = 'cejyemHog-IjdufaibOd';
 
 /**
  * Enable or disable gzip output compression. This can dramatically decrease
@@ -102,7 +102,7 @@ $config['display_errors'] = TRUE;
  *
  * @see http://docs.kohanaphp.com/general/configuration
  */
-$config['render_stats'] = TRUE;
+$config['render_stats'] = FALSE;
 
 /**
  * Filename prefixed used to determine extensions. For example, an
@@ -131,6 +131,10 @@ if (!IN_PRODUCTION)
     $config['enable_hooks'] = TRUE;
 }
 
-$config['modules'][]  = MODPATH.'formo';
 $config['modules'][]  = MODPATH.'paypal';
 $config['modules'][]  = MODPATH.'ecmproject';
+
+if (file_exists('../config-local.php'))
+{
+    require_once('../config-local.php');
+}
