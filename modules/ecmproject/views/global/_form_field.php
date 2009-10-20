@@ -2,13 +2,15 @@
 if (!isset($fieldData['type'])) { $fieldData['type'] = 'text'; }
 $classRow = text::alternate('odd','even');
 
-$label = Kohana::lang('convention.registration_field_' . $field);
+$label = Kohana::lang((@$field_lang_prefix ? $field_lang_prefix : 'convention.registration_field_') . $field);
 if (isset($fieldData['required']) && $fieldData['required'])
     $label .= ' <span class="required">*</span>';
 
 
 switch ($fieldData['type'])
 {
+    case 'hidden':
+        break;
     case 'date':
         echo form::label($field.'-year', $label);
         break;
@@ -20,6 +22,14 @@ if ($hasError) { $attributes = 'class="fieldError"'; }
 
 switch ($fieldData['type'])
 {
+    case 'hidden':
+        echo form::hidden($field, $value);
+        break;
+    case 'bool':
+    case 'boolean':
+    case 'checkbox':
+        echo form::checkbox($field, $value, @$fieldData['selected'], $attributes);
+        break;
     case 'password':
         echo form::password($field, $value, $attributes);
         break;
