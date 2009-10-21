@@ -10,7 +10,6 @@ $label = Kohana::lang($field_lang_prefix . $field);
 if (isset($fieldData['required']) && $fieldData['required'])
     $label .= ' <span class="required">*</span>';
 
-
 switch ($fieldData['type'])
 {
     case 'radio':
@@ -70,8 +69,15 @@ switch ($fieldData['type'])
         $year = '';
         $month = '';
         $day = '';
-
-        if ($value && $value != '0000-00-00')
+		
+		/* Deal with cases where we feed in a UNIX timestamp value instead - Steve does this a lot (feed DB rows directly in as_array) */
+		if ($value && is_numeric($value))
+		{	
+			$year = date('Y', $value);
+            $month = date('n', $value);
+            $day = date('d', $value);		
+		}		
+        else if ($value && $value != '0000-00-00')
         {
             $date = strtotime($value);
             $year = date('Y', $date);
