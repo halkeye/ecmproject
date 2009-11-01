@@ -30,6 +30,14 @@ class Account_Model extends ORM
             'created'     => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => false,                     ),
             'login'       => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => false, 'null' => true,     ),
     );
+	
+	public $default_fields = array(
+            'email' => array( 'type'  => 'text', 'label' => 'Email', 'required'=>true 								),
+            'password' => array( 'type'  => 'text', 'label' => 'Password', 'required'=>true     					),
+			'confirm_password' => array( 'type'  => 'text', 'label' => 'Confirm Password', 'required'=>true    		),
+            'status' => array( 'type'  => 'select', 'label' => 'Status', 'required'=>false    						)
+    );
+	
     protected $ignored_columns = array('confirm_password', 'groups', 'permissions');
 
 	public function __construct($id = NULL)
@@ -147,11 +155,12 @@ class Account_Model extends ORM
 		if (isset($array->password) && isset($array->confirm_password) 
 				&& (!empty($array->password) || !empty($array->password) || $passRequired))
 		{
-			$array->add_rules('password', 'required');
-			
+			$array->add_rules('password', 'required');			
 			$array->add_rules('confirm_password', 'required');
 			$array->add_rules('confirm_password',  'matches[password]');
 		}
+		
+		$array->add_rules('status', 'required');
 		
 		/* Password is not required, but if it is...the new passwords should match. */		
 		return parent::validate($array, $save);
@@ -243,6 +252,18 @@ class Account_Model extends ORM
 			return Account_Model::ACCOUNT_STATUS_BANNED;	
 	
 	}	
+	
+	public function getVerifySelectList() {
+		return array('0' => 'Unverified', '1' => 'Confirmed', '99' => 'Banned');
+	}
+	
+	public function getTotalAccounts()
+	{
+		$db = new Database();
+		$result = $db->query('SELECT COUNT(*) as count FROM accounts');
+		
+		return (int) $result[0]->count;
+	}
 }
 
 /* End of file user.php */
