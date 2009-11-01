@@ -8,7 +8,7 @@ foreach ($menu as $m)
     }
 
     $attributes = array(
-            'class'=>'menuitem',
+            'class'=>'menuItem',
     );
     if ($m['url'] == url::current()) 
     {
