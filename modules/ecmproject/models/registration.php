@@ -40,19 +40,19 @@ class Registration_Model extends ORM
     );
 
     public $formo_defaults = array(
-            'gname' => array( 'type'  => 'text', 'required'=>true ),
-            'sname' => array( 'type'  => 'text', 'required'=>true    ),
-            'badge' => array( 'type'  => 'text', 'required'=>true    ),
-            'pass_id' => array( 'type'  => 'select', 'required'=>true    ),
-            'dob'   => array( 'type'  => 'date', 'required'=>true ),
-            'email' => array( 'type'  => 'text', 'required'=>true ),
-            'phone' => array( 'type'  => 'text', 'required' => true),
-            'cell'  => array( 'type'  => 'text', 'required' => false),
-            'address' => array( 'type'  => 'textarea', 'rows'  => 4, 'required' => true ),
-            'econtact'  => array( 'type'  => 'text', 'required' => true),
-            'ephone'  => array( 'type'  => 'text', 'required' => true),
-            'heard_from' => array( 'type'  => 'text', 'required'=>false ),
-            'attendance_reason' => array( 'type'  => 'textarea', 'rows'  => 10, 'required'=>false),
+            'gname' => array( 'type'  => 'text', 'label' => 'Given Name', 'required'=>true ),
+            'sname' => array( 'type'  => 'text', 'label' => 'Surname', 'required'=>true    ),
+            'badge' => array( 'type'  => 'text', 'label' => 'Badge', 'required'=>true    ),
+            'pass_id' => array( 'type'  => 'select', 'label' => 'Pass', 'required'=>true    ),
+            'dob'   => array( 'type'  => 'date', 'label' => 'Date of Birth', 'required'=>true ),
+            'email' => array( 'type'  => 'text', 'label' => 'Email', 'required'=>true ),
+            'phone' => array( 'type'  => 'text', 'label' => 'Phone', 'required' => true),
+            'cell'  => array( 'type'  => 'text', 'label' => 'Cell Phone', 'required' => false),
+            'address' => array( 'type'  => 'textarea', 'rows'  => 4, 'label' => 'Address', 'required' => true ),
+            'econtact'  => array( 'type'  => 'text', 'label' => 'Emergency Contact Name', 'required' => true),
+            'ephone'  => array( 'type'  => 'text', 'label' => 'Emergency Contact Phone', 'required' => true),
+            'heard_from' => array( 'type'  => 'text', 'label' => 'Heard from', 'required'=>false ),
+            'attendance_reason' => array( 'type'  => 'textarea', 'rows'  => 10, 'label' => 'Reason For Attendance', 'required'=>false),
     );
 
     public function __toString()
@@ -196,6 +196,7 @@ class Registration_Model extends ORM
     {
         $originalChanged = $this->changed;
         $this->changed = array_keys($this->changed);
+		$this->status = Registration_Model::STATUS_UNPROCESSED;
         $ret = parent::save();
 
         if ( ! empty($originalChanged))
@@ -215,6 +216,26 @@ class Registration_Model extends ORM
 
     /* for validation */
     public function _true() { return TRUE; }
+	
+	public function getTotalRegistrations($convention_id)
+	{
+		$cid = htmlspecialchars($convention_id);
+		$db = new Database();
+		$result = $db->query('SELECT COUNT(*) as count FROM registrations WHERE convention_id = ' . $cid);
+		
+		return (int) $result[0]->count;
+	}
+	
+	public function statusToString() {
+		if ($this->status == Registration_Model::STATUS_UNPROCESSED)
+			return 'UNPROCESSED';
+		else if ($this->status == Registration_Model::STATUS_PROCESSING )
+			return 'PROCESSING';
+		else if ($this->status == Registration_Model::STATUS_PAID)
+			return 'PAID';
+		else
+			return 'IN LIMBO';
+	}
 
 }
 
