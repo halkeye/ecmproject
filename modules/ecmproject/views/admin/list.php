@@ -1,34 +1,62 @@
-<p class='action'>
-<?php
-	echo form::open("admin/$cmd_target");
-	if (isset($commands))
-	{
-		foreach ($commands as $cmd):
-			print $cmd;
-		endforeach;
-	}	
-	
-	//This is so cheap.
-	if (isset($hack))
-		echo form::submit('submit', 'Change convention');
-		
-	echo form::close();
-?>
-</p>
-<!-- CONTENT: TODO: Renaming variables to something general. -->
-<table width='100%'>	
-	<tr>	
-		<?php 
-			foreach ($headers as $header): 
-				print "<th class='header' width=" . $header['width'] . ">" . $header['name'] . "</th>";
-			endforeach;
-			
-		?>
-	</tr>
+<div id="list">
 	<?php 
+		if (isset($crows) && isset($convention_id)) {
+			echo form::open("$callback");		
+	?>
+	
+		<p class='right'>
+			<label for="convention_id">Viewing Convention: </label>		
+			<?php echo form::dropdown('convention_id', $crows, $convention_id); ?>	
+			<button type='submit'>Go</button>			
+		</p>
+		
+	<?php
+			echo form::close();
+		} 
+	?>
+	
+	<?php echo form::open("admin/search"); ?>
+	<p class='floatRight'>
+		<label for='pass_search'>Search: </label> <input type='text' id='pass_search' name='pass_search'></input><button type='submit'>Search</button>	
+	</p>
+	<?php echo form::close(); ?>
 
-		foreach ($entries as $entry):
-			print $entry;
+	<p>
+		<?php echo html::anchor($createLink, $createText, $createText); ?>
+	</p>
+	
+	<table width='100%'>
+	<?php 
+		foreach ($rows as $row):
+			print $row;	
 		endforeach;	
 	?>
-</table>
+	</table>	
+	<p class='right'>
+		<?php 
+		
+		if (isset($convention_id))
+		{
+			$this->pagination = new Pagination(array(
+				'base_url'    => "$callback", // base_url will default to current uri
+				'uri_segment'    => "$convention_id", // pass a string as uri_segment to trigger former 'label' functionality
+				'total_items'    => $total_rows, // use db count query here of course
+				'items_per_page' => Admin_Controller::ROWS_PER_PAGE, // it may be handy to set defaults for stuff like this in config/pagination.php
+				'style'          => 'digg', // pick one from: classic (default), digg, extended, punbb, or add your own!				
+			));			
+		}
+		else
+		{
+			$this->pagination = new Pagination(array(
+			'base_url'    => "$callback", // base_url will default to current uri
+			//'uri_segment'    => "$convention_id", // pass a string as uri_segment to trigger former 'label' functionality
+			'total_items'    => $total_rows, // use db count query here of course
+			'items_per_page' => Admin_Controller::ROWS_PER_PAGE, // it may be handy to set defaults for stuff like this in config/pagination.php
+			'style'          => 'digg', // pick one from: classic (default), digg, extended, punbb, or add your own!
+		));	
+		}
+			
+		echo $this->pagination->render('digg');		
+		?>
+	</p>
+</div>
