@@ -1,22 +1,19 @@
 <?php
 
-class Pass_Model extends orm 
+class Pass_Model extends ORM
 {
     var $table_name = 'passes';
-    
-	/*
-    protected $table_columns = array (
-            'id'          		=> array ( 'type' => 'int',    'max' => 2147483647,    'unsigned' => true,    'sequenced' => true,  ),
-			'convention_id' 	=> array ( 'type' => 'int',    'max' => 2147483647,    'unsigned' => true),            
-            'name'        		=> array ( 'type' => 'string', 'length' => '55',  ),
-            'price'				=> array ( 'type' => 'string', 'null' => true,  ),
-			'isPurchasable'     => array ( 'type' => 'string', 'length' => '55',  ),
-            'minAge'			=> array ( 'type' => 'string', 'null' => true,  ),
-			'maxAge'			=> array ( 'type' => 'string', 'null' => true,  ),
-			'startDate'  	    => array ( 'type' => 'string', 'length' => '55',  ),
-            'endDate'			=> array ( 'type' => 'string', 'null' => true,  )			
+
+	public $default_fields = array(
+            'name' => array( 'type'  => 'text', 'label' => 'Pass Name', 'required'=>true ),
+            'price' => array( 'type'  => 'text', 'label' => 'Price', 'required'=>true    ),
+            'convention_id' => array( 'type'  => 'select', 'label' => 'Convention', 'required'=>true    ),
+            'startDate' => array( 'type'  => 'date', 'label' => 'Start Date', 'required'=>true    ),
+            'endDate'   => array( 'type'  => 'date', 'label' => 'End Date', 'required'=>true ),
+            'minAge' => array( 'type'  => 'text', 'label' => 'Minimum Age', 'required'=>true ),
+            'maxAge' => array( 'type'  => 'text', 'label' => 'Maximum Age', 'required' => true),
+            'isPurchasable'  => array( 'type'  => 'checkbox', 'label' => 'Purchasable', 'required' => false),
     );
-		*/
 		
 	public function __construct($id = NULL)
 	{
@@ -28,6 +25,21 @@ class Pass_Model extends orm
 		parent::__set($key, $value);
 	}
 
+	public function save()
+	{
+		/* Fill in optional fields.*/
+		if (!isset($this->minAge) || empty($this->minAge))
+			$this->minAge = 0;
+			
+		if (!isset($this->maxAge) || empty($this->maxAge))
+			$this->maxAge = 255;
+			
+		if (!isset($this->isPurchasable) || empty($this->isPurchasable))
+			$this->isPurchasable = 0;
+			
+		parent::save();	
+	}
+	
 	/* Only admin will modify passes anyways.*/
 	public function validate_admin(array & $array, $save = FALSE) 
 	{
@@ -37,6 +49,11 @@ class Pass_Model extends orm
 		$array->add_rules('convention_id', 'required');
 		$array->add_rules('name', 'required');
 		$array->add_rules('price', 'required'); //Also set
+		
+		// Some extra work is needed for this.
+		
+		$array->add_rules('startDate', 'required');
+		$array->add_rules('endDate', 'required');
 		$array->add_callbacks('startDate', array($this, '__validateISODate')); //Non-set start date will be set to today
 		$array->add_callbacks('endDate', array($this, '__validateISODate')); //Non-set end date will be set to convention end.
 		
@@ -59,19 +76,21 @@ class Pass_Model extends orm
 	
 	public function __validateISODate(Validation $array, $field)
 	{
-		$regex = '/(\d{2})-(\d{2})-(\d{4})/';		
-		
-		// PHP regex matching seems so damn picky relative to Java. Can't even match an escaped backslash -_-;
-		$string = str_replace("/", "-", $array->$field);
-		
-		//If the field is not set or empty
-		if (!isset($array->$field) || empty($array->$field))
-		{
-			//Do nothing. 
-		}		
-		else if ( ! preg_match($regex, $string) ) {
+		// previous to PHP 5.1.0 you would compare with -1, instead of false
+		if (($time = strtotime($array->$field)) === false) {
 			$array->add_error($field, 'invalid_date');
 		}
+		else
+			$this->startDate = $array->$field;
+	}
+	
+	public function getTotalPasses($convention_id)
+	{
+		$cid = htmlspecialchars($convention_id);
+		$db = new Database();
+		$result = $db->query('SELECT COUNT(*) as count FROM passes WHERE convention_id = ' . $cid);
+		
+		return (int) $result[0]->count;
 	}
 }
 
