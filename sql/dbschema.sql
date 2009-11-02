@@ -63,6 +63,7 @@ CREATE TABLE registrations (
    dob DATE NOT NULL,
    phone VARCHAR(15) NOT NULL,
    cell VARCHAR(15), -- Cell is an optional field, so don't require a field value.
+   address TEXT, -- Leave in while we do change. Remove later (or leave like heard_from/attendance reason)
    city VARCHAR(85) NOT NULL, 
    prov VARCHAR(50) NOT NULL,
    email VARCHAR(55) NOT NULL, -- Account email can be the same as this one...
