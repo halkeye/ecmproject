@@ -62,12 +62,13 @@ CREATE TABLE registrations (
    badge VARCHAR(55),
    dob DATE NOT NULL,
    phone VARCHAR(15) NOT NULL,
-   cell VARCHAR(15) NOT NULL,
-   address TEXT,
+   cell VARCHAR(15), -- Cell is an optional field, so don't require a field value.
+   city VARCHAR(85) NOT NULL, 
+   prov VARCHAR(50) NOT NULL,
    email VARCHAR(55) NOT NULL, -- Account email can be the same as this one...
    econtact VARCHAR(55) NOT NULL,
    ephone VARCHAR(15) NOT NULL,
-   heard_from TEXT,
+   heard_from TEXT, -- We'll leave these two here just in case.
    attendance_reason TEXT,
    status TINYINT NOT NULL, -- Status of account (unprocessed, processing, accepted, etc)
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE RESTRICT, -- Conventions shouldn't be deleted if in use already.
