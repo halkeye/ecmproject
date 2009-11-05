@@ -40,7 +40,7 @@ INSERT INTO `usergroups` VALUES(1, 'Registered', 'All registered users get this 
 INSERT INTO `usergroups` VALUES(2, 'Administrator', 'Admin Access');
 
 INSERT INTO `accounts_usergroups` VALUES (NULL,1,1), (NULL,2,1);
-INSERT INTO `permissions` VALUES (1,'can_do_stuff',NULL), (2,'admin',NULL)
+INSERT INTO `permissions` VALUES (1,'can_do_stuff',NULL), (2,'admin',NULL);
 INSERT INTO `usergroups_permissions` VALUES (NULL,1,1), (NULL, 2, 2);
 
 INSERT INTO `conventions` VALUES(1, 'Anime Evolution 2010', UNIX_TIMESTAMP('2009-07-31'), UNIX_TIMESTAMP('2010-08-31'), 'University of British Columbia');
