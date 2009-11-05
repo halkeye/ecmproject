@@ -104,8 +104,8 @@ class Registration_Model extends ORM
         }
 
         // Add Rules
-        $form->add_rules('heard_from', 'standard_text');
-        $form->add_rules('attendance_reason', array($this, '_true'));
+        //$form->add_rules('heard_from', 'standard_text');
+        //$form->add_rules('attendance_reason', array($this, '_true'));
         $form->add_rules('email', 'required', array('valid','email'));
         $form->add_rules('phone', array('valid', 'phone'));
         $form->add_rules('cell', array('valid', 'phone'));
