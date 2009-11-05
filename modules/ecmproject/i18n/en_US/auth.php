@@ -8,6 +8,7 @@ $lang = array(
         'existingEmail'             => 'Email address is already associated with another account',
         /* After emails are changed */
         'emailChangeSuccess'        => 'Email sucessfully changed, please check your email for verification email',
+        'sendVerificationMessage'   => 'Sending new vertification email to \'%s\'',
         /* Logout confirm button  */
         'logoutConfirmButton'       => 'Confirm Logout',
 

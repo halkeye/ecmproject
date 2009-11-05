@@ -44,9 +44,11 @@ class Auth_Core {
         $this->session     = Session::instance();
         /* User Stuff */
         $this->account    =  new StdClass;
-        if ($this->is_logged_in())
+        if ($this->is_logged_in() && $this->session->get('account'))
         {
-            $this->account     = unserialize($this->session->get('account'));
+            $this->account     = is_string($this->session->get('account')) ? 
+                unserialize($this->session->get('account')) : 
+                $this->session->get('account');
             $this->groups      = $this->session->get('account_groups');
             $this->permissions = $this->session->get('account_perms');
         }

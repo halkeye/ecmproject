@@ -190,7 +190,7 @@ class User_Controller extends Controller
         $account->sendValidateEmail($code);
 
         /* FIXME: Send Verification Message */
-        $this->addMessage(Kohana::lang('auth.sendVerificationMessage')); 
+        $this->addMessage(Kohana::lang('auth.sendVerificationMessage', $account->email)); 
         return url::redirect('/user/verifyMenu');
     }
 

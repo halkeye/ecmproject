@@ -93,7 +93,7 @@ class Account_Model extends ORM
         );
 
         $to      = $emailVars['email'];
-        $from    = Kohana::lang('ecmproject.outgoing_email_name');
+        $from    = Kohana::lang('ecmproject.outgoing_email_name') . ' <' . Kohana::lang('ecmproject.outgoing_email_address') . '>';
         $subject = Kohana::lang('ecmproject.registration_subject');
  
         $view = new View('user/register_email', $emailVars);
