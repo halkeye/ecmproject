@@ -114,7 +114,7 @@ class Registration_Model extends ORM
 
     public function _valid_pass_for_account(Validation $array, $field)
     {
-        $ageTime = strftime($array['dob']);
+        $ageTime = strtotime($array['dob']);
         $t = $this->convention->start_date; // Store current time for consistency
         $age = ($ageTime < 0) ? ( $t + ($ageTime * -1) ) : $t - $ageTime;
         $yearsOld = intval(floor($age / (60 * 60 * 24 * 365)));
