@@ -19,6 +19,7 @@ class Convention_Controller extends Controller
     {
         parent::__construct();
         $this->requireLogin();
+        $this->requireVerified();
         $this->addMenuItem(
                 array('title'=>'Add Registration', 'url'=>Convention_Controller::STEP1)
         );
