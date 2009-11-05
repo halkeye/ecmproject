@@ -29,6 +29,7 @@ class Convention_Controller extends Controller
     {
         $regs = Registration_Model::getByAccount($this->auth->get_user()->id);
         if (!$regs->count()) { url::redirect(Convention_Controller::STEP1); }
+        else { url::redirect('/convention/checkout'); }
 
         $data['conventions'] = array();
         foreach ($regs as $row) 

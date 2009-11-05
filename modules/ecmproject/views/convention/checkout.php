@@ -4,10 +4,11 @@
     <table width='100%'>    
         <tr>    
             <th width='40%'>For</th>
-            <th width='40%'>Item</th>
+            <th width='30%'>Item</th>
             <th width='10%'>Price</th>  
             <th width='5%'>Edit</th>
             <th width='5%'>Delete</th>
+            <th width='10%'>Status</th>  
         </tr><?php
 foreach ($registrations as $reg)
 {
@@ -18,6 +19,7 @@ foreach ($registrations as $reg)
     echo '<td>' . html::specialchars(sprintf('$%01.2F', $reg->pass->price)) . '</td>';
     echo '<td>'.html::anchor('/convention/editReg/'.$reg->id,   html::image('img/edit-copy.png', 'Edit this account')) . '</td>';
     echo '<td>'.html::anchor('/convention/deleteReg/'.$reg->id, html::image('img/edit-delete.png', 'Delete this account')) . '</td>';
+    echo '<td>'.$reg->statusToString().'</td>';
     echo '</tr>';
 }
 ?>
@@ -40,6 +42,7 @@ foreach ($registrations as $reg)
                 $regids = array();
                 foreach ($registrations as $reg)
                 {
+                    if ($reg->status != Registration_Model::STATUS_UNPROCESSED) { continue; }
                     $id = count($regids)+1;
                     $regids[] = $reg->id;
 
@@ -56,6 +59,11 @@ foreach ($registrations as $reg)
             <td><?php
                 echo form::open('/convention/checkoutOther', array('method'=>'get')); 
                 echo form::submit('', Kohana::lang('convention.checkout_with_other')); 
+                echo form::close();
+            ?></td>
+            <td><?php
+                echo form::open(Convention_Controller::STEP1, array('method'=>'get')); 
+                echo form::submit('', Kohana::lang('convention.checkout_button_add_registration')); 
                 echo form::close();
             ?></td>
         </tr>
