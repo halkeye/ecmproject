@@ -19,7 +19,7 @@ echo '<h1>'.html::specialchars(Kohana::lang('convention.registration_form_header
 echo '<p>'.html::specialchars(Kohana::lang('convention.form_required')) . '</p>';
 
 echo "<fieldset>";
-foreach (array('gname','sname', 'badge', 'dob', 'email', 'phone','cell', 'address', 'econtact', 'ephone', 'heard_from', 'attendance_reason') as $field)
+foreach (array('gname','sname', 'badge', 'dob', 'email', 'phone','cell', 'city', 'prov', 'econtact', 'ephone') as $field)
 {
     echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $form[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
 }

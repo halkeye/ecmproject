@@ -30,12 +30,13 @@ class Registration_Model extends ORM
             'dob'           => array ( 'type' => 'string', 'format' => '0000-00-00',                                     ),
             'phone'         => array ( 'type' => 'string', 'length' => '15'                                              ),
             'cell'          => array ( 'type' => 'string', 'length' => '15'                                              ),
-            'address'       => array ( 'type' => 'string',                   'null' => true                              ),
+            'city'          => array ( 'type' => 'string', 'length' => '85'                                              ),
+            'prov'          => array ( 'type' => 'string', 'length' => '50'                                              ),
             'email'         => array ( 'type' => 'string', 'length' => '55', 'null' => true                              ),
             'econtact'      => array ( 'type' => 'string', 'length' => '55', 'null' => true                              ),
             'ephone'        => array ( 'type' => 'string', 'length' => '15', 'null' => true                              ),
-            'heard_from'    => array ( 'type' => 'text',                     'null' => true,                             ),
-            'attendance_reason'    => array ( 'type' => 'text',              'null' => true,                             ),
+/*            'heard_from'    => array ( 'type' => 'text',                     'null' => true,                             ),
+            'attendance_reason'    => array ( 'type' => 'text',              'null' => true,                             ), */
             'status'      => array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                       ),
     );
 
@@ -48,11 +49,12 @@ class Registration_Model extends ORM
             'email' => array( 'type'  => 'text', 'label' => 'Email', 'required'=>true ),
             'phone' => array( 'type'  => 'text', 'label' => 'Phone', 'required' => true),
             'cell'  => array( 'type'  => 'text', 'label' => 'Cell Phone', 'required' => false),
-            'address' => array( 'type'  => 'textarea', 'rows'  => 4, 'label' => 'Address', 'required' => true ),
+            'city'  => array( 'type'  => 'text', 'label' => 'City', 'required' => false),
+            'prov'  => array( 'type'  => 'text', 'label' => 'Province', 'required' => false),
             'econtact'  => array( 'type'  => 'text', 'label' => 'Emergency Contact Name', 'required' => true),
             'ephone'  => array( 'type'  => 'text', 'label' => 'Emergency Contact Phone', 'required' => true),
-            'heard_from' => array( 'type'  => 'text', 'label' => 'Heard from', 'required'=>false ),
-            'attendance_reason' => array( 'type'  => 'textarea', 'rows'  => 10, 'label' => 'Reason For Attendance', 'required'=>false),
+            /*'heard_from' => array( 'type'  => 'text', 'label' => 'Heard from', 'required'=>false ),
+            'attendance_reason' => array( 'type'  => 'textarea', 'rows'  => 10, 'label' => 'Reason For Attendance', 'required'=>false), */
     );
 
     public function __toString()
