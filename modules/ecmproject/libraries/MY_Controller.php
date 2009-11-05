@@ -144,7 +144,7 @@ class Controller extends Controller_Core
         {
             /* FIXME: Add lang file */
             /* You can't go any furthur until email address is verified. */
-            $this->addError(Kohana::lang('auth.not_validated')); 
+            #$this->addError(Kohana::lang('auth.not_validated')); 
             $this->session->set('redirected_from', url::current());
             url::redirect('/user/verifyMenu');
             return;
