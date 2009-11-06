@@ -29,5 +29,26 @@ $lang = array(
         'registration_field_ephone'       => 'Emergency Contact Phone',
         'registration_field_heard_from'   => 'Heard from',
         'registration_field_attendance_reason' => 'Reason For Attendance',
+        'registration_field_agree_toc'    => 'I have read and agreed to the <b>Terms and Conditions</b>',
+
+        'registration_tac_header' => 'Terms And Conditions',
+        'registration_tac_desc'   => '',
+        'registration_tac'     => <<<EOT
+TERMS AND CONDITIONS
+
+By submitting payment, I acknowledge that I understand the intent thereof, and I hereby agree to absolve and hold blameless AE Convention Corp/Anime Evolution and its subsets, sponsors, cooperating organization, other parties connected with this event in any way, individually or collectively, and any of its members, from and against any blame or liability for injury, harm, loss, inconvenience or damage hereby suffered or sustained as a result of participation in the Anime Evolution event or any activities associated herewith.
+
+I hereby consent to and permit Anime Evolution and its staff to contact any emergency services and/or my emergency contact in the event of any injury, illness, or emergencies as deemed necessary by Anime Evolution and its staff.
+
+I also acknowledge that I have read and agreed to the registration and convention policies and will be bound by it.
+
+I also give full permission for the use of my likeness in photography or videography in connection with this event.
+
+Anime Evolution and its organizers will not be held liable should the Anime Evolution 2010 convention event fail to happen due to events beyond the control of Anime Evolution staff including but not limited to natural disasters, states of emergency, illness or incapacitation of Anime Evolution staff, venue changes or delays in the convention.
+
+I understand that Anime Evolution must often prepay for services and as a result may not have the funds to refund all pre-registrants in the event of a cancellation, and that refunds will then be dealt with on a case-by-case basis.
+
+Anime Evolution is a private event, and it reserves the right to reject or remove attendees at its organizers’ discretion.
+EOT
 
 );

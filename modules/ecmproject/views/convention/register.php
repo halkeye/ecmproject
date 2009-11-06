@@ -35,6 +35,20 @@ echo '<fieldset>';
     echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $form[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
 }
 echo '</fieldset>';
+
+echo '<h1>'.html::specialchars(Kohana::lang('convention.registration_tac_header')) . '</h1>';
+echo '<p>'.html::specialchars(Kohana::lang('convention.registration_tac_desc')) . '</p>';
+
+echo '<fieldset>';
+echo form::textarea(array('rows'=>15, 'style'=>'width:95%; margin-left: 2%;'), Kohana::lang('convention.registration_tac'));
+{
+    $field = 'agree_toc';
+    $fields[$field]['type'] = 'boolean';
+    $fields[$field]['required'] = true;
+    if (!isset($form[$field])) $form[$field]=0;
+    echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $form[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
+}
+echo '</fieldset>';
         
 echo "<fieldset class='left'>";
 echo form::submit(null,Kohana::lang('convention.registration_submit'));

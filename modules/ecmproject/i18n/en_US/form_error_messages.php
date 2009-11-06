@@ -65,4 +65,9 @@ $lang = array(
         'required' => 'You must supply a date of birth.',
         'default' => 'Invalid Input for date of birth.',
     ),
+ 'agree_toc' => Array
+    (
+        'required' => 'You must agree to the Terms and Conditions to continue.',
+        'default' => 'You must agree to the Terms and Conditions to continue.',
+    ),
 );

@@ -5,6 +5,8 @@ class Registration_Model extends ORM
     const STATUS_UNPROCESSED = 0;
     const STATUS_PROCESSING  = 1; // Waiting for Paypal to respond
     const STATUS_PAID        = 99; // Fully working and paid
+    
+    protected $ignored_columns = array('agree_toc');
 
     /* On unserialize never check the db */
     protected $reload_on_wakeup = false;
@@ -106,6 +108,10 @@ class Registration_Model extends ORM
         // Add Rules
         //$form->add_rules('heard_from', 'standard_text');
         //$form->add_rules('attendance_reason', array($this, '_true'));
+        if (isset($form['agree_toc']))
+        {
+            $form->add_rules('agree_toc', 'required');
+        }
         $form->add_rules('email', 'required', array('valid','email'));
         $form->add_rules('phone', array('valid', 'phone'));
         $form->add_rules('cell', array('valid', 'phone'));

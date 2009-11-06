@@ -99,6 +99,9 @@ class Convention_Controller extends Controller
                     unset($post[$fieldName.'-day']);
                 }
             }
+
+            if (!isset($post['agree_toc']))
+                $post['agree_toc'] = false;
             if ($reg->validate($post))
             {
                 $reg->save();
