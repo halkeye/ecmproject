@@ -43,6 +43,9 @@ switch ($fieldData['type'])
         break;
     case 'bool':
     case 'boolean':
+        #selected should be value, value should be if $fieldData['value]'
+        echo form::checkbox($field, 1, $value, $attributes);
+        break;
     case 'checkbox':
         echo form::checkbox($field, $value, @$fieldData['selected'], $attributes);
         break;

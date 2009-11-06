@@ -6,7 +6,7 @@ if(isset($row)) { ?>
 	<td><?php print $row->gname; ?></td>
 	<td><?php print $row->sname; ?></td>	
 	<td><?php print $row->email; ?></td>
-	<td><?php print $row->status; ?></td>	
+	<td><?php print $row->statusToString(); ?></td>	
 	<?php
 		foreach ($actions as $action): 		
 			print '<td>' . $action; '</td>';

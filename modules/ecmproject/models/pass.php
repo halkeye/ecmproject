@@ -12,7 +12,7 @@ class Pass_Model extends ORM
             'endDate'   => array( 'type'  => 'date', 'label' => 'End Date', 'required'=>true ),
             'minAge' => array( 'type'  => 'text', 'label' => 'Minimum Age', 'required'=>true ),
             'maxAge' => array( 'type'  => 'text', 'label' => 'Maximum Age', 'required' => true),
-            'isPurchasable'  => array( 'type'  => 'checkbox', 'label' => 'Purchasable', 'required' => false),
+            'isPurchasable'  => array( 'type'  => 'boolean', 'label' => 'Purchasable', 'required' => false),
     );
 		
 	public function __construct($id = NULL)

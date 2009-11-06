@@ -482,6 +482,7 @@ class Admin_Controller extends Controller
 		
 		if ($post = $this->input->post())
 		{
+            $pass->isPurchasable = isset($post['isPurchasable']) && $post['isPurchasable'];
 			$post['startDate'] = Admin_Controller::parseSplitDate($post, 'startDate');
 			$post['endDate'] = Admin_Controller::parseSplitDate($post, 'endDate');
 			
