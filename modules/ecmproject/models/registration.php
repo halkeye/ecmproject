@@ -180,6 +180,7 @@ class Registration_Model extends ORM
         return ORM::Factory('pass')
             ->where('enddate >',   time())
             ->where('startdate <', time())
+            ->where('isPurchasable', 1)
             ->where('convention_id', $this->convention_id);
     }
 
