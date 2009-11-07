@@ -256,7 +256,11 @@ class Registration_Model extends ORM
     {
         $originalChanged = $this->changed;
         $this->changed = array_keys($this->changed);
-		$this->status = Registration_Model::STATUS_UNPROCESSED;
+		
+		//Only set status to UNPROCESSED if it's a new registration! (Else it'll keep blanking my status updates).
+		if ($this->id == 0)
+			$this->status = Registration_Model::STATUS_UNPROCESSED;
+			
         $ret = parent::save();
 
         if ( ! empty($originalChanged))
