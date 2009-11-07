@@ -224,7 +224,48 @@ class Admin_Controller extends Controller
 				'total_rows' => $total_rows)
 			);	
 	}
+	
+	function managePayments($rid = NULL)
+	{
+		if (!isset($rid) || !is_numeric($rid))
+			die('Get out of here!');
+			
+		//Get registration and then get associated payment entries (if any)	
+		$reg = ORM::Factory('Registration')->find($rid);
+		if (! $reg->loaded )
+		{
+			$this->addError('Invalid registration. Maybe someone deleted it when you weren\'t looking?');
+			url::redirect('manageRegistrations');
+		}		
 
+		$rows = ORM::Factory('Payment')->where("register_id=$rid")->find_all();
+		$pass = ORM::Factory('Pass')->find($reg->pass_id);
+		if (count($rows) == 0)
+		{
+			$this->addError("This person hasn't paid anything yet!");
+		}		
+
+		$this->view->title = "Administration: Manage Payments";
+		$this->view->heading = $reg->gname . ' ' . $reg->sname . ' (' . $reg->badge . ') ';
+		$this->view->subheading = $pass->name;
+		
+		$data['entries'][0] = new View('admin/ListItems/PaymentEntry');
+		foreach ($rows as $row)
+		{
+			$data['actions']['edit'] = html::anchor('admin/editPass/'. $row->id, html::image('img/edit-copy.png', Kohana::lang('admin.edit_account')));
+			$data['actions']['delete'] = html::anchor('admin/deletePass/' . $row->id, html::image('img/edit-delete.png', Kohana::lang('admin.delete_account')));			
+			$data['entries'][$row->id] = new View('admin/ListItems/PaymentEntry', array('row' => $row, 'actions' => $data['actions']));				
+		}			
+			
+		$this->view->content = new View('admin/PaymentList', array(
+				'reg' => $reg->as_array(),
+				'pass' => $pass->as_array(),
+				'callback' => 'admin/managePayments', 
+				'createText' => 'Create Payment',
+				'createLink' => "admin/createPayment/$rid",
+				'rows' => $data['entries'])
+			);
+	}
 	
 	function createAccount() 
 	{
@@ -393,6 +434,184 @@ class Admin_Controller extends Controller
 		}	
 	}
 	
+	/* Step 1 */
+	function createRegistration() {
+		// Set headers
+		$this->view->title = "Administration: Create Registration";
+		$this->view->heading = "Administration: Create Registration";
+		$this->view->subheading = "Create a registration for a convention.";
+	
+		$reg = ORM::factory('Registration');
+		$crows = ORM::factory('Convention')->find_all()->select_list('id', 'name');	
+		
+		$fields = $reg->formo_defaults;
+		$fields['convention_id'] = array( 'type'  => 'select', 'label' => 'Convention', 'required'=>true );
+		$fields['convention_id']['values'] = $crows;
+	
+		if ($post = $this->input->post())
+		{
+			//Validate valid convention id, validate account - create if not exist email. Then pass it on as a POST.
+			if (Convention_Model::validConvention($post['convention_id']) && isset($post['email']) && !empty($post['email']))
+			{
+				$aid = Account_Model::createAccount($post['email']);
+				if ($aid != -1)
+					url::redirect("admin/createRegistration2/" . $post['convention_id'] . "/$aid"); //Move to next STEP
+				else
+					$this->addError("Oops. An internal error occured. Try again.");
+			}
+						
+			$this->addError("One or more fields are blank!");	//pass_field_reg_error_convention_id_missing	
+			$this->view->content = new View('admin/Registration', array(
+				'row' => $post,
+				'fields' => $fields,
+				'callback' => 'createRegistration'
+			));
+		}
+		else 
+		{
+			$this->view->content = new View('admin/Registration', array(
+				'row' => $reg->as_array(),
+				'fields' => $fields,
+				'callback' => 'createRegistration'
+			));		
+		}	
+	}
+	
+	/* Step 2 */
+	function createRegistration2($cid = NULL, $aid = NULL) {
+	
+		//Not allowed to be lazy in checking input here.
+		if ( (!isset($cid) || !is_numeric($cid) || $cid <= 0) || (!isset($aid) || !is_numeric($aid) || $aid <= 0))
+			die("You're not allowed to be here!");
+			
+		$reg = ORM::factory('Registration');
+		$crows = ORM::factory('Convention')->find_all()->select_list('id', 'name');	
+		$fields = $reg->formo_defaults;
+		
+		$fields['pass_id']['values'] = ORM::Factory('Pass')->where("convention_id=$cid")->find_all()->select_list('id', 'name');
+		
+		if ($post = $this->input->post())
+		{
+			$fieldName = 'dob';
+			$post[$fieldName] = implode('-', 
+                        array(
+                            @sprintf("%04d", $post[$fieldName . '-year']), 
+                            @sprintf("%02d", $post[$fieldName . '-month']), 
+                            @sprintf("%02d", $post[$fieldName . '-day'])
+                        )
+                    );		
+		
+			if ($reg->validate_admin($post))
+			{			
+				$reg->convention_id = $cid;
+				$reg->account_id = $aid;
+				$reg->save();				
+				if ($reg->saved) {
+					$this->addMessage('Created a newly minted registration for: ' . $reg->gname . ' ' . $reg->sname);
+					url::redirect('admin/manageRegistrations');
+				}
+				else
+				{
+					$this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
+				}
+			}
+						
+			$errorMsg = 'Oops. You entered something bad! Please fix it! <br />';				
+			$errors = $post->errors('form_error_messages');
+			foreach ($errors as $error)
+				$errorMsg = $errorMsg . ' ' . $error . '<br />';					
+		
+			$this->addError($errorMsg);
+			
+			$this->view->content = new View('admin/Registration2', array(
+				'row' => $post,
+				'fields' => $fields,
+				'callback' => "createRegistration2/$cid/$aid"
+			));
+		} else {
+		
+			/* Full registration at this step. */
+			$this->view->content = new View('admin/Registration2', array(
+					'row' => $reg->as_array(),
+					'fields' => $fields,
+					'callback' => "createRegistration2/$cid/$aid"
+				));
+		}
+	}
+	
+	/*
+	* $rid - Registration ID to add payment to. The rest can be determined using the registration ID.
+	*/
+	function createPayment($rid = NULL)
+	{
+		if ($rid == NULL || !is_numeric($rid))
+			die('Get out of here!');
+			
+		$pay = ORM::Factory('Payment'); 
+		$reg = ORM::Factory('Registration')->find($rid);
+		$pass = ORM::Factory('Pass')->find($reg->pass_id);
+		
+		if (!$reg->loaded)
+			die('Unable to retrieve registration');
+		
+		$fields = $pay->default_fields;
+		
+		//Move to model.
+		$fields['type']['values'] = array('instant' => 'Instant (Paypal)', 'mail' => 'Mail', 'inperson' => 'In Person');
+		$fields['payment_status']['values'] = array('Pending' => 'Pending', 'Completed' => 'Completed', 'Denied' => 'Denied');	
+		
+		//Do dropdown for payment type. What kind of selections can we have?		
+		if ($post = $this->input->post())
+		{
+			if ($pay->validate_admin($post))
+			{				
+				$pay->register_id = $rid;
+				$pay->save();
+				if ($pay->saved) {
+					$this->addMessage('Payment created for the amount of: ' . $pay->mc_gross . ' (' . $pay->type . ') ');
+					
+					/* Check status of payment for registration */
+					print ($pay->getTotal() >= $pass->price);
+				
+					if ($pay->getTotal() >= $pass->price) {
+						$reg->status = Registration_Model::STATUS_PAID;
+						print $reg->status;
+						$reg->save();
+						print $reg->saved;
+					}
+					
+					//url::redirect("admin/managePayments/$rid");
+				}
+				else
+				{
+					$this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
+				}
+			}		
+			
+			$errorMsg = 'Oops. You entered something bad! Please fix it! <br />';				
+			$errors = $post->errors('form_error_messages');
+			foreach ($errors as $error)
+				$errorMsg = $errorMsg . ' ' . $error . '<br />';					
+		
+			$this->addError($errorMsg);
+
+			//Do validation here.
+			$this->view->content = new View('admin/Payment', array(
+					'row' => $post,
+					'fields' => $fields,
+					'callback' => "createPayment/$rid"
+				));
+		}
+		else
+		{
+			$this->view->content = new View('admin/Payment', array(
+					'row' => $pay->as_array(),
+					'fields' => $fields,
+					'callback' => "createPayment/$rid"
+				));
+		}
+	}	
+	
 	function editAccount($id = NULL) {	
 		// Set headers
 		$this->view->title = "Administration: Edit an Account";
@@ -482,7 +701,6 @@ class Admin_Controller extends Controller
 		
 		if ($post = $this->input->post())
 		{
-            $pass->isPurchasable = isset($post['isPurchasable']) && $post['isPurchasable'];
 			$post['startDate'] = Admin_Controller::parseSplitDate($post, 'startDate');
 			$post['endDate'] = Admin_Controller::parseSplitDate($post, 'endDate');
 			
@@ -739,5 +957,5 @@ class Admin_Controller extends Controller
 		}
 		
 		return $multiplier;	
-	}
+	}	
 }
