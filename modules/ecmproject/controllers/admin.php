@@ -284,7 +284,7 @@ class Admin_Controller extends Controller
 				$acct->save();				
 				if ($acct->saved) {
 					$this->addMessage('Created a newly minted account with email: ' . $acct->email);
-					url::redirect('admin/manageAccount');
+					url::redirect('admin/manageAccounts');
 				}
 				else
 				{
