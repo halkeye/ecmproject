@@ -92,6 +92,13 @@ class Pass_Model extends ORM
 		
 		return (int) $result[0]->count;
 	}
+	
+	//Get all passes related to the convention regardless of status.
+	public function getAllPasses($convention_id)
+	{
+		$cid = htmlspecialchars($convention_id);
+		return ORM::Factory('Pass')->where("convention_id=$convention_id")->find_all();
+	}
 }
 
 /* End of file pass.php */

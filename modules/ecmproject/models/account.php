@@ -264,6 +264,39 @@ class Account_Model extends ORM
 		
 		return (int) $result[0]->count;
 	}
+	
+	/**
+	* Given an email address, create an account if it does not already exist with the email as the password.
+	* Return the id of the account (new or existing).
+	*/
+	public function createAccount($email)
+	{
+		$account = ORM::Factory('Account');
+		$account->email = $email; //Race condition aside, we know it won't be in the DB.	
+		$account->password = $account->_encryptValue($email);
+		
+		try {
+		
+			$account->save();
+			if ($account->saved)			
+				return $account->id;
+			
+		} catch (Exception $exception)
+		{
+			//Do nothing. Assume that it already exists (the account).
+		}
+			
+		/* Email column has restraint UNIQUE. We will either get 0 ... 1 entries. */
+		$results = ORM::Factory('Account')->where("email='$email'")->find_all();
+		if (count($results) > 0)
+		{
+			return $results[0]->id;
+		}
+		else
+		{
+			return -1;
+		}		
+	}
 }
 
 /* End of file user.php */

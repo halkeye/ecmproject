@@ -92,6 +92,34 @@ class Registration_Model extends ORM
         return $ret;
     }
 
+	/**
+     * Validates and optionally saves a new user record from an array. Same as validate minus pass restriction checking.
+     *
+     * @param  array    values to check
+     * @param  boolean  save[Optional] the record when validation succeeds
+     * @return boolean
+     */
+    public function validate_admin(array & $array, $save = FALSE)
+    {
+        // Initialise the validation library and setup some rules
+        $array = Validation::factory($array);
+        // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
+        $this->addValidationRules_admin($array);
+
+        /* Keep track of what really changed so we don't update fields we havn't changed */
+        $realChanged = $this->changed;
+        foreach ($array->safe_array() as $field=>$value)
+        {
+            if ($this->$field != $value) 
+            {
+                $realChanged[$field] = $this->$field; 
+            }
+        }
+        $ret = parent::validate($array, $save);
+        $this->changed = $realChanged;
+        return $ret;
+    }
+	
     private function addValidationRules($form)
     {
         $form->pre_filter('trim');
@@ -119,7 +147,30 @@ class Registration_Model extends ORM
         $form->add_rules('dob', array('valid', 'date'));
         $form->add_callbacks('pass_id', array($this, '_valid_pass_for_account'));
     }
+	private function addValidationRules_admin($form)
+    {
+        $form->pre_filter('trim');
 
+        $fields = $this->formo_defaults;
+        foreach ($fields as $field => $fieldData)
+        {
+            if (isset($fieldData['required']) && $fieldData['required'])
+            {
+                $form->add_rules($field, 'required');
+            }
+        }
+
+        // Add Rules
+        $form->add_rules('heard_from', 'standard_text');
+        $form->add_rules('attendance_reason', array($this, '_true'));
+        $form->add_rules('email', 'required', array('valid','email'));
+        $form->add_rules('phone', array('valid', 'phone'));
+        $form->add_rules('cell', array('valid', 'phone'));
+        $form->add_rules('ephone', array('valid', 'phone'));
+        $form->add_rules('dob', array('valid', 'date'));
+        //$form->add_callbacks('pass_id', array($this, '_valid_pass_for_account'));
+    }
+	
     public function _valid_pass_for_account(Validation $array, $field)
     {
         $ageTime = strtotime($array['dob']);

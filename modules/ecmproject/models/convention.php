@@ -70,4 +70,15 @@ class Convention_Model extends ORM
 		
 		return (int) $result[0]->count;
 	}
+	public function validConvention($cid)
+	{
+		if (!is_numeric($cid) || $cid == -1)
+			return false;
+		
+		$res = ORM::factory('Convention')->find($cid);
+		if ($res->loaded)
+			return true;
+		else
+			return false;		
+	}
 }
