@@ -772,12 +772,6 @@ class Admin_Controller extends Controller
 		{			
 			$post['start_date'] = Admin_Controller::parseSplitDate($post, 'start_date');
 			$post['end_date'] = Admin_Controller::parseSplitDate($post, 'end_date');
-								
-			/*
-			foreach ($post as $k => $v):
-				print "$k => $v <br />";
-			endforeach;
-			*/
 		
 			if ($conv->validate_admin($post, false, true))
 			{			
@@ -786,7 +780,7 @@ class Admin_Controller extends Controller
  			
 				$conv->save();				
 				if ($conv->saved) {
-					$this->addMessage('Created a newly minted convention named ' . $conv->name);
+					$this->addMessage('Successfully changed the convention (now) named ' . $conv->name);
 					url::redirect('admin/manageConventions');
 				}
 				else
@@ -805,7 +799,7 @@ class Admin_Controller extends Controller
 			$this->view->content = new View('admin/Convention', array(
 				'row' => $post,
 				'fields' => $fields,
-				'callback' => 'editConvention'
+				'callback' => "editConvention/$id"
 			)); 
 					
 		} 
@@ -814,7 +808,7 @@ class Admin_Controller extends Controller
 			$this->view->content = new View('admin/Convention', array(
 				'row' => $conv->as_array(),
 				'fields' => $fields,
-				'callback' => 'editonvention'
+				'callback' => "editConvention/$id"
 			));
 		}	
 	}
@@ -827,16 +821,21 @@ class Admin_Controller extends Controller
 	
 	function deleteConvention($id = NULL)
 	{
-		Admin_Controller::__delete($id, 'Convention', 'deleteConvention');
+		Admin_Controller::__delete($id, 'Convention', 'deleteConvention', 'manageConventions');
 	}
 	
 	function deleteAccount($id = NULL) {
-		Admin_Controller::__delete($id, 'Account', 'deleteAccount');
+		Admin_Controller::__delete($id, 'Account', 'deleteAccount', 'manageAccounts');
 	}
 	
 	function deletePass($id = NULL)
 	{
-		Admin_Controller::__delete($id, 'Pass', 'deletePass');
+		Admin_Controller::__delete($id, 'Pass', 'deletePass', 'managePasses');
+	}
+	
+	function deleteRegistration($id = NULL)
+	{
+		Admin_Controller::__delete($id, 'Registration', 'deleteRegistration', 'manageRegistrations');
 	}
 	
 	function search()
@@ -846,7 +845,7 @@ class Admin_Controller extends Controller
 	}
 	
 	/* Common use functions */
-	public function __delete($id, $entityType, $callback)
+	public function __delete($id, $entityType, $callback, $return)
 	{
 		/* If no ID or bad ID defined, kill it with fire. */
 		if ($id == NULL || !is_numeric($id))
@@ -868,18 +867,18 @@ class Admin_Controller extends Controller
 				if ($row->delete()) 
 				{
 					$this->addMessage($entityName . " was deleted. D:");				
-					url::redirect('admin/manage' . $entityType . 's');
+					url::redirect("admin/$return");
 				}
 				else
 				{
 					$this->addError("Failed to delete convention with ID: $id! Please try again.");				
-					url::redirect('admin/manage' . $entityType . 's');
+					url::redirect("admin/$return");
 				}	
 			}		
 			/* User changed mind. */
 			else if ($val = $this->input->post('No'))
 			{
-				url::redirect('admin/manage' . $entityType . 's');
+				url::redirect("admin/$return");
 			}
 
 			$this->view->content = new View('admin/delete', array(
@@ -891,7 +890,7 @@ class Admin_Controller extends Controller
 		}
 		else {
 			$this->addMessage(Kohana::lang('admin.convention_not_exist'));	
-			url::redirect('admin/manage' . $entityType . 's');
+			url::redirect("admin/$return");
 		}
 	}
 	
