@@ -37,8 +37,8 @@ class Registration_Model extends ORM
             'email'         => array ( 'type' => 'string', 'length' => '55', 'null' => true                              ),
             'econtact'      => array ( 'type' => 'string', 'length' => '55', 'null' => true                              ),
             'ephone'        => array ( 'type' => 'string', 'length' => '15', 'null' => true                              ),
-/*            'heard_from'    => array ( 'type' => 'text',                     'null' => true,                             ),
-            'attendance_reason'    => array ( 'type' => 'text',              'null' => true,                             ), */
+            'heard_from'    => array ( 'type' => 'text',                     'null' => true,                             ),
+            'attendance_reason'    => array ( 'type' => 'text',              'null' => true,                             ), 
             'status'      => array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                       ),
     );
 
@@ -261,6 +261,7 @@ class Registration_Model extends ORM
 		if ($this->id == 0)
 			$this->status = Registration_Model::STATUS_UNPROCESSED;
 			
+			
         $ret = parent::save();
 
         if ( ! empty($originalChanged))
@@ -290,13 +291,18 @@ class Registration_Model extends ORM
 		return (int) $result[0]->count;
 	}
 	
-	public function regStatusToString() 
+	public function statusToString()
+	{
+		return Registration_Model::regStatusToString($this->status);
+	}
+	
+	public function regStatusToString($status) 
     {
-		if ($this->status == Registration_Model::STATUS_UNPROCESSED)
+		if ($status == Registration_Model::STATUS_UNPROCESSED)
 			return 'UNPROCESSED';
-		else if ($this->status == Registration_Model::STATUS_PROCESSING )
+		else if ($status == Registration_Model::STATUS_PROCESSING )
 			return 'PROCESSING';
-		else if ($this->status == Registration_Model::STATUS_PAID)
+		else if ($status == Registration_Model::STATUS_PAID)
 			return 'PAID';
 		else
 			return 'IN LIMBO';
