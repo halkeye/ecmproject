@@ -17,10 +17,10 @@ INSERT INTO `usergroups` VALUES(1, 'Registered', 'All registered users get this 
 INSERT INTO `usergroups` VALUES(2, 'Administrator', 'Admin Access');
 INSERT INTO `permissions` VALUES (1,'can_do_stuff',NULL), (2,'admin',NULL);
 INSERT INTO `usergroups_permissions` VALUES (NULL,1,1), (NULL, 2, 2);
-   
+
 -- Status of account (unverified, verified, banned, etc)
 -- reg_status TINYINT NOT NULL,
-INSERT INTO `accounts` SET 
+INSERT INTO `accounts` SET
     id         = 1,
     email      = 'halkeye@gmail.com',
     password   = 'c1537a66964e2acbb3a8232a20b6d8338cb206c5',
@@ -39,7 +39,7 @@ INSERT INTO `accounts` SET
     login      = 1249888291
 ;
 -- Heather from ae reg
-INSERT INTO `accounts` SET 
+INSERT INTO `accounts` SET
     id         = 3,
     email      = 'queens_net@yahoo.ca',
     password   = 'f7a2752cdd4239075c6a8241c8a8ce77c0d3fb8f',
@@ -68,12 +68,12 @@ INSERT INTO registrations SET
     dob   = '1982-12-18',
     phone = '604-555-5555',
     cell  = '604-555-6666',
-    address = 'This is my address',
     email = 'halkeye@gmail.com',
     econtact = 'ME ME ME ME',
     ephone = '604-555-7777',
     heard_from = 'The best person ever!!!! GAVIN!!!!',
-    attendance_reason = 'Um, what goes here?';
+    attendance_reason = 'Um, what goes here?',
+    status=0;
 
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 /*!40000 ALTER TABLE `usergroups` ENABLE KEYS */;
