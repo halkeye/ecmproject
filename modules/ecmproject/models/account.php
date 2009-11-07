@@ -287,7 +287,7 @@ class Account_Model extends ORM
 		}
 			
 		/* Email column has restraint UNIQUE. We will either get 0 ... 1 entries. */
-		$results = ORM::Factory('Account')->where("email='$email'")->find_all();
+		$results = ORM::Factory('Account')->where('email',$email)->find_all();
 		if (count($results) > 0)
 		{
 			return $results[0]->id;
