@@ -6,7 +6,7 @@ if(isset($row)) { ?>
 	<td><?php print $row->gname; ?></td>
 	<td><?php print $row->sname; ?></td>	
 	<td><?php print $row->email; ?></td>
-	<td><?php print $row->statusToString(); ?></td>	
+	<td><?php print html::anchor('admin/managePayments/'. $row->id, $row->regStatusToString(), $row->status); ?></td>	
 	<?php
 		foreach ($actions as $action): 		
 			print '<td>' . $action; '</td>';
