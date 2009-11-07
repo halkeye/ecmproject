@@ -290,7 +290,7 @@ class Registration_Model extends ORM
 		return (int) $result[0]->count;
 	}
 	
-	public function statusToString() 
+	public function regStatusToString() 
     {
 		if ($this->status == Registration_Model::STATUS_UNPROCESSED)
 			return 'UNPROCESSED';
