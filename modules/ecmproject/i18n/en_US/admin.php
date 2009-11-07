@@ -32,5 +32,12 @@ $lang = array(
 		'pass_field_conv_name' => 'Convention Name', 
 		'pass_field_conv_start_date' => 'Start Date', 
 		'pass_field_conv_end_date' => 'End Date', 
-		'pass_field_conv_location' => 'Location'
+		'pass_field_conv_location' => 'Location',
+		'reg_field_convention_id' => 'Convention', 
+		'reg_field_error_convention_id_missing' => 'You need to select a convention first!',
+		'payment_field_type' => 'Payment Type',
+		'payment_field_txn_id' => 'Transaction ID', 
+		'payment_field_receipt_id' => 'Reciept ID',
+		'payment_field_mc_gross' => 'Amount',
+		'payment_field_payment_status' => 'Payment Status'
 );
