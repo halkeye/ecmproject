@@ -1,4 +1,4 @@
-DROP DATABASE ecms;
+﻿DROP DATABASE ecms;
 CREATE DATABASE ecms;
 USE ecms;
 
@@ -63,9 +63,8 @@ CREATE TABLE registrations (
    dob DATE NOT NULL,
    phone VARCHAR(15) NOT NULL,
    cell VARCHAR(15), -- Cell is an optional field, so don't require a field value.
-   address TEXT, -- Leave in while we do change. Remove later (or leave like heard_from/attendance reason)
-   city VARCHAR(85) NOT NULL, 
-   prov VARCHAR(50) NOT NULL,
+   city VARCHAR(85),
+   prov VARCHAR(50),
    email VARCHAR(55) NOT NULL, -- Account email can be the same as this one...
    econtact VARCHAR(55) NOT NULL,
    ephone VARCHAR(15) NOT NULL,
@@ -87,11 +86,11 @@ CREATE TABLE payments (
    last_modified INT UNSIGNED, -- Track the last account to add/edit a payment manually to allow for reg. manager/board to give out a badge, fix payment, etc. NULL if last person who touched it wasn't human. Think of a better solution.
    type VARCHAR(55) NOT NULL,
    mc_gross DECIMAL(10,2) NOT NULL,
-   payer_id VARCHAR(13) NOT NULL,
+   payer_id VARCHAR(13),
    payment_date INT UNSIGNED NOT NULL,
    payment_status VARCHAR(17) NOT NULL,
-   txn_id VARCHAR(17) NOT NULL, -- txn_id is 17 characters alphanumeric.
-   receipt_id VARCHAR(19) NOT NULL, -- reciept id is in form XXXX-XXXX-XXXX-XXXX (19 characters)
+   txn_id VARCHAR(17), -- txn_id is 17 characters alphanumeric.
+   receipt_id VARCHAR(19), -- reciept id is in form XXXX-XXXX-XXXX-XXXX (19 characters)
    mod_time INT UNSIGNED,
    FOREIGN KEY (register_id) REFERENCES registrations(id) ON DELETE RESTRICT, -- Registrations with payment information shouldn't be deleted.
    FOREIGN KEY (last_modified) REFERENCES accounts(id) ON DELETE RESTRICT
