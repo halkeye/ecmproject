@@ -44,11 +44,17 @@ body {
   font-size: 12px; 
 }
 
-#sidebar .title {
+#sidebar .title  {
   color: #8A0917; 
   font-size: 16px;
   font-weight: bold;
-  border-bottom: 1px solid #BBB;
+  border-bottom: 1px solid #BBB;  
+}
+
+#sidebar .title a {
+  color: #8A0917; 
+  font-size: 16px;
+  font-weight: bold;
 }
 
 #sidebar a {
@@ -126,8 +132,6 @@ body {
 	padding: 5px;
 	border: 1px solid #A00;
 }
-
-.fieldError { border: 2px solid #F00; }
 
 /* Form Input Styling */
 #form strong{
@@ -223,7 +227,13 @@ body {
 
 #form select {
 	display: inline;
-	margin: 0px 0px 5px 0px;
+	margin: 0px 0px 10px 0px;
+	padding: 2px 2px;
+}
+
+#form select.block {
+	display: block;
+	margin: 0px 0px 10px 0px;
 	padding: 2px 2px;
 }
 
@@ -264,8 +274,14 @@ body {
 	margin: 0px 0px 5px 10px;
 }
 
+#list p.pagination {
+	text-align: right;
+	margin: 0px 0px 5px 10px;
+	font-size: 14px;
+}
+
 #list select {
-	margin-right: 10px;
+	margin-right: 5px;
 }
 
 #list input.jump {
@@ -312,6 +328,14 @@ body {
 /* For checkout */
 #list form.inline {
 	display: inline;
+}
+
+#written p {
+	font-size: 12px;
+	padding-top: 10px;  
+	padding-bottom: 2px;  
+	margin-left: 10px;
+	line-height:1.5;
 }
 
 #footer.contentNoMenu {   
