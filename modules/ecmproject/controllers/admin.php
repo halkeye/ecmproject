@@ -570,17 +570,13 @@ class Admin_Controller extends Controller
 				if ($pay->saved) {
 					$this->addMessage('Payment created for the amount of: ' . $pay->mc_gross . ' (' . $pay->type . ') ');
 					
-					/* Check status of payment for registration */
-					print ($pay->getTotal() >= $pass->price);
-				
+					/* Check status of payment for registration */				
 					if ($pay->getTotal() >= $pass->price) {
 						$reg->status = Registration_Model::STATUS_PAID;
-						print $reg->status;
 						$reg->save();
-						print $reg->saved;
 					}
 					
-					//url::redirect("admin/managePayments/$rid");
+					url::redirect("admin/managePayments/$rid");
 				}
 				else
 				{
