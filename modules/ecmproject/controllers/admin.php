@@ -18,6 +18,7 @@ class Admin_Controller extends Controller
 	{
 		parent::__construct();
 		$this->requireLogin();
+		$this->requirePermission('admin'); //Force requirement of full administrative access.
 	
 		/* We don't even use the menu right now.(or at least I don't)...*/
 		$this->view->menu += array(
