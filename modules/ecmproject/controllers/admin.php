@@ -11,7 +11,7 @@
 
 
 class Admin_Controller extends Controller 
-{
+{ 
 	const ROWS_PER_PAGE = 4;
 
 	function __construct()
@@ -253,8 +253,8 @@ class Admin_Controller extends Controller
 		$data['entries'][0] = new View('admin/ListItems/PaymentEntry');
 		foreach ($rows as $row)
 		{
-			$data['actions']['edit'] = html::anchor('admin/editPass/'. $row->id, html::image('img/edit-copy.png', Kohana::lang('admin.edit_account')));
-			$data['actions']['delete'] = html::anchor('admin/deletePass/' . $row->id, html::image('img/edit-delete.png', Kohana::lang('admin.delete_account')));			
+			$data['actions']['edit'] = html::anchor('admin/editPayment/'. $row->id, html::image('img/edit-copy.png', Kohana::lang('admin.edit_account')));
+			$data['actions']['delete'] = html::anchor('admin/deletePayment/' . $rid . '/' . $row->id, html::image('img/edit-delete.png', Kohana::lang('admin.delete_account')));			
 			$data['entries'][$row->id] = new View('admin/ListItems/PaymentEntry', array('row' => $row, 'actions' => $data['actions']));				
 		}			
 			
@@ -835,6 +835,12 @@ class Admin_Controller extends Controller
 		Admin_Controller::__delete($id, 'Registration', 'deleteRegistration', 'manageRegistrations');
 	}
 	
+	function deletePayment($rid = NULL, $id = NULL)
+	{	
+		//TODO: Update status as necessary!
+		Admin_Controller::__delete($id, 'Payment', "deletePayment/$rid", "managePayments/$rid");
+	}
+	
 	function search()
 	{
 		
@@ -852,8 +858,10 @@ class Admin_Controller extends Controller
 		
 		if (isset($row->name))
 			$entityName = $row->name;
-		else
+		else if (isset($row->email))
 			$entityName = $row->email;
+		else
+			$entityName = 'Type: ' . $row->type; //hack.
 		
 		/* If row is defined (only if ID was set) and row was loaded... */
 		if ($row->loaded)
@@ -886,7 +894,7 @@ class Admin_Controller extends Controller
 			));
 		}
 		else {
-			$this->addMessage(Kohana::lang('admin.convention_not_exist'));	
+			$this->addError("Loading error: $id $entityType $callback $return");	
 			url::redirect("admin/$return");
 		}
 	}
