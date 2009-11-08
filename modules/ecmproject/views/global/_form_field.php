@@ -10,6 +10,10 @@ $label = Kohana::lang($field_lang_prefix . $field);
 if (isset($fieldData['required']) && $fieldData['required'])
     $label .= ' <span class="required">*</span>';
 
+$sublabel = Kohana::lang($field_lang_prefix . $field . '_sub');
+if ($sublabel != $field_lang_prefix . $field . '_sub')
+	$label .= ' <span class="small">' . $sublabel . '</span>';
+
 switch ($fieldData['type'])
 {
     case 'radio':
