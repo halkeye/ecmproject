@@ -59,7 +59,7 @@ switch ($fieldData['type'])
         $values = $fieldData['values'];
         $values[-1] = "";
         asort($values);
-        echo form::dropdown($field, $values, $value, $attributes);
+        echo form::dropdown($field, $values, $value, 'class="block"');
         break;
     case 'date':
         $months[-1] = '';
