@@ -139,7 +139,7 @@ CREATE TABLE `logs` (
    target_account_id INT UNSIGNED,
    target_registration_id INT UNSIGNED,
    target_badge_id INT UNSIGNED,
-   method VARCHAR(50),
+   method TEXT,
    description TEXT,
    mod_time INT UNSIGNED,
    ip VARCHAR(39),
