@@ -1,8 +1,8 @@
 <div id='list'>
 <?php
-	echo '<p><strong>Payment Status:</strong>' . $reg['status'] . '</p>';
-	echo '<p><strong>Badge Type:</strong>' . $pass['name'] . '<br /><strong>Price: </strong>$' . $pass['price'] . '</p>';
-	echo '<p><strong>Email:</strong>' . $reg['email'] . '<br /><strong>DOB: </strong>' . $reg['dob'] . '</p>';
+	echo '<p><strong>Payment Status:</strong> ' . Registration_Model::regStatusToString($reg['status']) . '</p>';
+	echo '<p><strong>Badge Type:</strong> ' . $pass['name'] . '<br /><strong>Price: </strong>$' . $pass['price'] . '</p>';
+	echo '<p><strong>Email:</strong> ' . $reg['email'] . '<br /><strong>DOB: </strong>' . $reg['dob'] . '</p>';
 ?>
 
 	<p>
