@@ -12,4 +12,6 @@ $lang = array(
         /* Logout confirm button  */
         'logoutConfirmButton'       => 'Confirm Logout',
 
+        'verifyMenu_heading'        => 'Email Not Validated',
+        'verifyMenu_subheading'     => 'You need to validate your email to proceed...',
 );

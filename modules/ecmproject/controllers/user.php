@@ -168,6 +168,8 @@ class User_Controller extends Controller
     function verifyMenu()
     {
         $this->view->title = "Require Verification";
+        $this->view->heading = Kohana::lang('auth.verifyMenu_heading');
+        $this->view->subheading = Kohana::lang('auth.verifyMenu_subheading');
         $this->requireLogin();
         $data = array();
 
