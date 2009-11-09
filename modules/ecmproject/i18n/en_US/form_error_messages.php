@@ -3,7 +3,7 @@
 $lang = array(
  'email' => Array
     (
-        'required' => 'The name cannot be blank.',
+        'required' => 'An email must be supplied.',
         'alpha' => 'Only alphabetic characters are allowed.',
         'length' => 'The name must be between three and twenty letters.',
         'email_exists' => 'Email already exists. Please login or try a different email address.',

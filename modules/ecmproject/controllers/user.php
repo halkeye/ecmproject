@@ -200,44 +200,60 @@ class User_Controller extends Controller
     {
         /* Set page title */
         $this->view->title = "Change Email";
+        $this->view->heading = Kohana::lang('auth.changeEmail_heading');
+        $this->view->subheading = Kohana::lang('auth.changeEmail_subheading');
         /* Require login */
         $this->requireLogin();
 
         /* Get logged in account */
         $account = $this->auth->getAccount();
         
-        $form = Formo::factory('changeEmail');
-        $form->plugin('table');
-        $form->plugin('csrf');
-        $form->plugin('required');
+        $fields = array(
+                'email' => array('type'=>'text', 'required'=> true),
+        );
+        $form = array(
+                'email' => ''
+        );
+        $errors = array();
 
-        $form->add('text', 'old_email', array('value'=>$account->email, 'readonly'=>1))->label('Old Email');
-        $form->add('text', 'email')->label('New Email');
-        $form->add_rule('new_email', array($account,'_unique_email_formo'), Kohana::lang('auth.existingEmail'));
-        $form->add('submit');
-
-        if ( $form->validate())
+        if ($post = $this->input->post())
         {
-            $values = $form->get_values();
-            $account->email  = $values['email'];
+            $post = new Validation($this->input->post());
+            // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
+            $post->pre_filter('trim');
 
-            /* FIXME: Log email change */
-            /* FIXME: if we have a working one, keep the working one until the new one is verified? */
+            $post->add_rules('email', 'required', array('valid', 'email'));
+            $post->add_callbacks('email', array($account,'_unique_email_validation'));
 
-            /* Reset verification status */
-            $account->status = Account_Model::ACCOUNT_STATUS_UNVERIFIED;
-            /* Generate new code */
-            $code = $account->generateVerifyCode();
-            /* Send out verification Email */
-            $account->sendValidateEmail($code);
-            /* Update cached session object */
-            $this->auth->complete_login($account);
-            /* Tell the user what happened */
-            $this->addMessage(Kohana::lang('auth.emailChangeSuccess'));
-            /* Redirect to main page */
-            $this->_redirect('');
+            if ( $post->validate())
+            {
+                $account->email  = $post['email'];
+
+                /* FIXME: Log email change */
+                /* FIXME: if we have a working one, keep the working one until the new one is verified? */
+
+                /* Reset verification status */
+                $account->status = Account_Model::ACCOUNT_STATUS_UNVERIFIED;
+                /* Generate new code */
+                $code = $account->generateVerifyCode();
+                /* Send out verification Email */
+                $account->sendValidateEmail($code);
+                /* Update cached session object */
+                $this->auth->complete_login($account);
+                /* Tell the user what happened */
+                $this->addMessage(Kohana::lang('auth.emailChangeSuccess'));
+                /* Redirect to main page */
+                $this->_redirect('');
+            }
+            else
+            {
+                $errors = $post->errors();
+            }
+            
+            $form = arr::overwrite($form, $post->as_array());
+            $errors = $post->errors('form_error_messages');
         }
-        $this->view->content = $form->get();
+        $this->view->content = new View('user/changeEmail', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
     }
 
 }

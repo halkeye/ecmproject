@@ -13,4 +13,7 @@ $lang = array(
         'not_validated'                => 'Account is not verified. Please check your email for your validation link.',
         'not_logged_in'                => 'You are already logged out.',
         'already_logged_in'            => 'Already logged in. Please logout first.',
+        
+        /* Re-useable for all forms with * or required fields */
+        'form_required'         => 'Please fill out the fields below. Fields that are marked with a <span class="required">*</span> are required',
 );

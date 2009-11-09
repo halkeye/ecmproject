@@ -16,7 +16,7 @@ if (count($errors))
 echo '<div id="form">';
 echo form::open();
 echo '<h1>'.html::specialchars(Kohana::lang('convention.registration_form_header')) . '</h1>';
-echo '<p>'.html::specialchars(Kohana::lang('convention.form_required')) . '</p>';
+echo '<p>' . Kohana::lang('ecmproject.form_required') . '</p>';
 
 echo "<fieldset>";
 foreach (array('gname','sname', 'badge', 'dob', 'email', 'phone','cell', 'city', 'prov', 'econtact', 'ephone') as $field)
