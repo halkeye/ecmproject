@@ -44,7 +44,7 @@ class Auth_Core {
         $this->session     = Session::instance();
         /* User Stuff */
         $this->account    =  new StdClass;
-        if ($this->is_logged_in() && $this->session->get('account'))
+        if ($this->isLoggedIn() && $this->session->get('account'))
         {
             $this->account     = is_string($this->session->get('account')) ? 
                 unserialize($this->session->get('account')) : 
@@ -172,6 +172,7 @@ class Auth_Core {
      * @return  boolean
      */
 
+    public function isLoggedIn() { return $this->is_logged_in(); }
     public function is_logged_in()
     {
         if (Session::instance()->get('account_id'))

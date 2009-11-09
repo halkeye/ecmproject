@@ -46,6 +46,7 @@ class Pass_Model extends ORM
 		$array = Validation::factory($array);
         $array->pre_filter('trim');
 	
+		$array->add_rules('isPurchasable', 'is_numeric');
 		$array->add_rules('convention_id', 'required');
 		$array->add_rules('name', 'required');
 		$array->add_rules('price', 'required'); //Also set
@@ -57,7 +58,7 @@ class Pass_Model extends ORM
 		$array->add_callbacks('startDate', array($this, '__validateISODate')); //Non-set start date will be set to today
 		$array->add_callbacks('endDate', array($this, '__validateISODate')); //Non-set end date will be set to convention end.
 		
-		if (!isset($isPurchasable))
+		if (!isset($array->isPurchasable))
 			$array->isPurchasable = 0;
 		
 		if (isset($array->minAge) && !empty($array->minAge))

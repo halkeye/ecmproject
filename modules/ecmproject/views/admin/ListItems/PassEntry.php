@@ -3,7 +3,7 @@
 if(isset($row)) { ?>
 
 <tr>
-	<td><?php print $row->name; ?></td>
+	<td><?php print html::specialchars($row->name) . (!$row->isPurchasable ? ' <strong>(Private)</strong>' : ''); ?></td>
 	<td><?php print $row->price; //Force price formatting. ?></td> 	
 	<td>
 	<?php 
