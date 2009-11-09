@@ -483,6 +483,7 @@ class Admin_Controller extends Controller
 		if ( (!isset($cid) || !is_numeric($cid) || $cid <= 0) || (!isset($aid) || !is_numeric($aid) || $aid <= 0))
 			die("You're not allowed to be here!");
 			
+		//TODO: Deal with the case where one of the below fails to load.
 		$reg = ORM::factory('Registration');
 		$crows = ORM::factory('Convention')->find_all()->select_list('id', 'name');	
 		$fields = $reg->formo_defaults;
@@ -528,7 +529,12 @@ class Admin_Controller extends Controller
 				'callback' => "createRegistration2/$cid/$aid"
 			));
 		} else {
-		
+			$acct = ORM::factory('Account')->find($aid);
+			if (!$acct->loaded)
+				die('Serious error here. The account is supposed to exist but it doesn\'t.');
+				
+			$reg->email = $acct->email;
+			
 			/* Full registration at this step. */
 			$this->view->content = new View('admin/Registration2', array(
 					'row' => $reg->as_array(),
