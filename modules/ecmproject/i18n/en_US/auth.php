@@ -1,6 +1,7 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 $lang = array(
         'login_success'             => 'Login Success!',
+        'invalid_user_pass'         => 'Invalid username or password',
         /* Expired and/or already logged in and/or other stuff */
         'bad_link'                  => 'An invalid verification code was provided. Please check and try again.',
         /* Email address already exists */

@@ -43,7 +43,7 @@ class User_Controller extends Controller
             $this->addError($err);
         $this->auth->clearErrors();
 
-        return;
+        return $this->loginOrRegister();
     }
 
     function logout()
