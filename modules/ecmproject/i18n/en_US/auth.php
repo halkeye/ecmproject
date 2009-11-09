@@ -21,4 +21,10 @@ $lang = array(
         'changeEmail_field_submit'  => 'Change Email',
         'changeEmail_heading'       => 'Change Email',
         'changeEmail_subheading'    => '---subheading--- FIXME',
+        
+        /* Access Denied Page */
+        'accessDenied_heading'       => '---heading--- FIXME',
+        'accessDenied_subheading'    => '---subheading--- FIXME',
+        'accessDenied_title'         => 'Access Denied',
+        'accessDenied_paragraph'     => 'This area requires more access than you currently have. If you think you should have access please contact AE staff HR department.',
 );

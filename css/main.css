@@ -153,7 +153,7 @@ body {
 	text-decoration: underline;
 }
 
-#form form h1 {
+#form h1 {
 	padding: 7px 0px 7px 5px;
 	font-weight: bold;
 	background-color: #DDD;
@@ -161,12 +161,12 @@ body {
 	font-size: 14px;
 }
 
-#form form p {
+#form p {
 	margin: 10px 10px 20px 10px;
 	text-align: left;
 }
 
-#form form p.fixed {
+#form p.fixed {
 	margin: 10px 10px 0px 10px;
 	text-align: left;
 	height: 50px;
@@ -207,7 +207,7 @@ body {
 	width: 240px;
 }
 
-#form input.inline{
+#form input.inline {
 	display: inline;
 }
 

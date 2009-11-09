@@ -151,7 +151,13 @@ class Controller extends Controller_Core
         }
     }
 
-    protected function requirePermission($permission) {}
+    protected function requirePermission($permission) 
+    {
+        if (!$this->auth->isLoggedIn() && !$this->auth->hasPermission($permission))
+        {
+            return $this->accessDenied();
+        }
+    }
     protected function requireGroup($group) {}
 
     protected function addMenuItem($item)
@@ -159,6 +165,14 @@ class Controller extends Controller_Core
         $items = $this->view->menu;
         $items[] = $item;
         $this->view->menu = $items;
+    }
+
+    public function accessDenied()
+    {
+        $this->view->title = Kohana::lang('auth.accessDenied_title');
+        $this->view->heading = Kohana::lang('auth.accessDenied_heading');
+        $this->view->subheading = Kohana::lang('auth.accessDenied_subheading');
+        $this->view->content = new View('global/accessDenied');
     }
 
 }
