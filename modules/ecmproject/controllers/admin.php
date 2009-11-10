@@ -580,6 +580,12 @@ class Admin_Controller extends Controller
 						$reg->status = Registration_Model::STATUS_PAID;
 						$reg->save();
 					}
+					/* If total payment no longer equals or exceeds cost of badge, mark as failed registration. */
+					else
+					{
+						$reg->status = Registration_Model::STATUS_NOT_ENOUGH;
+						$reg->save();
+					}
 					
 					url::redirect("admin/managePayments/$rid");
 				}
@@ -814,10 +820,150 @@ class Admin_Controller extends Controller
 		}	
 	}
 	
-	function editRegistration()
+	function editRegistration($rid = NULL)
 	{
 		/* Can change all fields. */	
+		//Not allowed to be lazy in checking input here.
+		if ( (!isset($rid) || !is_numeric($rid) || $rid <= 0) )
+			die("You're not allowed to be here!");
+			
+		//TODO: Deal with the case where one of the below fails to load.
+		$reg = ORM::factory('Registration')->find($rid);
+		if (! $reg->loaded )
+		{
+			$this->addError('Grace says this registration does not exist.');
+			url::redirect('admin/manageRegistrations/');
+		}
 		
+		$crows = ORM::factory('Convention')->find_all()->select_list('id', 'name');	
+		$fields = $reg->formo_defaults;
+		
+		$fields['pass_id']['values'] = ORM::Factory('Pass')->where("convention_id", $reg->convention_id)->find_all()->select_list('id', 'name');
+		
+		if ($post = $this->input->post())
+		{
+			$fieldName = 'dob';
+			$post[$fieldName] = implode('-', 
+                        array(
+                            @sprintf("%04d", $post[$fieldName . '-year']), 
+                            @sprintf("%02d", $post[$fieldName . '-month']), 
+                            @sprintf("%02d", $post[$fieldName . '-day'])
+                        )
+                    );		
+		
+			if ($reg->validate_admin($post))
+			{			
+				// die ('stop!' . $post['city'] . $post['prov'] . '|' . $reg->city . $reg->prov);
+				// Non-required fields. Validate doesn't seem to set fields that aren't required.
+				$reg->city = $post['city'];
+				$reg->prov = $post['prov'];
+				$reg->save();				
+				if ($reg->saved) {
+					$this->addMessage('Successfully edited registatration for: ' . $reg->gname . ' ' . $reg->sname);
+					url::redirect('admin/manageRegistrations');
+				}
+				else
+				{
+					$this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
+				}
+			}
+						
+			$errorMsg = 'Oops. You entered something bad! Please fix it! <br />';				
+			$errors = $post->errors('form_error_messages');
+			foreach ($errors as $error)
+				$errorMsg = $errorMsg . ' ' . $error . '<br />';					
+		
+			$this->addError($errorMsg);
+			
+			$this->view->content = new View('admin/Registration2', array(
+				'row' => $post,
+				'fields' => $fields,
+				'callback' => "editRegistration/$rid"
+			));
+		} else {
+			/* Full registration at this step. */
+			$this->view->content = new View('admin/Registration2', array(
+					'row' => $reg->as_array(),
+					'fields' => $fields,
+					'callback' => "editRegistration/$rid"
+				));
+		}
+		
+	}
+	
+	function editPayment($id = NULL)
+	{
+		if ($id == NULL || !is_numeric($id))
+			die('Get out of here!');
+			
+		$pay = ORM::Factory('Payment')->find($id); 
+		$reg = ORM::Factory('Registration')->find($pay->register_id);
+		$pass = ORM::Factory('Pass')->find($reg->pass_id);
+
+		if (!$pay->loaded)
+		{
+			$this->addError('Selected payment is invalid. Maybe it was deleted while you were busy?');
+			url::redirect('admin/managePayments/' . $pay->register_id);
+		}
+		
+		$fields = $pay->default_fields;
+		
+		//Move to model.
+		$fields['type']['values'] = array('instant' => 'Instant (Paypal)', 'mail' => 'Mail', 'inperson' => 'In Person');
+		$fields['payment_status']['values'] = array('Pending' => 'Pending', 'Completed' => 'Completed', 'Denied' => 'Denied');	
+		
+		//Do dropdown for payment type. What kind of selections can we have?		
+		if ($post = $this->input->post())
+		{
+			echo $pay->id;
+			if ($pay->validate_admin($post))
+			{				
+				$pay->save();
+				if ($pay->saved) {
+					$this->addMessage('Payment created for the amount of: ' . $pay->mc_gross . ' (' . $pay->type . ') ');
+					
+					/* Check status of payment for registration */				
+					if ($pay->getTotal() >= $pass->price) {
+						$reg->status = Registration_Model::STATUS_PAID;
+						$reg->save();
+					}
+					/* If total payment no longer equals or exceeds cost of badge, mark as failed registration. */
+					else
+					{
+						$reg->status = Registration_Model::STATUS_NOT_ENOUGH;
+						$reg->save();
+					}
+					
+					url::redirect('admin/managePayments/' . $pay->register_id);
+				}
+				else
+				{
+					$this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
+				}
+			}		
+			
+			$errorMsg = 'Oops. You entered something bad! Please fix it! <br />';				
+			$errors = $post->errors('form_error_messages');
+			foreach ($errors as $error)
+				$errorMsg = $errorMsg . ' ' . $error . '<br />';					
+		
+			$this->addError($errorMsg);
+
+			//Do validation here.
+			$this->view->content = new View('admin/Payment', array(
+					'row' => $post,
+					'fields' => $fields,
+					'callback' => 'editPayment/' . $pay->id
+				));
+		}
+		else
+		{
+			$this->view->content = new View('admin/Payment', array(
+					'row' => $pay->as_array(),
+					'fields' => $fields,
+					'callback' => 'editPayment/' . $pay->id
+				));
+		}
 	}
 	
 	function deleteConvention($id = NULL)
