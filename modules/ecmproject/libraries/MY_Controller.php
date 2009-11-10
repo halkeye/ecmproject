@@ -153,9 +153,11 @@ class Controller extends Controller_Core
 
     protected function requirePermission($permission) 
     {
-        if (!$this->auth->isLoggedIn() && !$this->auth->hasPermission($permission))
+        $this->requireLogin();
+        if (!$this->auth->hasPermission($permission))
         {
-            return $this->accessDenied();
+            /* Kohana has no forward, so redirect */
+            url::redirect('/user/accessDenied');
         }
     }
     protected function requireGroup($group) {}
