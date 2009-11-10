@@ -718,7 +718,7 @@ class Admin_Controller extends Controller
 				
 				$pass->save();								
 				if ($pass->saved) {
-					$this->addMessage('Created a newly minted pass called: ' . $pass->name);
+					$this->addMessage('Edited the pass (now) named: ' . $pass->name);
 					url::redirect('admin/managePasses');
 				}
 				else
