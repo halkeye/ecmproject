@@ -21,7 +21,7 @@ class Admin_Controller extends Controller
 		$this->requirePermission('admin'); //Force requirement of full administrative access.
 	
 		/* We don't even use the menu right now.(or at least I don't)...*/
-		$this->addMenuItem(array('title'=>'Administration', 'url'=>'admin'));
+		//$this->addMenuItem(array('title'=>'Administration', 'url'=>'admin'));
 		$this->addMenuItem(array('title'=>'Add Registration', 'url'=>'convention/editReg'));
 
 		return;
