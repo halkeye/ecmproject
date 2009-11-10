@@ -10,6 +10,10 @@ $label = Kohana::lang($field_lang_prefix . $field);
 if (isset($fieldData['required']) && $fieldData['required'])
     $label .= ' <span class="required">*</span>';
 
+$sublabel = Kohana::lang($field_lang_prefix . $field . '_sub');
+if ($sublabel != $field_lang_prefix . $field . '_sub')
+	$label .= ' <span class="small">' . $sublabel . '</span>';
+
 switch ($fieldData['type'])
 {
     case 'radio':
@@ -43,6 +47,9 @@ switch ($fieldData['type'])
         break;
     case 'bool':
     case 'boolean':
+        #selected should be value, value should be if $fieldData['value]'
+        echo form::checkbox($field, 1, $value, $attributes);
+        break;
     case 'checkbox':
         echo form::checkbox($field, $value, @$fieldData['selected'], $attributes);
         break;
@@ -56,7 +63,7 @@ switch ($fieldData['type'])
         $values = $fieldData['values'];
         $values[-1] = "";
         asort($values);
-        echo form::dropdown($field, $values, $value, $attributes);
+        echo form::dropdown($field, $values, $value, 'class="block"');
         break;
     case 'date':
         $months[-1] = '';
@@ -84,7 +91,7 @@ switch ($fieldData['type'])
             $month = date('n', $date);
             $day = date('d', $date);
         }
-        $years = array_values(date::years(1900, date('Y', time())));
+        $years = array_values(date::years(1900, date('Y', time() + (31536000 * 5)))); //Allow for up to 5 years ahead.
         $years = array_combine($years, $years);
         $years[-1] = "";
         ksort($years);
