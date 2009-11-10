@@ -42,7 +42,6 @@ class Registration_Model extends ORM
             'heard_from'    => array ( 'type' => 'text',                     'null' => true,                             ),
             'attendance_reason'    => array ( 'type' => 'text',              'null' => true,                             ), 
             'status'      => array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                       ),
-			'agree_toc'		=> array ('type' => 'int',	'max' =>127,		'unsigned'=> true							 ),
     );
 
     public $formo_defaults = array(
@@ -85,6 +84,7 @@ class Registration_Model extends ORM
         $realChanged = $this->changed;
         foreach ($array->safe_array() as $field=>$value)
         {
+            if (isset($this->ignored_columns[$field])) { continue; }
             if ($this->$field != $value) 
             {
                 $realChanged[$field] = $this->$field; 
