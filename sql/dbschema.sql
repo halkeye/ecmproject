@@ -8,8 +8,8 @@ DROP TABLE IF EXISTS `conventions`;
 CREATE TABLE conventions (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    name VARCHAR(100) NOT NULL,
-   start_date INT UNSIGNED NOT NULL,
-   end_date INT UNSIGNED NOT NULL,
+   start_date INT NOT NULL,
+   end_date INT NOT NULL,
    location VARCHAR(150)
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
@@ -25,8 +25,8 @@ CREATE TABLE passes (
    isPurchasable TINYINT NOT NULL,
    minAge TINYINT UNSIGNED,
    maxAge TINYINT UNSIGNED,
-   startDate INT UNSIGNED,
-   endDate INT UNSIGNED,
+   startDate INT,
+   endDate INT,
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE CASCADE -- Cascade deletion of passes. Will (should) still fail if registrations have started.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
@@ -87,11 +87,11 @@ CREATE TABLE payments (
    type VARCHAR(55) NOT NULL,
    mc_gross DECIMAL(10,2) NOT NULL,
    payer_id VARCHAR(13),
-   payment_date INT UNSIGNED NOT NULL,
+   payment_date INT NOT NULL,
    payment_status VARCHAR(17) NOT NULL,
    txn_id VARCHAR(17), -- txn_id is 17 characters alphanumeric.
    receipt_id VARCHAR(19), -- reciept id is in form XXXX-XXXX-XXXX-XXXX (19 characters)
-   mod_time INT UNSIGNED,
+   mod_time INT,
    FOREIGN KEY (register_id) REFERENCES registrations(id) ON DELETE RESTRICT, -- Registrations with payment information shouldn't be deleted.
    FOREIGN KEY (last_modified) REFERENCES accounts(id) ON DELETE RESTRICT
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
@@ -141,7 +141,7 @@ CREATE TABLE `logs` (
    target_badge_id INT UNSIGNED,
    method TEXT,
    description TEXT,
-   mod_time INT UNSIGNED,
+   mod_time INT,
    ip VARCHAR(39),
    FOREIGN KEY (modifier_id) REFERENCES accounts(id) ON DELETE SET NULL,
    FOREIGN KEY (target_account_id) REFERENCES accounts(id) ON DELETE SET NULL,
