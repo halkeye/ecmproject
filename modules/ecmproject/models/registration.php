@@ -2,8 +2,10 @@
 
 class Registration_Model extends ORM 
 {
-    const STATUS_UNPROCESSED = 0;
-    const STATUS_PROCESSING  = 1; // Waiting for Paypal to respond
+    const STATUS_UNPROCESSED = 0; // Payment has not been sent yet (or recieved if mail-in)
+    const STATUS_PROCESSING  = 1; // Waiting for Paypal to respond, mail-in/in-person payment is in limbo.
+	const STATUS_NOT_ENOUGH	 = 2; // Payment recieved is not enough to pay cost of pass.
+	const STATUS_FAILED		 = 98; //Registration no longer valid (cancelled, refunded, etc).
     const STATUS_PAID        = 99; // Fully working and paid
     
     protected $ignored_columns = array('agree_toc');
@@ -40,6 +42,7 @@ class Registration_Model extends ORM
             'heard_from'    => array ( 'type' => 'text',                     'null' => true,                             ),
             'attendance_reason'    => array ( 'type' => 'text',              'null' => true,                             ), 
             'status'      => array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                       ),
+			'agree_toc'		=> array ('type' => 'int',	'max' =>127,		'unsigned'=> true							 ),
     );
 
     public $formo_defaults = array(
@@ -260,8 +263,7 @@ class Registration_Model extends ORM
 		//Only set status to UNPROCESSED if it's a new registration! (Else it'll keep blanking my status updates).
 		if ($this->id == 0)
 			$this->status = Registration_Model::STATUS_UNPROCESSED;
-			
-			
+						
         $ret = parent::save();
 
         if ( ! empty($originalChanged))
@@ -304,6 +306,10 @@ class Registration_Model extends ORM
 			return 'PROCESSING';
 		else if ($status == Registration_Model::STATUS_PAID)
 			return 'PAID';
+		else if ($status == Registration_Model::STATUS_NOT_ENOUGH)
+			return 'PARTIAL PAYMENT';
+		else if ($status == Registration_Model::STATUS_FAILED)
+			return 'CANCELLED';
 		else
 			return 'IN LIMBO';
 	}
