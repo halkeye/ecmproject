@@ -563,7 +563,7 @@ class Admin_Controller extends Controller
 		
 		//Move to model.
 		$fields['type']['values'] = array('instant' => 'Instant (Paypal)', 'mail' => 'Mail', 'inperson' => 'In Person');
-		$fields['payment_status']['values'] = array('Pending' => 'Pending', 'Completed' => 'Completed', 'Denied' => 'Denied');	
+		$fields['payment_status']['values'] = $pay->getPaymentStatusSelectList();	
 		
 		//Do dropdown for payment type. What kind of selections can we have?		
 		if ($post = $this->input->post())
@@ -571,22 +571,13 @@ class Admin_Controller extends Controller
 			if ($pay->validate_admin($post))
 			{				
 				$pay->register_id = $rid;
+				$pay->last_modified = $this->auth->getAccount()->id;
 				$pay->save();
 				if ($pay->saved) {
 					$this->addMessage('Payment created for the amount of: ' . $pay->mc_gross . ' (' . $pay->type . ') ');
 					
 					/* Check status of payment for registration */				
-					if ($pay->getTotal() >= $pass->price) {
-						$reg->status = Registration_Model::STATUS_PAID;
-						$reg->save();
-					}
-					/* If total payment no longer equals or exceeds cost of badge, mark as failed registration. */
-					else
-					{
-						$reg->status = Registration_Model::STATUS_NOT_ENOUGH;
-						$reg->save();
-					}
-					
+					$this->updatePaymentStatus($pay, $reg, $pass);						
 					url::redirect("admin/managePayments/$rid");
 				}
 				else
@@ -910,7 +901,7 @@ class Admin_Controller extends Controller
 		
 		//Move to model.
 		$fields['type']['values'] = array('instant' => 'Instant (Paypal)', 'mail' => 'Mail', 'inperson' => 'In Person');
-		$fields['payment_status']['values'] = array('Pending' => 'Pending', 'Completed' => 'Completed', 'Denied' => 'Denied');	
+		$fields['payment_status']['values'] = $pay->getPaymentStatusSelectList();
 		
 		//Do dropdown for payment type. What kind of selections can we have?		
 		if ($post = $this->input->post())
@@ -918,22 +909,11 @@ class Admin_Controller extends Controller
 			echo $pay->id;
 			if ($pay->validate_admin($post))
 			{				
-				$pay->save();
-				if ($pay->saved) {
-					$this->addMessage('Payment created for the amount of: ' . $pay->mc_gross . ' (' . $pay->type . ') ');
-					
-					/* Check status of payment for registration */				
-					if ($pay->getTotal() >= $pass->price) {
-						$reg->status = Registration_Model::STATUS_PAID;
-						$reg->save();
-					}
-					/* If total payment no longer equals or exceeds cost of badge, mark as failed registration. */
-					else
-					{
-						$reg->status = Registration_Model::STATUS_NOT_ENOUGH;
-						$reg->save();
-					}
-					
+				$pay->last_modified = $this->auth->getAccount()->id;
+				$pay->save();				
+				if ($pay->saved) {				
+					$this->addMessage('Edited payment to the amount of: ' . $pay->mc_gross . ' (' . $pay->type . ') ');
+					$this->updatePaymentStatus($pay, $reg, $pass);						
 					url::redirect('admin/managePayments/' . $pay->register_id);
 				}
 				else
@@ -977,7 +957,7 @@ class Admin_Controller extends Controller
 	
 	function deletePass($id = NULL)
 	{
-		Admin_Controller::__delete($id, 'Pass', 'deletePass', 'managePasses');
+		Admin_Controller::__delete($id, 'Pass', 'deletePass', 'managePasses');		
 	}
 	
 	function deleteRegistration($id = NULL)
@@ -988,7 +968,7 @@ class Admin_Controller extends Controller
 	function deletePayment($rid = NULL, $id = NULL)
 	{	
 		//TODO: Update status as necessary!
-		Admin_Controller::__delete($id, 'Payment', "deletePayment/$rid", "managePayments/$rid");
+		Admin_Controller::__delete($id, 'Payment', "deletePayment/$rid", "managePayments/$rid", true);				
 	}
 	
 	function search()
@@ -998,7 +978,7 @@ class Admin_Controller extends Controller
 	}
 	
 	/* Common use functions */
-	public function __delete($id, $entityType, $callback, $return)
+	private function __delete($id, $entityType, $callback, $return, $updatePaymentStatus = NULL)
 	{
 		/* If no ID or bad ID defined, kill it with fire. */
 		if ($id == NULL || !is_numeric($id))
@@ -1019,9 +999,23 @@ class Admin_Controller extends Controller
 			/* POST value YES ... do delete */
 			if ($val = $this->input->post('Yes'))
 			{
+				if ($updatePaymentStatus)
+				{
+						//We need to fetch reg, pass, and payment objects...
+						$pay = ORM::Factory('Payment')->find($id);
+						$reg = ORM::Factory('Registration')->find($pay->register_id);
+						$pass = ORM::Factory('Pass')->find($reg->pass_id);						
+				}			
+			
 				if ($row->delete()) 
 				{
-					$this->addMessage($entityName . " was deleted. D:");				
+					$this->addMessage($entityName . " was deleted. D:");	
+
+					if ($updatePaymentStatus)
+					{							
+						$this->updatePaymentStatus(null, $reg, $pass);							
+					}				
+					
 					url::redirect("admin/$return");
 				}
 				else
@@ -1112,4 +1106,37 @@ class Admin_Controller extends Controller
 		
 		return $multiplier;	
 	}	
+	
+	/*
+	 * One of the below states will be set. UNPROCESSED, PROCESSING, FAILED are not applicable for manual changes.
+	 * If an admin wants to cancel a registration, simply delete it?
+	 * const STATUS_NOT_ENOUGH	 = 2; // Payment recieved is not enough to pay cost of pass.
+     * const STATUS_PAID        = 99; // Fully working and paid	
+	 */
+	
+	function updatePaymentStatus($pay = NULL, $reg, $pass)
+	{		
+		/* Check status of payment for registration */		
+		if ($pay == NULL)
+		{
+			if (Payment_Model::staticGetTotal($reg->id) >= $pass->price)
+			{
+				$reg->status = Registration_Model::STATUS_PAID;			
+			}
+			else
+			{
+				$reg->status = Registration_Model::STATUS_NOT_ENOUGH;
+			}		
+		}
+		else if ($pay->getTotal() >= $pass->price) {
+			$reg->status = Registration_Model::STATUS_PAID;			
+		}
+		/* If total payment no longer equals or exceeds cost of badge, mark as failed registration. */
+		else
+		{
+			$reg->status = Registration_Model::STATUS_NOT_ENOUGH;
+		}
+		
+		$reg->save();
+	}
 }
