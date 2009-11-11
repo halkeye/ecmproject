@@ -2,6 +2,9 @@
 
 class Payment_Model extends ORM 
 {
+	const STATUS_PENDING = 'Pending'; // Payment approval is pending.
+    const STATUS_DENIED  = 'Denied'; // Payment was denied (invalid, insufficient funds, etc).
+	const STATUS_COMPLETED	 = 'Completed'; // Payment status is accepted (completed).	
 
 	/* These fields are all that are needed for manual payment entry. Other fields are for PayPal use only */
 	public $default_fields = array(
@@ -33,12 +36,21 @@ class Payment_Model extends ORM
             'mod_time' => array ('type' => 'int','max' => 2147483647,'unsigned' => true,'null' => true,),
     );
 	
+	public function __construct($id = NULL)
+	{
+        parent::__construct($id);
+    }
+	
+	public function __set($key, $value)
+	{
+		parent::__set($key, $value);
+	}
+	
 	public function save()
 	{
 		if ($this->id == 0)
 			$this->payment_date = time();
 			
-		$this->last_modified = 1;
 		$ret = parent::save();
 	}
 	
@@ -66,19 +78,52 @@ class Payment_Model extends ORM
 		
 		return parent::validate($array, $save);
 	}
+	
+	public function getPaymentStatusSelectList() {
+		return array(Payment_Model::STATUS_PENDING => 'Pending', Payment_Model::STATUS_DENIED => 'Denied', Payment_Model::STATUS_COMPLETED => 'Completed');
+	}
 
+	public function statusToString()
+	{
+		if ($this->payment_status == Payment_Model::STATUS_PENDING)
+			return 'PENDING';
+		else if ($this->payment_status == Payment_Model::STATUS_DENIED )
+			return 'DENIED';
+		else if ($this->payment_status == Payment_Model::STATUS_COMPLETED)
+			return 'COMPLETE';
+		else
+			return $this->payment_status; //If paypal sets status values, it'll probably be in string format. So just return it.
+	}
+	
 	public function getTotalPayments($reg)
 	{
 		$db = new Database();
-		$result = $db->query('SELECT COUNT(*) as count FROM payments WHERE register_id=' . $reg);
+		$result = $db->query('SELECT COUNT(*) as count FROM payments WHERE register_id=' . $reg . ' AND payment_status="' . Payment_Model::STATUS_COMPLETED . '"');
 		
 		return (int) $result[0]->count;
 	}
 	
+	public function lastModifiedName()
+	{
+		$acct = ORM::Factory('Account')->find($this->last_modified);
+		if (! $acct->loaded)
+			return $this->id;
+		else
+			return $acct->email;
+	}
+	
 	public function getTotal()
 	{
+		$db = new Database();				
+		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE register_id=' . $this->register_id . ' AND payment_status="' . Payment_Model::STATUS_COMPLETED . '"');
+		
+		return (int) $result[0]->gross;		
+	}
+	
+	public function staticGetTotal($register_id)
+	{
 		$db = new Database();
-		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE register_id=' . $this->register_id);
+		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE register_id=' . $register_id);
 		
 		return (int) $result[0]->gross;		
 	}
