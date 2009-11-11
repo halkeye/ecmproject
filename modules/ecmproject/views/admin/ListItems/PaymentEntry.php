@@ -4,9 +4,9 @@ if(isset($row)) { ?>
 
 <tr>
 	<td><?php print $row->type; ?></td>
-	<td><?php print $row->mc_gross; ?></td>	
-	<td><?php print $row->last_modified; ?></td>
-	<td><?php print $row->payment_status; ?></td>	
+	<td><?php print '$' . $row->mc_gross; ?></td>	
+	<td><?php print $row->lastModifiedName(); ?></td>
+	<td><?php print $row->statusToString(); ?></td>	
 	<?php
 		foreach ($actions as $action): 		
 			print '<td>' . $action; '</td>';
@@ -18,7 +18,7 @@ if(isset($row)) { ?>
 <tr>
 	<th width='25%'>Payment Type</th>
 	<th width='15%'>Amount</th>
-	<th width='25%'>Last Modified</th>
+	<th width='25%'>Last Modified By</th>
 	<th width='25%'>Status</th>
 	<th width='5%'>Edit</th>
 	<th width='5%'>Delete</th>
