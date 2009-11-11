@@ -11,16 +11,27 @@ class Payment_Model extends ORM
             'mc_gross' => array( 'type'  => 'text', 'label' => 'Password', 'required'=>true     					),
             'payment_status' => array( 'type'  => 'select', 'label' => 'Status', 'required'=>true    					)
     );
-	
-	public function __construct($id = NULL)
-	{
-        parent::__construct($id);
-    }
-	
-	public function __set($key, $value)
-	{
-		parent::__set($key, $value);
-	}
+    
+    /* On unserialize never check the db */
+    protected $reload_on_wakeup = false;
+
+    // Table primary key and value
+    protected $primary_key = 'id';
+
+    // Model table information
+    protected $table_columns = array (
+            'id' => array ( 'type' => 'int','max' => 2147483647,'unsigned' => true,'sequenced' => true, ),
+            'register_id'   => array ( 'type' => 'int', 'max' => 2147483647, 'unsigned' => true,  ),
+            'last_modified' => array ( 'type' => 'int','max' => 2147483647,'unsigned' => true,'null' => true,  ),
+            'type' => array ('type' => 'string','length' => '55',),
+            'mc_gross' => array ('type' => 'float','length' => '10,2',),
+            'payer_id' => array ('type' => 'string','length' => '13',),
+            'payment_date' => array ('type' => 'int', 'max' => 2147483647, 'unsigned' => true,),
+            'payment_status' => array ('type' => 'string','length' => '17',),
+            'txn_id' => array ('type' => 'string','length' => '17',),
+            'receipt_id' => array ('type' => 'string','length' => '19', ),
+            'mod_time' => array ('type' => 'int','max' => 2147483647,'unsigned' => true,'null' => true,),
+    );
 	
 	public function save()
 	{
@@ -72,26 +83,3 @@ class Payment_Model extends ORM
 		return (int) $result[0]->gross;		
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-?>

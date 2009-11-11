@@ -26,6 +26,7 @@ foreach ($registrations as $reg)
     $regids[] = $reg->id;
 
     $class_row = text::alternate('row_odd','row_even');
+    $class_row = text::alternate('row_odd','row_even');
     echo '<li class="'.$class_row.'">';
     $name = $reg->pass->name . ' - ' . $reg->badge;
     echo html::specialchars($name);
@@ -33,6 +34,10 @@ foreach ($registrations as $reg)
     echo form::hidden("item_name_$id", $name);
     echo form::hidden("amount_$id", sprintf('%01.2F', $reg->pass->price));
     echo form::hidden("quantity_$id", 1);
+    echo ' ';
+    echo html::anchor('/convention/editReg/'.$reg->id,   html::image('img/edit-copy.png', 'Edit this account'));
+    echo ' ';
+    echo html::anchor('/convention/deleteReg/'.$reg->id, html::image('img/edit-delete.png', 'Delete this account'));
     echo '</li>';
 }
 echo form::hidden("custom", implode('|', $regids));
@@ -41,8 +46,10 @@ echo form::hidden("custom", implode('|', $regids));
 
 <br />
 <?php
-echo form::submit('', Kohana::lang('convention.confirm_checkout_with_paypal')); 
-echo form::close(); 
- 
-?>
+    echo form::submit('', Kohana::lang('convention.checkout_with_paypal')); 
+    echo form::close();
 
+    echo form::open('/convention/checkoutOther', array('method'=>'get')); 
+    echo form::submit('', Kohana::lang('convention.checkout_with_other')); 
+    echo form::close();
+?>>
