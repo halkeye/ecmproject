@@ -98,7 +98,7 @@ class Payment_Model extends ORM
 	public function getTotalPayments($reg)
 	{
 		$db = new Database();
-		$result = $db->query('SELECT COUNT(*) as count FROM payments WHERE register_id=' . $db->escape($reg) . ' AND payment_status="' . Payment_Model::STATUS_COMPLETED . '"');
+		$result = $db->query('SELECT COUNT(*) as count FROM payments WHERE register_id=?', $db->escape($reg));
 		
 		return (int) $result[0]->count;
 	}
@@ -115,7 +115,7 @@ class Payment_Model extends ORM
 	public function getTotal()
 	{
 		$db = new Database();				
-		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE register_id=' . $db->escape($this->register_id) . ' AND payment_status="' . Payment_Model::STATUS_COMPLETED . '"');
+		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE register_id=? AND payment_status=?',$this->register_id, Payment_Model::STATUS_COMPLETED);
 		
 		return (int) $result[0]->gross;		
 	}
@@ -123,7 +123,7 @@ class Payment_Model extends ORM
 	public function staticGetTotal($register_id)
 	{
 		$db = new Database();
-		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE register_id=' . $db->escape($register_id));
+		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE register_id=? AND payment_status=?',$register_id, Payment_Model::STATUS_COMPLETED);
 		
 		return (int) $result[0]->gross;		
 	}
