@@ -12,7 +12,7 @@
 
 class Admin_Controller extends Controller 
 { 
-	const ROWS_PER_PAGE = 4;
+	const ROWS_PER_PAGE = 10;
 
 	function __construct()
 	{
@@ -973,7 +973,7 @@ class Admin_Controller extends Controller
 	
 	function search()
 	{
-		
+		//Go context sensitive...
 	
 	}
 	
@@ -1041,6 +1041,114 @@ class Admin_Controller extends Controller
 			$this->addError("Loading error: $id $entityType $callback $return");	
 			url::redirect("admin/$return");
 		}
+	}
+	
+	/*
+	* Export is limited to exporting registration information. We will need to know the convention to export for and any conditions the
+	* exporter wants applied. We will do this in two stages. One to determine the convention, and the other to determine the remaining
+	* conditions to be applied. (GO checkboxes).
+	*
+	* Conditions:
+	*   * Include those with a certain age or greater (or less).
+	*   * Export by pass type.
+	*   * Export by registration status.
+	*/
+	public function export()
+	{
+		// Set headers
+		$this->view->title = "Administration: Export";
+		$this->view->heading = "Administration: Export";
+		$this->view->subheading = "Export Registration Info to CSV";
+	
+		$reg = ORM::factory('Registration');
+		$crows = ORM::factory('Convention')->find_all()->select_list('id', 'name');	
+		
+		$fields = $reg->formo_defaults;
+		$fields['convention_id'] = array( 'type'  => 'select', 'label' => 'Convention', 'required'=>true );
+		$fields['convention_id']['values'] = $crows;
+	
+		if ($post = $this->input->post())
+		{
+			//Validate valid convention id, validate account - create if not exist email. Then pass it on as a POST.
+			if (Convention_Model::validConvention($post['convention_id']))
+			{
+				url::redirect("admin/export2/" . $post['convention_id']); //Move to next STEP				
+			}
+						
+			$this->addError("One or more fields are blank!");	//pass_field_reg_error_convention_id_missing	
+			$this->view->content = new View('admin/Export', array(
+				'row' => $post,
+				'fields' => $fields,
+				'callback' => 'export'
+			));
+		}
+		else 
+		{
+			$this->view->content = new View('admin/Export', array(
+				'row' => $reg->as_array(),
+				'fields' => $fields,
+				'callback' => 'export'
+			));		
+		}	
+	}
+	
+	public function export2($cid)
+	{
+		if (!isset($cid) || !is_numeric($cid) || $cid <= 0)
+			die('Get out of here!');
+	
+		$passes = ORM::Factory('Pass')->where("convention_id", $cid)->find_all();
+		$status_values = Registration_Model::getStatusValues();
+		
+		if ($post = $this->input->post())
+		{			
+			$export_passes = array();
+			$export_status = array();
+			$export_age = array();
+	
+			//Determine what to export. This is a bit cheap but it works...
+			foreach($post as $k => $v):			
+				/* Pass include */
+				if ($k[0] == 'p')
+				{
+					$temp = explode("_", $k);
+					$export_passes[$temp[1]] = $temp[1];
+				}	
+				else if ($k[0] == 's')
+				{
+					$temp = explode("_", $k);
+					$export_status[$temp[1]] = $temp[1];
+				}
+				else if ($k == 'minor')
+				{
+					$export_age['minor'] = 'minor';
+				}
+				else if ($k == 'adult')
+				{
+					$export_age['adult'] = 'adult';
+				}				
+			endforeach;		
+			
+			print (count($export_passes));
+			
+			$age;
+			if (isset($export_age['minor']) && isset($export_age['adult']))
+				$age = 'all';
+			else if (isset($export_age['minor']))
+				$age = 'minor';
+			else if (isset($export_age['adult']))
+				$age = 'adult';
+			else
+				$age = 'none';
+			
+			$this->doExport($cid, $export_passes, $export_status, $age);
+		}
+		
+		$this->view->content = new View('admin/Export2', array(
+				'passes' => $passes,
+				'status_values' => $status_values,
+				'callback' => "export2/$cid"
+			));
 	}
 	
 	/*
@@ -1138,5 +1246,94 @@ class Admin_Controller extends Controller
 		}
 		
 		$reg->save();
+	}
+	
+	function test()
+	{
+		$this->doExport('1', null, null, 'adult');
+	}
+	
+	/*
+	* doExport - Export all information pertaining to the registration and pass cost.
+	*
+	* $cid is the Convention identifier that we will export the list of registrations from.
+	* $passes is the array of allowed pass types for registrations to be included in the exported list.
+	* $status is the array of allowed status values for registrations exported to the list.
+	* 
+	* $age is a single value of either "all", "minor", "adult", or "none".
+	*/
+	private function doExport($cid, $passes, $status, $age)
+	{
+		$query = ORM::Factory('Registration');
+		
+		if ($cid == null || !is_numeric($cid)) {
+			die('Get out of here!');	
+		}
+	
+		if ($passes != null && is_array($passes) && count($passes) > 0)
+		{
+			$query = $query->in('registrations.pass_id', implode(",", $passes));
+		}
+	
+		if ($status != null && is_array($status) && count($status) > 0)
+		{
+			$query = $query->in('registrations.status', implode(",", $status));
+		}
+		
+		
+		if ($age != null)
+		{
+			if ($age == 'minor')
+			{
+				$query->where(" (YEAR(CURDATE()) - YEAR(dob)) - (RIGHT(CURDATE(),5) < RIGHT(dob,5)) < 18");
+			}
+			else if ($age == 'adult')
+			{
+				$query->where(" (YEAR(CURDATE()) - YEAR(dob)) - (RIGHT(CURDATE(),5) < RIGHT(dob,5)) > 17");
+			}
+		}
+		
+	
+		//Lazy vs eager? We're going to use it all...get it all in one go.
+		$results = $query->where("registrations.convention_id", $cid)->with('pass')->with('account')->with('convention')->find_all();		
+		$csv_content = "";	
+		
+		/* Generate the content */
+		if (count($results) > 0)
+		{
+			$csv_content = $results[0]->getColumns() . "\n"; //Have it output actual column names...
+			foreach($results as $result):	
+				$temp = $result->as_array();
+				
+				/* Change to more meaningful values */
+				$temp['pass_id'] = $result->pass->name . ' ( $' . $result->pass->price . ' )';
+				$temp['account_id'] = $result->account->email;
+				$temp['convention_id'] = $result->convention->name;
+				$temp['status'] = Registration_Model::regStatusToString($temp['status']);		
+				
+				//$values = array_values($temp);	
+				//$csv_content .= implode(",", $values) . "\n";
+				$first = true;
+				foreach($temp as $value):
+					if (!$first) 
+						$csv_content .= ',';						
+					else 
+						$first = false;
+				
+					$csv_content .= "\"" . $value . "\"";
+				endforeach;
+				
+				$csv_content .= "\n";
+			endforeach;				
+		}		
+			
+		$filename = 'Registrations_' . date("n_d_Y_G_H") . '.csv';
+		header("Content-type: application/csv");
+		header("Content-Disposition: attachment; filename=$filename");
+		header("Pragma: no-cache");	
+		header("Expires: 0");
+
+	    print $csv_content;
+	    exit;		
 	}
 }
