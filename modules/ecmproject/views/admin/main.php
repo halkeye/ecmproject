@@ -14,7 +14,13 @@
 	</tr>
 	<tr>
 		<td>Add, modify, or delete user accounts in the system.</td>
-		<td>Add, modify or delete convention registrations for user(s).</td>
+		<td>Add, modify or delete convention registrations for user(s) as well as view and manage payments.</td>
+	</tr>
+	<tr>
+		<th class='header'><?php echo html::anchor('admin/export', 'Export Registration Information (CSV)') ?></th>
+	</tr>
+	<tr>
+		<td>Exports selected (or all) registration information for a particular convention to a CSV file which can be opened in Excel.</td>
 	</tr>
 </table>
 </div>
