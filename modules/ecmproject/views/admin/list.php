@@ -15,9 +15,9 @@
 		} 
 	?>
 	
-	<?php echo form::open("admin/search"); ?>
+	<?php echo form::open("admin/search/$entity"); ?>
 	<p class='floatRight'>
-		<label for='pass_search'>Search: </label> <input type='text' id='pass_search' name='pass_search'></input><button type='submit'>Search</button>	
+		<label for='search_term'>Search: </label> <input type='text' id='search_term' name='search_term'></input> <button type='submit'>Search</button>	
 	</p>
 	<?php echo form::close(); ?>
 
