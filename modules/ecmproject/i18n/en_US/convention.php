@@ -13,6 +13,9 @@ $lang = array(
         'registration_select_pass_header' => 'Select a Pass',
         'registration_select_pass_desc'   => 'Please select the pass you wish to register for below. Keep in mind that certain passes, such as pre-registration passes, are only available for registration at certain times and that only passes that can be purchased will be listed below.',
 
+		'registration_field_id'			  => 'Registration ID',
+		'registration_field_convention_id'=> 'Convention',
+		'registration_field_account_id'   => 'Account', 
         'registration_field_gname'        => 'Given Name',
         'registration_field_sname'        => 'Surname',
         'registration_field_badge'        => 'Nickname',
@@ -28,6 +31,7 @@ $lang = array(
         'registration_field_heard_from'   => 'Heard from',
         'registration_field_attendance_reason' => 'Reason For Attendance',
         'registration_field_agree_toc'    => 'I have read and agreed to the <b>Terms and Conditions</b>',
+		'registration_field_status'		  => 'Registration Status',
 
         'registration_tac_header' => 'Terms And Conditions',
         'registration_tac_desc'   => '',
