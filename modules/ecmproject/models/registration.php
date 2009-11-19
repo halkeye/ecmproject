@@ -22,7 +22,7 @@ class Registration_Model extends ORM
     // Table primary key and value
     protected $primary_key = 'id';
 
-    // Model table information
+    // Model table information	
     protected $table_columns = array (
             'id'            => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, 'sequenced' => true, ),
             'convention_id' => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true,                      ),
@@ -313,7 +313,31 @@ class Registration_Model extends ORM
 		else
 			return 'IN LIMBO';
 	}
-
+	
+	public function getColumns()
+	{
+		//return implode(",", array_keys($this->table_columns));
+		$keys = array_keys($this->table_columns);
+		$columns = array();
+		
+		foreach($keys as $key):
+			$columns[$key] = Kohana::lang('convention.registration_field_' . $key);					
+		endforeach;
+		
+		return implode(",", $columns);
+	}
+	
+	//Function spam!
+	public function getStatusValues()
+	{
+		$status_values = array();
+		$status_values[Registration_Model::STATUS_UNPROCESSED] = 'UNPROCESSED';
+		$status_values[Registration_Model::STATUS_PROCESSING] = 'PROCESSING';
+		$status_values[Registration_Model::STATUS_PAID] = 'PAID';
+		$status_values[Registration_Model::STATUS_NOT_ENOUGH] = 'PARTIAL PAYMENT';
+		$status_values[Registration_Model::STATUS_FAILED] = 'FAILED';
+		return $status_values;
+	}
 }
 
 /* End of file user.php */
