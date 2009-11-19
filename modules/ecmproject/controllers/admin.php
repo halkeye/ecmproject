@@ -70,6 +70,7 @@ class Admin_Controller extends Controller
 		
 		// Set callback path for form submit (change convention, jump to page)
 		$this->view->content = new View('admin/list', array(
+				'entity' => 'Convention',
 				'callback' => 'admin/manageConventions', 
 				'createText' => 'Create new Convention',
 				'createLink' => 'admin/createConvention', 
@@ -114,6 +115,7 @@ class Admin_Controller extends Controller
 		// Set callback path for form submit (change convention, jump to page)
 	
 		$this->view->content = new View('admin/list', array(
+				'entity' => 'Account',
 				'callback' => 'admin/manageAccounts', 
 				'createText' => 'Create new Account',
 				'createLink' => 'admin/createAccount', 
@@ -163,6 +165,7 @@ class Admin_Controller extends Controller
 		
 		// Set callback path for form submit (change convention, jump to page)
 		$this->view->content = new View('admin/list', array(
+				'entity' => 'Pass',
 				'crows' => $crows, 
 				'callback' => 'admin/managePasses', 
 				'createText' => 'Create new Pass',
@@ -213,6 +216,7 @@ class Admin_Controller extends Controller
 		
 		// Set callback path for form submit (change convention, jump to page)
 		$this->view->content = new View('admin/list', array(
+				'entity' => 'Registration',
 				'crows' => $crows, 
 				'callback' => 'admin/manageRegistrations', 
 				'createText' => 'New Registration',
@@ -971,10 +975,72 @@ class Admin_Controller extends Controller
 		Admin_Controller::__delete($id, 'Payment', "deletePayment/$rid", "managePayments/$rid", true);				
 	}
 	
-	function search()
+	function search($entity = NULL)	
 	{
-		//Go context sensitive...
+		//Determine search term (POST).
+		$post = $this->input->post();	
+		
+		if (isset($post['search_term']))
+			$search_term = $post['search_term'];		
+		else
+			$search_term = null;
 	
+		//Go context sensitive...
+		$rows = null;
+		if ($entity == 'Registration' && $search_term != null)
+		{
+			$rows = ORM::Factory('Registration')
+				->orlike('email', $search_term)
+				->orlike('gname', $search_term)
+				->orlike('sname', $search_term)
+				->orwhere('id',$search_term)
+				->find_all();
+		}
+		else if ($entity == 'Account' && $search_term != null)
+		{
+			$rows = ORM::Factory('Account')
+				->orlike('email', $search_term)
+				->orwhere('id',$search_term)
+				->find_all();
+		}
+		else if ($entity == 'Convention' && $search_term != null)
+		{
+			$rows = ORM::Factory('Convention')
+				->orlike('name', $search_term)
+				->orwhere('id',$search_term)
+				->find_all();
+		}
+		else if ($entity == 'Pass' && $search_term != null)
+		{
+			$rows = ORM::Factory('Pass')
+				->orlike('name', $search_term)
+				->orwhere('id',$search_term)
+				->find_all();
+		}
+	
+		// Header entry. (View with no data generates a header)					
+		if ($rows != null)
+		{			
+			$data['entries'][0] = new View("admin/ListItems/$entity" . 'Entry');
+			foreach ($rows as $row)
+			{
+				$data['actions']['edit'] = html::anchor("admin/edit$entity/". $row->id, html::image('img/edit-copy.png', Kohana::lang('admin.edit_account')));
+				$data['actions']['delete'] = html::anchor("admin/delete$entity/" . $row->id, html::image('img/edit-delete.png', Kohana::lang('admin.delete_account')));			
+				$data['entries'][$row->id] = new View("admin/ListItems/$entity" . 'Entry', array('row' => $row, 'actions' => $data['actions']));				
+			}			
+		} else if ($search_term == null) {
+			$this->addError('No search term entered.');
+			$data['entries'] = null;
+		} else {
+			$this->addError('Searching for something that does not exist!');
+			$data['entries'] = null;
+		}
+		
+		// Set callback path for form submit (change convention, jump to page)
+		$this->view->content = new View('admin/Search', array(
+				'callback' => "admin/search/$entity", 
+				'rows' => $data['entries'], 
+		));	
 	}
 	
 	/* Common use functions */
@@ -1250,7 +1316,7 @@ class Admin_Controller extends Controller
 	
 	function test()
 	{
-		$this->doExport('1', null, null, 'adult');
+		$this->search('Registration', 'Ste');
 	}
 	
 	/*
