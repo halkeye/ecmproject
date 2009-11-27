@@ -581,7 +581,7 @@ class Admin_Controller extends Controller
 					$this->addMessage('Payment created for the amount of: ' . $pay->mc_gross . ' (' . $pay->type . ') ');
 					
 					/* Check status of payment for registration */				
-					$this->updatePaymentStatus($pay, $reg, $pass);						
+					$this->updatePaymentStatus($reg, $pass);						
 					url::redirect("admin/managePayments/$rid");
 				}
 				else
@@ -917,7 +917,7 @@ class Admin_Controller extends Controller
 				$pay->save();				
 				if ($pay->saved) {				
 					$this->addMessage('Edited payment to the amount of: ' . $pay->mc_gross . ' (' . $pay->type . ') ');
-					$this->updatePaymentStatus($pay, $reg, $pass);						
+					$this->updatePaymentStatus($reg, $pass);						
 					url::redirect('admin/managePayments/' . $pay->register_id);
 				}
 				else
@@ -1079,7 +1079,7 @@ class Admin_Controller extends Controller
 
 					if ($updatePaymentStatus)
 					{							
-						$this->updatePaymentStatus(null, $reg, $pass);							
+						$this->updatePaymentStatus($reg, $pass);							
 					}				
 					
 					url::redirect("admin/$return");
@@ -1288,29 +1288,18 @@ class Admin_Controller extends Controller
      * const STATUS_PAID        = 99; // Fully working and paid	
 	 */
 	
-	function updatePaymentStatus($pay = NULL, $reg, $pass)
+	function updatePaymentStatus($reg, $pass)
 	{		
-		/* Check status of payment for registration */		
-		if ($pay == NULL)
+		/* Check status of payment for registration */			
+		if (Payment_Model::staticGetTotal($reg->id) >= $pass->price)
 		{
-			if (Payment_Model::staticGetTotal($reg->id) >= $pass->price)
-			{
-				$reg->status = Registration_Model::STATUS_PAID;			
-			}
-			else
-			{
-				$reg->status = Registration_Model::STATUS_NOT_ENOUGH;
-			}		
-		}
-		else if ($pay->getTotal() >= $pass->price) {
 			$reg->status = Registration_Model::STATUS_PAID;			
 		}
-		/* If total payment no longer equals or exceeds cost of badge, mark as failed registration. */
 		else
 		{
 			$reg->status = Registration_Model::STATUS_NOT_ENOUGH;
-		}
-		
+		}		
+				
 		$reg->save();
 	}
 	
