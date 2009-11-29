@@ -60,7 +60,8 @@ class Convention_Model extends ORM
 
     public function getCurrentConvention()
     {
-        return $this->where(time().' BETWEEN start_date AND end_date')->find();
+        //return $this->where(time().' BETWEEN start_date AND end_date')->find(); //If start dates are set to actual convention start dates, this goes boom.
+		return $this->where('start_date >', time())->orderby('start_date', 'asc')->find();
     }
 
 	public function getTotalConventions()
