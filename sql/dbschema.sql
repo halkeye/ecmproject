@@ -61,13 +61,13 @@ CREATE TABLE registrations (
    sname VARCHAR(55) NOT NULL, -- Surname
    badge VARCHAR(55),
    dob DATE NOT NULL,
-   phone VARCHAR(15) NOT NULL,
-   cell VARCHAR(15), -- Cell is an optional field, so don't require a field value.
+   phone VARCHAR(25) NOT NULL,
+   cell VARCHAR(25), -- Cell is an optional field, so don't require a field value.
    city VARCHAR(85),
    prov VARCHAR(50),
    email VARCHAR(55) NOT NULL, -- Account email can be the same as this one...
    econtact VARCHAR(55) NOT NULL,
-   ephone VARCHAR(15) NOT NULL,
+   ephone VARCHAR(25) NOT NULL,
    heard_from TEXT, -- We'll leave these two here just in case.
    attendance_reason TEXT,
    status TINYINT NOT NULL, -- Status of account (unprocessed, processing, accepted, etc)
