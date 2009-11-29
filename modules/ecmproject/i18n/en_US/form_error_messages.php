@@ -12,7 +12,7 @@ $lang = array(
  'password' => Array
     (
         'required' => 'You must supply a password.',
-        'default' => 'Invalid Input for password.',
+        'default' => 'Invalid Input for password. (Password length must be > 6 characters)',
     ),
  'confirm_password' => Array
     (

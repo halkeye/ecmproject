@@ -122,6 +122,7 @@ class Account_Model extends ORM
         // Add Rules
         $array->add_rules('email', 'required', array('valid','email'));
         $array->add_rules('password', 'required');
+		$array->add_rules('password', 'length[6,255]');
 
         $array->add_rules('confirm_password', 'required');
         $array->add_rules('confirm_password',  'matches[password]');
