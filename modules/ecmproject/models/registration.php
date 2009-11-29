@@ -109,7 +109,7 @@ class Registration_Model extends ORM
         // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
         $this->addValidationRules_admin($array);
 
-        /* Keep track of what really changed so we don't update fields we havn't changed */
+        /* Keep track of what really changed so we don't update fields we haven't changed */
         $realChanged = $this->changed;
         foreach ($array->safe_array() as $field=>$value)
         {
@@ -143,13 +143,14 @@ class Registration_Model extends ORM
         {
             $form->add_rules('agree_toc', 'required');
         }
-        $form->add_rules('email', 'required', array('valid','email'));
-        $form->add_rules('phone', array('valid', 'phone'));
-        $form->add_rules('cell', array('valid', 'phone'));
-        $form->add_rules('ephone', array('valid', 'phone'));
-        $form->add_rules('dob', array('valid', 'date'));
+        $form->add_rules('email', 'required', array('valid','email'));		
+		$form->add_rules('phone', 'phone[7,10-20]');
+        $form->add_rules('cell', 'phone[7,10-20]');
+        $form->add_rules('ephone', 'phone[7,10-20]');
+        $form->add_rules('dob', 'phone[7,10-20]');
         $form->add_callbacks('pass_id', array($this, '_valid_pass_for_account'));
     }
+	
 	private function addValidationRules_admin($form)
     {
         $form->pre_filter('trim');
@@ -162,15 +163,15 @@ class Registration_Model extends ORM
                 $form->add_rules($field, 'required');
             }
         }
-
+		
         // Add Rules
         $form->add_rules('heard_from', 'standard_text');
         $form->add_rules('attendance_reason', array($this, '_true'));
         $form->add_rules('email', 'required', array('valid','email'));
-        $form->add_rules('phone', array('valid', 'phone'));
-        $form->add_rules('cell', array('valid', 'phone'));
-        $form->add_rules('ephone', array('valid', 'phone'));
-        $form->add_rules('dob', array('valid', 'date'));
+		$form->add_rules('phone', 'phone[7,10-20]');
+        $form->add_rules('cell', 'phone[7,10-20]');
+        $form->add_rules('ephone', 'phone[7,10-20]');
+        $form->add_rules('dob', 'phone[7,10-20]');
         //$form->add_callbacks('pass_id', array($this, '_valid_pass_for_account'));
     }
 	
@@ -193,7 +194,7 @@ class Registration_Model extends ORM
             $array->add_error($field, 'invalid_pass_age');
         }
     }
-
+	
     /**
      * @param $accountId Account Id
      * @param $conventionId [optional] Convention id, defaults to most recent one
