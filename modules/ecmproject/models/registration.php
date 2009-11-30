@@ -147,7 +147,7 @@ class Registration_Model extends ORM
 		$form->add_rules('phone', 'phone[7,10-20]');
         $form->add_rules('cell', 'phone[7,10-20]');
         $form->add_rules('ephone', 'phone[7,10-20]');
-        $form->add_rules('dob', 'phone[7,10-20]');
+        $form->add_rules('dob', 'date');
         $form->add_callbacks('pass_id', array($this, '_valid_pass_for_account'));
     }
 	
@@ -171,7 +171,7 @@ class Registration_Model extends ORM
 		$form->add_rules('phone', 'phone[7,10-20]');
         $form->add_rules('cell', 'phone[7,10-20]');
         $form->add_rules('ephone', 'phone[7,10-20]');
-        $form->add_rules('dob', 'phone[7,10-20]');
+        $form->add_rules('dob', 'date');
         //$form->add_callbacks('pass_id', array($this, '_valid_pass_for_account'));
     }
 	
