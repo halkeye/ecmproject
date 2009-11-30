@@ -177,14 +177,23 @@ class Registration_Model extends ORM
 	
     public function _valid_pass_for_account(Validation $array, $field)
     {
-        $ageTime = strtotime($array['dob']);
-        $t = $this->convention->start_date; // Store current time for consistency
-        $age = ($ageTime < 0) ? ( $t + ($ageTime * -1) ) : $t - $ageTime;
-        $yearsOld = intval(floor($age / (60 * 60 * 24 * 365)));
-
-        // If add->rules validation found any errors, get me out of here!
+        /*
+         * If add->rules validation found any errors, get me out of here!
+         * Saves us doing any sql lookups before its valid data 
+         */
 //        if (array_key_exists('pass_id', $array->errors()))
 //            return;
+        $ageTime = strtotime($array['dob']);
+        $pass = ORM::Factory('Pass')->with('convention')->find($array['pass_id']);
+        $conventionStartTime = $pass->convention->start_date;
+        $yearsOld = date::timespan($ageTime, $conventionStartTime, 'years');
+        Kohana::log('error', var_export(array(
+                        $array['dob'], 
+                        date('Y-m-d', $conventionStartTime),
+                        date::timespan($ageTime, $conventionStartTime+3600),
+                        $yearsOld,
+        ),1));
+
         $query = $this->getPossiblePassesQuery();
         $query->where('minAge <=', $yearsOld);
         $query->where('maxAge >=', $yearsOld);
@@ -241,8 +250,8 @@ class Registration_Model extends ORM
         return ORM::Factory('pass')
             ->where('enddate >=',   time())
             ->where('startdate <=', time())
-            ->where('isPurchasable', 1)
-            ->where('convention_id', $this->convention_id);
+            ->where('isPurchasable', 1);
+            #->where('convention_id', $this->convention_id);
     }
 
     public function getForAccount($account_id)
@@ -258,6 +267,7 @@ class Registration_Model extends ORM
     
     public function save()
     {
+        $this->convention_id = $this->pass->convention_id;
         $originalChanged = $this->changed;
         $this->changed = array_keys($this->changed);
 		

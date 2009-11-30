@@ -14,6 +14,8 @@ class Pass_Model extends ORM
             'maxAge' => array( 'type'  => 'text', 'label' => 'Maximum Age', 'required' => true),
             'isPurchasable'  => array( 'type'  => 'boolean', 'label' => 'Purchasable', 'required' => false),
     );
+    
+    protected $has_one = array('convention');
 		
 	public function __construct($id = NULL)
 	{

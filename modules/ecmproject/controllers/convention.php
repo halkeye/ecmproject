@@ -52,7 +52,6 @@ class Convention_Controller extends Controller
         $reg = ORM::factory('registration', $reg_id);
         if (!$reg->loaded)
         {
-            $reg->convention_id = ORM::Factory('convention')->getCurrentConvention();
             $reg->account_id    = $this->auth->get_user()->id;
             $reg->email         = $this->auth->getAccount()->email;
         }
