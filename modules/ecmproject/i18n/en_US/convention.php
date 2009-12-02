@@ -2,6 +2,8 @@
 $lang = array(
         'checkout_with_paypal'  => 'Pay with Paypal',
         'checkout_with_other'   => 'Pay via Mail/In-Person',
+		'checkout_other_heading' => 'Mail-in/In-Person',
+		'checkout_other_subheading' => 'For when you want to mail in payment, or bringing in person to us',
         'checkout_button_add_registration'         => 'Add More Registrations',
         'checkout_heading'      => 'Shopping Cart',
         'checkout_subheading'   => "The badges that you've signed up for so far",
