@@ -203,6 +203,15 @@ class Convention_Controller extends Controller
         $this->view->subheading = Kohana::lang('convention.checkout_other_subheading'); 
 
         $data = array();
+		
+		/* Fetch all registrations that are marked with status UNPROCESSED, or PARTIAL PAYMENT */
+		$data['registrations'] = ORM::Factory('Registration')->getForAccount($this->auth->getAccount()->id);
+		if (!$data['registrations']->count()) 
+        {
+            $this->addError('FIXME: Nothing to pay for!');
+            return;
+        }
+		
         /* Our "checkout template" */
         $this->view->content = new View('convention/checkoutOther', $data);
     }
