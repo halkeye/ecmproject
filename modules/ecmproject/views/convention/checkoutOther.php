@@ -3,6 +3,7 @@
 <p>
 To ensure the successful processing of your payment and entry into the convention, please ensure that you <strong>read everything on this page</strong> before submitting or bringing payment.
 Listed below are the registrations that will be paid for. If in error, press the back button and add, edit or remove registrations as necessary.
+The Reg(istration) ID displayed on this page is not your badge number but is used for quick reference in our system. Any questions to registration@animeevolution.com should include the registration ID if possible.
 </p>
 
 <?php $acctDetails = $this->auth->getAccount() ?>
@@ -15,16 +16,18 @@ Account Status: <?php echo $acctDetails->statusToString(); ?>
 
 <table width='100%'>    
 	<tr>    
-		<th width='40%'>For</th>
+		<th width='10%'>Reg ID</th>
+		<th width='35%'>For</th>
 		<th width='30%'>Item</th>
 		<th width='10%'>Price</th>  
-		<th width='10%'>Status</th>  
+		<th width='15%'>Status</th>  
 	</tr>
 	<?php
 	foreach ($registrations as $reg)
 	{
 		$class_row = text::alternate('odd','even');
 		echo '<tr class="'.$class_row.'">';
+		echo '<td>' . html::specialchars($reg->id) . '</td>';
 		echo '<td>' . html::specialchars($reg->gname . ' ' . $reg->sname) . '</td>';
 		echo '<td>' . html::specialchars($reg->pass->name) . '</td>';
 		echo '<td>' . html::specialchars(sprintf('$%01.2F', $reg->pass->price)) . '</td>';
