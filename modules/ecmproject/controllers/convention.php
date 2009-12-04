@@ -45,6 +45,65 @@ class Convention_Controller extends Controller
         return;
     }
 
+	/* Force limitation: cannot delete registrations unless they are unprocessed */
+	//TODO: Put strings to lang file.
+	function deleteReg($reg_id = NULL)
+	{
+		$reg_id = isset($reg_id) ? intval($reg_id) : NULL;
+		$reg = ORM::factory('registration', $reg_id);
+		
+		if (!$reg->loaded)
+		{
+			$this->addError(Kohana::lang('convention.not_loaded'));
+			url::redirect("convention/checkout");
+		}
+		
+		if ($reg->status != Registration_Model::STATUS_UNPROCESSED)
+		{
+			$this->addError(Kohana::lang('convention.registration_already_processed_unable_to_edit'));
+			url::redirect("convention/checkout");
+		}
+		
+		if ($post = $this->input->post())
+        {
+			if ($val = $this->input->post('Yes'))
+			{
+				if ($reg->delete())
+				{
+					$this->addMessage(Kohana::lang('convention.delete_success'));	
+				}
+				else
+				{
+					$this->addError(Kohana::lang('convention.delete_error'));	
+				}
+			}
+			
+			url::redirect("convention/checkout");
+		}
+				
+		$this->view->content = new View('convention/deleteReg', array('reg'=>$reg));
+
+	}
+	
+	function viewReg($reg_id = NULL)
+	{
+		$this->view->title = "Viewing Registration...";		
+	
+		$reg_id = isset($reg_id) ? intval($reg_id) : NULL;
+		$reg = ORM::factory('registration', $reg_id);
+		$pass = ORM::factory('Pass', $reg->pass_id);
+		
+		if (!$reg->loaded)
+		{
+			$this->addError(Kohana::lang('convention.not_loaded'));
+			url::redirect("convention/checkout");
+		}
+		
+		$this->view->heading = $pass->name . ' for ' . $reg->gname . ' ' . $reg->sname;
+		$this->view->subheading = 'Viewing registration...';
+		$this->view->content = new View('convention/viewReg', array('reg' => $reg, 'pass' => $pass));
+	}
+	
     function editReg($reg_id = NULL)
     {
         $reg_id = isset($reg_id) ? intval($reg_id) : NULL;
