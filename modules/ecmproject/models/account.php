@@ -82,7 +82,7 @@ class Account_Model extends ORM
     function isBanned()   { return $this->status == Account_model::ACCOUNT_STATUS_BANNED; }
     function isVerified() { return $this->status == Account_model::ACCOUNT_STATUS_VERIFIED; }
 
-    function sendValidateEmail($code)
+    function sendValidateEmail($code, $type = 'registration')
     {
         $timestamp = time();
         $emailVars = array(
@@ -98,15 +98,12 @@ class Account_Model extends ORM
 
         $to      = $emailVars['email'];
         $from    = Kohana::lang('ecmproject.outgoing_email_name') . ' <' . Kohana::lang('ecmproject.outgoing_email_address') . '>';
-        $subject = Kohana::lang('ecmproject.registration_subject');
+        $subject = Kohana::lang('ecmproject.'.$type.'_subject');
  
-        $view = new View('user/register_email', $emailVars);
+        $view = new View('user/'.$type.'_email', $emailVars);
         $message = $view->render(FALSE);
 
-/*        if (php_uname('n') == 'barkdog')
-            file_put_contents("/var/www/emails.html", "<pre>To: $to\nFrom: $from\nSubject: Subject\n\n$message\n=======================================================================\n\n", FILE_APPEND);
-        else*/
-            email::send($to, $from, $subject, $message, TRUE);
+        email::send($to, $from, $subject, $message, TRUE);
     }
 
     /**
