@@ -14,5 +14,5 @@
 
 <br />
 --<br />
-<p>To stop receiving these notifications, head to the Privacy section at <?php echo html::anchor('/user/privacy') ?> </p>
-
+Anime Evolution Registration
+registration@animeevolution.com
