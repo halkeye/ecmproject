@@ -1,3 +1,3 @@
-alter table registrations change phone phone VARCHAR(25) NOT NULL;
-alter table registrations change cell cell VARCHAR(25) NOT NULL;
-alter table registrations change ephone ephone VARCHAR(25) NOT NULL;
+alter table verificationcodes add `type` INT UNSIGNED NOT NULL AFTER `account_id`;
+alter table verificationcodes add `value` VARCHAR(255) NOT NULL AFTER `code`;
+alter table verificationcodes drop key `account_id`;

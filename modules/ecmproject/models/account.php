@@ -1,5 +1,9 @@
 <?php
 
+
+define('MAX_VERIFICATION_ITEMS', 2);
+class Verification_Exceeds_Exception extends Exception {}
+
 class Account_Model extends ORM 
 {
     const ACCOUNT_STATUS_UNVERIFIED =  0;
@@ -215,22 +219,44 @@ class Account_Model extends ORM
     }
 
 
-    public function generateVerifyCode()
+    public function generateVerifyCode($type, $value = NULL)
     {
-        $vcode = ORM::Factory('verificationcode')->where('account_id', $this->id)->delete_all();
+        $countType = ORM::Factory('verificationcode')
+            ->where('account_id', $this->id)
+            ->where('type', $type)
+            ->count_all();
+
+        if ($countType >= MAX_VERIFICATION_ITEMS)
+        {
+            throw new Verification_Exceeds_Exception();
+        }
+
         while (true)
         {
             try 
             {
                 $code = substr(md5(uniqid(rand(), true)), 0, 10);
                 $vcode = ORM::Factory('verificationcode');
+                $vcode->original_code = $code;
                 $vcode->account_id = $this->id;
                 $vcode->code = sha1($this->salt. $code);
+                $vcode->type = $type;
+                $vcode->value = $value;
                 $vcode->save();
-                return $code;
+                return $vcode;
             }
-            catch (Kohana_Database_Exception $e) {}
+            catch (Kohana_Database_Exception $e) {
+                var_dump($e);
+                die($e);
+            }
         }
+    }
+
+    public function validateAccount()
+    {
+        $account->status = Account_Model::ACCOUNT_STATUS_VERIFIED;
+        /* Delete any outstanding validation codes */
+        $vcode = ORM::Factory('verificationcode')->where('account_id', $this->id)->delete();
     }
 	
 	public function statusToString() {

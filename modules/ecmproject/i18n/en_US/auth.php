@@ -23,9 +23,19 @@ $lang = array(
         'changeEmail_heading'       => 'Change Email',
         'changeEmail_subheading'    => '---subheading--- FIXME',
         
+        'changePassword_field_password'   => 'New Password',
+        'changePassword_field_confirm_password'   => 'Confirm New Password',
+        'changePassword_field_submit'  => 'Change Password',
+        'changePassword_heading'       => 'Change Password',
+        'changePassword_subheading'    => '---subheading--- FIXME',
+        'passwordChangeSuccess'        => 'Email sucessfully changed, please check your email for verification email',
+        
         /* Access Denied Page */
         'accessDenied_heading'       => '---heading--- FIXME',
         'accessDenied_subheading'    => '---subheading--- FIXME',
         'accessDenied_title'         => 'Access Denied',
         'accessDenied_paragraph'     => 'This area requires more access than you currently have. If you think you should have access please contact AE staff HR department.',
+
+        /* User has attempted to verify an email too many times */
+        'too_many_verification'      => 'You have attempted to verify an email too many times. Please contact registrations@animeevolution.com to help you out.',
 );

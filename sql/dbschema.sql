@@ -124,11 +124,12 @@ CREATE TABLE accounts_usergroups (
 
 DROP TABLE IF EXISTS `verificationcodes`;
 CREATE TABLE `verificationcodes` (
-   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-   account_id INT UNSIGNED NOT NULL,
-   code VARCHAR(40) NOT NULL, 
+   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+   `account_id` INT UNSIGNED NOT NULL,
+   `type` INT UNSIGNED NOT NULL,
+   `code` VARCHAR(40) NOT NULL, 
+   `value` VARCHAR(255) NOT NULL, 
    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
-   UNIQUE (`account_id`),
    UNIQUE (`code`)
 );
 

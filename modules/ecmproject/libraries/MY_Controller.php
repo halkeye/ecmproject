@@ -57,6 +57,7 @@ class Controller extends Controller_Core
                     $this->auth->storeAccount($user);
                 }
             }
+            $this->addMenuItem(array('title'=>'My Account', 'url'=>'user'));
 
             if ($this->auth->hasPermission('admin'))
             {

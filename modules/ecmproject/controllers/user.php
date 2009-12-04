@@ -15,7 +15,7 @@ class User_Controller extends Controller
     function index()
     {
         $this->requireLogin();
-        $this->view->content = "This page is 'main page' from the flow diagram. What does it do, I don't know.";
+        $this->view->content = new View('user/index');
     }
 
     function login()
@@ -84,8 +84,16 @@ class User_Controller extends Controller
             {
                 $account->save();
 
-                $code = $account->generateVerifyCode();
-                $account->sendValidateEmail($code);
+                try {
+                    $vcode = $account->generateVerifyCode(Verificationcode_Model::TYPE_VALIDATE_EMAIL);
+                }
+                catch (Verification_Exceeds_Exception $e) 
+                {
+                    $this->addError(Kohana::lang('auth.too_many_verification'));
+                    $this->view->content = "";
+                    return;
+                }
+                $account->sendValidateEmail($vcode->original_code);
 
                 $this->auth->complete_login($account);
                 $this->addMessage(Kohana::lang('ecmproject.registration_success_message'));
@@ -127,26 +135,29 @@ class User_Controller extends Controller
             $this->_badVerify();
         if (!$key) 
             $this->_badVerify();
-        $code = ORM::Factory('verificationcode', sha1($account->salt.$key));
+        $vcode = ORM::Factory('verificationcode')->where('code',sha1($account->salt.$key))->find();
 
         /* We have no account */
         if (!$account->loaded) 
             $this->_badVerify();
         
         /* We don't have a valid code */
-        if (!$code || !$code->loaded || 
-             $code->account_id != $account->id)
+        if (!$vcode || !$vcode->loaded || 
+             $vcode->account_id != $account->id)
+        {
             $this->_badVerify();
+        }
 
         /* Verify the account */
-        $account->status = Account_Model::ACCOUNT_STATUS_VERIFIED;
+        if ($vcode->type == Verificationcode_Model::TYPE_EMAIL_CHANGE)
+        {
+            $account->email = $vcode->value;
+        }
+        $account->validateAccount();
         /* Complete login saves the account when it updates the login time */
         $this->auth->complete_login($account);
-        /* Delete the code */
-        $code->delete();
 
         /* Show a message that they logged in, and goto the default page */
-        /* FIXME */
         $this->addMessage(Kohana::lang('auth.verification_success'));
         $this->_redirect('');
     }
@@ -187,9 +198,18 @@ class User_Controller extends Controller
         /* Get logged in account */
         $account = $this->auth->getAccount();
         /* Generate new code */
-        $code = $account->generateVerifyCode();
+        try {
+            $vcode = $account->generateVerifyCode(Verificationcode_Model::TYPE_VALIDATE_EMAIL);
+        }
+        catch (Verification_Exceeds_Exception $e) 
+        {
+            $this->addError(Kohana::lang('auth.too_many_verification'));
+            $this->view->content = "";
+            return;
+        }
+
         /* Send email */
-        $account->sendValidateEmail($code);
+        $account->sendValidateEmail($vcode->original_code);
 
         /* FIXME: Send Verification Message */
         $this->addMessage(Kohana::lang('auth.sendVerificationMessage', $account->email)); 
@@ -227,23 +247,23 @@ class User_Controller extends Controller
 
             if ( $post->validate())
             {
-                $account->email  = $post['email'];
-
-                /* FIXME: Log email change */
-                /* FIXME: if we have a working one, keep the working one until the new one is verified? */
-
-                /* Reset verification status */
-                $account->status = Account_Model::ACCOUNT_STATUS_UNVERIFIED;
                 /* Generate new code */
-                $code = $account->generateVerifyCode();
+                try {
+                    $vcode           = $account->generateVerifyCode(Verificationcode_Model::TYPE_EMAIL_CHANGE, $post['email']);
+                }
+                catch (Verification_Exceeds_Exception $e) 
+                {
+                    $this->addError(Kohana::lang('auth.too_many_verification'));
+                    $this->view->content = "";
+                    return;
+                }
+
                 /* Send out verification Email */
-                $account->sendValidateEmail($code);
-                /* Update cached session object */
-                $this->auth->complete_login($account);
+                $account->sendValidateEmail($vcode->original_code);
                 /* Tell the user what happened */
                 $this->addMessage(Kohana::lang('auth.emailChangeSuccess'));
                 /* Redirect to main page */
-                $this->_redirect('');
+                url::redirect('user/index');
             }
             else
             {
@@ -254,6 +274,61 @@ class User_Controller extends Controller
             $errors = $post->errors('form_error_messages');
         }
         $this->view->content = new View('user/changeEmail', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
+    }
+    
+    function changePassword()
+    {
+        /* Set page title */
+        $this->view->title = "Change Password";
+        $this->view->heading = Kohana::lang('auth.changePassword_heading');
+        $this->view->subheading = Kohana::lang('auth.changePassword_subheading');
+        /* Require login */
+        $this->requireLogin();
+
+        /* Get logged in account */
+        $account = $this->auth->getAccount();
+        
+        $fields = array(
+                'password'         => array('type'=>'password', 'required'=> true),
+                'confirm_password' => array('type'=>'password', 'required'=> true),
+        );
+        $form = array(
+                'password' => '',
+                'confirm_password' => '',
+        );
+        $errors = array();
+
+        if ($post = $this->input->post())
+        {
+            $post = new Validation($this->input->post());
+            // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
+            $post->pre_filter('trim');
+            $post->add_rules('password', 'required');
+            $post->add_rules('password', 'length[6,255]');
+
+            $post->add_rules('confirm_password', 'required');
+            $post->add_rules('confirm_password',  'matches[password]');
+
+            if ( $post->validate())
+            {
+                $account->salt = null;
+                $account->password = $post['password'];
+                /* Complete login, update hash, update timestamps, etc */
+                $this->auth->complete_login($account);
+                /* Tell the user what happened */
+                $this->addMessage(Kohana::lang('auth.passwordChangeSuccess'));
+                /* Redirect to main page */
+                url::redirect('user/index');
+            }
+            else
+            {
+                $errors = $post->errors();
+            }
+            
+            $form = arr::overwrite($form, $post->as_array());
+            $errors = $post->errors('form_error_messages');
+        }
+        $this->view->content = new View('user/changePassword', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
     }
 
 }
