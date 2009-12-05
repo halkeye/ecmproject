@@ -30,6 +30,13 @@ $lang = array(
         'changePassword_subheading'    => '---subheading--- FIXME',
         'passwordChangeSuccess'        => 'Email sucessfully changed, please check your email for verification email',
         
+        /* Lost Password */
+        'lostPassword_field_email'   => 'Email',
+        'lostPassword_field_submit'  => '---FIXME--- Lost Password Submit',
+        'lostPassword_heading'       => 'Lost Password',
+        'lostPassword_subheading'    => '---subheading--- FIXME',
+        'lostPasswordSuccess'        => 'Lost password email successfully emailed --FIXME--',
+        
         /* Access Denied Page */
         'accessDenied_heading'       => '---heading--- FIXME',
         'accessDenied_subheading'    => '---subheading--- FIXME',

@@ -7,6 +7,7 @@ $lang = array(
         'alpha' => 'Only alphabetic characters are allowed.',
         'length' => 'The name must be between three and twenty letters.',
         'email_exists' => 'Email already exists. Please login or try a different email address.',
+        'email_not_exists' => 'Email does not exist. Please make sure to supply a valid email address.',
         'default' => 'Invalid Input for email.',
     ),
  'password' => Array

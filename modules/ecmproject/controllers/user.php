@@ -228,12 +228,8 @@ class User_Controller extends Controller
         /* Get logged in account */
         $account = $this->auth->getAccount();
         
-        $fields = array(
-                'email' => array('type'=>'text', 'required'=> true),
-        );
-        $form = array(
-                'email' => ''
-        );
+        $fields = array('email' => array('type'=>'text', 'required'=> true));
+        $form = array('email' => '');
         $errors = array();
 
         if ($post = $this->input->post())
@@ -259,7 +255,7 @@ class User_Controller extends Controller
                 }
 
                 /* Send out verification Email */
-                $account->sendValidateEmail($vcode->original_code);
+                $account->sendValidateEmail($vcode->original_code, 'emailChange');
                 /* Tell the user what happened */
                 $this->addMessage(Kohana::lang('auth.emailChangeSuccess'));
                 /* Redirect to main page */
@@ -273,7 +269,7 @@ class User_Controller extends Controller
             $form = arr::overwrite($form, $post->as_array());
             $errors = $post->errors('form_error_messages');
         }
-        $this->view->content = new View('user/changeEmail', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
+        $this->view->content = new View('user/emailChange', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
     }
     
     function changePassword()
@@ -331,5 +327,73 @@ class User_Controller extends Controller
         $this->view->content = new View('user/changePassword', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
     }
 
+    function _findAccount(Validation $array, $field)
+    {
+        $exists = (bool)ORM::Factory('Account')
+            ->where('email', $array[$field])
+            ->count_all();
+
+        if (!$exists)
+            $array->add_error($field, 'email_not_exists' );
+    }
+
+    function lostPassword()
+    {
+        /* Set page title */
+        $this->view->title = "Change Email";
+        $this->view->heading = Kohana::lang('auth.lostPassword_heading');
+        $this->view->subheading = Kohana::lang('auth.lostPassword_subheading');
+
+        /* Get logged in account */
+        $account = $this->auth->getAccount();
+        
+        $fields = array('email' => array('type'=>'text', 'required'=> true));
+        $form = array('email' => '');
+        $errors = array();
+
+        if ($post = $this->input->post())
+        {
+            $post = new Validation($this->input->post());
+            // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
+            $post->pre_filter('trim');
+
+            $post->add_rules('email', 'required', array('valid', 'email'));
+            $post->add_callbacks('email', array($this, '_findAccount'));
+
+            if ( $post->validate())
+            {
+                $account = ORM::Factory('Account')
+                    ->where('email', $post['email'])
+                    ->find();
+
+                /* Generate new code */
+                try {
+                    $vcode           = $account->generateVerifyCode(Verificationcode_Model::TYPE_LOST_PASSWORD, $post['email']);
+                }
+                catch (Verification_Exceeds_Exception $e) 
+                {
+                    $this->addError(Kohana::lang('auth.too_many_verification'));
+                    $this->view->content = "";
+                    return;
+                }
+
+                /* Send out verification Email */
+                $account->sendValidateEmail($vcode->original_code, 'lostPassword');
+                /* Tell the user what happened */
+                $this->addMessage(Kohana::lang('auth.lostPasswordSuccess'));
+                /* Show empty page */
+                $this->view->content = "";
+                return;
+            }
+            else
+            {
+                $errors = $post->errors();
+            }
+            
+            $form = arr::overwrite($form, $post->as_array());
+            $errors = $post->errors('form_error_messages');
+        }
+        $this->view->content = new View('user/lostPassword', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
+    }
 }
 

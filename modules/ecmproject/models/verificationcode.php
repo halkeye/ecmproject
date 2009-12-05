@@ -4,6 +4,7 @@ class Verificationcode_Model extends ORM
 {
     const TYPE_EMAIL_CHANGE   = 1;
     const TYPE_VALIDATE_EMAIL = 2;
+    const TYPE_LOST_PASSWORD  = 3;
 
     public $original_code;
     protected $ignored_columns = array('original_code');

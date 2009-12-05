@@ -3,7 +3,12 @@ $lang = array(
         'registration_success_message' => 'Successfully registered, Check email for validation link',
         'outgoing_email_address'       => 'registration@animeevolution.com',
         'outgoing_email_name'          => 'Anime Evolution Registration',
+
+        /* Subject Meessages */
         'registration_subject'         => 'REGISTRATION EMAIL',
+        'lostPassword_subject'         => 'Anime Evolution - Lost Password',
+        'emailChange_subject'         => 'Anime Evolution - Email Change',
+
         'convention_name'              => 'Anime Evolution',
         'convention_forum_url'         => 'http://www.animeevolution.net',
         'convention_url'               => 'http://www.animeevolution.com',
