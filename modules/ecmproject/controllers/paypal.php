@@ -4,28 +4,39 @@ class Paypal_Controller extends Controller_Core
 {
     function registrationPaypalIPN()
     {
+
         $p = new Paypal();
         $data = $_POST;
-        /*
-        if (!$p->validate_ipn()) 
+
+        if (!IN_PRODUCTION)
         {
-            $msg = "Unable to validate ipn: " . $p->getLastError();
-            print $msg;
-            Kohana::log('error', $msg);
-            return;
+            if (!$p->validate_ipn()) 
+            {
+                $msg = "Unable to validate ipn: " . $p->getLastError();
+                print $msg;
+                Kohana::log('error', "[PAYPAL] $msg");
+                return;
+            }
+            $data = $p->getIpnData();
         }
-        $data = $p->getIpnData();
-        */
-
-        $count = 1;
-
-        while (1)
+        
+        Kohana::log('debug','[PAYPAL] Data Dump - ' . var_export($data,1));
+        foreach (range(1, $data['num_cart_items']) as $count)
         {
-            if (!isset($data['item_number'.$count])) break;
-
+            if (!isset($data['item_number'.$count])) 
+            {
+                Kohana::log('error',"[PAYPAL] unable to find item $count - " . var_export($_POST,1));
+                break;
+            }
             list($reg_id, $pass_id) = explode('|', $data['item_number'.$count]);
+            Kohana::log('info',"[PAYPAL] Starting $count - $reg_id/$pass_id");
             
-            $reg = ORM::Factory('registration')->find($reg_id);
+            $reg = ORM::Factory('registration')->where('id', $reg_id)->find();
+            if (!$reg->loaded)
+            {
+                Kohana::log('error',"[PAYPAL] processing $count - Unable to load $reg_id");
+                continue;
+            }
             /* To make sure they paid the right one */
             $reg->pass_id = $pass_id;
             $reg->status = Registration_Model::STATUS_PAID;
@@ -45,12 +56,10 @@ class Paypal_Controller extends Controller_Core
             $payment->mod_time = time();
             $payment->save();
             $reg->save();
-
-            /* FIXME - Store raw data somewhere as a log also */
-            $count++;
+            
+            Kohana::log('info',"[PAYPAL] Finished $count - $reg_id/$pass_id");
         }
         
-        Kohana::log('info',' Paypal data - ' . var_export($_POST,1));
         return;
    
     }
