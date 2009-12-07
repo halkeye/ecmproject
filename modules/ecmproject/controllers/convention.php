@@ -194,7 +194,7 @@ class Convention_Controller extends Controller
         while ($this->input->get('item_number'.$count))
         {
             $data = explode('|', $this->input->get('item_number'.$count));
-            $regids[$data[0]] = array('id' => $data[0], 'pass_id' => $data[1]);
+            $regids[$data[0]] = array('id' => $data[0], 'pass_id' => $data[1]); 
             $count++;
         }
 
@@ -205,19 +205,22 @@ class Convention_Controller extends Controller
             ->find_all();
         foreach ($registrations as $reg)
         {
+            /* Now if the status was unprocessed before, mark it as being processed (Anything else is handled by other handlers */
+            if ($reg->status != Registration_Model::STATUS_UNPROCESSED)
+                continue;
+
             /* We don't really trust this data so lets make sure people havn't messed with the params at all */
             if ($regids[$reg->id]['pass_id'] != $reg->pass->id)
                 throw Exception('Data has been tampered with');
-            /* Now if the status was unprocessed before, mark it as being processed (Anything else is handled by other handlers */
-            if ($reg->status == Registration_Model::STATUS_UNPROCESSED)
-                $reg->status = Registration_Model::STATUS_PROCESSING;
+
+            $reg->status = Registration_Model::STATUS_PROCESSING;
             /* Update modules if they've been changed */
             $reg->save();
         }
 
-        $this->view->content = "success page".
-            var_export($regids,1).
-        "";
+        $this->view->heading = "Thank you";
+        $this->view->subheading = "";
+        $this->view->content = new View('convention/paypalReturn');
     }
 
     public function checkout()
