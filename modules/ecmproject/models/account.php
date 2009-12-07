@@ -251,9 +251,9 @@ class Account_Model extends ORM
 
     public function validateAccount()
     {
-        $account->status = Account_Model::ACCOUNT_STATUS_VERIFIED;
+        $this->status = Account_Model::ACCOUNT_STATUS_VERIFIED;
         /* Delete any outstanding validation codes */
-        $vcode = ORM::Factory('verificationcode')->where('account_id', $this->id)->delete();
+        $vcode = ORM::Factory('verificationcode')->where('account_id', $this->id)->delete_all();
     }
 	
 	public function statusToString() {
