@@ -261,8 +261,11 @@ class Registration_Model extends ORM
             ->with('convention')
             ->with('pass')
             ->where('account_id', $account_id)
-            ->where('status', Registration_Model::STATUS_UNPROCESSED) /* Only grab one we havn't heard back from yet */
-			->orwhere('status', Registration_Model::STATUS_NOT_ENOUGH)
+            ->in('status', array(
+                        Registration_Model::STATUS_UNPROCESSED, /* Only grab one we havn't heard back from yet */
+                        Registration_Model::STATUS_NOT_ENOUGH
+                )
+            )
             ->find_all();
     }
     
