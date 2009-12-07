@@ -910,7 +910,6 @@ class Admin_Controller extends Controller
 		//Do dropdown for payment type. What kind of selections can we have?		
 		if ($post = $this->input->post())
 		{
-			echo $pay->id;
 			if ($pay->validate_admin($post))
 			{				
 				$pay->last_modified = $this->auth->getAccount()->id;
@@ -1290,8 +1289,8 @@ class Admin_Controller extends Controller
 	
 	function updatePaymentStatus($reg, $pass)
 	{		
-		/* Check status of payment for registration */			
-		if (Payment_Model::staticGetTotal($reg->id) >= $pass->price)
+		/* Check status of payment for registration. Set only if not PAID status. */			
+		if (Payment_Model::staticGetTotal($reg->id) >= $pass->price && $reg->status != Registration_Model::STATUS_PAID)
 		{
 			$reg->status = Registration_Model::STATUS_PAID;			
 		}
@@ -1301,6 +1300,7 @@ class Admin_Controller extends Controller
 		}		
 				
 		$reg->save();
+		exit;
 	}
 	
 	function test()
