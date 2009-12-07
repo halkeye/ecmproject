@@ -275,7 +275,10 @@ class Registration_Model extends ORM
 		//Only set status to UNPROCESSED if it's a new registration! (Else it'll keep blanking my status updates).
 		if ($this->id == 0)
 			$this->status = Registration_Model::STATUS_UNPROCESSED;
-						
+
+		if (isset($originalChanged['status']) && $this->status == Registration_Model::STATUS_PAID)
+			$this->sendConfirmationEmail();
+		
         $ret = parent::save();
 
         if ( ! empty($originalChanged))
@@ -349,6 +352,40 @@ class Registration_Model extends ORM
 		$status_values[Registration_Model::STATUS_NOT_ENOUGH] = 'PARTIAL PAYMENT';
 		$status_values[Registration_Model::STATUS_FAILED] = 'FAILED';
 		return $status_values;
+	}
+	
+	private function sendConfirmationEmail()
+	{		
+		$conv = ORM::Factory('Convention')->find($this->convention_id);
+		$pass = ORM::Factory('Pass')->find($this->pass_id);
+		$acct = ORM::Factory('Account')->find($this->account_id);
+		
+		if (!$conv->loaded || !$pass->loaded)
+		{
+			die('Unexpected error encountered! Press back and try again else contact the system administrators');
+		}
+		
+		/* Prevent spamming the user twice. Ignore upper/lowercase? */
+		if ($this->email == $acct->email)
+			$email = $this->email;
+		else
+			$email = $this->email . ',' . $acct->email;
+		
+        $emailVars = array(
+                'email'                    => $email,
+                'reg'            		   => $this,
+				'conv'					   => $conv,
+				'pass'					   => $pass
+			);
+
+        $to      = $emailVars['email'];
+        $from    = Kohana::lang('ecmproject.outgoing_email_name') . ' <' . Kohana::lang('ecmproject.outgoing_email_address') . '>';
+        $subject = Kohana::lang('ecmproject.registration_subject');
+ 
+        $view = new View('user/register_confirmation', $emailVars);
+        $message = $view->render(FALSE);
+		
+        email::send($to, $from, $subject, $message, TRUE);    
 	}
 }
 
