@@ -38,8 +38,8 @@ Account Status: <?php echo $acctDetails->statusToString(); ?>
 </table>
 <br />
 <p>
-For <strong>minor passes</strong> also attach the parental consent form (link here) or bring a completed parental consent form to the convention when picking up your pass. <strong>Minors
-without a completed written parental consent form will be unable to pick up their badge with no exceptions</strong>
+For <strong>minor passes</strong> remember that you will need to bring a parental consent form (link here) or bring to the convention when picking up your pass. <strong>Minors
+without a completed written parental consent form will be unable to pick up their badge with no exceptions.</strong>
 </p>
 
 <p>
