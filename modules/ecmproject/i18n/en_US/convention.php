@@ -8,7 +8,11 @@ $lang = array(
         'checkout_heading'      => 'Shopping Cart',
         'checkout_subheading'   => "The badges that you've signed up for so far",
         'checkout_header'       => 'Listed here are all the badges that you wish to register for. Bear in mind that your registration is <strong>not yet complete</strong> until you checkout by selecting <strong>Pay with Paypal</strong> or <strong>Pay via Main/In-Person</strong>. If you wish to add more badges, select the "Add Registration" menu link on the left hand side.',
-
+		
+		'not_loaded'			=> 'The registration does not exist.',
+		'delete_success'		=> 'Succeeded in removing the registration from your shopping cart D:',
+		'delete_error'			=> 'A problem occured while trying to remove this registration. Contact registration@animeevolution.com',
+		
         'registration_form_header' => 'Primary Information',
         'registration_submit'   => 'Add to Cart',
 
@@ -34,7 +38,8 @@ $lang = array(
         'registration_field_attendance_reason' => 'Reason For Attendance',
         'registration_field_agree_toc'    => 'I have read and agreed to the <b>Terms and Conditions</b>',
 		'registration_field_status'		  => 'Registration Status',
-
+		'registration_already_processed_unable_to_edit' => 'You cannot delete a registration that has been partly paid for/processed.',
+		
         'registration_tac_header' => 'Terms And Conditions',
         'registration_tac_desc'   => '',
         'registration_tac'     => <<<EOT
