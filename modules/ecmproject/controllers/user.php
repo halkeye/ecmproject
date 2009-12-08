@@ -14,8 +14,10 @@ class User_Controller extends Controller
 {
     function index()
     {
-        $this->requireLogin();
-        $this->view->content = new View('user/index');
+        $this->requireLogin();		
+		$reg = Registration_Model::getAllRegistrationsByConvention($this->auth->getAccount()->id);		
+				
+        $this->view->content = new View('user/index', array('registrations'=>$reg));
     }
 
     function login()
