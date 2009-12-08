@@ -281,7 +281,7 @@ class Registration_Model extends ORM
 
 		if (isset($originalChanged['status']) && $this->status == Registration_Model::STATUS_PAID)
 			$this->sendConfirmationEmail();
-		
+				
         $ret = parent::save();
 
         if ( ! empty($originalChanged))
@@ -309,6 +309,17 @@ class Registration_Model extends ORM
 		$result = $db->query('SELECT COUNT(*) as count FROM registrations WHERE convention_id = ' . $cid);
 		
 		return (int) $result[0]->count;
+	}
+	
+	/*
+	* getAllRegistrationsByConvention
+	*
+	* Returns all conventions for a particular account ordered by convention_id in newest first (DESC order) Used for displaying 
+	* the history of registrations for a particular user.
+	*/
+	public function getAllRegistrationsByConvention($account_id)	{
+		
+		return ORM::Factory('Registration')->where('account_id', $account_id)->orderby('convention_id', 'DESC')->find_all();	
 	}
 	
 	public function statusToString()
