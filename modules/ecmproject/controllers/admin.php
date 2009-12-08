@@ -390,12 +390,6 @@ class Admin_Controller extends Controller
 		{			
 			$post['start_date'] = Admin_Controller::parseSplitDate($post, 'start_date');
 			$post['end_date'] = Admin_Controller::parseSplitDate($post, 'end_date');
-								
-			/*
-			foreach ($post as $k => $v):
-				print "$k => $v <br />";
-			endforeach;
-			*/
 		
 			if ($conv->validate_admin($post, false, true))
 			{			
@@ -638,12 +632,7 @@ class Admin_Controller extends Controller
 		if ($post = $this->input->post())
 		{			
 			if ($acct->validate_admin($post, false, false))
-			{			
-				foreach ($acct->as_array() as $k => $v)
-				{
-					print "$k => $v <br />";
-				}
-			
+			{						
 				$acct->save();				
 				if ($acct->saved) {
 					$this->addMessage('Edited successfully the Account with email: ' . $acct->email);
