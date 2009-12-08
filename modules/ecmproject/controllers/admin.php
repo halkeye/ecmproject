@@ -1289,12 +1289,6 @@ class Admin_Controller extends Controller
 		}		
 				
 		$reg->save();
-		exit;
-	}
-	
-	function test()
-	{
-		$this->search('Registration', 'Ste');
 	}
 	
 	/*
