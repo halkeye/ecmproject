@@ -12,6 +12,14 @@
 
 class User_Controller extends Controller 
 {
+	function __construct()
+	{
+		parent::__construct();
+		$this->addMenuItem(
+                array('title'=>'Add Registration', 'url'=>Convention_Controller::STEP1)
+        );
+	}
+
     function index()
     {
         $this->requireLogin();		
