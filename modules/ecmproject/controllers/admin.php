@@ -560,7 +560,7 @@ class Admin_Controller extends Controller
 		$fields = $pay->default_fields;
 		
 		//Move to model.
-		$fields['type']['values'] = array('instant' => 'Instant (Paypal)', 'mail' => 'Mail', 'inperson' => 'In Person');
+		$fields['type']['values'] = array('paypal' => 'Instant (Paypal)', 'mail' => 'Mail', 'inperson' => 'In Person');
 		$fields['payment_status']['values'] = $pay->getPaymentStatusSelectList();	
 		
 		//Do dropdown for payment type. What kind of selections can we have?		
@@ -893,7 +893,7 @@ class Admin_Controller extends Controller
 		$fields = $pay->default_fields;
 		
 		//Move to model.
-		$fields['type']['values'] = array('instant' => 'Instant (Paypal)', 'mail' => 'Mail', 'inperson' => 'In Person');
+		$fields['type']['values'] = array('paypal' => 'Instant (Paypal)', 'mail' => 'Mail', 'inperson' => 'In Person');
 		$fields['payment_status']['values'] = $pay->getPaymentStatusSelectList();
 		
 		//Do dropdown for payment type. What kind of selections can we have?		
