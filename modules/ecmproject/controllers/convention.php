@@ -234,8 +234,7 @@ class Convention_Controller extends Controller
         $data['registrations'] = ORM::Factory('registration')->getForAccount($this->auth->getAccount()->id);
         if (!$data['registrations']->count()) 
         {
-            $this->addError('FIXME - No registrations to process');
-            return;
+			url::redirect('user/index'); 
         }
 
         /* Config file is currently 'url', lets map it to 'paypal_url' incase any other url is used */
