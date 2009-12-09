@@ -4,7 +4,7 @@
 Details follow below. Registration will get back to you regarding any other important matters via email.</p>
 
 <p>
-	<strong><?php echo $pass->name ?></strong>
+	<strong><?php echo $pass->name ?></strong><br /><br />
 	System Registration ID: <?php echo $reg->id; ?><br />
 	Email: <?php echo $reg->email; ?><br />
 	Badge Name: <?php echo $reg->badge; ?><br />
