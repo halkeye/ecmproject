@@ -12,17 +12,12 @@
 
 class User_Controller extends Controller 
 {
-	function __construct()
-	{
-		parent::__construct();
-		$this->addMenuItem(
-                array('title'=>'Add Registration', 'url'=>Convention_Controller::STEP1)
-        );
-	}
-
     function index()
     {
         $this->requireLogin();		
+		$this->addMenuItem(
+                array('title'=>'Add Registration', 'url'=>Convention_Controller::STEP1)
+        );
 		$reg = Registration_Model::getAllRegistrationsByConvention($this->auth->getAccount()->id);		
 				
         $this->view->content = new View('user/index', array('registrations'=>$reg));
