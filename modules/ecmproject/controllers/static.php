@@ -26,5 +26,28 @@ class Static_Controller extends Controller_Core
         }
 
     }
+    
+    public function img($filename)
+    {
+        if (expires::check(300) === FALSE) expires::set(300);
+        $info = pathinfo($filename);
+        $file = Kohana::find_file('views/images', $info['filename'], true, $info['extension']);
+
+        if ($info['extension'] == 'png')
+            header('Content-Type: Content-Type: image/png');
+        if ($info['extension'] == 'jpg')
+            header('Content-Type: Content-Type: image/jpeg');
+        if ($info['extension'] == 'gif')
+            header('Content-Type: Content-Type: image/gif');
+        if ($info['extension'] == 'ico')
+            header('Content-Type: Content-Type: image/vnd.microsoft.icon');
+
+        header('Content-Length: ' . filesize($file));
+        
+        ob_clean();
+        flush();
+        readfile($file);
+
+    }
 
 }
