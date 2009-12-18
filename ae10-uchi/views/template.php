@@ -10,10 +10,7 @@
 <body> 
  
 <!-- Content container beings here --> 
-<div id="container"> 
-    <!-- Header --> 
-    <div id="header"></div> 
- 
+<div id="container">  
     <!-- Left Sidebar. --> 
     <?php if ($isLoggedIn || $menu): ?>
     <div id="sidebar">
