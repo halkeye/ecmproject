@@ -17,8 +17,8 @@ foreach ($registrations as $reg)
     echo '<td>' . html::specialchars($reg->gname . ' ' . $reg->sname) . '</td>';
     echo '<td>' . html::specialchars($reg->pass->name) . '</td>';
     echo '<td>' . html::specialchars(sprintf('$%01.2F', $reg->pass->price)) . '</td>';
-    echo '<td>'.html::anchor('/convention/editReg/'.$reg->id,   html::image('img/edit-copy.png', 'Edit this account')) . '</td>';
-    echo '<td>'.html::anchor('/convention/deleteReg/'.$reg->id, html::image('img/edit-delete.png', 'Delete this account')) . '</td>';
+    echo '<td>'.html::anchor('/convention/editReg/'.$reg->id,   html::image(url::site('/static/img/edit-copy.png'), 'Edit this account')) . '</td>';
+    echo '<td>'.html::anchor('/convention/deleteReg/'.$reg->id, html::image(url::site('/static/img/edit-delete.png'), 'Delete this account')) . '</td>';
     echo '<td>'.$reg->statusToString().'</td>';
     echo '</tr>';
 }

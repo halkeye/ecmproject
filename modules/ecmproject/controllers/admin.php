@@ -63,8 +63,8 @@ class Admin_Controller extends Controller
 		$data['entries'][0] = new View('admin/ListItems/ConventionEntry');
 		foreach ($rows as $row)
 		{
-			$data['actions']['edit'] = html::anchor('admin/editConvention/'. $row->id, html::image('img/edit-copy.png', Kohana::lang('admin.edit_account')));
-			$data['actions']['delete'] = html::anchor('admin/deleteConvention/' . $row->id, html::image('img/edit-delete.png', Kohana::lang('admin.delete_account')));			
+			$data['actions']['edit'] = html::anchor('admin/editConvention/'. $row->id, html::image(url::site('/static/img/edit-copy.png'), Kohana::lang('admin.edit_account')));
+			$data['actions']['delete'] = html::anchor('admin/deleteConvention/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), Kohana::lang('admin.delete_account')));			
 			$data['entries'][$row->id] = new View('admin/ListItems/ConventionEntry', array('row' => $row, 'actions' => $data['actions']));				
 		}	
 		
@@ -107,8 +107,8 @@ class Admin_Controller extends Controller
 		$data['entries'][0] = new View('admin/ListItems/AccountEntry');
 		foreach ($rows as $row)
 		{
-			$data['actions']['edit'] = html::anchor('admin/editAccount/'. $row->id, html::image('img/edit-copy.png', Kohana::lang('admin.edit_account')));
-			$data['actions']['delete'] = html::anchor('admin/deleteAccount/' . $row->id, html::image('img/edit-delete.png', Kohana::lang('admin.delete_account')));			
+			$data['actions']['edit'] = html::anchor('admin/editAccount/'. $row->id, html::image(url::site('/static/img/edit-copy.png'), Kohana::lang('admin.edit_account')));
+			$data['actions']['delete'] = html::anchor('admin/deleteAccount/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), Kohana::lang('admin.delete_account')));			
 			$data['entries'][$row->id] = new View('admin/ListItems/AccountEntry', array('row' => $row, 'actions' => $data['actions']));				
 		}	
 		
@@ -158,8 +158,8 @@ class Admin_Controller extends Controller
 		$data['entries'][0] = new View('admin/ListItems/PassEntry');
 		foreach ($rows as $row)
 		{
-			$data['actions']['edit'] = html::anchor('admin/editPass/'. $row->id, html::image('img/edit-copy.png', Kohana::lang('admin.edit_account')));
-			$data['actions']['delete'] = html::anchor('admin/deletePass/' . $row->id, html::image('img/edit-delete.png', Kohana::lang('admin.delete_account')));			
+			$data['actions']['edit'] = html::anchor('admin/editPass/'. $row->id, html::image(url::site('/static/img/edit-copy.png'), Kohana::lang('admin.edit_account')));
+			$data['actions']['delete'] = html::anchor('admin/deletePass/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), Kohana::lang('admin.delete_account')));			
 			$data['entries'][$row->id] = new View('admin/ListItems/PassEntry', array('row' => $row, 'actions' => $data['actions']));				
 		}	
 		
@@ -209,8 +209,8 @@ class Admin_Controller extends Controller
 		$data['entries'][0] = new View('admin/ListItems/RegistrationEntry');
 		foreach ($rows as $row)
 		{
-			$data['actions']['edit'] = html::anchor('admin/editRegistration/'. $row->id, html::image('img/edit-copy.png', Kohana::lang('admin.edit_account')));
-			$data['actions']['delete'] = html::anchor('admin/deleteRegistration/' . $row->id, html::image('img/edit-delete.png', Kohana::lang('admin.delete_account')));			
+			$data['actions']['edit'] = html::anchor('admin/editRegistration/'. $row->id, html::image(url::site('/static/img/edit-copy.png'), Kohana::lang('admin.edit_account')));
+			$data['actions']['delete'] = html::anchor('admin/deleteRegistration/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), Kohana::lang('admin.delete_account')));			
 			$data['entries'][$row->id] = new View('admin/ListItems/RegistrationEntry', array('row' => $row, 'actions' => $data['actions']));				
 		}	
 		
@@ -255,8 +255,8 @@ class Admin_Controller extends Controller
 		$data['entries'][0] = new View('admin/ListItems/PaymentEntry');
 		foreach ($rows as $row)
 		{
-			$data['actions']['edit'] = html::anchor('admin/editPayment/'. $row->id, html::image('img/edit-copy.png', Kohana::lang('admin.edit_account')));
-			$data['actions']['delete'] = html::anchor('admin/deletePayment/' . $rid . '/' . $row->id, html::image('img/edit-delete.png', Kohana::lang('admin.delete_account')));			
+			$data['actions']['edit'] = html::anchor('admin/editPayment/'. $row->id, html::image(url::site('/static/img/edit-copy.png'), Kohana::lang('admin.edit_account')));
+			$data['actions']['delete'] = html::anchor('admin/deletePayment/' . $rid . '/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), Kohana::lang('admin.delete_account')));			
 			$data['entries'][$row->id] = new View('admin/ListItems/PaymentEntry', array('row' => $row, 'actions' => $data['actions']));				
 		}			
 			
@@ -1012,8 +1012,8 @@ class Admin_Controller extends Controller
 			$data['entries'][0] = new View("admin/ListItems/$entity" . 'Entry');
 			foreach ($rows as $row)
 			{
-				$data['actions']['edit'] = html::anchor("admin/edit$entity/". $row->id, html::image('img/edit-copy.png', Kohana::lang('admin.edit_account')));
-				$data['actions']['delete'] = html::anchor("admin/delete$entity/" . $row->id, html::image('img/edit-delete.png', Kohana::lang('admin.delete_account')));			
+				$data['actions']['edit'] = html::anchor("admin/edit$entity/". $row->id, html::image(url::site('/static/img/edit-copy.png'), Kohana::lang('admin.edit_account')));
+				$data['actions']['delete'] = html::anchor("admin/delete$entity/" . $row->id, html::image(url::site('/static/img/edit-delete.png'), Kohana::lang('admin.delete_account')));			
 				$data['entries'][$row->id] = new View("admin/ListItems/$entity" . 'Entry', array('row' => $row, 'actions' => $data['actions']));				
 			}			
 		} else if ($search_term == null) {

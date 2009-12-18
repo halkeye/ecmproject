@@ -35,9 +35,9 @@ foreach ($registrations as $reg)
     echo form::hidden("amount_$id", sprintf('%01.2F', $reg->pass->price));
     echo form::hidden("quantity_$id", 1);
     echo ' ';
-    echo html::anchor('/convention/editReg/'.$reg->id,   html::image('img/edit-copy.png', 'Edit this account'));
+    echo html::anchor('/convention/editReg/'.$reg->id,   html::image(url::site('/static/img/edit-copy.png'), 'Edit this account'));
     echo ' ';
-    echo html::anchor('/convention/deleteReg/'.$reg->id, html::image('img/edit-delete.png', 'Delete this account'));
+    echo html::anchor('/convention/deleteReg/'.$reg->id, html::image(url::site('/static/img/edit-delete.png'), 'Delete this account'));
     echo '</li>';
 }
 echo form::hidden("custom", implode('|', $regids));
