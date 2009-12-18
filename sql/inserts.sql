@@ -1,4 +1,4 @@
-﻿USE ecms;
+USE ecms;
 
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
 /*!40000 ALTER TABLE `usergroups` DISABLE KEYS */;

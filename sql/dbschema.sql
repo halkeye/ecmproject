@@ -1,4 +1,4 @@
-﻿DROP DATABASE ecms;
+DROP DATABASE ecms;
 CREATE DATABASE ecms;
 USE ecms;
 
