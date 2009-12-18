@@ -23,7 +23,7 @@ body {
   margin-right: auto;
   margin-top: 10px; 
   margin-bottom: 5px; 
-  width: 680px; /* Change from 800. */
+  width: 670px; /* Change from 800. */
   text-align: left; /* Override body text-align to get proper default text-alignment */
 }
 
