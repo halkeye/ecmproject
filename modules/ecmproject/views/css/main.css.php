@@ -1,0 +1,374 @@
+
+/* Reset */
+html,body,div,span,object,iframe, h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,cite,code,del,em,img,strong,sub,sup,tt,dl,dt,dd,ol,ul,li,form,label,legend{margin:0;padding:0;border:0;font-weight:inherit;font-style:inherit;font-size:100%;font-family:inherit;vertical-align:baseline}
+:focus{outline:0}
+
+/* Generic settings and sections */
+a { 	color: #00275E; text-decoration: underline; }
+a:hover { text-decoration: none; }
+a:visited { color: #00275E; text-decoration: underline; }
+
+body {   
+  /* background-color: #20232B;  */ 
+  /* background: url('../img/bg.jpg') repeat; */
+  background-color: #FFF;
+  font-size: 12px;
+  font-family: "Lucida Grande", "Trebuchet MS";   
+  text-align: center; /* For the stupidity that is IE6 */
+}
+
+/* Page container */
+#container { 
+  margin-left: auto;  
+  margin-right: auto;
+  margin-top: 10px; 
+  margin-bottom: 5px; 
+  width: 670px; /* Change from 800. */
+  text-align: left; /* Override body text-align to get proper default text-alignment */
+}
+
+#header {    
+  height: 176px;  
+  background: url('../img/banner2.png') no-repeat;  
+}
+
+/* Sidebar */
+/* Left navigation #4B050D */
+#sidebar{
+  float: left;
+  /* border-top: 3px solid #8A0917; */
+  border-bottom: 1px solid #BBB;
+  left: 0px;
+  top: 200px;
+  width: 160px;
+  padding-top: 0px;     
+  color: #CCC;
+  background-color: #FFF;  
+  font-size: 12px; 
+}
+
+#sidebar .title  {
+  color: #8A0917; 
+  font-size: 16px;
+  font-weight: bold;
+  border-bottom: 1px solid #BBB;  
+}
+
+#sidebar .title a {
+  color: #8A0917; 
+  font-size: 16px;
+  font-weight: bold;
+}
+
+#sidebar a {
+	color: #000;
+	width: auto;
+	display: block;
+	text-decoration: none; /* Override default */
+}
+
+#sidebar ul {
+  list-style: none;
+  background-color: #FFF;
+}
+
+#sidebar li  {
+  color: #000;   
+  padding: 5px; 
+}
+
+#sidebar li.currentMenuChoice {    
+  color: #000;
+  font-weight: bold;
+  background-color: #BBB;  
+}
+
+#sidebar li:hover.menuItem {  
+  font-weight: bold;    
+  text-decoration: none;
+  background-color: #FC0; 
+}
+
+/* Generic Content Container */
+#content.contentMenu
+{
+  /* border-top: 3px solid #445772; */
+  border-left: 1px solid #BBB; 
+  padding: 10px;  
+  margin-right: 0px;  
+  margin-left: 160px;
+  background-color: #FFF;
+}
+
+#content.contentNoMenu 
+{   
+  /* border-top: 3px solid #445772; */ /* Old: #8A0917 */
+  /* border-left: 1px solid #BBB; */
+  padding: 10px;  
+  background-color: #FFF;
+}
+
+#content h2 {  
+  color: #8A0917;
+  padding-top: 10px;
+  padding-left: 10px;  
+  font-size: 20px;
+}
+
+#content h3 {
+  color: #B8AE9C;
+  padding-left: 10px;  
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+
+#content p.msg {
+	margin: 5px;
+	background-color: #99FF99;
+	padding: 5px;
+	border: 1px solid #009900;
+}
+
+#content p.errormsg {
+	margin: 5px;
+	background-color: #F33;
+	padding: 5px;
+	border: 1px solid #A00;
+}
+
+/* Form Input Styling */
+#form strong{
+  font-size: 14px;
+  font-weight: bold;
+}
+
+#form form {
+	text-align: left;
+}
+
+#form a {	
+	color: #00275E;
+	text-decoration: underline;
+}
+
+#form a:visited {
+	color: #00275E;
+	text-decoration: underline;
+}
+
+#form h1 {
+	padding: 7px 0px 7px 5px;
+	font-weight: bold;
+	background-color: #DDD;
+	text-align: center;
+	font-size: 14px;
+}
+
+#form p {
+	margin: 10px 10px 20px 10px;
+	text-align: left;
+}
+
+#form p.fixed {
+	margin: 10px 10px 0px 10px;
+	text-align: left;
+	height: 50px;
+}
+
+#form fieldset {
+	text-align: left;
+	border: 0px solid #000;
+	padding-left: 10px;
+	margin-bottom: 10px;
+}
+
+#form fieldset.fixed {
+	margin-bottom: 10px;
+	height: 120px;
+}
+
+#form fieldset.right {
+	text-align: right;
+}
+
+#form fieldset.left {
+	text-align: left;
+}
+
+#form label {
+	float: left;
+	text-align: left;
+	display: inline;
+	margin-right: 1em;
+	width: 180px;
+}
+
+#form input {
+	display: block;
+	margin: 0px 0px 15px 0px;
+	padding: 2px 2px;
+	width: 240px;
+}
+
+#form input.inline {
+	display: inline;
+}
+
+#form input.datebox {
+	width: 50px;
+	display: inline;
+	margin: 0px 0px 5px 0px;
+	padding: 2px 2px;
+}
+
+#form input.checkbox {
+	display: block;
+	margin: 0px 0px 5px 0px;
+	padding: 2px 2px;
+	width: 240px; 
+}
+
+#form select {
+	display: inline;
+	margin: 0px 0px 10px 0px;
+	padding: 2px 2px;
+}
+
+#form select.block {
+	display: block;
+	margin: 0px 0px 10px 0px;
+	padding: 2px 2px;
+}
+
+#form textarea {
+	display: block;
+	margin: 0px 0px 5px 0px;
+	padding: 2px 2px;
+	width: 240px;
+}
+
+#form button {
+	padding: 4px 20px 4px 20px;
+}
+
+#form td {
+	vertical-align: top;
+}
+
+#form span.small {
+	font-size: 9px;
+	color: #888;
+	display: block;
+}
+
+#list p {
+	padding: 3px;
+	margin: 5px 0px 5px 10px;
+}
+
+#list p.floatRight {
+	padding: 0px;
+	float: right;
+	margin: 0px 0px 5px 10px;
+}
+
+#list p.right {
+	text-align: right;
+	margin: 0px 0px 5px 10px;
+}
+
+#list p.pagination {
+	text-align: right;
+	margin: 0px 0px 5px 10px;
+	font-size: 14px;
+}
+
+#list select {
+	margin-right: 5px;
+}
+
+#list input.jump {
+	margin-right: 10px;
+	width: 40px;
+}
+
+#list button {
+	padding: 0px 5px 0px 5px;
+}
+
+#list table {
+	margin-top: 10px;
+}
+
+#list th {
+	background-color: #CCC;
+	padding: 5px;
+	font-size: 14px;
+	text-align: left; /* Screw you too IE */
+}
+
+#list tr.fixedSummary {
+	height: 40px;
+}
+
+#list tr.even {
+	background-color: #FFF;
+}
+
+#list tr.odd {
+	background-color: #EEE;
+}
+
+#list td {
+	padding: 5px;
+}
+
+#list strong{
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* For checkout */
+#list form.inline {
+	display: inline;
+}
+
+#written p {
+	font-size: 12px;
+	padding-top: 10px;  
+	padding-bottom: 2px;  
+	margin-left: 10px;
+	line-height:1.5;
+}
+
+#footer.contentNoMenu {   
+  color: #DDD;
+  margin-left: auto;
+  vertical-align: middle;
+  text-align: center;
+}
+
+#footer.contentMenu {
+  color: #DDD;
+  margin-left: 160px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+#footer p {  
+  padding: 5px;
+  font-size: 10px;
+}
+
+#footer a {
+  color: #CCC;
+  text-decoration: underline;  
+}
+
+/* Misc formatting */
+span.required {  
+  color: #F00;
+  font-weight: bold;
+  font-size: 10px;
+  margin-left: 5px;
+}

@@ -8,7 +8,7 @@ class Paypal_Controller extends Controller_Core
         $p = new Paypal();
         $data = $_POST;
 
-        if (!IN_PRODUCTION)
+        if (IN_PRODUCTION)
         {
             if (!$p->validate_ipn()) 
             {
