@@ -116,7 +116,7 @@ class User_Controller extends Controller
                 $errors = arr::overwrite($errors, $post->errors('form_error_messages'));
             }
         }
-        $this->view->content = new View('user/register', array('form'=>$form, 'errors'=>$errors));
+        $this->view->content = new View('user/loginOrRegister', array('form'=>$form, 'errors'=>$errors));
     }
 
     function validate($uid = 0, $key = '')
@@ -176,6 +176,8 @@ class User_Controller extends Controller
     function loginOrRegister()
     {
         $data = array();
+        /* Fixme */
+        $this->view->subheading = "Login or Register";
 
         $this->view->content = new View('user/loginOrRegister', $data);
         return;

@@ -4,11 +4,14 @@
         <?php echo form::open('/user/register'); ?>
         <h1>Create Log-in ID</h1>
         <p class='fixed'>Please enter your e-mail address and a password of your choice and click Continue. The e-mail address will serve as your login ID.</p>
-        <fieldset class='fixed'>			
+        <fieldset>			
+            <?php $field = 'email'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?>
             <label for="email">Email Address <span class="small">Add a valid email address</span></label>
             <input name="email" type="text" />
+            <?php $field = 'password'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?>
             <label for="password">Password <span class="small">Min. size 6 characters</span></label>
             <input name="password" type="password" />
+            <?php $field = 'confirm_password'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?>
             <label for="confirm_password">Re-type Password <span class="small">Type in the same characters again.</span></label>
             <input name="confirm_password" type="password" />
         </fieldset>
@@ -25,7 +28,7 @@
         <h1>Log-in with Existing ID</h1>
         <p class='fixed'>Please enter your e-mail address and password and click <strong>Continue</strong>.</p>
     
-        <fieldset class='fixed'>		
+        <fieldset>		
             <label for="email">Email Address <span class="small">Add a valid email address</span></label>
             <input name="email" type="text" />
             <label for="password">Password <span class="small">Min. size 6 characters</span></label>
