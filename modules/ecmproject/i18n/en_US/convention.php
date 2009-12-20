@@ -10,6 +10,7 @@ $lang = array(
         'checkout_header'       => 'Listed here are all the badges that you wish to register for. Bear in mind that your registration is <strong>not yet complete</strong> until you checkout by selecting <strong>Pay with Paypal</strong> or <strong>Pay via Main/In-Person</strong>. If you wish to add more badges, select the "Add Registration" menu link on the left hand side.',
 		
 		'not_loaded'			=> 'The registration does not exist.',
+		'cart_no_items'			=> 'Nothing in your shopping cart to pay for.',
 		'delete_success'		=> 'Succeeded in removing the registration from your shopping cart D:',
 		'delete_error'			=> 'A problem occured while trying to remove this registration. Contact registration@animeevolution.com',
 		
