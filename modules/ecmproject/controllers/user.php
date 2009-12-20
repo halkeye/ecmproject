@@ -176,8 +176,8 @@ class User_Controller extends Controller
     function loginOrRegister()
     {
         $data = array();
-        /* Fixme */
-        $this->view->subheading = "Login or Register";
+		$this->view->heading = Kohana::lang('auth.login_header');
+        $this->view->subheading = Kohana::lang('auth.login_subheader');
 
         $this->view->content = new View('user/loginOrRegister', $data);
         return;
@@ -218,7 +218,6 @@ class User_Controller extends Controller
         /* Send email */
         $account->sendValidateEmail($vcode->original_code);
 
-        /* FIXME: Send Verification Message */
         $this->addMessage(Kohana::lang('auth.sendVerificationMessage', $account->email)); 
         return url::redirect('/user/verifyMenu');
     }

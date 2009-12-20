@@ -58,12 +58,19 @@ class Convention_Controller extends Controller
 			url::redirect("convention/checkout");
 		}
 		
+		/* Prevent users from using deleteReg with an arbitrary number */
+		if ($reg->account_id != $this->auth->getAccount()->id)
+		{
+			$this->addError(Kohana::lang('convention.not_loaded') . $reg->account_id);
+			url::redirect("convention/checkout");
+		}
+		
 		if ($reg->status != Registration_Model::STATUS_UNPROCESSED)
 		{
 			$this->addError(Kohana::lang('convention.registration_already_processed_unable_to_edit'));
 			url::redirect("convention/checkout");
 		}
-		
+				
 		if ($post = $this->input->post())
         {
 			if ($val = $this->input->post('Yes'))
@@ -243,6 +250,7 @@ class Convention_Controller extends Controller
 
         /* Where paypal should tell us about successful transactions */
         $data['notify_url'] = url::site('/paypal/registrationPaypalIPN');
+		
         ### FIXME - This needs an external url, so can't be localhost
         if (strpos($data['notify_url'], 'localhost') !== FALSE) {
             $data['notify_url'] = 'http://barkdog.halkeye.net:6080/ecmproject/index.php/paypal/registrationPaypalIPN';
@@ -269,7 +277,8 @@ class Convention_Controller extends Controller
 		$data['registrations'] = ORM::Factory('Registration')->getForAccount($this->auth->getAccount()->id);
 		if (!$data['registrations']->count()) 
         {
-            $this->addError('FIXME: Nothing to pay for!');
+            $this->addError(Kohana::lang('convention.cart_no_items'));
+			url::redirect('user/index'); 
             return;
         }
 		

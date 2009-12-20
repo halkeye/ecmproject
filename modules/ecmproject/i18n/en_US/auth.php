@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 $lang = array(
+		/* Login page headers */
+		'login_header'				=> 'Login or Register',
+		'login_subheader'			=> 'Register for a new account or login with an existing one.',
+
         'login_success'             => 'Login Success!',
         'invalid_user_pass'         => 'Invalid username or password',
         /* Expired and/or already logged in and/or other stuff */
