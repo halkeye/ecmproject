@@ -14,6 +14,7 @@ $lang = array(
         'emailChangeSuccess'        => 'Email sucessfully changed, please check your email for verification email',
         'sendVerificationMessage'   => 'Sending new vertification email to \'%s\'',
         'verification_success'      => 'Account successfully validated! Welcome aboard.',
+		'not_validated'				=> 'The account email has not been validated yet. You cannot do anything until you have!',
 
         /* Logout confirm button  */
         'logoutConfirmButton'       => 'Confirm Logout',
