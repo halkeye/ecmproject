@@ -1,4 +1,4 @@
-<!-- FIXME: THIS NEEDS A BETTER NESS -->
+<!-- THIS NEEDS A BETTER NESS...this isn't even used any more...(replaced with shopping cart/my account view. -->
 <h2>Registrations:</h2>
 <?php
 foreach ($conventions as $convention)
