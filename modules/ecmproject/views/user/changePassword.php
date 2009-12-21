@@ -26,7 +26,7 @@ foreach (array_keys($fields) as $field)
 echo '</fieldset>';
  
 echo "<fieldset class='left'>";
-echo form::submit(null,Kohana::lang('auth.changeEmail_field_submit'));
+echo form::submit(null,Kohana::lang('auth.changePassword_field_submit'));
 echo '</fieldset>'; 
 
 echo form::close();
