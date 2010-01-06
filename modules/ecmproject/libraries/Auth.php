@@ -191,7 +191,7 @@ class Auth_Core {
     }
     public function hasUserGroup($group)
     {
-        if ($group != 'superAdmin' && $this->hasPermission('superAdmin'))
+        if ($group != 'SuperAdmin' && $this->hasPermission('superAdmin'))
             return true;
         return isset($this->groups[$permission]); 
     }
