@@ -60,7 +60,8 @@ switch ($fieldData['type'])
         echo form::textarea(array('name'=>$field,'rows'=>4, 'cols'=>30), $value, $attributes);
         break;
     case 'select':
-        $values = $fieldData['values'];
+        $values = @$fieldData['values'];
+        if (!$values) $values = array();
         $values[-1] = "";
         asort($values);
         echo form::dropdown($field, $values, $value, 'class="block"');
