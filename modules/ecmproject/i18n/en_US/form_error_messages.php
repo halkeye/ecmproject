@@ -73,13 +73,13 @@ $lang = array(
     ),
  'start_date' => Array
     (
-        'required' => 'You must set a Start Date.',
-        'default' => 'You must set a Start Date.',
+        'required' => 'You must set a valid Start Date.',
+        'default' => 'You must set a valid Start Date.',
     ),
  'end_date' => Array
     (
-        'required' => 'You must set an End Date',
-        'default' => 'You must set an End Date',
+        'required' => 'You must set a valid End Date',
+        'default' => 'You must set a valid End Date',
     ),
  'name' => Array
     (
