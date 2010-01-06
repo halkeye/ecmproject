@@ -22,7 +22,7 @@ define('IN_PRODUCTION', FALSE);
  *
  * This path can be absolute or relative to this file.
  */
-$kohana_application = 'application';
+$kohana_application = 'default';
 
 /**
  * Kohana modules directory. This directory should contain all the modules used

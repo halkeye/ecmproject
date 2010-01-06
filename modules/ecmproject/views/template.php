@@ -3,8 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
 <head> 
 <title>Electronic Convention Management (ECM)<?php echo $title ? "::$title" : "" ?></title> 
-<?php echo html::stylesheet(array('css/main.css')); ?>
-<?php echo html::script(array('js/jquery-1.3.2.min.js')); ?>
+<?php echo html::stylesheet(array(url::site('static/css/main.css'))); ?>
 </head> 
  
 <body> 

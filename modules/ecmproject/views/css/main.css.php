@@ -1,4 +1,3 @@
-
 /* Reset */
 html,body,div,span,object,iframe, h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,cite,code,del,em,img,strong,sub,sup,tt,dl,dt,dd,ol,ul,li,form,label,legend{margin:0;padding:0;border:0;font-weight:inherit;font-style:inherit;font-size:100%;font-family:inherit;vertical-align:baseline}
 :focus{outline:0}
@@ -9,9 +8,7 @@ a:hover { text-decoration: none; }
 a:visited { color: #00275E; text-decoration: underline; }
 
 body {   
-  /* background-color: #20232B;  */ 
-  /* background: url('../img/bg.jpg') repeat; */
-  background-color: #FFF;
+  background-color: #20232B;   
   font-size: 12px;
   font-family: "Lucida Grande", "Trebuchet MS";   
   text-align: center; /* For the stupidity that is IE6 */
@@ -23,20 +20,20 @@ body {
   margin-right: auto;
   margin-top: 10px; 
   margin-bottom: 5px; 
-  width: 670px; /* Change from 800. */
+  width: 1024px; /* Change from 800. */
   text-align: left; /* Override body text-align to get proper default text-alignment */
 }
 
 #header {    
-  height: 176px;  
-  background: url('../img/banner2.png') no-repeat;  
+  height: 200px;  
+  background: #000 url('../img/banner.jpg') no-repeat;  
 }
 
 /* Sidebar */
 /* Left navigation #4B050D */
 #sidebar{
   float: left;
-  /* border-top: 3px solid #8A0917; */
+  border-top: 3px solid #8A0917;    
   border-bottom: 1px solid #BBB;
   left: 0px;
   top: 200px;
@@ -92,7 +89,7 @@ body {
 /* Generic Content Container */
 #content.contentMenu
 {
-  /* border-top: 3px solid #445772; */
+  border-top: 3px solid #445772;
   border-left: 1px solid #BBB; 
   padding: 10px;  
   margin-right: 0px;  
@@ -102,8 +99,8 @@ body {
 
 #content.contentNoMenu 
 {   
-  /* border-top: 3px solid #445772; */ /* Old: #8A0917 */
-  /* border-left: 1px solid #BBB; */
+  border-top: 3px solid #445772; /* Old: #8A0917 */
+  border-left: 1px solid #BBB; 
   padding: 10px;  
   background-color: #FFF;
 }
