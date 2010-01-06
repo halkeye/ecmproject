@@ -76,7 +76,19 @@ $lang = array(
         'required' => 'You must set a valid Start Date.',
         'default' => 'You must set a valid Start Date.',
     ),
+  //This needs to be normalized with the other fields...
+  'startDate' => Array
+    (
+        'required' => 'You must set a valid Start Date.',
+        'default' => 'You must set a valid Start Date.',
+    ),
  'end_date' => Array
+    (
+        'required' => 'You must set a valid End Date',
+        'default' => 'You must set a valid End Date',
+    ),
+  //This needs to be normalized with the other fields...(made to be end_date).
+ 'endDate' => Array
     (
         'required' => 'You must set a valid End Date',
         'default' => 'You must set a valid End Date',
