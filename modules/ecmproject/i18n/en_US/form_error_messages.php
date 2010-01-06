@@ -71,4 +71,24 @@ $lang = array(
         'required' => 'You must agree to the Terms and Conditions to continue.',
         'default' => 'You must agree to the Terms and Conditions to continue.',
     ),
+ 'start_date' => Array
+    (
+        'required' => 'You must set a Start Date.',
+        'default' => 'You must set a Start Date.',
+    ),
+ 'end_date' => Array
+    (
+        'required' => 'You must set an End Date',
+        'default' => 'You must set an End Date',
+    ),
+ 'name' => Array
+    (
+        'required' => 'You must provide a name for this item.',
+        'default' => 'You must provide a name for this item.',
+    ),
+ 'location' => Array
+    (
+        'required' => 'You must specify a location!',
+        'default' => 'You must specify a location!',
+    ),
 );
