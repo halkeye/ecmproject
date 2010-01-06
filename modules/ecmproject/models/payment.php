@@ -68,6 +68,17 @@ class Payment_Model extends ORM
             }
         }
 		
+		/* For optional fields */
+		if (isset($array['txn_id']) && !empty($array['txn_id']))
+		{
+			$array->add_rules('txn_id', 'required');
+		}
+		
+		if (isset($array['receipt_id']) && !empty($array['receipt_id']))
+		{
+			$array->add_rules('receipt_id', 'required');
+		}
+		
 		/* Ensure non-empty dropdown menus */
 
 		if (empty($array->type) || $array->type == -1)
