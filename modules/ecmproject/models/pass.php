@@ -47,18 +47,23 @@ class Pass_Model extends ORM
 	{
 		$array = Validation::factory($array);
         $array->pre_filter('trim');
-	
+
 		$array->add_rules('isPurchasable', 'is_numeric');
 		$array->add_rules('convention_id', 'required');
+		$array->add_rules('convention_id', 'is_numeric'); //Convention_id's should be numeric.
 		$array->add_rules('name', 'required');
 		$array->add_rules('price', 'required'); //Also set
 		
-		// Some extra work is needed for this.
-		
+		// Some extra work is needed for this.		
 		$array->add_rules('startDate', 'required');
 		$array->add_rules('endDate', 'required');
 		$array->add_callbacks('startDate', array($this, '__validateISODate')); //Non-set start date will be set to today
 		$array->add_callbacks('endDate', array($this, '__validateISODate')); //Non-set end date will be set to convention end.
+
+		// Non-selected convention_id input is less than 1.
+		if (isset($array['convention_id']) && is_numeric($array['convention_id']) && $array['convention_id'] < 1) {
+			$array->add_error('convention_id', 'convention_id_invalid');
+		}	
 		
 		if (!isset($array->isPurchasable))
 			$array->isPurchasable = 0;
