@@ -149,3 +149,59 @@ CREATE TABLE `logs` (
    FOREIGN KEY (target_registration_id) REFERENCES registrations(id) ON DELETE SET NULL,
    FOREIGN KEY (target_badge_id) REFERENCES passes(id) ON DELETE SET NULL
  ) ENGINE=Innodb DEFAULT CHARSET=utf8;
+
+/*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
+/*!40000 ALTER TABLE `usergroups` DISABLE KEYS */;
+/*!40000 ALTER TABLE `accounts_usergroups` DISABLE KEYS */;
+/*!40000 ALTER TABLE `permissions` DISABLE KEYS */;
+/*!40000 ALTER TABLE `usergroups_permissions` DISABLE KEYS */;
+
+INSERT INTO `usergroups` VALUES(1, 'Registered', 'All registered users get this group');
+INSERT INTO `usergroups` VALUES(2, 'SuperAdmin', 'Super Admin Access');
+INSERT INTO `usergroups` VALUES(3, 'Administrator', 'Admin Access');
+
+INSERT INTO `permissions` VALUES (1,'admin',NULL), (2, 'superAdmin', NULL) ;
+-- INSERT INTO `usergroups_permissions` SET usergroup_id = 2, permission_id = 1;
+INSERT INTO `usergroups_permissions` SET usergroup_id = 2, permission_id = 2;
+INSERT INTO `usergroups_permissions` SET usergroup_id = 3, permission_id = 1;
+
+-- Status of account (unverified, verified, banned, etc)
+-- reg_status TINYINT NOT NULL,
+INSERT INTO `accounts` SET
+    id         = 1,
+    email      = 'halkeye@gmail.com',
+    password   = 'c1537a66964e2acbb3a8232a20b6d8338cb206c5',
+    salt       = '3e215344f1',
+    status     = 1,
+    created    = 1249191871,
+    login      = 1249793436
+;
+INSERT INTO `accounts` SET 
+    id         = 2,
+    email      = 'stt@sfu.ca',
+    password   = '59e9c0e9d8e1f1b26b7f867a58ee6edf93becb33',
+    salt       = '9f8d6875ac',
+    status     = 1,
+    created    = 1257639234,
+    login      = 1262579714 
+;
+-- Heather from ae reg
+INSERT INTO `accounts` SET
+    id         = 3,
+    email      = 'queens_net@yahoo.ca',
+    password   = 'f7a2752cdd4239075c6a8241c8a8ce77c0d3fb8f',
+    salt       = '74feb3d02f',
+    status     = 1,
+    created    = 1257483052,
+    login      = 1257484338
+;
+
+INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 1;
+INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 2;
+INSERT INTO `accounts_usergroups` SET usergroup_id = 1, account_id = 3;
+
+/*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
+/*!40000 ALTER TABLE `usergroups` ENABLE KEYS */;
+/*!40000 ALTER TABLE `accounts_usergroups` ENABLE KEYS */;
+/*!40000 ALTER TABLE `permissions` ENABLE KEYS */;
+/*!40000 ALTER TABLE `usergroups_permissions` ENABLE KEYS */;
