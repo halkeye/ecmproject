@@ -6,8 +6,9 @@ $lang = array(
         'admin_accounts'         => 'Manage Accounts',
         'admin_conventions'              => 'Manage Conventions',
         'admin_passes'         => 'Manage Passes',
-        'admin_registrations'               => 'Manage Registrations',       
-
+        'admin_registrations'               => 'Manage Registrations',     
+		
+		'reg_field_email'		=> 'Account Email', 		
         'edit_account'            => 'Editing account',
         'delete_account'                => 'Delete this account',
         'add_account'                => 'Add account',
@@ -40,4 +41,5 @@ $lang = array(
 		'payment_field_receipt_id' => 'Reciept ID',
 		'payment_field_mc_gross' => 'Amount',
 		'payment_field_payment_status' => 'Payment Status'
+
 );
