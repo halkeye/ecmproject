@@ -76,7 +76,6 @@ $lang = array(
         'required' => 'You must set a valid Start Date.',
         'default' => 'You must set a valid Start Date.',
     ),
-  //This needs to be normalized with the other fields...
   'startDate' => Array
     (
         'required' => 'You must set a valid Start Date.',
@@ -87,7 +86,6 @@ $lang = array(
         'required' => 'You must set a valid End Date',
         'default' => 'You must set a valid End Date',
     ),
-  //This needs to be normalized with the other fields...(made to be end_date).
  'endDate' => Array
     (
         'required' => 'You must set a valid End Date',
@@ -103,4 +101,8 @@ $lang = array(
         'required' => 'You must specify a location!',
         'default' => 'You must specify a location!',
     ),
+  'convention_id' => Array
+  (
+		'default' => 'You must select a convention first!',  
+  ),
 );
