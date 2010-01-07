@@ -13,6 +13,7 @@
 class Admin_Controller extends Controller 
 { 
 	const ROWS_PER_PAGE = 10;
+    const ADMIN_USERGROUP = 'Administrator';
 
 	function __construct()
 	{
@@ -287,24 +288,20 @@ class Admin_Controller extends Controller
 								
 		// Calculate the offset.
 		//$start = ( Admin_Controller::getMultiplier($page) * Admin_Controller::ROWS_PER_PAGE );	
-		$rows = ORM::factory('Account')->find_all(); 
+		$rows = ORM::factory('Account')
+            ->join('accounts_usergroups', 'accounts_usergroups.account_id', 'accounts.id')
+            ->join('usergroups', 'accounts_usergroups.usergroup_id', 'usergroups.id')
+            ->where('usergroups.name', Admin_Controller::ADMIN_USERGROUP)
+            //->limit(
+            ->find_all(); 
 			
-		// Extra validation.
-		if (count($rows) == 0)
-		{
-			$this->addError('Invalid page number.');
-		}
-
 		// Header entry. (View with no data generates a header)
 		$data['entries'][0] = new View('admin/ListItems/AdminAccountEntry');
 		foreach ($rows as $row)
 		{
-			if ($row->has(ORM::factory('usergroup', 3)))
-			{
-				$data['actions']['edit'] = html::anchor('admin/deleteAdmin/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), Kohana::lang('admin.edit_account')));
-				//$data['actions']['delete'] = html::anchor('admin/deleteAccount/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), Kohana::lang('admin.delete_account')));			
-				$data['entries'][$row->id] = new View('admin/ListItems/AdminAccountEntry', array('row' => $row, 'actions' => $data['actions']));				
-			}		
+            $data['actions']['edit'] = html::anchor('admin/deleteAdmin/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), Kohana::lang('admin.edit_account')));
+            //$data['actions']['delete'] = html::anchor('admin/deleteAccount/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), Kohana::lang('admin.delete_account')));			
+            $data['entries'][$row->id] = new View('admin/ListItems/AdminAccountEntry', array('row' => $row, 'actions' => $data['actions']));				
 		}	
 		
 		// Set callback path for form submit (change convention, jump to page)
@@ -1018,10 +1015,12 @@ class Admin_Controller extends Controller
 		
 		if ($post = $this->input->post())
 		{
+            $post['email'] = trim($post['email']);
+            $group = ORM::Factory('usergroup', Admin_Controller::ADMIN_USERGROUP);
 			$acct = ORM::Factory('Account')->where('email', $post['email'])->find();
-			if ($acct->loaded && !$acct->has(ORM::Factory('usergroup', 3)))
+			if ($acct->loaded && !$acct->has($group))
 			{
-				$acct->add(ORM::factory('usergroup', 3));		
+				$acct->add($group);
 				$acct->save();
 				$this->addMessage('Account login ' . $acct->email . ' was granted administrator access.');
 				url::redirect('admin/manageAdmin');
