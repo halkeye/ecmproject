@@ -18,10 +18,8 @@ class Admin_Controller extends Controller
 	{
 		parent::__construct();
 		$this->requireLogin();
-		$this->requirePermission('admin'); //Force requirement of full administrative access.
+		$this->requirePermission('admin'); //Force requirement of full administrative access minimum.
 	
-		/* We don't even use the menu right now.(or at least I don't)...*/
-		//$this->addMenuItem(array('title'=>'Administration', 'url'=>'admin'));
 		$this->addMenuItem(array('title'=>'Add Registration', 'url'=>'convention/editReg'));
 
 		return;
@@ -100,6 +98,7 @@ class Admin_Controller extends Controller
 		}
 		else if ($total_rows == 0)
 		{
+			//TODO: Add string to the language file.
 			$this->addError("D: No one's used our system yet! (You shouldn't be getting this - if you are, something's wrong) D:");
 		}			
 		
@@ -267,6 +266,57 @@ class Admin_Controller extends Controller
 				'createText' => 'Create Payment',
 				'createLink' => "admin/createPayment/$rid",
 				'rows' => $data['entries'])
+			);
+	}
+	
+	/*
+	* List accounts with admin powers. Only action is to remove account from list of administrators or to add one.
+	*
+	*
+	*/
+	function manageAdmin()
+	{
+		$this->requirePermission('superAdmin'); //Require extra permissions to manage administrators.
+		
+		// Set headers
+		$this->view->title = "Administration: Manage Admins";
+		$this->view->heading = "Administration: Manage Admins";
+		$this->view->subheading = "Add or remove admin users.";
+				
+		//$total_rows = Account_Model::getTotalAdminAccounts(); //Modify to getTotalAccounts with admin permissions.
+								
+		// Calculate the offset.
+		//$start = ( Admin_Controller::getMultiplier($page) * Admin_Controller::ROWS_PER_PAGE );	
+		$rows = ORM::factory('Account')->find_all(); 
+			
+		// Extra validation.
+		if (count($rows) == 0)
+		{
+			$this->addError('Invalid page number.');
+		}
+
+		// Header entry. (View with no data generates a header)
+		$data['entries'][0] = new View('admin/ListItems/AdminAccountEntry');
+		foreach ($rows as $row)
+		{
+			if ($row->has(ORM::factory('usergroup', 3)))
+			{
+				$data['actions']['edit'] = html::anchor('admin/deleteAdmin/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), Kohana::lang('admin.edit_account')));
+				//$data['actions']['delete'] = html::anchor('admin/deleteAccount/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), Kohana::lang('admin.delete_account')));			
+				$data['entries'][$row->id] = new View('admin/ListItems/AdminAccountEntry', array('row' => $row, 'actions' => $data['actions']));				
+			}		
+		}	
+		
+		// Set callback path for form submit (change convention, jump to page)
+	
+		$this->view->content = new View('admin/list', array(
+				'entity' => 'Account',
+				'callback' => 'admin/manageAccounts', 
+				'createText' => 'Add Admin',
+				'createLink' => 'admin/setAdmin', 
+				'rows' => $data['entries'], 
+				'page' => 1,
+				'total_rows' => count($rows))
 			);
 	}
 	
@@ -554,16 +604,14 @@ class Admin_Controller extends Controller
 		$reg = ORM::Factory('Registration')->find($rid);
 		$pass = ORM::Factory('Pass')->find($reg->pass_id);
 		
+		//TODO: Redirect properly.
 		if (!$reg->loaded)
 			die('Unable to retrieve registration');
 		
 		$fields = $pay->default_fields;
-		
-		//Move to model.
 		$fields['type']['values'] = array('paypal' => 'Instant (Paypal)', 'mail' => 'Mail', 'inperson' => 'In Person');
 		$fields['payment_status']['values'] = $pay->getPaymentStatusSelectList();	
-		
-		//Do dropdown for payment type. What kind of selections can we have?		
+			
 		if ($post = $this->input->post())
 		{
 			if ($pay->validate_admin($post))
@@ -963,8 +1011,56 @@ class Admin_Controller extends Controller
 		Admin_Controller::__delete($id, 'Payment', "deletePayment/$rid", "managePayments/$rid", true);				
 	}
 	
-	function search($entity = NULL)	
+	function setAdmin()
+	{	
+		$this->requirePermission('superAdmin'); //Require extra permissions to manage administrators.
+		$fields = array('email' => array( 'type'  => 'text', 'label' => 'Email', 'required'=>true 								));
+		
+		if ($post = $this->input->post())
+		{
+			$acct = ORM::Factory('Account')->where('email', $post['email'])->find();
+			if ($acct->loaded && !$acct->has(ORM::Factory('usergroup', 3)))
+			{
+				$acct->add(ORM::factory('usergroup', 3));		
+				$acct->save();
+				$this->addMessage('Account login ' . $acct->email . ' was granted administrator access.');
+				url::redirect('admin/manageAdmin');
+			}
+		}
+		else
+		{
+			/* Full registration at this step. */
+			$this->view->content = new View('admin/Admin', array(
+				'row' => $reg['email'] = '',
+				'fields' => $fields,
+				'callback' => "setAdmin"
+			));		
+		}
+	}
+	
+	function deleteAdmin($id = NULL)
 	{
+		$this->requirePermission('superAdmin'); //Require extra permissions to manage administrators.
+		if ($id == NULL || !is_numeric($id))
+			die('Get out of here!');
+			
+		$acct = ORM::Factory('Account')->find($id);
+		if ($acct->loaded && $acct->has(ORM::Factory('usergroup', 3)))
+		{
+			$acct->remove(ORM::Factory('usergroup', 3));
+			$acct->save();		
+			$this->addMessage('Account login ' . $acct->email . ' was stripped of admin access.');
+		}
+		else
+		{
+			$this->addError("Not a valid (admin) account.");
+		}
+	
+		url::redirect('admin/manageAdmin');
+	}
+	
+	function search($entity = NULL)	
+	{		
 		//Determine search term (POST).
 		$post = $this->input->post();	
 		
@@ -977,6 +1073,7 @@ class Admin_Controller extends Controller
 		$rows = null;
 		if ($entity == 'Registration' && $search_term != null)
 		{
+			$this->view->heading = "Searching for Registrations";
 			$rows = ORM::Factory('Registration')
 				->orlike('email', $search_term)
 				->orlike('gname', $search_term)
@@ -986,6 +1083,7 @@ class Admin_Controller extends Controller
 		}
 		else if ($entity == 'Account' && $search_term != null)
 		{
+			$this->view->heading = "Searching for Accounts";
 			$rows = ORM::Factory('Account')
 				->orlike('email', $search_term)
 				->orwhere('id',$search_term)
@@ -993,6 +1091,7 @@ class Admin_Controller extends Controller
 		}
 		else if ($entity == 'Convention' && $search_term != null)
 		{
+			$this->view->heading = "Searching for Conventions";
 			$rows = ORM::Factory('Convention')
 				->orlike('name', $search_term)
 				->orwhere('id',$search_term)
@@ -1000,6 +1099,7 @@ class Admin_Controller extends Controller
 		}
 		else if ($entity == 'Pass' && $search_term != null)
 		{
+			$this->view->heading = "Searching for Passes";
 			$rows = ORM::Factory('Pass')
 				->orlike('name', $search_term)
 				->orwhere('id',$search_term)
@@ -1204,12 +1304,12 @@ class Admin_Controller extends Controller
 				'callback' => "export2/$cid"
 			));
 	}
-	
+		
 	/*
 	* Validate and determine the convention id to use. If $convention_id is 
 	* NULL, determine it from a result set of convention entries. 
 	*/
-	function getConventionId($convention_id, $crows)
+	private function getConventionId($convention_id, $crows)
 	{
 		/* POST Variable defines $convention_id */
 		if ($convention_id == NULL) 
@@ -1239,7 +1339,7 @@ class Admin_Controller extends Controller
 			return -1;		
 	}
 	
-	function parseSplitDate($post, $fieldName)
+	private function parseSplitDate($post, $fieldName)
 	{
 		return implode('-', 
 			array(
@@ -1253,7 +1353,7 @@ class Admin_Controller extends Controller
 	/*
 	* Validate and determine the page multiplier to use when fetching results from the DB.
 	*/
-	function getMultiplier($page)
+	private function getMultiplier($page)
 	{
 		// Page variable is a number.
 		if (isset($page) && is_numeric($page))
@@ -1276,7 +1376,7 @@ class Admin_Controller extends Controller
      * const STATUS_PAID        = 99; // Fully working and paid	
 	 */
 	
-	function updatePaymentStatus($reg, $pass)
+	private function updatePaymentStatus($reg, $pass)
 	{		
 		/* Check status of payment for registration. Set only if not PAID status. */			
 		if (Payment_Model::staticGetTotal($reg->id) >= $pass->price && $reg->status != Registration_Model::STATUS_PAID)
