@@ -18,9 +18,11 @@
 	</tr>
 	<tr>
 		<th class='header'><?php echo html::anchor('admin/export', 'Export Registration Information (CSV)') ?></th>
+		<th class='header'><?php echo html::anchor('admin/manageAdmin', 'Manage Administrators') ?></th>
 	</tr>
 	<tr>
 		<td>Exports selected (or all) registration information for a particular convention to a CSV file which can be opened in Excel.</td>
+		<td>Grant and manage administrator access to accounts</td>
 	</tr>
 </table>
 </div>
