@@ -1,8 +1,3 @@
-DROP DATABASE ecms;
-CREATE DATABASE ecms;
-USE ecms;
-
-
 DROP TABLE IF EXISTS `conventions`;
 -- Table that describes a convention. Start/end times, name and location. Auto-incrementing integer ID.
 CREATE TABLE conventions (
