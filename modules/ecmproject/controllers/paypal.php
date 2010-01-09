@@ -6,19 +6,9 @@ class Paypal_Controller extends Controller_Core
     {
 
         $p = new Paypal();
-        $data = $_POST;
 
-        if (IN_PRODUCTION)
-        {
-            if (!$p->validate_ipn()) 
-            {
-                $msg = "Unable to validate ipn: " . $p->getLastError();
-                print $msg;
-                Kohana::log('error', "[PAYPAL] $msg");
-                return;
-            }
-            $data = $p->getIpnData();
-        }
+        $p->validateIPN();
+        $data = $this->input->post();
         
         Kohana::log('debug','[PAYPAL] Data Dump - ' . var_export($data,1));
         foreach (range(1, $data['num_cart_items']) as $count)
