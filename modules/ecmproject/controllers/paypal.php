@@ -10,10 +10,15 @@ class Paypal_Controller extends Controller_Core
         $p->validateIPN();
         $data = $this->input->post();
         
-        Kohana::log('debug','[PAYPAL] Data Dump - ' . var_export($data,1));
-        foreach (range(1, $data['num_cart_items']) as $count)
+        $total_items = 1;
+        if (isset($data['num_cart_items']))
+            $total_items = $data['num_cart_items'];
+        else
+            while (isset($data['item_number'.$total_items+1])) { $total_items++; }
+
+        foreach (range(1, $total_items) as $count)
         {
-            if (!isset($data['item_number'.$count])) 
+            if (!isset($data['item_number'.$count]) || strpos($data['item_number'.$count], "|") === FALSE ) 
             {
                 Kohana::log('error',"[PAYPAL] unable to find item $count - " . var_export($_POST,1));
                 break;

@@ -27,7 +27,7 @@ foreach ($registrations as $reg)
     <table>
         <tr>
             <td><?php
-                echo form::open($paypal_url);
+                echo form::open($paypal_url, array('target'=>'_top'));
                 echo form::hidden('cmd', '_cart');
                 echo form::hidden('upload', '1');
                 echo form::hidden('no_shipping', '2');

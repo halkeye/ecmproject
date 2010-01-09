@@ -5,7 +5,8 @@ class Input extends Input_Core
     public $originalPost = array();
     function __construct()
     {
-        $this->originalPost = $_POST;
+        foreach ($_POST as $key=>$value) { $this->originalPost[$key] = $value; }
+        #$this->originalPost = $_POST;
         parent::__construct();
     }
 }
