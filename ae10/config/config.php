@@ -93,7 +93,7 @@ $config['log_directory'] = 'kohana/application/logs';
  * Enable or disable displaying of Kohana error pages. This will not affect
  * logging. Turning this off will disable ALL error pages.
  */
-$config['display_errors'] = TRUE;
+$config['display_errors'] = FALSE;
 
 /**
  * Enable or disable statistics in the final output. Stats are replaced via

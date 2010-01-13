@@ -87,14 +87,14 @@ $config['log_threshold'] = 4;
 /**
  * Message logging directory.
  */
-$config['log_directory'] = APPPATH.'logs';
-$config['log_directory'] = dirname($_SERVER['SCRIPT_FILENAME']).'/logs';
+//$config['log_directory'] = APPPATH.'logs';
+$config['log_directory'] = dirname($_SERVER['SCRIPT_FILENAME']).'/kohana/application/logs';
 
 /**
  * Enable or disable displaying of Kohana error pages. This will not affect
  * logging. Turning this off will disable ALL error pages.
  */
-$config['display_errors'] = TRUE;
+$config['display_errors'] = FALSE;
 
 /**
  * Enable or disable statistics in the final output. Stats are replaced via
