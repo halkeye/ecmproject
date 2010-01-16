@@ -4,7 +4,8 @@
  * then a full URL will be used, eg: http://localhost/kohana/. If it only includes
  * the path, and a site_protocol is specified, the domain will be auto-detected.
  */
-$config['site_domain']    = $_SERVER['HTTP_HOST'].dirname($_SERVER['SCRIPT_NAME']);
+$config['script_name'] = isset($_SERVER["ORIG_SCRIPT_NAME"]) ? $_SERVER["ORIG_SCRIPT_NAME"] : $_SERVER['SCRIPT_NAME'];
+$config['site_domain'] = $_SERVER['HTTP_HOST'].dirname($config['script_name']);
 
 /**
  * Force a default protocol to be used by the site. If no site_protocol is
@@ -18,7 +19,7 @@ $config['site_protocol'] = '';
  *
  * This can be removed by using URL rewriting.
  */
-$config['index_page'] = basename($_SERVER['SCRIPT_NAME']);
+$config['index_page'] = basename($config['script_name']);
 
 /**
  * Fake file extension that will be added to all generated URLs. Example: .html
@@ -82,19 +83,18 @@ $config['enable_hooks'] = FALSE;
  *  3 - Notices
  *  4 - Debugging
  */
-$config['log_threshold'] = 4;
+$config['log_threshold'] = 1;
 
 /**
  * Message logging directory.
  */
-//$config['log_directory'] = APPPATH.'logs';
-$config['log_directory'] = dirname($_SERVER['SCRIPT_FILENAME']).'/kohana/application/logs';
+$config['log_directory'] = 'kohana/application/logs';
 
 /**
  * Enable or disable displaying of Kohana error pages. This will not affect
  * logging. Turning this off will disable ALL error pages.
  */
-$config['display_errors'] = FALSE;
+$config['display_errors'] = TRUE;
 
 /**
  * Enable or disable statistics in the final output. Stats are replaced via
@@ -131,7 +131,6 @@ if (!IN_PRODUCTION)
     $config['enable_hooks'] = TRUE;
 }
 
-$config['modules'][]  = MODPATH.'paypal';
 $config['modules'][]  = MODPATH.'ecmproject';
 
 if (file_exists('../config-local.php'))

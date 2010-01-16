@@ -47,7 +47,7 @@ $kohana_system = 'kohana/system';
  * line out. When running an application on a new server, uncomment this line
  * to check the PHP version quickly.
  */
-version_compare(PHP_VERSION, '5.2', '<') and exit('Kohana requires PHP 5.2 or newer.');
+#version_compare(PHP_VERSION, '5.2', '<') and exit('Kohana requires PHP 5.2 or newer.');
 
 /**
  * Set the error reporting level. Unless you have a special need, E_ALL is a
@@ -92,6 +92,7 @@ define('APPPATH', str_replace('\\', '/', realpath($kohana_application)).'/');
 define('MODPATH', str_replace('\\', '/', realpath($kohana_modules)).'/');
 define('SYSPATH', str_replace('\\', '/', realpath($kohana_system)).'/');
 
+if (!defined('E_RECOVERABLE_ERROR')) { define('E_RECOVERABLE_ERROR', 4096); }
 // Clean up
 unset($kohana_application, $kohana_modules, $kohana_system);
 
