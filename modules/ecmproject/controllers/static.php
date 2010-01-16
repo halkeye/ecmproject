@@ -31,7 +31,7 @@ class Static_Controller extends Controller_Core
     {
         if (expires::check(300) === FALSE) expires::set(300);
         $info = pathinfo($filename);
-        $file = Kohana::find_file('views/images', $info['filename'], true, $info['extension']);
+        $file = Kohana::find_file('views/images', basename($info['basename'], '.'.$info['extension']), true, $info['extension']);
 
         if ($info['extension'] == 'png')
             header('Content-Type: Content-Type: image/png');
