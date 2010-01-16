@@ -143,7 +143,7 @@ class Convention_Controller extends Controller
         }
         foreach ($passesQuery->find_all() as $pass)
         {
-            $fields['pass_id']['values'][$pass->id] = $pass;
+            $fields['pass_id']['values'][$pass->id] = $pass->__toString();
         }
 
         if ($post = $this->input->post())
