@@ -37,7 +37,7 @@ class Log_Model extends ORM
             $this->method = url::current(TRUE);
             if (Auth::instance()->is_logged_in())
             {
-                $this->modifier_id = Auth::instance()->getAccount();
+                $this->modifier_id = Auth::instance()->getAccount()->id;
             }
         }
     }
