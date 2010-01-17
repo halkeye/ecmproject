@@ -1378,9 +1378,12 @@ class Admin_Controller extends Controller
 	private function updatePaymentStatus($reg, $pass)
 	{		
 		/* Check status of payment for registration. Set only if not PAID status. */			
-		if (Payment_Model::staticGetTotal($reg->id) >= $pass->price && $reg->status != Registration_Model::STATUS_PAID)
+		if (Payment_Model::staticGetTotal($reg->id) >= $pass->price)
 		{
-			$reg->status = Registration_Model::STATUS_PAID;			
+			//Only if the status is not set to PAID should we set it. This way, we won't spam confirmation mail on changes that do not affect PAID status.
+			if ($reg->status != Registration_Model::STATUS_PAID) {
+				$reg->status = Registration_Model::STATUS_PAID;		
+			}				
 		}
 		else
 		{
