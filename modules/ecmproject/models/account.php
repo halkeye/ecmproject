@@ -146,6 +146,7 @@ class Account_Model extends ORM
 	
 	public function validate_admin(array & $array, $save = FALSE, $passRequired = FALSE)
 	{
+        $data = (array) $array;
 		// Initialise the validation library and setup some rules
 		$array = Validation::factory($array);
         // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
@@ -153,12 +154,12 @@ class Account_Model extends ORM
 		
 		$array->add_rules('email', 'required', array('valid','email')); //Email is always required. 
 		
-        $array->add_rules('password', 'length[0-255]');
 		/* If password is filled in, set additional rules. */
-		if (isset($array['password']) && isset($array['confirm_password']) 
-				&& (!empty($array['password']) || !empty($array['password']) ||
+		if (isset($data['password']) && isset($data['confirm_password']) 
+				&& (!empty($data['password']) || !empty($data['password']) ||
                     $passRequired))
 		{
+            $array->add_rules('password', 'length[0-255]');
 			$array->add_rules('confirm_password', 'required');
 			$array->add_rules('confirm_password',  'matches[password]');
 		}
