@@ -69,15 +69,8 @@ class Payment_Model extends ORM
         }
 		
 		/* For optional fields */
-		if (isset($array['txn_id']) && !empty($array['txn_id']))
-		{
-			$array->add_rules('txn_id', 'required');
-		}
-		
-		if (isset($array['receipt_id']) && !empty($array['receipt_id']))
-		{
-			$array->add_rules('receipt_id', 'required');
-		}
+        $array->add_rules('txn_id', 'length[0-255]');
+        $array->add_rules('receipt_id', 'length[0-255]');
 		
 		/* Ensure non-empty dropdown menus */
 
