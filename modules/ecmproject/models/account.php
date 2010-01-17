@@ -153,11 +153,12 @@ class Account_Model extends ORM
 		
 		$array->add_rules('email', 'required', array('valid','email')); //Email is always required. 
 		
+        $array->add_rules('password', 'length[0-255]');
 		/* If password is filled in, set additional rules. */
-		if (isset($array->password) && isset($array->confirm_password) 
-				&& (!empty($array->password) || !empty($array->password) || $passRequired))
+		if (isset($array['password']) && isset($array['confirm_password']) 
+				&& (!empty($array['password']) || !empty($array['password']) ||
+                    $passRequired))
 		{
-			$array->add_rules('password', 'required');			
 			$array->add_rules('confirm_password', 'required');
 			$array->add_rules('confirm_password',  'matches[password]');
 		}

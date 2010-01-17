@@ -131,9 +131,9 @@ class Registration_Model extends ORM
         foreach ($fields as $field => $fieldData)
         {
             if (isset($fieldData['required']) && $fieldData['required'])
-            {
                 $form->add_rules($field, 'required');
-            }
+            else
+                $form->add_rules($field, 'length[0,255]');
         }
 
         // Add Rules

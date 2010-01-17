@@ -65,15 +65,12 @@ class Pass_Model extends ORM
 			$array->add_error('convention_id', 'convention_id_invalid');
 		}	
 		
-		if (!isset($array->isPurchasable))
-			$array->isPurchasable = 0;
+		if (!isset($array['isPurchasable']))
+			$array['isPurchasable'] = 0;
 		
-		if (isset($array->minAge) && !empty($array->minAge))
-			$array->add_rules('minAge', 'required', 'numeric');
-			
-		if (isset($array->maxAge) && !empty($array->maxAge))
-			$array->add_rules('maxAge', 'required', 'numeric');
-				
+        $array->add_rules('minAge', 'required', 'numeric');
+        $array->add_rules('maxAge', 'required', 'numeric');
+
 		return parent::validate($array, $save);
 	}
 	
