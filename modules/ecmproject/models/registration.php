@@ -184,24 +184,18 @@ class Registration_Model extends ORM
 //        if (array_key_exists('pass_id', $array->errors()))
 //            return;
         $ageTime = strtotime($array['dob']);
+
         $pass = ORM::Factory('Pass')->with('convention')->find($array['pass_id']);
         $conventionStartTime = $pass->convention->start_date;
-        $yearsOld = date::timespan($ageTime, $conventionStartTime, 'years');
-        Kohana::log('error', var_export(array(
-                        $array['dob'], 
-                        date('Y-m-d', $conventionStartTime),
-                        date::timespan($ageTime, $conventionStartTime+3600),
-                        $yearsOld,
-        ),1));
+        # Code from http://forums.webmasterhub.net/viewtopic.php?f=23&t=1831 - Option 4
+        $yearsOld = abs(substr(date('Ymd', $conventionStartTime) - date('Ymd', $ageTime), 0, -4));
 
-        $query = $this->getPossiblePassesQuery();
-        $query->where('minAge <=', $yearsOld);
-        $query->where('maxAge >=', $yearsOld);
-        $query->where('id', $array['pass_id']);
-        if (!(bool)$query->count_all())
-        {
+        $happy = FALSE;
+        if ($yearsOld <= $pass->maxAge && $yearsOld >= $pass->minAge) 
+            $happy = TRUE;
+
+        if (!$happy)
             $array->add_error($field, 'invalid_pass_age');
-        }
     }
 	
     /**
