@@ -194,11 +194,11 @@ class Registration_Model extends ORM
         # Code from http://forums.webmasterhub.net/viewtopic.php?f=23&t=1831 - Option 4
         $yearsOld = abs(substr(date('Ymd', $conventionStartTime) - date('Ymd', $ageTime), 0, -4));
 
-        $happy = FALSE;
-        if ($yearsOld <= $pass->maxAge && $yearsOld >= $pass->minAge) 
-            $happy = TRUE;
-
-        if (!$happy)
+        $query = $this->getPossiblePassesQuery();
+        $query->where('minAge <=', $yearsOld);
+        $query->where('maxAge >=', $yearsOld);
+        $query->where('id', $array['pass_id']);
+        if (!(bool)$query->count_all())
             $array->add_error($field, 'invalid_pass_age');
     }
 	
