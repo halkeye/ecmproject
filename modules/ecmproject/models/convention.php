@@ -43,6 +43,7 @@ class Convention_Model extends ORM
 		$array->add_rules('location', 'required');
 		$array->add_callbacks('start_date', array($this, '_valid_date')); //Non-set start date will be set to today
 		$array->add_callbacks('end_date', array($this, '_valid_date')); //Non-set end date will be set to convention end.
+		$array->add_callbacks('valid_range', array($this, '_valid_range')); //Non-set end date will be set to convention end.
 		
 		return parent::validate($array, $save);
 	}
@@ -57,6 +58,16 @@ class Convention_Model extends ORM
 			$array->add_error($field, 'invalid_date');
 	}
 
+	/* This is cheap (since I hardcoded stuff) But it works :) */
+	public function _valid_range(Validation $array, $field)
+	{
+		$start = strtotime($array['start_date']);
+		$end = strtotime($array['end_date']);
+		
+		if (!$start || !$end || $start >= $end)
+			$array->add_error($field, 'invalid_range');	
+	}
+	
     public function getCurrentConvention()
     {
         //return $this->where(time().' BETWEEN start_date AND end_date')->find(); //If start dates are set to actual convention start dates, this goes boom.

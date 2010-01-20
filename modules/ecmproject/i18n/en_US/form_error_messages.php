@@ -105,4 +105,8 @@ $lang = array(
   (
 		'default' => 'You must select a convention first!',  
   ),
+  'valid_range' => Array
+  (
+		'default' => 'End date must be after the Start date!',
+  ),
 );
