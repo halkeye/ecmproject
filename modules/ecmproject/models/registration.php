@@ -149,7 +149,7 @@ class Registration_Model extends ORM
         $form->add_rules('cell', 'phone[7,9,10,11,14,15]');
         $form->add_rules('ephone', 'phone[7,9,10,11,14,15]');
         //$form->add_rules('dob', 'date');
-		$form->add_callbacks('dob', array($this, '_valid_date'));
+		$form->add_callbacks('dob', array($this, '_valid_birthdate'));
         $form->add_callbacks('pass_id', array($this, '_valid_pass_for_account'));
     }
 	
@@ -174,7 +174,7 @@ class Registration_Model extends ORM
         $form->add_rules('cell', 'phone[7,9,10,11,14,15]');
         $form->add_rules('ephone', 'phone[7,9,10,11,14,15]');
         //$form->add_rules('dob', 'date');
-		$form->add_callbacks('dob', array($this, '_valid_date'));
+		$form->add_callbacks('dob', array($this, '_valid_birthdate'));
         //$form->add_callbacks('pass_id', array($this, '_valid_pass_for_account'));
     }
 	
@@ -202,13 +202,16 @@ class Registration_Model extends ORM
     }
 	
 	/* Takes in a date in the format: YYYY-MM-DD (ISO_8601) */
-	public function _valid_date(Validation $array, $field)
+	public function _valid_birthdate(Validation $array, $field)
 	{
 		$date = strtotime($array[$field]);
 		
 		/* If date validation failed (not a date string) or date does not match expected... */
 		if (!$date || date("Y-m-d", $date) != $array[$field])
-			$array->add_error($field, 'invalid_date');
+			$array->add_error($field, 'invalid_birthdate');
+        /* if someone isn't born yet, they can't have a badge (mostly because they don't have a birthday) */
+        if ($date > time())
+			$array->add_error($field, 'invalid_birthdate');
 	}
 	
     /**
