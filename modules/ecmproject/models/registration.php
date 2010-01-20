@@ -79,7 +79,7 @@ class Registration_Model extends ORM
         $array = Validation::factory($array);
         // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
         $this->addValidationRules($array);
-
+		
         /* Keep track of what really changed so we don't update fields we havn't changed */
         $realChanged = $this->changed;
         foreach ($array->safe_array() as $field=>$value)
@@ -108,7 +108,7 @@ class Registration_Model extends ORM
         $array = Validation::factory($array);
         // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
         $this->addValidationRules_admin($array);
-
+		
         /* Keep track of what really changed so we don't update fields we haven't changed */
         $realChanged = $this->changed;
         foreach ($array->safe_array() as $field=>$value)
@@ -126,6 +126,7 @@ class Registration_Model extends ORM
     private function addValidationRules($form)
     {
         $form->pre_filter('trim');
+
 
         $fields = $this->formo_defaults;
         foreach ($fields as $field => $fieldData)
@@ -147,7 +148,8 @@ class Registration_Model extends ORM
 		$form->add_rules('phone', 'phone[7,9,10,11,14,15]');
         $form->add_rules('cell', 'phone[7,9,10,11,14,15]');
         $form->add_rules('ephone', 'phone[7,9,10,11,14,15]');
-        $form->add_rules('dob', 'date');
+        //$form->add_rules('dob', 'date');
+		$form->add_callbacks('dob', array($this, '_valid_date'));
         $form->add_callbacks('pass_id', array($this, '_valid_pass_for_account'));
     }
 	
@@ -171,7 +173,8 @@ class Registration_Model extends ORM
 		$form->add_rules('phone', 'phone[7,9,10,11,14,15]');
         $form->add_rules('cell', 'phone[7,9,10,11,14,15]');
         $form->add_rules('ephone', 'phone[7,9,10,11,14,15]');
-        $form->add_rules('dob', 'date');
+        //$form->add_rules('dob', 'date');
+		$form->add_callbacks('dob', array($this, '_valid_date'));
         //$form->add_callbacks('pass_id', array($this, '_valid_pass_for_account'));
     }
 	
@@ -197,6 +200,16 @@ class Registration_Model extends ORM
         if (!$happy)
             $array->add_error($field, 'invalid_pass_age');
     }
+	
+	/* Takes in a date in the format: YYYY-MM-DD (ISO_8601) */
+	public function _valid_date(Validation $array, $field)
+	{
+		$date = strtotime($array[$field]);
+		
+		/* If date validation failed (not a date string) or date does not match expected... */
+		if (!$date || date("Y-m-d", $date) != $array[$field])
+			$array->add_error($field, 'invalid_date');
+	}
 	
     /**
      * @param $accountId Account Id
