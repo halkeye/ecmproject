@@ -60,6 +60,14 @@ $lang = array(
         'required' => 'You must supply a valid address.',
         'default' => 'Invalid Input for address.',
     ),
+ 'city' => Array
+  (
+		'default' => 'You need to type something in for city!',
+  ),
+  'prov' => Array
+  (
+		'default' => 'You need to type something in for your province/state/corresponding term!',
+  ),
  'dob' => Array
     (
         'date' => 'You must supply a date of birth.',
