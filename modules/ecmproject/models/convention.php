@@ -41,21 +41,20 @@ class Convention_Model extends ORM
 		
 		$array->add_rules('name', 'required');
 		$array->add_rules('location', 'required');
-		$array->add_callbacks('start_date', array($this, '__validateISODate')); //Non-set start date will be set to today
-		$array->add_callbacks('end_date', array($this, '__validateISODate')); //Non-set end date will be set to convention end.
+		$array->add_callbacks('start_date', array($this, '_valid_date')); //Non-set start date will be set to today
+		$array->add_callbacks('end_date', array($this, '_valid_date')); //Non-set end date will be set to convention end.
 		
 		return parent::validate($array, $save);
 	}
 	
 	/* Have some utility library instead of duplicating this across models? */
-	public function __validateISODate(Validation $array, $field)
+	public function _valid_date(Validation $array, $field)
 	{
-		// previous to PHP 5.1.0 you would compare with -1, instead of false
-		if (($time = strtotime($array->$field)) === false) {
+		$date = strtotime($array[$field]);
+		
+		/* If date validation failed (not a date string) or date does not match expected... */
+		if (!$date || date("Y-m-d", $date) != $array[$field])
 			$array->add_error($field, 'invalid_date');
-		}
-		else
-			$this->$field = $array->$field;
 	}
 
     public function getCurrentConvention()
