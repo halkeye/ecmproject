@@ -1261,40 +1261,24 @@ class Admin_Controller extends Controller
 	
 			//Determine what to export. This is a bit cheap but it works...
 			foreach($post as $k => $v):			
-				/* Pass include */
+			
+				/* Pass */
 				if ($k[0] == 'p')
 				{
 					$temp = explode("_", $k);
 					$export_passes[$temp[1]] = $temp[1];
 				}	
+				
+				/* Status */
 				else if ($k[0] == 's')
 				{
 					$temp = explode("_", $k);
 					$export_status[$temp[1]] = $temp[1];
-				}
-				else if ($k == 'minor')
-				{
-					$export_age['minor'] = 'minor';
-				}
-				else if ($k == 'adult')
-				{
-					$export_age['adult'] = 'adult';
-				}				
+				}			
+				
 			endforeach;		
 			
-			print (count($export_passes));
-			
-			$age;
-			if (isset($export_age['minor']) && isset($export_age['adult']))
-				$age = 'all';
-			else if (isset($export_age['minor']))
-				$age = 'minor';
-			else if (isset($export_age['adult']))
-				$age = 'adult';
-			else
-				$age = 'none';
-			
-			$this->doExport($cid, $export_passes, $export_status, $age);
+			$this->doExport($cid, $export_passes, $export_status);
 		}
 		
 		$this->view->content = new View('admin/Export2', array(
@@ -1402,7 +1386,7 @@ class Admin_Controller extends Controller
 	* 
 	* $age is a single value of either "all", "minor", "adult", or "none".
 	*/
-	private function doExport($cid, $passes, $status, $age)
+	private function doExport($cid, $passes, $status)
 	{
 		$query = ORM::Factory('Registration');
 		
@@ -1418,21 +1402,7 @@ class Admin_Controller extends Controller
 		if ($status != null && is_array($status) && count($status) > 0)
 		{
 			$query = $query->in('registrations.status', implode(",", $status));
-		}
-		
-		
-		if ($age != null)
-		{
-			if ($age == 'minor')
-			{
-				$query->where(" (YEAR(CURDATE()) - YEAR(dob)) - (RIGHT(CURDATE(),5) < RIGHT(dob,5)) < 18");
-			}
-			else if ($age == 'adult')
-			{
-				$query->where(" (YEAR(CURDATE()) - YEAR(dob)) - (RIGHT(CURDATE(),5) < RIGHT(dob,5)) > 17");
-			}
-		}
-		
+		}	
 	
 		//Lazy vs eager? We're going to use it all...get it all in one go.
 		$results = $query->where("registrations.convention_id", $cid)->with('pass')->with('account')->with('convention')->find_all();		

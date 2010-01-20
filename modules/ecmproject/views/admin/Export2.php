@@ -24,17 +24,7 @@
 				print form::checkbox('s_' . $k, $v, TRUE);			
 			endforeach;
 		?>
-	</fieldset>
-	<h1>Step 4: Select Age Group</h1>
-	<p>You may also want to limit the exported results to just minors or just adults. <strong>Note:</strong> Not selecting either will cause both groups to be exported.</p>		
-	<fieldset>		
-		<?php
-			print form::label('minor', 'Minor');
-			print form::checkbox('minor', 'Minor', TRUE);
-			print form::label('adult', 'Adult');
-			print form::checkbox('adult', 'Adult', TRUE);
-		?>
-	</fieldset>
+	</fieldset>	
 	<fieldset>				
 		<button type="submit">Continue</button>
 	</fieldset>							
