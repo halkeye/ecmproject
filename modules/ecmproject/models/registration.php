@@ -8,7 +8,7 @@ class Registration_Model extends ORM
 	const STATUS_FAILED		 = 98; //Registration no longer valid (cancelled, refunded, etc).
     const STATUS_PAID        = 99; // Fully working and paid
     
-    protected $ignored_columns = array('agree_toc');
+    protected $ignored_columns = array('agree_toc', 'unique_badge');
 
     /* On unserialize never check the db */
     protected $reload_on_wakeup = false;
@@ -151,6 +151,7 @@ class Registration_Model extends ORM
         //$form->add_rules('dob', 'date');
 		$form->add_callbacks('dob', array($this, '_valid_birthdate'));
         $form->add_callbacks('pass_id', array($this, '_valid_pass_for_account'));
+        $form->add_callbacks('unique_badge', array($this, '_unique_badge'));
     }
 	
 	private function addValidationRules_admin($form)
@@ -411,6 +412,21 @@ class Registration_Model extends ORM
 		
         email::send($to, $from, $subject, $message, TRUE);    
 	}
+    
+    public function _unique_badge(Validation $array, $field)
+    {
+        $query = ORM::Factory('registration');
+        // TODO: use config
+        // TODO: switch this to be a config. name bool, and badge bool, so name and badge can be enforced unique
+        $query->where('gname', $array['gname']);
+        $query->where('sname', $array['sname']);
+        $query->where('account_id', $array['account_id']);
+        if ($this->loaded) 
+            $query->where('id !=', $this->id);
+
+        if ((bool)$query->count_all())
+            $array->add_error($field, 'unique');
+    }
 }
 
 /* End of file user.php */

@@ -117,4 +117,8 @@ $lang = array(
   (
 		'default' => 'End date must be after the Start date!',
   ),
+  'unique_badge' => Array
+  (
+		'default' => "You've already created a registration with the same full name as this one.",
+  ),
 );

@@ -167,6 +167,7 @@ class Convention_Controller extends Controller
 
             if (!isset($post['agree_toc']))
                 $post['agree_toc'] = false;
+            $post['account_id'] = $this->auth->getAccount()->id;
             if ($reg->validate($post))
             {
                 $reg->save();
