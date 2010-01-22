@@ -116,7 +116,7 @@ class User_Controller extends Controller
                 $errors = arr::overwrite($errors, $post->errors('form_error_messages'));
             }
         }
-        $this->view->content = new View('user/loginOrRegister', array('form'=>$form, 'errors'=>$errors));
+        return $this->loginOrRegister( array('form'=>$form, 'errors'=>$errors) );
     }
 
     function validate($uid = 0, $key = '')
@@ -173,9 +173,9 @@ class User_Controller extends Controller
         return url::redirect('/user/verifyMenu');
     }
     
-    function loginOrRegister()
+    function loginOrRegister($data = array())
     {
-        $data = array();
+        if (!is_array($data)) $data = array();
 		$this->view->heading = Kohana::lang('auth.login_header');
         $this->view->subheading = Kohana::lang('auth.login_subheader');
 
