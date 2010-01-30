@@ -71,7 +71,7 @@ switch ($fieldData['type'])
         ### Generate list of years
         foreach (date::months() as $month)
         {
-            $months[$month] = Kohana::lang('calendar.' . strtolower(date('F', mktime(0,0,0,$month))));
+            $months[$month] = Kohana::lang('calendar.' . strtolower(date('F', mktime(0,0,0,$month, 1))));
         }
 
         $year = '';
