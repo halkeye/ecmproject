@@ -48,9 +48,10 @@ without a completed written parental consent form will be unable to pick up thei
 If paying by <strong>MAIL</strong> submit with your payment to:
 <br /><br />
 AE Convention Corp. <br />
-Box 641 <br />
+Box 423 <br />
 141 - 6200 McKay Ave. <br />
-Burnaby, BC  V5H 4M9" <br />
+Burnaby, BC  V5H 4M9 <br />
+Canada <br />
 </p>
 
 <p>
