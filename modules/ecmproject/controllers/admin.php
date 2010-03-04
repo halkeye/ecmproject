@@ -1446,4 +1446,11 @@ class Admin_Controller extends Controller
 	    print $csv_content;
 	    exit;		
 	}
+
+    public function testClock()
+    {
+        header("Content-type: text/plain");
+        print date("r");
+	    exit;		
+    }
 }
