@@ -369,3 +369,8 @@ span.required {
   font-size: 10px;
   margin-left: 5px;
 }
+
+td.expiredReg { 
+    background-color: #aa0000;
+    color: #FFFFFF;
+}

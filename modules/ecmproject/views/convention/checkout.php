@@ -16,13 +16,27 @@
             <th width='5%'>Delete</th>
             <th width='10%'>Status</th>  
         </tr><?php
+$noBadRegistrations = 1;
 foreach ($registrations as $reg)
 {
     $class_row = text::alternate('odd','even');
+    $expiredReg = 0;
+    if  (time() >= $reg->pass->endDate)
+    {
+        $expiredReg = 1;
+        $noBadRegistrations = 0;
+    }
     echo '<tr class="'.$class_row.'">';
     echo '<td>' . html::specialchars($reg->gname . ' ' . $reg->sname) . '</td>';
-    echo '<td>' . html::specialchars($reg->pass->name) . '</td>';
-    echo '<td>' . html::specialchars(sprintf('$%01.2F', $reg->pass->price)) . '</td>';
+    if (!$expiredReg)
+    {
+        echo '<td>' . html::specialchars($reg->pass->name) . '</td>';
+        echo '<td>' . html::specialchars(sprintf('$%01.2F', $reg->pass->price)) . '</td>';
+    }
+    else
+    {
+        echo '<td class="expiredReg" colspan="2">Registration Pass Expired. Please edit before checking out.</td>';
+    }
     echo '<td>'.html::anchor('/convention/editReg/'.$reg->id,   html::image(url::site('/static/img/edit-copy.png'), 'Edit this account')) . '</td>';
     echo '<td>'.html::anchor('/convention/deleteReg/'.$reg->id, html::image(url::site('/static/img/edit-delete.png'), 'Delete this account')) . '</td>';
     echo '<td>'.$reg->statusToString().'</td>';
@@ -32,6 +46,7 @@ foreach ($registrations as $reg)
     </table>
     <table>
         <tr>
+        <?php if ($noBadRegistrations): ?>
             <td><?php
                 echo form::open($paypal_url, array('target'=>'_top'));
                 echo form::hidden('cmd', '_cart');
@@ -67,6 +82,7 @@ foreach ($registrations as $reg)
                 echo form::submit('', Kohana::lang('convention.checkout_with_other')); 
                 echo form::close();
             ?></td>
+        <?php endif ?>
             <td><?php
                 echo form::open(Convention_Controller::STEP1, array('method'=>'get')); 
                 echo form::submit('', Kohana::lang('convention.checkout_button_add_registration')); 
