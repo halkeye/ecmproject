@@ -7,7 +7,7 @@ $lang = array(
         'checkout_button_add_registration'         => 'Add More Registrations',
         'checkout_heading'      => 'Shopping Cart',
         'checkout_subheading'   => "The badges that you've signed up for so far",
-        'checkout_header'       => 'Listed here are all the badges that you wish to register for. Bear in mind that your registration is <strong>not yet complete</strong> until you checkout by selecting <strong>Pay with Paypal</strong> or <strong>Pay via Main/In-Person</strong>. If you wish to add more badges, select the "Add Registration" menu link on the left hand side.',
+        'checkout_header'       => 'Listed here are all the badges that you wish to register for. Bear in mind that your registration is <strong>not yet complete</strong> until you checkout by selecting <strong>Pay with Paypal</strong> or <strong>Pay via Mail/In-Person</strong>. If you wish to add more badges, select the "Add Registration" menu link on the left hand side.',
 		
 		'not_loaded'			=> 'The registration does not exist.',
 		'cart_no_items'			=> 'Nothing in your shopping cart to pay for.',
