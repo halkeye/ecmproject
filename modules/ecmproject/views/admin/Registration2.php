@@ -12,6 +12,7 @@
 			//var_dump($row);
 			foreach (array('gname','sname', 'badge', 'dob', 'email', 'phone','cell', 'city', 'prov', 'econtact', 'ephone',) as $field)
 			{				
+                $fields[$field]['required'] = @$fields[$field]['adminRequired'];
 				echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $row[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
 			}		
 		?>
@@ -22,6 +23,7 @@
 	<fieldset>
 		<?php
 			$field = 'pass_id';
+            $fields[$field]['required'] = @$fields[$field]['adminRequired'];
 			echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $row[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
 		?>
 	</fieldset>

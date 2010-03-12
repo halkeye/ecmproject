@@ -45,10 +45,10 @@ class Registration_Model extends ORM
     );
 
     public $formo_defaults = array(
-            'gname' => array( 'type'  => 'text', 'label' => 'Given Name', 'required'=>true ),
-            'sname' => array( 'type'  => 'text', 'label' => 'Surname', 'required'=>true    ),
+            'gname' => array( 'type'  => 'text', 'label' => 'Given Name', 'required'=>true, 'adminRequired'=>true ),
+            'sname' => array( 'type'  => 'text', 'label' => 'Surname', 'required'=>true, 'adminRequired'=>true    ),
             'badge' => array( 'type'  => 'text', 'label' => 'Badge', 'required'=>true    ),
-            'pass_id' => array( 'type'  => 'select', 'label' => 'Pass', 'required'=>true    ),
+            'pass_id' => array( 'type'  => 'select', 'label' => 'Pass', 'required'=>true, 'adminRequired'=>true    ),
             'dob'   => array( 'type'  => 'date', 'label' => 'Date of Birth', 'required'=>true ),
             'email' => array( 'type'  => 'text', 'label' => 'Email', 'required'=>true ),
             'phone' => array( 'type'  => 'text', 'label' => 'Phone', 'required' => true),
@@ -161,7 +161,7 @@ class Registration_Model extends ORM
         $fields = $this->formo_defaults;
         foreach ($fields as $field => $fieldData)
         {
-            if (isset($fieldData['required']) && $fieldData['required'])
+            if (isset($fieldData['adminRequired']) && $fieldData['adminRequired'])
             {
                 $form->add_rules($field, 'required');
             }
