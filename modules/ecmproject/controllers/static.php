@@ -4,7 +4,7 @@ class Static_Controller extends Controller_Core
 {
     public function css($key = 'main.css')
     {
-#        if (expires::check(300) === FALSE) expires::set(300);
+        if (expires::check(300) === FALSE) expires::set(300);
 
         header('Content-Type: text/css');
         $view = new View('css/'.basename($key));
