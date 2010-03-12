@@ -1,6 +1,12 @@
 <div id="list">
     <p><?php echo Kohana::lang('convention.checkout_header'); ?></p>
     <br />
+    <p>Thank you for registering for Anime Evolution 2010! To qualify for the
+    pre-reg price that you have registered for, you must submit the payment
+    within one week from the deadline date. Mail in payments must be postmarked no later
+    then the deadline date. Failing this, you will be required to
+    pay the at-door price for your badge(s).</p>
+    <br />
     <table width='100%'>    
         <tr>    
             <th width='40%'>For</th>

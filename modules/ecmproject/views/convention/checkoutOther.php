@@ -1,5 +1,11 @@
 <div id="list">
 
+<p>Thank you for registering for Anime Evolution 2010! To qualify for the
+pre-reg price that you have registered for, you must submit the payment
+within one week from the deadline date. Mail in payments must be postmarked no later
+then the deadline date. Failing this, you will be required to
+pay the at-door price for your badge(s).</p>
+
 <p>
 To ensure the successful processing of your payment and entry into the convention, please ensure that you <strong>read everything on this page</strong> before submitting or bringing payment.
 Listed below are the registrations that will be paid for. If in error, press the back button and add, edit or remove registrations as necessary.
