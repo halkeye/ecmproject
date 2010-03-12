@@ -19,7 +19,7 @@ foreach ($letters as $letter) {
 <br />
 <p><a name="#<?php echo $letter;?>"><strong><span style="font-size:14px; color:#000000; text-decoration:underline;"><?php echo $letter ?></span></strong></a></p>
 <table cellpadding="0" cellspacing="0" border="0">
-<?php foreach ($preRegs[$letter] as $preReg) echo "<tr><td>" . htmlentities($preReg). "</td></tr>"; ?>
+<?php foreach ($preRegs[$letter] as $preReg) echo "<tr><td>" . htmlentities($preReg, ENT_COMPAT, 'UTF-8'). "</td></tr>"; ?>
 </table>
 <br />
 <p>[<a href="#top">Back to Top</a>]</p>
