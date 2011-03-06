@@ -88,7 +88,7 @@ $config['log_threshold'] = 1;
 /**
  * Message logging directory.
  */
-$config['log_directory'] = 'kohana/application/logs';
+$config['log_directory'] = 'logs';
 
 /**
  * Enable or disable displaying of Kohana error pages. This will not affect
