@@ -3,6 +3,6 @@
 <p><?php echo Kohana::lang('auth.accessDenied_paragraph') ?></p>
 
 <div style="text-align: center">
-<?php echo html::image('img/accessdenied.gif'); ?>
+<?php echo html::image(url::site('/static/img/accessdenied.gif')); ?>
 </div>
 
