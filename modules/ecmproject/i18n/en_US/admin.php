@@ -8,12 +8,16 @@ $lang = array(
         'admin_passes'         => 'Manage Passes',
         'admin_registrations'               => 'Manage Registrations',     
 		
+		/* Account */
 		'reg_field_email'		=> 'Account Email', 		
-        'edit_account'            => 'Editing account',
-        'delete_account'                => 'Delete this account',
-        'add_account'                => 'Add account',
-		
+        'edit_account'          => 'Editing account',
+        'delete_account'        => 'Delete this account',
+        'add_account'           => 'Add account',		
         'account_not_exist'            => 'The account specified no longer exists.',
+		
+		/* Convention */
+		'edit_convention'		=> 'Edit this convention',
+		'delete_convention'		=> 'Delete this convention',
 		
 		/* Headers, subheaders, titles */
 		

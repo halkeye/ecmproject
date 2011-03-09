@@ -62,8 +62,8 @@ class Admin_Controller extends Controller
 		$data['entries'][0] = new View('admin/ListItems/ConventionEntry');
 		foreach ($rows as $row)
 		{
-			$data['actions']['edit'] = html::anchor('admin/editConvention/'. $row->id, html::image(url::site('/static/img/edit-copy.png'), Kohana::lang('admin.edit_account')));
-			$data['actions']['delete'] = html::anchor('admin/deleteConvention/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), Kohana::lang('admin.delete_account')));			
+			$data['actions']['edit'] = html::anchor('admin/editConvention/'. $row->id, html::image(url::site('/static/img/edit-copy.png'), Kohana::lang('admin.edit_convention')));
+			$data['actions']['delete'] = html::anchor('admin/deleteConvention/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), Kohana::lang('admin.delete_convention')));			
 			$data['entries'][$row->id] = new View('admin/ListItems/ConventionEntry', array('row' => $row, 'actions' => $data['actions']));				
 		}	
 		
