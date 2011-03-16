@@ -4,3 +4,9 @@
 [submodule "modules/database"]
 	path = modules/database
 	url = git://github.com/kohana/database.git
+[submodule "modules/email"]
+	path = modules/email
+	url = https://github.com/shadowhand/email.git
+[submodule "modules/KOstache"]
+	path = modules/KOstache
+	url = https://github.com/zombor/KOstache.git
