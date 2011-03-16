@@ -80,7 +80,10 @@ if (isset($_SERVER['KOHANA_ENV']))
  * - boolean  caching     enable or disable internal caching                 FALSE
  */
 Kohana::init(array(
-	'base_url'   => '/',
+	'base_url'   => dirname($_SERVER['SCRIPT_NAME']),
+	'index_file' => basename($_SERVER['SCRIPT_NAME']),
+    'profile'    => Kohana::$environment !== Kohana::PRODUCTION,
+    'caching'    => Kohana::$environment === Kohana::PRODUCTION,
 ));
 
 /**

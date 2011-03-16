@@ -5,6 +5,7 @@
  * the path, and a site_protocol is specified, the domain will be auto-detected.
  */
 $config['script_name'] = isset($_SERVER["ORIG_SCRIPT_NAME"]) ? $_SERVER["ORIG_SCRIPT_NAME"] : $_SERVER['SCRIPT_NAME'];
+if (!isset($_SERVER['HTTP_HOST'])) $_SERVER['HTTP_HOST'] = 'ecm.kodekoan.com';
 $config['site_domain'] = $_SERVER['HTTP_HOST'].dirname($config['script_name']);
 
 /**
