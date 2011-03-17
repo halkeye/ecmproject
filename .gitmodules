@@ -13,6 +13,3 @@
 [submodule "modules/log"]
 	path = modules/log
 	url = https://github.com/shadowhand/kohana-log.git
-[submodule "modules/static"]
-	path = modules/static
-	url = git@github.com:halkeye/kohana-static.git
