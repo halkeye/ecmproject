@@ -89,7 +89,8 @@ Kohana::init(array(
 /**
  * Attach the file write to logging. Multiple writers are supported.
  */
-Kohana::$log->attach(new Log_File(APPPATH.'logs'));
+Kohana::$log->attach(new Log_File('logs'));
+#Kohana::$log->add(Log::INFO, 'someone just click the east egg!');
 
 /**
  * Attach a file reader to config. Multiple readers are supported.
@@ -108,6 +109,7 @@ Kohana::modules(array(
 	// 'orm'        => MODPATH.'orm',        // Object Relationship Mapping
 	// 'unittest'   => MODPATH.'unittest',   // Unit testing
 	// 'userguide'  => MODPATH.'userguide',  // User guide and API documentation
+	'log'  => MODPATH.'log',
 	));
 
 /**
