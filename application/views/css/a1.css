@@ -1,0 +1,373 @@
+/* Built off of CSS Reset, v1.0 | 20080212 */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+
+html, body {
+	height: 100%;
+	line-height: 1.5;
+	background-color: #20232B;
+	font-family: "Lucida Grande", "Trebuchet MS"; 
+}
+
+ol, ul {
+	list-style: none;
+}
+
+blockquote, q {
+	quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+
+:focus {
+	outline: 0;
+}
+
+ins {
+	text-decoration: none;
+}
+del {
+	text-decoration: line-through;
+}
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+img {
+	float: left;
+}
+
+a, a:visited {
+	font-size: 12px;
+	color: #FFF;
+	text-decoration: none;
+}
+
+a:hover , a:active {
+	color: #FC0;
+}
+
+/* CSS Popup should be half-in and half-out of the content container and starting where the menu ends */
+#menu a span
+{
+	display: none;
+	color: #FFF;
+	font-size: 12px;
+	width: 207px;
+	text-align: right;
+	padding-left: 50px;
+}
+
+#menu a:hover span
+{
+	display: block;
+	position: absolute; top: 365px; left: 130px;
+	padding: 0.75em;
+	background: url('../img/16_paperclip.png') no-repeat #606B2C 10px 50%;
+}
+
+#container {
+	padding: 24px 30px; 
+	min-width: 710px;
+	text-align: left;
+}
+
+#user_login
+{
+	padding: 0px 5px;
+	text-align: right;
+    color: #FFF;
+}
+
+/* Header */
+#header {	
+	margin-bottom: 10px;
+	font-family: Tahoma,Geneva,Kalimati,sans-serif;
+}
+
+#header h1 {	
+	float: left;
+	width: 171px;
+	height: 0;			
+	margin: 20px 30px;
+	padding: 66px 0px 0px 0px;	
+	background: url(../img/logo-tops.png) no-repeat transparent;	
+	overflow: hidden;
+}
+
+#header h2 {		
+	height: 55px;
+	margin-left: 226px;
+	padding: 50px 0 0 24px; 	
+	font-size: 34px;
+	background-color: #788095; 
+	color: #FFF;	
+}
+
+#menu
+{	
+	float: left;
+	width: 225px;
+	text-align: right;
+}
+
+#menu ul li {
+	margin-left: 25px;
+	font-size: 14px;
+}
+
+#menu ul li.current {
+	margin: 0;
+	padding: 0.75em;
+	background-color: #FFF;	
+	border-left: 3px solid #9F947D;	
+	font-size: 20px;	
+	font-weight: bold;	
+}
+#menu ul li.current span { display: none; }
+
+#menu ul a, #menu ul a:visited {
+	display: block;
+	padding: 1em;
+	background-color: #606B2C;	
+}
+
+#menu ul a:hover, #menu ul a:active {	
+	background-color: #FFF;
+	color: #000;	
+	font-weight: bold;	
+}
+
+#content
+{
+	min-height: 100px;
+	margin-left: 225px;
+	padding: 16px 20px 10px 15px;
+	background-color: #FFF;			
+	font-size: 12px;
+}
+
+#content strong {
+	font-size: 14px;
+}
+
+#content h2 {	
+	margin: 0.3em;
+	font-size: 24px;
+}
+
+#content h3 {	
+	margin: 0.5em;
+	font-size: 20px;
+}
+
+#content h4 {
+	font-size: 16px;
+	margin: 0.25em 0.75em;
+}
+
+#content p {	
+	margin: 12px 0 12px 12px;
+	font-size: 12px;
+}
+
+#content img {
+	margin: 0 9px 0 5px;
+}
+
+#content code {
+	display: block;	
+	border: 1px solid silver;
+	background-color: #EEE;
+	font-family: courier, monospace;
+}
+
+#content a, #content a:visited {
+	color: #273761;
+	font-weight: bold;
+	font-size: 13px;
+	text-decoration: underline;
+}
+
+#content a:hover, #content a:active {
+	color: #B4BACA;
+	text-decoration: none;
+}
+
+#content ul {	
+	margin: 10px 40px;
+	list-style-type: square;
+}
+
+#content table {
+	width: 100%;
+	margin-left: 4px;
+	font-size: 13px;
+	border: 1px solid #000;
+	text-align: center;
+}
+
+#content table caption {	
+	margin: 2px;
+	font-weight: bold;
+	text-align: left;
+}
+
+#content table thead {
+	border: 1px solid #000;
+	color: #FFF;
+	text-align: center;	
+}
+
+#content table thead th {
+	padding: 5px 15px;
+	background-color: #5F6470; /* IE7 needs this */
+}
+
+#content table td {
+	padding: 10px;
+}
+
+#content table tr.alt td {
+	background-color: #BBB; /* IE7 needs this */
+}
+
+#footer {
+	margin-left: 225px;
+	padding: 3px 0;
+	background-color: #606B2C;
+	color: #FFF;
+	font-size: 11px;	
+	text-align: center;	
+}
+
+/* Login */
+#login_floater {
+	width: 1px;
+	height: 50%;	
+	margin-bottom: -163px;
+	float: left;
+}
+
+#login_header {
+	padding: 70px 0px 0px 0px;
+	background: top center url('../img/logo.png') no-repeat;
+	margin: 0;
+	height: 0;	
+}
+
+#login_container {
+	clear:both; 
+}
+
+#login_container h1 {
+	height: 0;			
+	margin: 10px 30px;
+	padding: 66px 0px 0px 0px;	
+	background: url('../img/logo.png') top center no-repeat transparent;	
+	overflow: hidden;
+}
+
+#login_container p.error {
+	margin: 0.25em 0.25px 1em 0.25em;
+	text-align: center;
+	font-size: 12px;	
+	font-weight: bold;
+	color: #F00;
+}
+
+#login_topcorners , #login_bottomcorners {
+	height: 10px;
+	background-color: #9F9A7D;
+	position: relative;
+	margin: 0px auto;
+	width: 260px;
+}
+
+#login_topcorners div {
+	height: 10px;
+	width: 10px;
+	position: absolute;
+}
+
+#login_bottomcorners div {
+	height: 10px;
+	width: 10px;
+	position: absolute;
+}
+
+#login_topcorners div.cleft {	
+	left: -10px;	
+	background: transparent url('../img/corners.gif') 0px 0px no-repeat;
+}
+
+#login_topcorners div.cright {	
+	right: -10px;
+	background: transparent url('../img/corners.gif') -12px 0px no-repeat;
+}
+
+#login_bottomcorners div.cleft {
+	left: -10px;
+	background: transparent url('../img/corners.gif') 0px -12px no-repeat;
+}
+
+#login_bottomcorners div.cright {	
+	right: -10px;
+	background: transparent url('../img/corners.gif') -12px -12px no-repeat;
+}
+
+#login {
+	width: 280px;
+	margin: 0 auto;
+}
+
+#login form {
+	display: block;
+	padding: 15px 13px 10px 10px;
+	background-color: #9F9A7D;
+}
+
+#login label {
+	display: block;
+	margin: 0 3px 4px 0;	
+}
+
+#login label strong {
+	font-size: 12px;
+	display: block;
+	padding: 0 0 6px 0;
+}
+
+#login p {
+	margin-left: 2px;
+	font-size: 12px;
+}
+
+#login input.text {
+	width: 99%;
+	padding: 3px;
+}
+#login input.button {	
+	padding: 3px 30px;
+}
