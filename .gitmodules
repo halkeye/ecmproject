@@ -16,3 +16,6 @@
 [submodule "modules/static"]
 	path = modules/static
 	url = git@github.com:halkeye/kohana-static.git
+[submodule "modules/orm"]
+	path = modules/orm
+	url = https://github.com/kohana/orm.git
