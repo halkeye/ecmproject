@@ -36,8 +36,8 @@ class Controller_User extends Base_MainTemplate
         }
 
         // Load the user
-        $user = ORM::factory('account')->where('email', $this->input->post('email'))->find();
-        if ($this->auth->login($user, $this->input->post('password')))
+        $user = ORM::factory('account')->where('email', '=', $this->request->post('email'))->find();
+        if ($this->auth->login($user, $this->request->post('password')))
         {
             $this->addMessage(__('auth.login_success'));
             $this->_redirect('');
@@ -82,7 +82,7 @@ class Controller_User extends Base_MainTemplate
         
         $errors = $form;
 
-        if ($post = $this->input->post())
+        if ($post = $this->request->post())
         {
             $account = ORM::factory('Account');
             if ($account->validate($post))
@@ -133,7 +133,7 @@ class Controller_User extends Base_MainTemplate
         {
             $account = ORM::factory('account')->find($uid); 
         }
-        if (!$key) { $key = $this->input->post('verifyCode'); }
+        if (!$key) { $key = $this->request->post('verifyCode'); }
 
         /* Validate incomingness */
         if (!$account)
@@ -238,9 +238,9 @@ class Controller_User extends Base_MainTemplate
         $form = array('email' => '');
         $errors = array();
 
-        if ($post = $this->input->post())
+        if ($post = $this->request->post())
         {
-            $post = new Validation($this->input->post());
+            $post = new Validation($this->request->post());
             // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
             $post->pre_filter('trim');
 
@@ -300,9 +300,9 @@ class Controller_User extends Base_MainTemplate
         );
         $errors = array();
 
-        if ($post = $this->input->post())
+        if ($post = $this->request->post())
         {
-            $post = new Validation($this->input->post());
+            $post = new Validation($this->request->post());
             // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
             $post->pre_filter('trim');
             $post->add_rules('password', 'required');
@@ -357,9 +357,9 @@ class Controller_User extends Base_MainTemplate
         $form = array('email' => '');
         $errors = array();
 
-        if ($post = $this->input->post())
+        if ($post = $this->request->post())
         {
-            $post = new Validation($this->input->post());
+            $post = new Validation($this->request->post());
             // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
             $post->pre_filter('trim');
 

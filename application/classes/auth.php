@@ -67,7 +67,7 @@ class Auth {
      */
     public function login($account, $password)
     {
-        if (!$account || !$account->loaded)
+        if (!$account || !$account->isLoaded())
         {
             $this->addError(Kohana::lang('auth.invalid_user_pass'));
             return FALSE;
@@ -116,7 +116,7 @@ class Auth {
      * @param   object   account model object
      * @return  void
      */
-    public function complete_login(Account_Model $account)
+    public function complete_login(Model_Account $account)
     {
         // Update the number of logins
         $account->login = time();

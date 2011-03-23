@@ -47,11 +47,11 @@ class Model_Account extends ORM
 	public function __construct($id = NULL)
 	{
         parent::__construct($id);
-        if (!$this->loaded)
+        if (!$this->_loaded)
         {
             $this->created = time();
         /* Set a default status on new user creation */
-            $this->status = Account_Model::ACCOUNT_STATUS_UNVERIFIED;
+            $this->status = Model_Account::ACCOUNT_STATUS_UNVERIFIED;
         }
     }
 	
@@ -79,8 +79,8 @@ class Model_Account extends ORM
         return sha1($this->salt . $value);
     }
 	
-    function isBanned()   { return $this->status == Account_model::ACCOUNT_STATUS_BANNED; }
-    function isVerified() { return $this->status == Account_model::ACCOUNT_STATUS_VERIFIED; }
+    function isBanned()   { return $this->status == Model_Account::ACCOUNT_STATUS_BANNED; }
+    function isVerified() { return $this->status == Model_Account::ACCOUNT_STATUS_VERIFIED; }
 
     function sendValidateEmail($code, $type = 'registration')
     {
@@ -208,7 +208,7 @@ class Model_Account extends ORM
     {
         $fields = array();
         $fields['email'] = $email;
-        if ($this->loaded)
+        if ($this->_loaded)
             $fields[$this->primary_key.' !='] = $this->primary_key_value;
 
         // check the database for existing records
@@ -253,17 +253,17 @@ class Model_Account extends ORM
 
     public function validateAccount()
     {
-        $this->status = Account_Model::ACCOUNT_STATUS_VERIFIED;
+        $this->status = Model_Account::ACCOUNT_STATUS_VERIFIED;
         /* Delete any outstanding validation codes */
         $vcode = ORM::Factory('verificationcode')->where('account_id', $this->id)->delete_all();
     }
 	
 	public function statusToString() {
-		if ($this->status == Account_Model::ACCOUNT_STATUS_UNVERIFIED)
+		if ($this->status == Model_Account::ACCOUNT_STATUS_UNVERIFIED)
 			return 'UNVERIFIED';
-		else if ($this->status == Account_Model::ACCOUNT_STATUS_VERIFIED)
+		else if ($this->status == Model_Account::ACCOUNT_STATUS_VERIFIED)
 			return 'VERIFIED';
-		else if ($this->status == Account_Model::ACCOUNT_STATUS_BANNED)
+		else if ($this->status == Model_Account::ACCOUNT_STATUS_BANNED)
 			return 'BANNED';
 		else
 			return 'UNKNOWN STATUS';
@@ -271,11 +271,11 @@ class Model_Account extends ORM
 	
 	public function stringToStatus($status) {
 		if (strcmp($status, 'UNVERIFIED') == 0)
-			return Account_Model::ACCOUNT_STATUS_UNVERIFIED;
+			return Model_Account::ACCOUNT_STATUS_UNVERIFIED;
 		else if (strcmp($status, 'VERIFIED') == 0)
-			return Account_Model::ACCOUNT_STATUS_VERIFIED;
+			return Model_Account::ACCOUNT_STATUS_VERIFIED;
 		else
-			return Account_Model::ACCOUNT_STATUS_BANNED;	
+			return Model_Account::ACCOUNT_STATUS_BANNED;	
 	
 	}	
 	
@@ -323,6 +323,8 @@ class Model_Account extends ORM
 			return -1;
 		}		
 	}
+
+    public function isLoaded() { return $this->_loaded; }
 }
 
 /* End of file user.php */
