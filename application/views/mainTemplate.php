@@ -1,9 +1,16 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+<?php $content = (string) $content;
+?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
           "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
 <head> 
 <title>Electronic Convention Management (ECM)<?php echo $title ? "::$title" : "" ?></title> 
-<?php echo HTML::style('static/css/main.css', array(), NULL, TRUE); ?>
+<?php {
+    echo HTML::style('static/css/main.css', NULL, TRUE);
+    foreach (Assets::getCSS() as $style)
+        echo HTML::style("static/css/$style", NULL, TRUE);
+    foreach (Assets::getJS() as $js)
+        echo HTML::script("static/js/$js", NULL, TRUE);
+} ?>
 </head> 
  
 <body> 

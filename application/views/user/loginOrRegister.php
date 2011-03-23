@@ -1,4 +1,6 @@
-<!-- CONTENT -->
+<?php
+Assets::addJS('loginOrRegister.js', 100);
+?><!-- CONTENT -->
 <div id='form'>
     <div id="newLogin">
         <?php echo form::open('/user/register'); ?>
