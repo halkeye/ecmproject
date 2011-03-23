@@ -120,7 +120,7 @@ class Base_MainTemplate extends Controller_Template
     {
         $location = $this->session->get_once('redirected_from');
         if (!$location) $location = $where;
-        url::redirect($location);
+        $this->request->redirect($location);
         return;
     }
 
@@ -128,8 +128,8 @@ class Base_MainTemplate extends Controller_Template
     {
         if (!$this->auth->is_logged_in()) 
         {
-            $this->session->set('redirected_from', url::current());
-            url::redirect('/user/loginOrRegister');
+            $this->session->set('redirected_from', $this->request->current());
+            $this->request->redirect('/user/loginOrRegister');
             return;
         }
     }
