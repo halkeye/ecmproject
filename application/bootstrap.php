@@ -111,8 +111,11 @@ Kohana::modules(array(
 	// 'userguide'  => MODPATH.'userguide',  // User guide and API documentation
 	'static'  => MODPATH.'static',
 	'log'  => MODPATH.'log',
-	 'debug-toolbar'   => MODPATH.'debug-toolbar',   // Database access
 	));
+if (file_exists('module/debug-toolbar'))
+{
+    Kohana::modules(array('debug-toolbar'   => MODPATH.'debug-toolbar'));
+}
 
 /**
  * Set the routes. Each route must have a minimum of a name, a URI and a set of

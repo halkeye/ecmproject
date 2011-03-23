@@ -18,7 +18,7 @@ class Controller_User extends Base_MainTemplate
 		$this->addMenuItem(
                 array('title'=>'Add Registration', 'url'=>Convention_Controller::STEP1)
         );
-		$reg = Registration_Model::getAllRegistrationsByConvention($this->auth->getAccount()->id);		
+		$reg = Model_Registration::getAllRegistrationsByConvention($this->auth->getAccount()->id);		
 				
         $this->template->content = new View('user/index', array('registrations'=>$reg));
     }

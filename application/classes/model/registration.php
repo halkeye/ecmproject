@@ -1,6 +1,6 @@
 <?php
 
-class Registration_Model extends ORM 
+class Model_Registration extends ORM 
 {
     const STATUS_UNPROCESSED = 0; // Payment has not been sent yet (or recieved if mail-in)
     const STATUS_PROCESSING  = 1; // Waiting for Paypal to respond, mail-in/in-person payment is in limbo.
@@ -8,22 +8,22 @@ class Registration_Model extends ORM
 	const STATUS_FAILED		 = 98; //Registration no longer valid (cancelled, refunded, etc).
     const STATUS_PAID        = 99; // Fully working and paid
     
-    protected $ignored_columns = array('agree_toc', 'unique_badge');
+    protected $_ignored_columns = array('agree_toc', 'unique_badge');
 
     /* On unserialize never check the db */
-    protected $reload_on_wakeup = false;
+    protected $_reload_on_wakeup = false;
 
-    protected $belongs_to = array('convention');
+    protected $_belongs_to = array('convention');
 
-    protected $has_one = array('pass', 'account');
+    protected $_has_one = array('pass', 'account');
 
 //    protected $load_with = array('convention','pass', 'account');
 
     // Table primary key and value
-    protected $primary_key = 'id';
+    protected $_primary_key = 'id';
 
     // Model table information	
-    protected $table_columns = array (
+    protected $_table_columns = array (
             'id'            => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, 'sequenced' => true, ),
             'convention_id' => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true,                      ),
             'pass_id'       => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true,                      ),
@@ -273,8 +273,8 @@ class Registration_Model extends ORM
             ->with('pass')
             ->where('account_id', $account_id)
             ->in('status', array(
-                        Registration_Model::STATUS_UNPROCESSED, /* Only grab one we havn't heard back from yet */
-                        Registration_Model::STATUS_NOT_ENOUGH
+                        Model_Registration::STATUS_UNPROCESSED, /* Only grab one we havn't heard back from yet */
+                        Model_Registration::STATUS_NOT_ENOUGH
                 )
             )
             ->find_all();
@@ -288,9 +288,9 @@ class Registration_Model extends ORM
 		
 		//Only set status to UNPROCESSED if it's a new registration! (Else it'll keep blanking my status updates).
 		if ($this->id == 0)
-			$this->status = Registration_Model::STATUS_UNPROCESSED;
+			$this->status = Model_Registration::STATUS_UNPROCESSED;
 
-		if (isset($originalChanged['status']) && $this->status == Registration_Model::STATUS_PAID)
+		if (isset($originalChanged['status']) && $this->status == Model_Registration::STATUS_PAID)
 			$this->sendConfirmationEmail();
 				
         $ret = parent::save();
@@ -335,20 +335,20 @@ class Registration_Model extends ORM
 	
 	public function statusToString()
 	{
-		return Registration_Model::regStatusToString($this->status);
+		return Model_Registration::regStatusToString($this->status);
 	}
 	
 	public function regStatusToString($status) 
     {
-		if ($status == Registration_Model::STATUS_UNPROCESSED)
+		if ($status == Model_Registration::STATUS_UNPROCESSED)
 			return 'UNPROCESSED';
-		else if ($status == Registration_Model::STATUS_PROCESSING )
+		else if ($status == Model_Registration::STATUS_PROCESSING )
 			return 'PROCESSING';
-		else if ($status == Registration_Model::STATUS_PAID)
+		else if ($status == Model_Registration::STATUS_PAID)
 			return 'PAID';
-		else if ($status == Registration_Model::STATUS_NOT_ENOUGH)
+		else if ($status == Model_Registration::STATUS_NOT_ENOUGH)
 			return 'PARTIAL PAYMENT';
-		else if ($status == Registration_Model::STATUS_FAILED)
+		else if ($status == Model_Registration::STATUS_FAILED)
 			return 'CANCELLED';
 		else
 			return 'IN LIMBO';
@@ -371,11 +371,11 @@ class Registration_Model extends ORM
 	public function getStatusValues()
 	{
 		$status_values = array();
-		$status_values[Registration_Model::STATUS_UNPROCESSED] = 'UNPROCESSED';
-		$status_values[Registration_Model::STATUS_PROCESSING] = 'PROCESSING';
-		$status_values[Registration_Model::STATUS_PAID] = 'PAID';
-		$status_values[Registration_Model::STATUS_NOT_ENOUGH] = 'PARTIAL PAYMENT';
-		$status_values[Registration_Model::STATUS_FAILED] = 'FAILED';
+		$status_values[Model_Registration::STATUS_UNPROCESSED] = 'UNPROCESSED';
+		$status_values[Model_Registration::STATUS_PROCESSING] = 'PROCESSING';
+		$status_values[Model_Registration::STATUS_PAID] = 'PAID';
+		$status_values[Model_Registration::STATUS_NOT_ENOUGH] = 'PARTIAL PAYMENT';
+		$status_values[Model_Registration::STATUS_FAILED] = 'FAILED';
 		return $status_values;
 	}
 	

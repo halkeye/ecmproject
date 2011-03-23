@@ -28,7 +28,7 @@ class Controller_Convention extends Base_MainTemplate
 
     function action_index()
     {
-        $regs = Registration_Model::getByAccount($this->auth->get_user()->id);
+        $regs = Model_Registration::getByAccount($this->auth->get_user()->id);
         if (!$regs->count()) { url::redirect(Controller_Convention::STEP1); }
         else { url::redirect('/convention/checkout'); }
 
@@ -65,7 +65,7 @@ class Controller_Convention extends Base_MainTemplate
 			url::redirect("convention/checkout");
 		}
 		
-		if ($reg->status != Registration_Model::STATUS_UNPROCESSED)
+		if ($reg->status != Model_Registration::STATUS_UNPROCESSED)
 		{
 			$this->addError(Kohana::lang('convention.registration_already_processed_unable_to_edit'));
 			url::redirect("convention/checkout");
@@ -123,7 +123,7 @@ class Controller_Convention extends Base_MainTemplate
         }
         else
         {
-            if ($reg->status != Registration_Model::STATUS_UNPROCESSED)
+            if ($reg->status != Model_Registration::STATUS_UNPROCESSED)
             {
                 $this->addError(Kohana::lang('convention.registration_already_processed_unable_to_edit'));
                 url::redirect('/convention/viewReg/'.$reg_id);
@@ -214,14 +214,14 @@ class Controller_Convention extends Base_MainTemplate
         foreach ($registrations as $reg)
         {
             /* Now if the status was unprocessed before, mark it as being processed (Anything else is handled by other handlers */
-            if ($reg->status != Registration_Model::STATUS_UNPROCESSED)
+            if ($reg->status != Model_Registration::STATUS_UNPROCESSED)
                 continue;
 
             /* We don't really trust this data so lets make sure people havn't messed with the params at all */
             if ($regids[$reg->id]['pass_id'] != $reg->pass->id)
                 throw Exception('Data has been tampered with');
 
-            $reg->status = Registration_Model::STATUS_PROCESSING;
+            $reg->status = Model_Registration::STATUS_PROCESSING;
             /* Update modules if they've been changed */
             $reg->save();
         }
