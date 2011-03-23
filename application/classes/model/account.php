@@ -4,7 +4,7 @@
 define('MAX_VERIFICATION_ITEMS', 2);
 class Verification_Exceeds_Exception extends Exception {}
 
-class Account_Model extends ORM 
+class Model_Account extends ORM 
 {
     const ACCOUNT_STATUS_UNVERIFIED =  0;
     const ACCOUNT_STATUS_VERIFIED   =  1;
