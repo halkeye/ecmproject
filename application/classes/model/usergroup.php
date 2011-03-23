@@ -1,17 +1,19 @@
 <?php
 
-class Usergroup_Model extends orm 
+class Model_Usergroup extends orm 
 {
-    var $table_name = 'usergroups';
+    var $_table_name = 'usergroups';
     #var $primary_key = 'usergroups_id';
 
-    protected $table_columns = array (
+    protected $_table_columns = array (
             'id'          => array ( 'type' => 'int',    'max' => 2147483647,    'unsigned' => true,    'sequenced' => true,  ),
             'name'        => array ( 'type' => 'string', 'length' => '55',  ),
             'description' => array ( 'type' => 'string', 'null' => true,  ),
     );
 
-    public $has_and_belongs_to_many = array('usergroups_permissions' => 'permissions');
+    public $_has_many = array(
+        'permissions' => array ( 'model' => 'usergroups_permissions' )
+    );
     
     public function unique_key($id = NULL) 
     {

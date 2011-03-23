@@ -37,13 +37,13 @@ class Base_MainTemplate extends Controller_Template
         {
             $this->isVerifiedAccount = TRUE;
             $user = $this->auth->get_user();
-            if ($user->status != Account_Model::ACCOUNT_STATUS_VERIFIED)
+            if ($user->status != Model_Account::ACCOUNT_STATUS_VERIFIED)
             {
                 /* check the database not the cached version for determining if they are cached or not
                  * Maybe we can get away with not doing this 
                  */
                 $user = ORM::factory('Account', array('id'=>$user->id));
-                if ($user->status != Account_Model::ACCOUNT_STATUS_VERIFIED)
+                if ($user->status != Model_Account::ACCOUNT_STATUS_VERIFIED)
                 {
                     $this->isVerifiedAccount = FALSE;
                     $this->template->errors[] = Kohana::lang('ecmproject.not_validated');
@@ -102,14 +102,14 @@ class Base_MainTemplate extends Controller_Template
     {
         $messages = $this->session->get('messages') or array();
         $messages[] = $message;
-        $this->session->set_flash('messages',  $messages);
+        $this->session->set('messages',  $messages);
     }
     
     protected function addError($error)
     {
         $errors = $this->session->get('errors') or array();
         $errors[] = $error;
-        $this->session->set_flash('errors',  $errors);
+        $this->session->set('errors',  $errors);
     }
 
     /**
@@ -159,17 +159,17 @@ class Base_MainTemplate extends Controller_Template
 
     protected function addMenuItem($item)
     {
-        $items = $this->view->menu;
+        $items = $this->template->menu;
         $items[] = $item;
-        $this->view->menu = $items;
+        $this->template->menu = $items;
     }
 
     public function accessDenied()
     {
-        $this->view->title = Kohana::lang('auth.accessDenied_title');
-        $this->view->heading = Kohana::lang('auth.accessDenied_heading');
-        $this->view->subheading = Kohana::lang('auth.accessDenied_subheading');
-        $this->view->content = new View('global/accessDenied');
+        $this->template->title = Kohana::lang('auth.accessDenied_title');
+        $this->template->heading = Kohana::lang('auth.accessDenied_heading');
+        $this->template->subheading = Kohana::lang('auth.accessDenied_subheading');
+        $this->template->content = new View('global/accessDenied');
     }
 
 }

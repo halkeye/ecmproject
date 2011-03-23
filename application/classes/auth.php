@@ -126,7 +126,7 @@ class Auth {
 
         $this->groups = array();
         $this->permissions = array();
-        if ($account->has(ORM::factory('Usergroup'), TRUE))
+        if ($account->has('usergroups', ORM::factory('Usergroup'), TRUE))
         {
             foreach ($account->usergroups as $group)
             {
@@ -141,9 +141,12 @@ class Auth {
 
         /* FIXME: Make a constant or something out of here */
         /* Load up registered group always */
-        foreach (ORM::factory('usergroup', 'registered')->permissions as $p)
+        $regGroup = ORM::factory('usergroup', 'registered');
+        foreach ($regGroup->permissions as $p)
         {
-            $this->permissions[$p->pkey] = 1;
+            die('here');
+            ####### GAVIN----
+            #$this->permissions[$p->pkey] = 1;
         }
 
         // extra safety to prevent session fixation - http://en.wikipedia.org/wiki/Session_fixation
@@ -158,12 +161,10 @@ class Auth {
     function storeAccount($account)
     {
         // Store session data
-        $this->session->set(array(
-            'account_id'    => $account->id,
-            'account'       => $this->account,
-            'account_groups'=> $this->groups, 
-            'account_perms' => $this->permissions, 
-        ));
+        $this->session->set('account_id'    , $account->id);
+        $this->session->set('account'       , $this->account);
+        $this->session->set('account_groups', $this->groups); 
+        $this->session->set('account_perms' , $this->permissions); 
     }
 
     /**

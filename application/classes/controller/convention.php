@@ -21,7 +21,7 @@ class Controller_Convention extends Base_MainTemplate
         $this->requireLogin();
         $this->requireVerified();
         $this->addMenuItem(
-                array('title'=>'Add Registration', 'url'=>Convention_Controller::STEP1)
+                array('title'=>'Add Registration', 'url'=>Controller_Convention::STEP1)
         );
         return $ret;
     }
@@ -29,7 +29,7 @@ class Controller_Convention extends Base_MainTemplate
     function action_index()
     {
         $regs = Registration_Model::getByAccount($this->auth->get_user()->id);
-        if (!$regs->count()) { url::redirect(Convention_Controller::STEP1); }
+        if (!$regs->count()) { url::redirect(Controller_Convention::STEP1); }
         else { url::redirect('/convention/checkout'); }
 
         $data['conventions'] = array();
@@ -171,7 +171,7 @@ class Controller_Convention extends Base_MainTemplate
             if ($reg->validate($post))
             {
                 $reg->save();
-                url::redirect(Convention_Controller::STEP2);
+                url::redirect(Controller_Convention::STEP2);
                 return;
             }
 

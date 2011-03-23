@@ -111,6 +111,7 @@ Kohana::modules(array(
 	// 'userguide'  => MODPATH.'userguide',  // User guide and API documentation
 	'static'  => MODPATH.'static',
 	'log'  => MODPATH.'log',
+	 'debug-toolbar'   => MODPATH.'debug-toolbar',   // Database access
 	));
 
 /**

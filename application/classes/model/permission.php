@@ -1,11 +1,11 @@
 <?php
 
-class Permission_Model extends orm 
+class Model_Permission extends orm 
 {
-    var $table_name = 'permissions';
+    var $_table_name = 'permissions';
     #var $primary_key = 'permissions_id';
 
-    protected $table_columns = array (
+    protected $_table_columns = array (
             'id'          => array ( 'type' => 'int',    'max' => 2147483647,    'unsigned' => true,    'sequenced' => true,  ),
             'pkey'        => array ( 'type' => 'string', 'length' => '55',  ),
             'description' => array ( 'type' => 'string', 'null' => true,  ),

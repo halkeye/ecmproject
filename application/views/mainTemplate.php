@@ -54,6 +54,7 @@
  
 </div> 
 
+<?php echo DebugToolbar::render(); ?>
 </body> 
 </html> 
 
