@@ -134,7 +134,7 @@ class Auth_Core {
                 {
                     $this->groups[$group->name] = 1;
                     foreach ($group->permissions as $p)
-                        $this->permissions[$p->pkey] = 1;
+                        $this->permissions[$p->pkey()] = 1;
                 }
             }
         }
@@ -143,7 +143,7 @@ class Auth_Core {
         /* Load up registered group always */
         foreach (ORM::factory('usergroup', 'registered')->permissions as $p)
         {
-            $this->permissions[$p->pkey] = 1;
+            $this->permissions[$p->pkey()] = 1;
         }
 
         // extra safety to prevent session fixation - http://en.wikipedia.org/wiki/Session_fixation

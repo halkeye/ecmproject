@@ -1,6 +1,6 @@
 <?php
 
-class Model_Permission extends orm 
+class Model_Permission extends ORM 
 {
     var $_table_name = 'permissions';
     #var $primary_key = 'permissions_id';

@@ -145,7 +145,7 @@ class Auth {
         foreach ($regGroup->Permissions->find_all() as $p)
         {
             ####### GAVIN----
-            $this->permissions[$p->pkey()] = 1;
+            $this->permissions[$p->pkey] = 1;
         }
 
         // extra safety to prevent session fixation - http://en.wikipedia.org/wiki/Session_fixation

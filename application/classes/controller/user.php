@@ -57,7 +57,7 @@ class Controller_User extends Base_MainTemplate
         if (!$this->auth->is_logged_in()) 
         {
             $this->addMessage(__('auth.not_logged_in'));
-            url::redirect('');
+            $this->request->redirect('');
             return;
         }
 
