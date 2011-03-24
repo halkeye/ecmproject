@@ -13,9 +13,23 @@ class Model_Registration extends ORM
     /* On unserialize never check the db */
     protected $_reload_on_wakeup = false;
 
-    protected $_belongs_to = array('convention');
+    protected $_belongs_to = array(
+        'convention' => array (
+            'model' => 'convention', 
+            'foreign_key' => 'convention_id'
+        )
+    );
 
-    protected $_has_one = array('pass', 'account');
+    protected $_has_one = array(
+        'pass' => array(
+            'model' => 'pass', 
+            'foreign_key' => 'id',
+        ),
+        'account' => array(
+            'model' => 'account', 
+            'foreign_key' => 'id',
+        ),
+    );
 
 //    protected $load_with = array('convention','pass', 'account');
 
@@ -258,9 +272,9 @@ class Model_Registration extends ORM
     public function getPossiblePassesQuery()
     {
         return ORM::Factory('pass')
-            ->where('enddate >=',   time())
-            ->where('startdate <=', time())
-            ->where('isPurchasable', 1);
+            ->where('enddate', '>=',   time())
+            ->where('startdate', '<=', time())
+            ->where('isPurchasable', '=', 1);
             #->where('convention_id', $this->convention_id);
     }
 
@@ -270,8 +284,8 @@ class Model_Registration extends ORM
         return $this 
             ->with('convention')
             ->with('pass')
-            ->where('account_id', $account_id)
-            ->in('status', array(
+            ->where('account_id', '=', $account_id)
+            ->where('status', 'IN', array(
                         Model_Registration::STATUS_UNPROCESSED, /* Only grab one we havn't heard back from yet */
                         Model_Registration::STATUS_NOT_ENOUGH
                 )

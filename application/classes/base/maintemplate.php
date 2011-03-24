@@ -32,6 +32,8 @@ class Base_MainTemplate extends Controller_Template
         $this->template->errors = array();
 
         $this->template->profiler = '';
+
+        $this->template->set_global('currentUrl', $this->request->current());
         
         if ($this->auth->is_logged_in())
         {
@@ -140,7 +142,7 @@ class Base_MainTemplate extends Controller_Template
         {
             /* You can't go any furthur until email address is verified. */
             $this->addError(Kohana::lang('auth.not_validated')); 
-            $this->session->set('redirected_from', url::current());
+            $this->session->set('redirected_from',  $this->request->current());
             url::redirect('/user/verifyMenu');
             return;
         }

@@ -40,34 +40,34 @@ class Controller_Convention extends Base_MainTemplate
             $data['conventions'][$row->convention_id]->id = $row->convention_id;
             $data['conventions'][$row->convention_id]->regs[] = $row;
         }
-        $this->view->content = new View('convention/index', $data);
+        $this->template->content = new View('convention/index', $data);
         
         return;
     }
 
 	/* Force limitation: cannot delete registrations unless they are unprocessed */
 	//TODO: Put strings to lang file.
-	function deleteReg($reg_id = NULL)
+	function action_deleteReg($reg_id = NULL)
 	{
 		$reg_id = isset($reg_id) ? intval($reg_id) : NULL;
 		$reg = ORM::factory('registration', $reg_id);
 		
 		if (!$reg->loaded)
 		{
-			$this->addError(Kohana::lang('convention.not_loaded'));
+			$this->addError(__('convention.not_loaded'));
 			$this->request->redirect("convention/checkout");
 		}
 		
 		/* Prevent users from using deleteReg with an arbitrary number */
 		if ($reg->account_id != $this->auth->getAccount()->id)
 		{
-			$this->addError(Kohana::lang('convention.not_loaded') . $reg->account_id);
+			$this->addError(__('convention.not_loaded') . $reg->account_id);
 			$this->request->redirect("convention/checkout");
 		}
 		
 		if ($reg->status != Model_Registration::STATUS_UNPROCESSED)
 		{
-			$this->addError(Kohana::lang('convention.registration_already_processed_unable_to_edit'));
+			$this->addError(__('convention.registration_already_processed_unable_to_edit'));
 			$this->request->redirect("convention/checkout");
 		}
 				
@@ -77,38 +77,38 @@ class Controller_Convention extends Base_MainTemplate
 			{
 				if ($reg->delete())
 				{
-					$this->addMessage(Kohana::lang('convention.delete_success'));	
+					$this->addMessage(__('convention.delete_success'));	
 				}
 				else
 				{
-					$this->addError(Kohana::lang('convention.delete_error'));	
+					$this->addError(__('convention.delete_error'));	
 				}
 			}
 			
 			$this->request->redirect("convention/checkout");
 		}
 				
-		$this->view->content = new View('convention/deleteReg', array('reg'=>$reg));
+		$this->template->content = new View('convention/deleteReg', array('reg'=>$reg));
 
 	}
 	
-	function viewReg($reg_id = NULL)
+	function action_viewReg($reg_id = NULL)
 	{
-		$this->view->title = "Viewing Registration...";		
+		$this->template->title = "Viewing Registration...";		
 	
 		$reg_id = isset($reg_id) ? intval($reg_id) : NULL;
 		$reg = ORM::factory('registration', $reg_id);
 		$pass = ORM::factory('Pass', $reg->pass_id);
 		
-		if (!$reg->loaded)
+		if (!$reg->loaded())
 		{
-			$this->addError(Kohana::lang('convention.not_loaded'));
+			$this->addError(__('convention.not_loaded'));
 			$this->request->redirect("convention/checkout");
 		}
 		
-		$this->view->heading = $pass->name . ' for ' . $reg->gname . ' ' . $reg->sname;
-		$this->view->subheading = 'Viewing registration...';
-		$this->view->content = new View('convention/viewReg', array('reg' => $reg, 'pass' => $pass));
+		$this->template->heading = $pass->name . ' for ' . $reg->gname . ' ' . $reg->sname;
+		$this->template->subheading = 'Viewing registration...';
+		$this->template->content = new View('convention/viewReg', array('reg' => $reg, 'pass' => $pass));
 	}
 	
     function action_editReg($reg_id = NULL)
@@ -116,7 +116,7 @@ class Controller_Convention extends Base_MainTemplate
         $reg_id = isset($reg_id) ? intval($reg_id) : NULL;
 
         $reg = ORM::factory('registration')->find($reg_id);
-        if (!$reg->loaded)
+        if (!$reg->loaded())
         {
             $reg->account_id    = $this->auth->get_user()->id;
             $reg->email         = $this->auth->getAccount()->email;
@@ -125,7 +125,7 @@ class Controller_Convention extends Base_MainTemplate
         {
             if ($reg->status != Model_Registration::STATUS_UNPROCESSED)
             {
-                $this->addError(Kohana::lang('convention.registration_already_processed_unable_to_edit'));
+                $this->addError(__('convention.registration_already_processed_unable_to_edit'));
                 $this->request->redirect('/convention/viewReg/'.$reg_id);
                 return;
             }
@@ -184,17 +184,17 @@ class Controller_Convention extends Base_MainTemplate
             //$errors = arr::overwrite($errors, $post->errors('form_error_messages'));
             $errors = $post->errors('form_error_messages');
         }
-        $this->view->content = new View('convention/register', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
+        $this->template->content = new View('convention/register', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
     }
     
-    function registrationCancel($reg_id)
+    function action_registrationCancel($reg_id)
     {
         $reg_id = intval($reg_id);
         $reg = ORM::Factory('registration')->find($reg_id);
-        $this->view->content = "cancel/fail page";
+        $this->template->content = "cancel/fail page";
     }
     
-    function registrationReturn()
+    function action_registrationReturn()
     {
         $regids = array();
         /* Pull out some of the data returned from paypal success link */
@@ -226,16 +226,16 @@ class Controller_Convention extends Base_MainTemplate
             $reg->save();
         }
 
-        $this->view->heading = "Thank you";
-        $this->view->subheading = "";
-        $this->view->content = new View('convention/paypalReturn');
+        $this->template->heading = "Thank you";
+        $this->template->subheading = "";
+        $this->template->content = new View('convention/paypalReturn');
     }
 
-    public function checkout()
+    public function action_checkout()
     {
         $this->requireVerified();
-        $this->view->heading    = Kohana::lang('convention.checkout_heading');
-        $this->view->subheading = Kohana::lang('convention.checkout_subheading'); 
+        $this->template->heading    = __('convention.checkout_heading');
+        $this->template->subheading = __('convention.checkout_subheading'); 
 
         $data = Kohana::config('paypal');
         /* get all the registrations we need */
@@ -263,14 +263,18 @@ class Controller_Convention extends Base_MainTemplate
         $data['cancel_url'] = url::site('/convention/registrationCancel');
 
         /* Our "checkout template" */
-        $this->view->content = new View('convention/checkout', $data);
+        $this->template->content = new View('convention/checkout');
+        foreach ($data as $key=>$value)
+        {
+            $this->template->content->$key = $value;
+        }
     }
     
-    public function checkoutOther()
+    public function action_checkoutOther()
     {
         $this->requireVerified();
-        $this->view->heading    = Kohana::lang('convention.checkout_other_heading');
-        $this->view->subheading = Kohana::lang('convention.checkout_other_subheading'); 
+        $this->template->heading    = __('convention.checkout_other_heading');
+        $this->template->subheading = __('convention.checkout_other_subheading'); 
 
         $data = array();
 		
@@ -278,13 +282,13 @@ class Controller_Convention extends Base_MainTemplate
 		$data['registrations'] = ORM::Factory('Registration')->getForAccount($this->auth->getAccount()->id);
 		if (!$data['registrations']->count()) 
         {
-            $this->addError(Kohana::lang('convention.cart_no_items'));
+            $this->addError(__('convention.cart_no_items'));
 			$this->request->redirect('user/index'); 
             return;
         }
 		
         /* Our "checkout template" */
-        $this->view->content = new View('convention/checkoutOther', $data);
+        $this->template->content = new View('convention/checkoutOther', $data);
     }
 
 
