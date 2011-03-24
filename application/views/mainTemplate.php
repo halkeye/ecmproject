@@ -54,7 +54,7 @@
  
 </div> 
 
-<?php echo DebugToolbar::render(); ?>
+<?php if (class_exists('DebugToolbar', TRUE)) { echo DebugToolbar::render(); } ?>
 </body> 
 </html> 
 

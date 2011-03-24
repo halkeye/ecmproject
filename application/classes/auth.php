@@ -141,19 +141,17 @@ class Auth {
 
         /* FIXME: Make a constant or something out of here */
         /* Load up registered group always */
-        $regGroup = ORM::factory('usergroup', 'registered');
-        foreach ($regGroup->permissions as $p)
+        $regGroup = ORM::factory('usergroup')->find('Registered');
+        foreach ($regGroup->Permissions->find_all() as $p)
         {
-            die('here');
             ####### GAVIN----
-            #$this->permissions[$p->pkey] = 1;
+            $this->permissions[$p->pkey()] = 1;
         }
 
         // extra safety to prevent session fixation - http://en.wikipedia.org/wiki/Session_fixation
         $this->session->regenerate();
 
         $this->account = serialize($account);
-
         $this->storeAccount($account);
 
     }

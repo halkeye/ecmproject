@@ -29,8 +29,8 @@ class Controller_Convention extends Base_MainTemplate
     function action_index()
     {
         $regs = Model_Registration::getByAccount($this->auth->get_user()->id);
-        if (!$regs->count()) { url::redirect(Controller_Convention::STEP1); }
-        else { url::redirect('/convention/checkout'); }
+        if (!$regs->count()) { $this->request->redirect(Controller_Convention::STEP1); }
+        else { $this->request->redirect('/convention/checkout'); }
 
         $data['conventions'] = array();
         foreach ($regs as $row) 
@@ -55,20 +55,20 @@ class Controller_Convention extends Base_MainTemplate
 		if (!$reg->loaded)
 		{
 			$this->addError(Kohana::lang('convention.not_loaded'));
-			url::redirect("convention/checkout");
+			$this->request->redirect("convention/checkout");
 		}
 		
 		/* Prevent users from using deleteReg with an arbitrary number */
 		if ($reg->account_id != $this->auth->getAccount()->id)
 		{
 			$this->addError(Kohana::lang('convention.not_loaded') . $reg->account_id);
-			url::redirect("convention/checkout");
+			$this->request->redirect("convention/checkout");
 		}
 		
 		if ($reg->status != Model_Registration::STATUS_UNPROCESSED)
 		{
 			$this->addError(Kohana::lang('convention.registration_already_processed_unable_to_edit'));
-			url::redirect("convention/checkout");
+			$this->request->redirect("convention/checkout");
 		}
 				
 		if ($post = $this->input->post())
@@ -85,7 +85,7 @@ class Controller_Convention extends Base_MainTemplate
 				}
 			}
 			
-			url::redirect("convention/checkout");
+			$this->request->redirect("convention/checkout");
 		}
 				
 		$this->view->content = new View('convention/deleteReg', array('reg'=>$reg));
@@ -103,7 +103,7 @@ class Controller_Convention extends Base_MainTemplate
 		if (!$reg->loaded)
 		{
 			$this->addError(Kohana::lang('convention.not_loaded'));
-			url::redirect("convention/checkout");
+			$this->request->redirect("convention/checkout");
 		}
 		
 		$this->view->heading = $pass->name . ' for ' . $reg->gname . ' ' . $reg->sname;
@@ -111,11 +111,11 @@ class Controller_Convention extends Base_MainTemplate
 		$this->view->content = new View('convention/viewReg', array('reg' => $reg, 'pass' => $pass));
 	}
 	
-    function editReg($reg_id = NULL)
+    function action_editReg($reg_id = NULL)
     {
         $reg_id = isset($reg_id) ? intval($reg_id) : NULL;
 
-        $reg = ORM::factory('registration', $reg_id);
+        $reg = ORM::factory('registration')->find($reg_id);
         if (!$reg->loaded)
         {
             $reg->account_id    = $this->auth->get_user()->id;
@@ -126,7 +126,7 @@ class Controller_Convention extends Base_MainTemplate
             if ($reg->status != Model_Registration::STATUS_UNPROCESSED)
             {
                 $this->addError(Kohana::lang('convention.registration_already_processed_unable_to_edit'));
-                url::redirect('/convention/viewReg/'.$reg_id);
+                $this->request->redirect('/convention/viewReg/'.$reg_id);
                 return;
             }
         }
@@ -171,7 +171,7 @@ class Controller_Convention extends Base_MainTemplate
             if ($reg->validate($post))
             {
                 $reg->save();
-                url::redirect(Controller_Convention::STEP2);
+                $this->request->redirect(Controller_Convention::STEP2);
                 return;
             }
 
@@ -242,7 +242,7 @@ class Controller_Convention extends Base_MainTemplate
         $data['registrations'] = ORM::Factory('registration')->getForAccount($this->auth->getAccount()->id);
         if (!$data['registrations']->count()) 
         {
-			url::redirect('user/index'); 
+			$this->request->redirect('user/index'); 
         }
 
         /* Config file is currently 'url', lets map it to 'paypal_url' incase any other url is used */
@@ -279,7 +279,7 @@ class Controller_Convention extends Base_MainTemplate
 		if (!$data['registrations']->count()) 
         {
             $this->addError(Kohana::lang('convention.cart_no_items'));
-			url::redirect('user/index'); 
+			$this->request->redirect('user/index'); 
             return;
         }
 		

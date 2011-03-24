@@ -222,21 +222,19 @@ class Model_Registration extends ORM
      */
     public static function getByAccount($accountId, $conventionId = null)
     {
-        $db = Database::instance();
-
-        $vars = array($accountId);
+        $vars = array(':account_id' => $accountId);
         if ($conventionId)
         {
-            $conventionWhere = 'c.conventionId = ?';
-            $vars[] = $conventionId;
+            $conventionWhere = 'c.conventionId = :conventionId';
+            $vars[':conventionId'] = $conventionId;
         }
         else 
         {
-            $conventionWhere = '? BETWEEN c.start_date AND c.end_date';
-            $vars[] = time();
+            $conventionWhere = ':startTime BETWEEN c.start_date AND c.end_date';
+            $vars[':startTime'] = time();
         }
 
-        $result = $db->query("
+        $query = DB::query(Database::SELECT, "
                 SELECT 
                     r.*,
                     c.name as convention_name,
@@ -251,9 +249,10 @@ class Model_Registration extends ORM
                 LEFT JOIN 
                     passes p ON (r.pass_id=p.id)
                 WHERE
-                    account_id = ? AND $conventionWhere
-                ", $vars);
-        return $result;
+                    account_id = :account_id AND $conventionWhere
+                ");
+        $query->parameters($vars);
+        return $query->execute();
     }
 
     public function getPossiblePassesQuery()
@@ -280,7 +279,7 @@ class Model_Registration extends ORM
             ->find_all();
     }
     
-    public function save()
+    public function save(Validation $validation = null)
     {
         $this->convention_id = $this->pass->convention_id;
         $originalChanged = $this->changed;
@@ -293,7 +292,7 @@ class Model_Registration extends ORM
 		if (isset($originalChanged['status']) && $this->status == Model_Registration::STATUS_PAID)
 			$this->sendConfirmationEmail();
 				
-        $ret = parent::save();
+        $ret = parent::save($validation);
 
         if ( ! empty($originalChanged))
         {

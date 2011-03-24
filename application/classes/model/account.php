@@ -19,13 +19,18 @@ class Model_Account extends ORM
     //public $permissions = array();
 
     // Current relationships
-    public $has_and_belongs_to_many = array('accounts_usergroups' => 'usergroups');
+    public $_has_many = array(
+        'Usergroups' => array ( 
+            'model' => 'usergroup',
+            'through' => 'accounts_usergroups',
+        )
+    );
 
     // Table primary key and value
-    protected $primary_key = 'id';
+    protected $_primary_key = 'id';
 
     // Model table information
-    protected $table_columns = array (
+    protected $_table_columns = array (
             'id'          => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, 'sequenced' => true, ),
             'email'       => array ( 'type' => 'string', 'length' => '55'                                              ),
             'password'    => array ( 'type' => 'string', 'length' => '40'                                              ),

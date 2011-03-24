@@ -11,6 +11,7 @@ class Model_Permission extends orm
             'description' => array ( 'type' => 'string', 'null' => true,  ),
     );
 
+
     public function unique_key($id = NULL) 
     {
         if (empty($id))

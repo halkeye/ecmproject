@@ -12,7 +12,11 @@ class Model_Usergroup extends orm
     );
 
     public $_has_many = array(
-        'permissions' => array ( 'model' => 'usergroups_permissions' )
+        'Permissions' => array ( 
+            'model' => 'permission',
+            'through' => 'usergroups_permissions',
+            'foreign_key' => 'usergroup_id',
+        )
     );
     
     public function unique_key($id = NULL) 
