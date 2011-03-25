@@ -29,9 +29,9 @@ address will require your account to be re-validated.</p>
 	
 		$class_row = text::alternate('odd','even');
 		echo '<tr class="'.$class_row.'">';
-		echo '<td>' . html::specialchars($r->gname . ' ' . $r->sname) . '</td>';
-		echo '<td>' . html::specialchars($r->pass->name) . '</td>';
-		echo '<td>' . html::specialchars(sprintf('$%01.2F', $r->pass->price)) . '</td>';
+		echo '<td>' . HTML::chars($r->gname . ' ' . $r->sname) . '</td>';
+		echo '<td>' . HTML::chars($r->pass->name) . '</td>';
+		echo '<td>' . HTML::chars(sprintf('$%01.2F', $r->pass->price)) . '</td>';
 		echo '<td>'.$r->statusToString().'</td>';
 		echo '</tr>';
 		
