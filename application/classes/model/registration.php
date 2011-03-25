@@ -341,9 +341,9 @@ class Model_Registration extends ORM
 	* Returns all conventions for a particular account ordered by convention_id in newest first (DESC order) Used for displaying 
 	* the history of registrations for a particular user.
 	*/
-	public function getAllRegistrationsByConvention($account_id)	{
+	public static function getAllRegistrationsByConvention($account_id)	{
 		
-		return ORM::Factory('Registration')->where('account_id', $account_id)->orderby('convention_id', 'DESC')->find_all();	
+		return ORM::Factory('Registration')->where('account_id', '=', $account_id)->order_by('convention_id', 'DESC')->find_all();	
 	}
 	
 	public function statusToString()
