@@ -4,6 +4,8 @@
 define('MAX_VERIFICATION_ITEMS', 2);
 class Verification_Exceeds_Exception extends Exception {}
 
+// FIXME - on insert
+// ORM::factory('usergroup')->where('name', '=', 'Registered')->find()
 class Model_Account extends ORM 
 {
     const ACCOUNT_STATUS_UNVERIFIED =  0;
@@ -39,6 +41,7 @@ class Model_Account extends ORM
             'created'     => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => false,                     ),
             'login'       => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => false, 'null' => true,     ),
     );
+    // var_export($model->list_columns());
 	
 	public $default_fields = array(
             'email' => array( 'type'  => 'text', 'label' => 'Email', 'required'=>true 								),
@@ -52,10 +55,10 @@ class Model_Account extends ORM
 	public function __construct($id = NULL)
 	{
         parent::__construct($id);
-        if (!$this->_loaded)
+        if (!$this->loaded())
         {
             $this->created = time();
-        /* Set a default status on new user creation */
+            /* Set a default status on new user creation */
             $this->status = Model_Account::ACCOUNT_STATUS_UNVERIFIED;
         }
     }
@@ -213,7 +216,7 @@ class Model_Account extends ORM
     {
         $fields = array();
         $fields['email'] = $email;
-        if ($this->_loaded)
+        if ($this->loaded())
             $fields[$this->primary_key.' !='] = $this->primary_key_value;
 
         // check the database for existing records
@@ -328,8 +331,6 @@ class Model_Account extends ORM
 			return -1;
 		}		
 	}
-
-    public function isLoaded() { return $this->_loaded; }
 }
 
 /* End of file user.php */

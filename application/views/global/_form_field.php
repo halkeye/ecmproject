@@ -6,11 +6,11 @@ $classRow = text::alternate('odd','even');
  * This is generating the label from the lang files 
  */
 if (!isset($field_lang_prefix)) { $field_lang_prefix = 'convention.registration_field_'; }
-$label = Kohana::lang($field_lang_prefix . $field);
+$label = __($field_lang_prefix . $field);
 if (isset($fieldData['required']) && $fieldData['required'])
     $label .= ' <span class="required">*</span>';
 
-$sublabel = Kohana::lang($field_lang_prefix . $field . '_sub');
+$sublabel = __($field_lang_prefix . $field . '_sub');
 if ($sublabel != $field_lang_prefix . $field . '_sub')
 	$label .= ' <span class="small">' . $sublabel . '</span>';
 
@@ -26,8 +26,8 @@ switch ($fieldData['type'])
     default:
         echo form::label($field, $label);
 }
-$attributes = '';
-if ($hasError) { $attributes = 'class="fieldError"'; }
+$attributes = array('class'=>'');
+if ($hasError) { $attributes['class'] = "fieldError"; }
 
 switch ($fieldData['type'])
 {
@@ -64,14 +64,15 @@ switch ($fieldData['type'])
         if (!$values) $values = array();
         $values[-1] = "";
         asort($values);
-        echo form::dropdown($field, $values, $value, 'class="block"');
+        $attributes['class'] .= ' block';
+        echo form::select($field, $values, $value, $attributes);
         break;
     case 'date':
         $months[-1] = '';
         ### Generate list of years
         foreach (date::months() as $month)
         {
-            $months[$month] = Kohana::lang('calendar.' . strtolower(date('F', mktime(0,0,0,$month, 1))));
+            $months[$month] = __('calendar.' . strtolower(date('F', mktime(0,0,0,$month, 1))));
         }
 
         $year = '';
@@ -100,11 +101,11 @@ switch ($fieldData['type'])
         $days[-1] = "";
         ksort($years);
 
-        echo form::dropdown($field.'-year', $years, $year, $attributes );
+        echo form::select($field.'-year', $years, $year, $attributes );
         echo ' ';
-        echo form::dropdown($field.'-month', $months, $month, $attributes );
+        echo form::select($field.'-month', $months, $month, $attributes );
         echo ' ';
-        echo form::dropdown($field.'-day', $days, $day, $attributes );
+        echo form::select($field.'-day', $days, $day, $attributes );
         echo '<br />';
         break;
     default:

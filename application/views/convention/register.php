@@ -15,8 +15,8 @@ if (count($errors))
 
 echo '<div id="form">';
 echo form::open();
-echo '<h1>'.html::specialchars(Kohana::lang('convention.registration_form_header')) . '</h1>';
-echo '<p>' . Kohana::lang('ecmproject.form_required') . '</p>';
+echo '<h1>'.HTML::chars(__('convention.registration_form_header')) . '</h1>';
+echo '<p>' . __('ecmproject.form_required') . '</p>';
 
 echo "<fieldset>";
 foreach (array('gname','sname', 'badge', 'dob', 'email', 'phone','cell', 'city', 'prov', 'econtact', 'ephone') as $field)
@@ -26,8 +26,8 @@ foreach (array('gname','sname', 'badge', 'dob', 'email', 'phone','cell', 'city',
 echo '</fieldset>';
 
     
-echo '<h1>'.html::specialchars(Kohana::lang('convention.registration_select_pass_header')) . '</h1>';
-echo '<p>'.html::specialchars(Kohana::lang('convention.registration_select_pass_desc')) . '</p>';
+echo '<h1>'.HTML::chars(__('convention.registration_select_pass_header')) . '</h1>';
+echo '<p>'.HTML::chars(__('convention.registration_select_pass_desc')) . '</p>';
 
 echo '<fieldset>';
 {
@@ -36,11 +36,11 @@ echo '<fieldset>';
 }
 echo '</fieldset>';
 
-echo '<h1>'.html::specialchars(Kohana::lang('convention.registration_tac_header')) . '</h1>';
-echo '<p>'.html::specialchars(Kohana::lang('convention.registration_tac_desc')) . '</p>';
+echo '<h1>'.HTML::chars(__('convention.registration_tac_header')) . '</h1>';
+echo '<p>'.HTML::chars(__('convention.registration_tac_desc')) . '</p>';
 
 echo '<fieldset>';
-echo form::textarea(array('rows'=>15, 'style'=>'width:95%; margin-left: 2%;'), Kohana::lang('convention.registration_tac'));
+echo form::textarea(array('rows'=>15, 'style'=>'width:95%; margin-left: 2%;'), __('convention.registration_tac'));
 {
     $field = 'agree_toc';
     $fields[$field]['type'] = 'boolean';
@@ -51,7 +51,7 @@ echo form::textarea(array('rows'=>15, 'style'=>'width:95%; margin-left: 2%;'), K
 echo '</fieldset>';
         
 echo "<fieldset class='left'>";
-echo form::submit(null,Kohana::lang('convention.registration_submit'));
+echo form::submit(null,__('convention.registration_submit'));
 echo '</fieldset>'; 
 
 echo form::close();
