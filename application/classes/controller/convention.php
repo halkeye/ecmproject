@@ -115,7 +115,7 @@ class Controller_Convention extends Base_MainTemplate
     {
         $reg_id = isset($reg_id) ? intval($reg_id) : NULL;
 
-        $reg = ORM::factory('registration')->find($reg_id);
+        $reg = $reg_id ? ORM::factory('registration')->find($reg_id) : ORM::factory('registration');
         if (!$reg->loaded())
         {
             $reg->account_id    = $this->auth->get_user()->id;
