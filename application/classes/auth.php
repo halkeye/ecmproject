@@ -67,7 +67,7 @@ class Auth {
      */
     public function login($account, $password)
     {
-        if (!$account || !$account->isLoaded())
+        if (!$account || !$account->loaded())
         {
             $this->addError(Kohana::lang('auth.invalid_user_pass'));
             return FALSE;
@@ -126,26 +126,25 @@ class Auth {
 
         $this->groups = array();
         $this->permissions = array();
-        if ($account->has('usergroups', ORM::factory('Usergroup'), TRUE))
-        {
-            foreach ($account->usergroups as $group)
-            {
-                if ($group->has(ORM::factory('Permission'), TRUE))
-                {
-                    $this->groups[$group->name] = 1;
-                    foreach ($group->permissions as $p)
-                        $this->permissions[$p->pkey] = 1;
-                }
-            }
-        }
 
-        /* FIXME: Make a constant or something out of here */
-        /* Load up registered group always */
-        $regGroup = ORM::factory('usergroup')->find('Registered');
-        foreach ($regGroup->Permissions->find_all() as $p)
+        $groups = array();
+        array_push($groups, 1); // registered
+        foreach ($account->Usergroups->find_all() as $group)
         {
-            ####### GAVIN----
-            $this->permissions[$p->pkey] = 1;
+            array_push($groups, $group->id);
+        }
+        $query = DB::select(array('g.name','groupName'), array('p.pkey','pkey'))
+            ->from(array('usergroups', 'g'))
+            ->join(array('usergroups_permissions','up'))
+            ->on('g.id','=','up.usergroup_id')
+            ->join(array('permissions','p'))
+            ->on('p.id','=','up.permission_id')
+            ->where('g.id', 'IN', $groups);
+
+        foreach ($query->execute() as $result)
+        {
+            $this->groups[$result['groupName']]=1;
+            $this->permissions[$result['pkey']]=1;
         }
 
         // extra safety to prevent session fixation - http://en.wikipedia.org/wiki/Session_fixation
