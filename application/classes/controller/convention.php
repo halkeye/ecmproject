@@ -146,7 +146,7 @@ class Controller_Convention extends Base_MainTemplate
             $fields['pass_id']['values'][$pass->id] = $pass->__toString();
         }
 
-        if ($post = $this->input->post())
+        if ($post = $this->request->post())
         {
             foreach ($fields as $fieldName=>$fieldData)
             {
