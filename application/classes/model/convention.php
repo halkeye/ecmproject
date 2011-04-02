@@ -29,39 +29,45 @@ class Model_Convention extends ORM
             'end_date' => array( 'type'  => 'date', 'label' => 'End Date', 'required'=>true    ),
             'location' => array( 'type'  => 'text', 'label' => 'Location', 'required'=>true    )
     );
+
+    public function filters()
+    {
+        $filters = parent::filters();
+        $filters['*'] = array('trim');
+    }
 	
 	public function validate_admin(array & $array, $save = FALSE) 
 	{
 		$array = Validation::factory($array);
-        $array->pre_filter('trim');
+        $array->label('start_date', 'Start Date');
 		
-		$array->add_rules('name', 'required');
-		$array->add_rules('location', 'required');
-		$array->add_callbacks('start_date', array($this, '_valid_date')); //Non-set start date will be set to today
-		$array->add_callbacks('end_date', array($this, '_valid_date')); //Non-set end date will be set to convention end.
-		$array->add_callbacks('valid_range', array($this, '_valid_range')); //Non-set end date will be set to convention end.
+		$array->rule('name', 'not_empty');
+		$array->rule('location', 'not_empty');
+		$array->rule('start_date', array($this, '_valid_date')); //Non-set start date will be set to today
+		$array->rule('end_date', array($this, '_valid_date')); //Non-set end date will be set to convention end.
+        $array->rule('valid_range', array($this, '_valid_range'), array(':validation', 'start_date', 'end_date')); 
 		
-		return parent::validate($array, $save);
+		return parent::check($array);
 	}
 	
 	/* Have some utility library instead of duplicating this across models? */
-	public function _valid_date(Validation $array, $field)
+	public function _valid_date($date)
 	{
-		$date = strtotime($array[$field]);
-		
 		/* If date validation failed (not a date string) or date does not match expected... */
-		if (!$date || date("Y-m-d", $date) != $array[$field])
-			$array->add_error($field, 'invalid_date');
+		if (!$date || date("Y-m-d", strtotime($date)) != $date)
+            return 0;
+        return 1;
 	}
 
 	/* This is cheap (since I hardcoded stuff) But it works :) */
-	public function _valid_range(Validation $array, $field)
+	public function _valid_range(Validation $array, $field1, $field2)
 	{
-		$start = strtotime($array['start_date']);
-		$end = strtotime($array['end_date']);
+		$start = strtotime($array[$field1]);
+		$end = strtotime($array[$field2]);
 		
 		if (!$start || !$end || $start >= $end)
-			$array->add_error($field, 'invalid_range');	
+            return 0;
+        return 1;
 	}
 	
     public function getCurrentConvention()
@@ -70,12 +76,11 @@ class Model_Convention extends ORM
 		return $this->where('start_date >', time())->orderby('start_date', 'asc')->find();
     }
 
-	public function getTotalConventions()
+	public static function getTotalConventions()
 	{
-		$db = new Database();
-		$result = $db->query('SELECT COUNT(*) as count FROM conventions');
-		
-		return (int) $result[0]->count;
+        $query = DB::query(Database::SELECT, 'SELECT COUNT(*) as count FROM conventions');
+        $row = $query->execute();
+        return (int) $row[0]['count'];
 	}
 	public function validConvention($cid)
 	{

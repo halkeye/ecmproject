@@ -19,3 +19,6 @@
 [submodule "modules/orm"]
 	path = modules/orm
 	url = https://github.com/kohana/orm.git
+[submodule "modules/pagination"]
+	path = modules/pagination
+	url = https://github.com/kohana/pagination.git
