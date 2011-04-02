@@ -1,6 +1,4 @@
-<?php
-Assets::addJS('loginOrRegister.js', 100);
-?><!-- CONTENT -->
+<!-- CONTENT -->
 <div id='form'>
     <div id="newLogin">
         <?php echo form::open('/user/register'); ?>
@@ -9,7 +7,7 @@ Assets::addJS('loginOrRegister.js', 100);
         <fieldset>			
             <?php $field = 'email'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?>
             <label for="email">Email Address <span class="small">Add a valid email address</span></label>
-            <?php echo form::input($field, @$form['email']); ?>
+            <input name="email" type="text" />
             <?php $field = 'password'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?>
             <label for="password">Password <span class="small">Min. size 6 characters</span></label>
             <input name="password" type="password" />
@@ -32,7 +30,7 @@ Assets::addJS('loginOrRegister.js', 100);
     
         <fieldset>		
             <label for="email">Email Address <span class="small">Add a valid email address</span></label>
-            <?php echo form::input('email', @$form['email']); ?>
+            <input name="email" type="text" />
             <label for="password">Password <span class="small">Min. size 6 characters</span></label>
             <input name="password" type="password" />	
             
