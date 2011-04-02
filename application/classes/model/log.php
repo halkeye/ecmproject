@@ -1,6 +1,6 @@
 <?php
 
-class Log_Model extends ORM 
+class Model_Log extends ORM 
 {
     /* On unserialize never check the db */
     protected $reload_on_wakeup = false;

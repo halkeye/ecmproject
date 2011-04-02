@@ -1,6 +1,6 @@
 <?php
 
-class Payment_Model extends ORM 
+class Model_Payment extends ORM 
 {
 	const STATUS_PENDING = 'Pending'; // Payment approval is pending.
     const STATUS_DENIED  = 'Denied'; // Payment was denied (invalid, insufficient funds, etc).
@@ -84,16 +84,16 @@ class Payment_Model extends ORM
 	}
 	
 	public function getPaymentStatusSelectList() {
-		return array(Payment_Model::STATUS_PENDING => 'Pending', Payment_Model::STATUS_DENIED => 'Denied', Payment_Model::STATUS_COMPLETED => 'Completed');
+		return array(Model_Payment::STATUS_PENDING => 'Pending', Model_Payment::STATUS_DENIED => 'Denied', Model_Payment::STATUS_COMPLETED => 'Completed');
 	}
 
 	public function statusToString()
 	{
-		if ($this->payment_status == Payment_Model::STATUS_PENDING)
+		if ($this->payment_status == Model_Payment::STATUS_PENDING)
 			return 'PENDING';
-		else if ($this->payment_status == Payment_Model::STATUS_DENIED )
+		else if ($this->payment_status == Model_Payment::STATUS_DENIED )
 			return 'DENIED';
-		else if ($this->payment_status == Payment_Model::STATUS_COMPLETED)
+		else if ($this->payment_status == Model_Payment::STATUS_COMPLETED)
 			return 'COMPLETE';
 		else
 			return $this->payment_status; //If paypal sets status values, it'll probably be in string format. So just return it.
@@ -119,7 +119,7 @@ class Payment_Model extends ORM
 	public function getTotal()
 	{
 		$db = new Database();				
-		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE register_id=? AND payment_status=?',$this->register_id, Payment_Model::STATUS_COMPLETED);
+		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE register_id=? AND payment_status=?',$this->register_id, Model_Payment::STATUS_COMPLETED);
 		
 		return (int) $result[0]->gross;		
 	}
@@ -127,7 +127,7 @@ class Payment_Model extends ORM
 	public function staticGetTotal($register_id)
 	{
 		$db = new Database();
-		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE register_id=? AND payment_status=?',$register_id, Payment_Model::STATUS_COMPLETED);
+		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE register_id=? AND payment_status=?',$register_id, Model_Payment::STATUS_COMPLETED);
 		
 		return (int) $result[0]->gross;		
 	}
