@@ -96,28 +96,25 @@ Kohana::$log->attach(new Log_File('logs'));
  * Attach a file reader to config. Multiple readers are supported.
  */
 Kohana::$config->attach(new Config_File);
+Kohana::$config->load('ecmproject');
 
 /**
  * Enable modules. Modules are referenced by a relative or absolute path.
  */
 $modules = array(
-	// 'auth'       => MODPATH.'auth',       // Basic authentication
-	// 'cache'      => MODPATH.'cache',      // Caching with multiple backends
-	// 'codebench'  => MODPATH.'codebench',  // Benchmarking tool
-	 'database'   => MODPATH.'database',   // Database access
-	// 'image'      => MODPATH.'image',      // Image manipulation
-	 'orm'        => MODPATH.'orm',        // Object Relationship Mapping
-	 'pagination'        => MODPATH.'pagination',
-	// 'unittest'   => MODPATH.'unittest',   // Unit testing
-	// 'userguide'  => MODPATH.'userguide',  // User guide and API documentation
-	'static'  => MODPATH.'static',
-	'log'  => MODPATH.'log',
+	 'database'   => MODPATH.'database',
+	 'orm'        => MODPATH.'orm',
+	 'pagination' => MODPATH.'pagination',
+     'static'     => MODPATH.'static',
+     'log'        => MODPATH.'log',
+	 'email'      => MODPATH.'email',
 );
 if (file_exists(MODPATH.'debug-toolbar'))
 {
     $modules['debug-toolbar'] = MODPATH.'debug-toolbar';
 }
 Kohana::modules($modules);
+unset($modules);
 
 /**
  * Set the routes. Each route must have a minimum of a name, a URI and a set of

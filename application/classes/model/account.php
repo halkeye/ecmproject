@@ -119,26 +119,28 @@ class Model_Account extends ORM
 
     function sendValidateEmail($code, $type = 'registration')
     {
+        $config = Kohana::config('ecmproject');
         $timestamp = time();
         $emailVars = array(
                 'email'                    => $this->email,
                 'validationUrl'            => sprintf('/user/validate/%d/%s', $this->id, $code),
                 'validationCode'           => $code,
-                'convention_name'          => __('ecmproject.convention_name'),
-                'convention_name_short'    => __('ecmproject.convention_name_short'),
-                'convention_forum_url'     => __('ecmproject.convention_forum_url'),
-                'convention_contact_email' => __('ecmproject.convention_contact_email'),
-                'convention_url'           => __('ecmproject.convention_url'),
+                'convention_name'          => $config['convention_name'],
+                'convention_name_short'    => $config['convention_name_short'],
+                'convention_forum_url'     => $config['convention_forum_url'],
+                'convention_contact_email' => $config['convention_contact_email'],
+                'convention_url'           => $config['convention_url'],
         );
 
-        $to      = $emailVars['email'];
-        $from    = __('ecmproject.outgoing_email_name') . ' <' . __('ecmproject.outgoing_email_address') . '>';
-        $subject = __('ecmproject.'.$type.'_subject');
- 
         $view = new View('user/'.$type.'_email', $emailVars);
-        $message = $view->render(FALSE);
+        $message = $view->render();
 
-        email::send($to, $from, $subject, $message, TRUE);
+        ### FIXME - MAKE SURE TO ADD non html version too
+        $email = Email::factory($config[$type.'_subject']);
+        $email->message($message,'text/html');
+        $email->to($emailVars['email']);
+        $email->from($config['outgoing_email_address'], $config['outgoing_email_name']);
+        $email->send();
     }
 
 	public function validate_admin(array & $array, $save = FALSE, $passRequired = FALSE)

@@ -421,7 +421,7 @@ class Model_Registration extends ORM
         $subject = __('ecmproject.registration_subject');
  
         $view = new View('user/register_confirmation', $emailVars);
-        $message = $view->render(FALSE);
+        $message = $view->render();
 		
         email::send($to, $from, $subject, $message, TRUE);    
 	}

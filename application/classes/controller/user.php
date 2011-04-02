@@ -402,5 +402,11 @@ class Controller_User extends Base_MainTemplate
         }
         $this->template->content = new View('user/lostPassword', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
     }
+    function action_testEmail()
+    {
+
+        $account = ORM::Factory('account',1);
+        $account->sendValidateEmail(1);
+    }
 }
 
