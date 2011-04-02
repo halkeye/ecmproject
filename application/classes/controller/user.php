@@ -84,20 +84,15 @@ class Controller_User extends Base_MainTemplate
 
         if ($post = $this->request->post())
         {
-            $account = ORM::factory('Account');
-            if ($account->validate($post))
-            {
-                $account->save();
+            try {
+                $account = ORM::factory('Account');
+                $account->values($post);
 
-                try {
-                    $vcode = $account->generateVerifyCode(Verificationcode_Model::TYPE_VALIDATE_EMAIL);
-                }
-                catch (Verification_Exceeds_Exception $e) 
-                {
-                    $this->addError(__('auth.too_many_verification'));
-                    $this->template->content = "";
-                    return;
-                }
+                $extra_validation = Validation::Factory($post);
+                $extra_validation->rule('password', 'matches', array(':validation', 'password', 'confirm_password'));
+                $account->save($extra_validation);
+
+                $vcode = $account->generateVerifyCode(Model_Verificationcode::TYPE_VALIDATE_EMAIL);
                 $account->sendValidateEmail($vcode->original_code);
 
                 $this->auth->complete_login($account);
@@ -105,15 +100,21 @@ class Controller_User extends Base_MainTemplate
                 $this->_redirect('');
                 return;
             }
-            else
+            catch (ORM_Validation_Exception $e)
             {
                 // repopulate the form fields
-                $form = arr::overwrite($form, $post->as_array());
+                $form = arr::overwrite($form, $post);
 
                 // populate the error fields, if any
                 // We need to already have created an error message file, for Kohana to use
                 // Pass the error message file name to the errors() method
-                $errors = arr::overwrite($errors, $post->errors('form_error_messages'));
+                $errors = arr::overwrite($errors, $e->errors('form_error_messages'));
+            }
+            catch (Verification_Exceeds_Exception $e) 
+            {
+                $this->addError(__('auth.too_many_verification'));
+                $this->template->content = "";
+                return;
             }
         }
         return $this->action_loginOrRegister( array('form'=>$form, 'errors'=>$errors) );
@@ -154,7 +155,7 @@ class Controller_User extends Base_MainTemplate
         }
 
         /* Verify the account */
-        if ($vcode->type == Verificationcode_Model::TYPE_EMAIL_CHANGE)
+        if ($vcode->type == Model_Verificationcode::TYPE_EMAIL_CHANGE)
         {
             $account->email = $vcode->value;
         }
@@ -206,7 +207,7 @@ class Controller_User extends Base_MainTemplate
         $account = $this->auth->getAccount();
         /* Generate new code */
         try {
-            $vcode = $account->generateVerifyCode(Verificationcode_Model::TYPE_VALIDATE_EMAIL);
+            $vcode = $account->generateVerifyCode(Model_Verificationcode::TYPE_VALIDATE_EMAIL);
         }
         catch (Verification_Exceeds_Exception $e) 
         {
@@ -251,7 +252,7 @@ class Controller_User extends Base_MainTemplate
             {
                 /* Generate new code */
                 try {
-                    $vcode           = $account->generateVerifyCode(Verificationcode_Model::TYPE_EMAIL_CHANGE, $post['email']);
+                    $vcode           = $account->generateVerifyCode(Model_Verificationcode::TYPE_EMAIL_CHANGE, $post['email']);
                 }
                 catch (Verification_Exceeds_Exception $e) 
                 {
@@ -374,7 +375,7 @@ class Controller_User extends Base_MainTemplate
 
                 /* Generate new code */
                 try {
-                    $vcode           = $account->generateVerifyCode(Verificationcode_Model::TYPE_LOST_PASSWORD, $post['email']);
+                    $vcode           = $account->generateVerifyCode(Model_Verificationcode::TYPE_LOST_PASSWORD, $post['email']);
                 }
                 catch (Verification_Exceeds_Exception $e) 
                 {

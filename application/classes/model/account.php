@@ -51,6 +51,33 @@ class Model_Account extends ORM
     );
 	
     protected $ignored_columns = array('confirm_password', 'groups', 'permissions');
+    
+    public function filters()
+    {
+        $filters = parent::filters();
+        $filters['*'] = array('trim');
+        return $filters;
+    }
+
+    public function rules()
+    {
+        $rules = parent::rules();
+
+        $rules['email'] = array(
+            array('not_empty'),
+            array('email'),
+        );
+        $rules['password'] = array(
+            array('not_empty'),
+            array('min_length', array(':value',6)),
+            array('max_length', array(':value',255)),
+        );
+        // Email unique validation
+        $rules['email'] = array(
+            array(array($this, '_valid_unique_email'))
+        );
+        return $rules;
+    }
 
 	public function __construct($id = NULL)
 	{
@@ -97,16 +124,16 @@ class Model_Account extends ORM
                 'email'                    => $this->email,
                 'validationUrl'            => sprintf('/user/validate/%d/%s', $this->id, $code),
                 'validationCode'           => $code,
-                'convention_name'          => Kohana::lang('ecmproject.convention_name'),
-                'convention_name_short'    => Kohana::lang('ecmproject.convention_name_short'),
-                'convention_forum_url'     => Kohana::lang('ecmproject.convention_forum_url'),
-                'convention_contact_email' => Kohana::lang('ecmproject.convention_contact_email'),
-                'convention_url'           => Kohana::lang('ecmproject.convention_url'),
+                'convention_name'          => __('ecmproject.convention_name'),
+                'convention_name_short'    => __('ecmproject.convention_name_short'),
+                'convention_forum_url'     => __('ecmproject.convention_forum_url'),
+                'convention_contact_email' => __('ecmproject.convention_contact_email'),
+                'convention_url'           => __('ecmproject.convention_url'),
         );
 
         $to      = $emailVars['email'];
-        $from    = Kohana::lang('ecmproject.outgoing_email_name') . ' <' . Kohana::lang('ecmproject.outgoing_email_address') . '>';
-        $subject = Kohana::lang('ecmproject.'.$type.'_subject');
+        $from    = __('ecmproject.outgoing_email_name') . ' <' . __('ecmproject.outgoing_email_address') . '>';
+        $subject = __('ecmproject.'.$type.'_subject');
  
         $view = new View('user/'.$type.'_email', $emailVars);
         $message = $view->render(FALSE);
@@ -114,44 +141,6 @@ class Model_Account extends ORM
         email::send($to, $from, $subject, $message, TRUE);
     }
 
-    /**
-	 * Validates and optionally saves a new user record from an array.
-	 *
-	 * @param  array    values to check
-	 * @param  boolean  save[Optional] the record when validation succeeds
-	 * @return boolean
-	 */
-	public function validate(array & $array, $save = FALSE)
-	{
-		// Initialise the validation library and setup some rules
-		$array = Validation::factory($array);
-        // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
-        $array->pre_filter('trim');
-
-        // Add Rules
-        $array->add_rules('email', 'required', array('valid','email'));
-        $array->add_rules('password', 'required');
-		$array->add_rules('password', 'length[6,255]');
-
-        $array->add_rules('confirm_password', 'required');
-        $array->add_rules('confirm_password',  'matches[password]');
-
-        /*
-        $array->add_rules('gname', 'required');
-        $array->add_rules('sname', 'required');
-
-        $array->add_rules('phone', 'required');
-        $array->add_rules('phone', array('valid', 'phone'));
-        */
-
-        // Email unique validation
-        $array->add_callbacks('email', array($this, '_unique_email_validation'));
-        //$array->add_rules('name', 'required', array($this, '_name_exists'));
-
- 
-		return parent::validate($array, $save);
-	}
-	
 	public function validate_admin(array & $array, $save = FALSE, $passRequired = FALSE)
 	{
         $data = (array) $array;
@@ -192,45 +181,24 @@ class Model_Account extends ORM
         return parent::unique_key($id);
     }
     
-    /*
-     * Callback method that checks for uniqueness of email
-     *
-     * @param  Validation  $array   Validation object
-     * @param  string      $field   name of field being validated
-     */
-    public function _unique_email_validation(Validation $array, $field)
+    public function _valid_unique_email($email)
     {
-        if (!$this->_unique_email($array[$field]))
-        {
-            // add error to validation object
-            $array->add_error($field, 'email_exists');
-        }
-    }
-
-    public function _unique_email_formo($email)
-    {
-        return $this->_unique_email($email);
-    }
-
-    private function _unique_email($email)
-    {
-        $fields = array();
+        $query = ORM::factory('Account');
+        $query->where('email','=',$email);
         $fields['email'] = $email;
         if ($this->loaded())
-            $fields[$this->primary_key.' !='] = $this->primary_key_value;
+            $query->where($this->primary_key,'!=',$this->primary_key_value);
 
         // check the database for existing records
-        $email_exists = (bool) ORM::factory('account')->where($fields)->count_all();
-        return !$email_exists;
-
+        $ret = $query->count_all();
+        return !$ret;
     }
-
 
     public function generateVerifyCode($type, $value = NULL)
     {
         $countType = ORM::Factory('verificationcode')
-            ->where('account_id', $this->id)
-            ->where('type', $type)
+            ->where('account_id', '=', $this->id)
+            ->where('type', '=', $type)
             ->count_all();
 
         if ($countType >= MAX_VERIFICATION_ITEMS)

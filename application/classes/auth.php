@@ -54,8 +54,6 @@ class Auth {
         }
 
         $this->clearErrors();
-
-        Kohana::$log->add(Log::DEBUG, 'Auth Library loaded');
     }
 
     /**
@@ -69,19 +67,19 @@ class Auth {
     {
         if (!$account || !$account->loaded())
         {
-            $this->addError(Kohana::lang('auth.invalid_user_pass'));
+            $this->addError(__('auth.invalid_user_pass'));
             return FALSE;
         }
 
         if (empty($password))
         {
-            $this->addError(Kohana::lang('auth.invalid_user_pass'));
+            $this->addError(__('auth.invalid_user_pass'));
             return FALSE;
         }
 
         if ($account->isBanned())
         {
-            $this->addError(Kohana::lang('auth.banned'));
+            $this->addError(__('auth.banned'));
             return FALSE;
         }
 
@@ -89,7 +87,7 @@ class Auth {
         $password = sha1($account->salt . $password);
         if ($account->password !== $password)
         {
-            $this->addError(Kohana::lang('auth.invalid_user_pass'));
+            $this->addError(__('auth.invalid_user_pass'));
             return FALSE;
         }
             

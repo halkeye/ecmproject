@@ -374,7 +374,7 @@ class Model_Registration extends ORM
 		$columns = array();
 		
 		foreach($keys as $key):
-			$columns[$key] = Kohana::lang('convention.registration_field_' . $key);					
+			$columns[$key] = __('convention.registration_field_' . $key);					
 		endforeach;
 		
 		return implode(",", $columns);
@@ -417,8 +417,8 @@ class Model_Registration extends ORM
 			);
 
         $to      = $emailVars['email'];
-        $from    = Kohana::lang('ecmproject.outgoing_email_name') . ' <' . Kohana::lang('ecmproject.outgoing_email_address') . '>';
-        $subject = Kohana::lang('ecmproject.registration_subject');
+        $from    = __('ecmproject.outgoing_email_name') . ' <' . __('ecmproject.outgoing_email_address') . '>';
+        $subject = __('ecmproject.registration_subject');
  
         $view = new View('user/register_confirmation', $emailVars);
         $message = $view->render(FALSE);

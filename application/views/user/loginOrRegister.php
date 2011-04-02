@@ -9,7 +9,7 @@ Assets::addJS('loginOrRegister.js', 100);
         <fieldset>			
             <?php $field = 'email'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?>
             <label for="email">Email Address <span class="small">Add a valid email address</span></label>
-            <input name="email" type="text" />
+            <?php echo form::input($field, @$form['email']); ?>
             <?php $field = 'password'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?>
             <label for="password">Password <span class="small">Min. size 6 characters</span></label>
             <input name="password" type="password" />
@@ -32,7 +32,7 @@ Assets::addJS('loginOrRegister.js', 100);
     
         <fieldset>		
             <label for="email">Email Address <span class="small">Add a valid email address</span></label>
-            <input name="email" type="text" />
+            <?php echo form::input('email', @$form['email']); ?>
             <label for="password">Password <span class="small">Min. size 6 characters</span></label>
             <input name="password" type="password" />	
             

@@ -1,6 +1,6 @@
 <?php
 
-class Verificationcode_Model extends ORM 
+class Model_Verificationcode extends ORM 
 {
     const TYPE_EMAIL_CHANGE   = 1;
     const TYPE_VALIDATE_EMAIL = 2;

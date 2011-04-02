@@ -48,7 +48,7 @@ class Base_MainTemplate extends Controller_Template
                 if ($user->status != Model_Account::ACCOUNT_STATUS_VERIFIED)
                 {
                     $this->isVerifiedAccount = FALSE;
-                    $this->template->errors[] = Kohana::lang('ecmproject.not_validated');
+                    $this->template->errors[] = __('ecmproject.not_validated');
                     $this->addMenuItem(array('title'=>'Verify Account', 'url'=>'/user/verifyMenu'));
                 }
                 else
@@ -141,7 +141,7 @@ class Base_MainTemplate extends Controller_Template
         if ($this->auth->is_logged_in() && !$this->isVerifiedAccount ) 
         {
             /* You can't go any furthur until email address is verified. */
-            $this->addError(Kohana::lang('auth.not_validated')); 
+            $this->addError(__('auth.not_validated')); 
             $this->session->set('redirected_from',  $this->request->current());
             url::redirect('/user/verifyMenu');
             return;
@@ -168,9 +168,9 @@ class Base_MainTemplate extends Controller_Template
 
     public function accessDenied()
     {
-        $this->template->title = Kohana::lang('auth.accessDenied_title');
-        $this->template->heading = Kohana::lang('auth.accessDenied_heading');
-        $this->template->subheading = Kohana::lang('auth.accessDenied_subheading');
+        $this->template->title = __('auth.accessDenied_title');
+        $this->template->heading = __('auth.accessDenied_heading');
+        $this->template->subheading = __('auth.accessDenied_subheading');
         $this->template->content = new View('global/accessDenied');
     }
 
