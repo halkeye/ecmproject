@@ -433,7 +433,7 @@ class Controller_Admin extends Base_MainTemplate
 		}			
 	}
 	
-	function createConvention() {
+	function action_createConvention() {
 		// Set headers
 		$this->template->title = "Administration: Create a Convention";
 		$this->template->heading = "Administration: Create a Convention";
@@ -441,51 +441,39 @@ class Controller_Admin extends Base_MainTemplate
 		
 		$conv = ORM::factory('Convention');	
 		$fields = $conv->default_fields;
+        $post = $conv->as_array();
 		
 		if ($post = $this->request->post())
 		{			
 			$post['start_date'] = Controller_Admin::parseSplitDate($post, 'start_date');
 			$post['end_date'] = Controller_Admin::parseSplitDate($post, 'end_date');
 		
-			if ($conv->validate_admin($post, false, true))
-			{			
-				$conv->start_date = strtotime($post['start_date']);
-				$conv->end_date = strtotime($post['end_date']); //Bug - does not work for dates before the base time.
- 			
-				$conv->save();				
-				if ($conv->saved()) {
-					$this->addMessage('Created a newly minted convention named ' . $conv->name);
-					$this->request->redirect('admin/manageConventions');
-				}
-				else
-				{
-					$this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
-				}				
-			}
-					
-			$errorMsg = 'Oops. You entered something bad! Please fix it! <br />';				
-			$errors = $post->errors('form_error_messages');
-			foreach ($errors as $error)
-				$errorMsg = $errorMsg . ' ' . $error . '<br />';					
-		
-			$this->addError($errorMsg);					
-			
-			$this->template->content = new View('admin/Convention', array(
-				'row' => $post,
-				'fields' => $fields,
-				'callback' => 'createConvention'
-			)); 
-					
-		} 
-		else 
-		{		
-			$this->template->content = new View('admin/Convention', array(
-				'row' => $conv->as_array(),
-				'fields' => $fields,
-				'callback' => 'createConvention'
-			));
-		}	
-	}
+            $conv->values($post);
+            try {
+                $conv->save();
+                $this->addMessage('Created a newly minted convention named ' . $conv->name);
+                $this->request->redirect('admin/manageConventions');
+            }
+            catch (ORM_Validation_Exception $e)
+            {
+                $errorMsg = 'Oops. You entered something bad! Please fix it! <br />';				
+                $errors = $e->errors('form_error_messages');
+                foreach ($errors as $error)
+                    $errorMsg = $errorMsg . ' ' . $error . '<br />';					
+            
+                $this->addError($errorMsg);					
+            }				
+            catch (Exception $e)
+            {
+                $this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
+            }
+        }
+        $this->template->content = new View('admin/Convention', array(
+            'row' => $post,
+            'fields' => $fields,
+            'callback' => 'createConvention'
+        )); 
+    }
 	
 	/* Step 1 */
 	function createRegistration() {
@@ -1331,15 +1319,19 @@ class Controller_Admin extends Base_MainTemplate
 			return -1;		
 	}
 	
-	private function parseSplitDate($post, $fieldName)
+	private function parseSplitDate(array & $post, $fieldName)
 	{
-		return implode('-', 
+		$ret = implode('-', 
 			array(
 				@sprintf("%04d", $post[$fieldName . '-year']), 
 				@sprintf("%02d", $post[$fieldName . '-month']), 
 				@sprintf("%02d", $post[$fieldName . '-day'])
 			)
 		);	
+        unset ($post[$fieldName . '-year']); 
+        unset ($post[$fieldName . '-month']);
+        unset ($post[$fieldName . '-day']);
+        return $ret;
 	}
 	
 	/*

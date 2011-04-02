@@ -34,10 +34,38 @@ class Model_Convention extends ORM
     {
         $filters = parent::filters();
         $filters['*'] = array('trim');
+        return $filters;
     }
-	
-	public function validate_admin(array & $array, $save = FALSE) 
+    
+    public function rules()
+    {
+        $rules = parent::rules();
+        $rules['name'] = array(
+            array('not_empty'),
+        );
+        $rules['location'] = array(
+            array('not_empty'),
+        );
+        //Non-set start date will be set to today
+        $rules['start_date'] = array(
+            array(array($this, '_valid_date'))
+        );
+        //Non-set end date will be set to convention end.
+        $rules['end_date'] = array(
+            array(array($this, '_valid_date'))
+        );
+        $rules['valid_range'] = array(
+            array(
+                array($this, '_valid_range'),
+                array(':validation', 'start_date', 'end_date')
+            )
+        );
+        return $rules;
+    }
+    
+    public function save_admin(array & $array)
 	{
+        var_dump($array);
 		$array = Validation::factory($array);
         $array->label('start_date', 'Start Date');
 		
@@ -46,8 +74,7 @@ class Model_Convention extends ORM
 		$array->rule('start_date', array($this, '_valid_date')); //Non-set start date will be set to today
 		$array->rule('end_date', array($this, '_valid_date')); //Non-set end date will be set to convention end.
         $array->rule('valid_range', array($this, '_valid_range'), array(':validation', 'start_date', 'end_date')); 
-		
-		return parent::check($array);
+		return $this->loaded() ? $this->update($array) : $this->create($array);
 	}
 	
 	/* Have some utility library instead of duplicating this across models? */
