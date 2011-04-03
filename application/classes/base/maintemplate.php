@@ -143,7 +143,7 @@ class Base_MainTemplate extends Controller_Template
             /* You can't go any furthur until email address is verified. */
             $this->addError(__('auth.not_validated')); 
             $this->session->set('redirected_from',  $this->request->current());
-            url::redirect('/user/verifyMenu');
+            $this->request->redirect('/user/verifyMenu');
             return;
         }
     }
@@ -154,7 +154,7 @@ class Base_MainTemplate extends Controller_Template
         if (!$this->auth->hasPermission($permission))
         {
             /* Kohana has no forward, so redirect */
-            url::redirect('/user/accessDenied');
+            $this->request->redirect('/user/accessDenied');
         }
     }
     protected function requireGroup($group) {}

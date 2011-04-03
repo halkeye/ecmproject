@@ -123,7 +123,7 @@ class Model_Account extends ORM
         $timestamp = time();
         $emailVars = array(
                 'email'                    => $this->email,
-                'validationUrl'            => sprintf('/user/validate/%d/%s', $this->id, $code),
+                'validationUrl'            => URL::site(sprintf('/user/validate/%d/%s', $this->id, $code),Request::current()),
                 'validationCode'           => $code,
                 'convention_name'          => $config['convention_name'],
                 'convention_name_short'    => $config['convention_name_short'],
@@ -189,7 +189,7 @@ class Model_Account extends ORM
         $query->where('email','=',$email);
         $fields['email'] = $email;
         if ($this->loaded())
-            $query->where($this->primary_key,'!=',$this->primary_key_value);
+            $query->where($this->_primary_key, '!=', $this->pk());
 
         // check the database for existing records
         $ret = $query->count_all();

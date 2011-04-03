@@ -141,14 +141,14 @@ class Controller_User extends Base_MainTemplate
             $this->_badVerify();
         if (!$key) 
             $this->_badVerify();
-        $vcode = ORM::Factory('verificationcode')->where('code',sha1($account->salt.$key))->find();
+        $vcode = ORM::Factory('verificationcode')->where('code','=',sha1($account->salt.$key))->find();
 
         /* We have no account */
-        if (!$account->loaded) 
+        if (!$account->loaded()) 
             $this->_badVerify();
         
         /* We don't have a valid code */
-        if (!$vcode || !$vcode->loaded || 
+        if (!$vcode || !$vcode->loaded() || 
              $vcode->account_id != $account->id)
         {
             $this->_badVerify();
@@ -171,7 +171,7 @@ class Controller_User extends Base_MainTemplate
     function _badVerify()
     {
         $this->addError(__('auth.bad_link')); 
-        return url::redirect('/user/verifyMenu');
+        return $this->request->redirect('/user/verifyMenu');
     }
     
     function action_loginOrRegister($data = array())
@@ -219,8 +219,8 @@ class Controller_User extends Base_MainTemplate
         /* Send email */
         $account->sendValidateEmail($vcode->original_code);
 
-        $this->addMessage(__('auth.sendVerificationMessage', $account->email)); 
-        return url::redirect('/user/verifyMenu');
+        $this->addMessage(__('auth.sendVerificationMessage', array('mail'=>$account->email))); 
+        return $this->request->redirect('/user/verifyMenu');
     }
 
     function action_changeEmail()
@@ -266,7 +266,7 @@ class Controller_User extends Base_MainTemplate
                 /* Tell the user what happened */
                 $this->addMessage(__('auth.emailChangeSuccess'));
                 /* Redirect to main page */
-                url::redirect('user/index');
+                $this->request->redirect('user/index');
             }
             else
             {
@@ -321,7 +321,7 @@ class Controller_User extends Base_MainTemplate
                 /* Tell the user what happened */
                 $this->addMessage(__('auth.passwordChangeSuccess'));
                 /* Redirect to main page */
-                url::redirect('user/index');
+                $this->request->redirect('user/index');
             }
             else
             {

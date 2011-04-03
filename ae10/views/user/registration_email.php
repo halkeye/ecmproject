@@ -1,6 +1,6 @@
 <p>We are excited to welcome you to <?php echo $convention_name ?></p>
 
-<p>Please follow this link to validate your email: <?php echo html::anchor("http://www.animeevolution.com/?page_id=2655") ?></p>
+<p>Please follow this link to validate your email: <?php echo html::anchor($validationUrl) ?></p>
 
 <p>And enter the code: <b><?php echo $validationCode ?></b></p>
 

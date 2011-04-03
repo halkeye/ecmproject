@@ -81,7 +81,7 @@ if (isset($_SERVER['KOHANA_ENV']))
  */
 Kohana::init(array(
 	'base_url'   => dirname($_SERVER['SCRIPT_NAME']),
-	'index_file' => basename($_SERVER['SCRIPT_NAME']),
+	'index_file' =>'', # basename($_SERVER['SCRIPT_NAME']),
     'profile'    => Kohana::$environment !== Kohana::PRODUCTION,
     'caching'    => Kohana::$environment === Kohana::PRODUCTION,
 ));
@@ -124,4 +124,9 @@ Route::set('default', '(<controller>(/<action>(/<id>)))')
 	->defaults(array(
 		'controller' => 'convention',
 		'action'     => 'index',
+	));
+Route::set('user-validate', 'user/validate/<userid>/<code>')
+	->defaults(array(
+		'controller' => 'user',
+		'action'     => 'validate',
 	));
