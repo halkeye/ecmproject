@@ -326,13 +326,9 @@ class Model_Registration extends ORM
     /* for validation */
     public function _true() { return TRUE; }
 	
-	public function getTotalRegistrations($convention_id)
+	public static function getTotalRegistrations($cid)
 	{
-		$cid = htmlspecialchars($convention_id);
-		$db = new Database();
-		$result = $db->query('SELECT COUNT(*) as count FROM registrations WHERE convention_id = ' . $cid);
-		
-		return (int) $result[0]->count;
+        return ORM::Factory('Registration')->where('convention_id','=',$cid)->count_all();
 	}
 	
 	/*

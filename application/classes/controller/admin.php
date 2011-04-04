@@ -88,7 +88,7 @@ class Controller_Admin extends Base_MainTemplate
 			);	
 	}
 	
-	function manageAccounts($page = NULL)
+	function action_manageAccounts($page = NULL)
 	{
 		// Set headers
 		$this->template->title = "Administration: Manage Accounts";
@@ -134,7 +134,7 @@ class Controller_Admin extends Base_MainTemplate
 			);
 	}
 	
-	function managePasses($convention_id = NULL, $page = NULL) 
+	function action_managePasses($convention_id = NULL, $page = NULL) 
 	{
 		// Set headers
 		$this->template->title = "Administration: Manage Passes";
@@ -145,7 +145,7 @@ class Controller_Admin extends Base_MainTemplate
 		// Get all conventions, determine and validate convention_id, and get total number of passes for the particular convention_id.
 		$crows = ORM::factory('Convention')->find_all();	
 		$convention_id = Controller_Admin::getConventionId($convention_id, $crows);						
-		$crows = $crows->select_list('id', 'name');					
+		$crows = $crows->as_array('id', 'name');					
 		$total_rows = Model_Pass::getTotalPasses($convention_id);
 							
 							
@@ -186,7 +186,7 @@ class Controller_Admin extends Base_MainTemplate
 			);
 	}
 	
-	function manageRegistrations($convention_id = NULL, $page = NULL)
+	function action_manageRegistrations($convention_id = NULL, $page = NULL)
 	{
 		// Set headers
 		$this->template->title = "Administration: Manage Registrations";
@@ -197,12 +197,16 @@ class Controller_Admin extends Base_MainTemplate
 		// Get all conventions, determine and validate convention_id, and get total number of passes for the particular convention_id.
 		$crows = ORM::factory('Convention')->find_all();	
 		$convention_id = Controller_Admin::getConventionId($convention_id, $crows);						
-		$crows = $crows->select_list('id', 'name');					
+		$crows = $crows->as_array('id', 'name');					
 		$total_rows = Model_Registration::getTotalRegistrations($convention_id);
 		
 		// Calculate the offset.
 		$start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );	
-		$rows = ORM::factory('Registration')->where("convention_id = $convention_id")->limit( Controller_Admin::ROWS_PER_PAGE )->offset( $start )->find_all();
+        $rows = ORM::factory('Registration')
+            ->where('convention_id','=',$convention_id)
+            ->limit( Controller_Admin::ROWS_PER_PAGE )
+            ->offset( $start )
+            ->find_all();
 			
 		// Extra validation.
 		if (count($rows) == 0 && $total_rows > 0)
@@ -218,8 +222,8 @@ class Controller_Admin extends Base_MainTemplate
 		$data['entries'][0] = new View('admin/ListItems/RegistrationEntry');
 		foreach ($rows as $row)
 		{
-			$data['actions']['edit'] = html::anchor('admin/editRegistration/'. $row->id, html::image(url::site('/static/img/edit-copy.png'), __('admin.edit_account')));
-			$data['actions']['delete'] = html::anchor('admin/deleteRegistration/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), __('admin.delete_account')));			
+			$data['actions']['edit'] = html::anchor('admin/editRegistration/'. $row->id, html::image(url::site('/static/img/edit-copy.png', TRUE), array('title'=>__('admin.edit_account'))));
+			$data['actions']['delete'] = html::anchor('admin/deleteRegistration/' . $row->id, html::image(url::site('/static/img/edit-delete.png',TRUE), array('title'=>__('admin.delete_account'))));
 			$data['entries'][$row->id] = new View('admin/ListItems/RegistrationEntry', array('row' => $row, 'actions' => $data['actions']));				
 		}	
 		
@@ -237,7 +241,7 @@ class Controller_Admin extends Base_MainTemplate
 			);	
 	}
 	
-	function managePayments($rid = NULL)
+	function action_managePayments($rid = NULL)
 	{
 		if (!isset($rid) || !is_numeric($rid))
 			die('Get out of here!');
@@ -325,7 +329,7 @@ class Controller_Admin extends Base_MainTemplate
 			);
 	}
 	
-	function createAccount() 
+	function action_createAccount() 
 	{
 		$this->template->title = "Administration: Create an Account";
 		$this->template->heading = "Administration: Create an Account";
@@ -374,7 +378,7 @@ class Controller_Admin extends Base_MainTemplate
 		}
 	}
 	
-	function createPass()
+	function action_createPass()
 	{
 		// Set headers
 		$this->template->title = "Administration: Create a Pass";
@@ -382,7 +386,7 @@ class Controller_Admin extends Base_MainTemplate
 		$this->template->subheading = "Create a pass for a convention.";
 		
 		$pass = ORM::factory('Pass');
-		$crows = ORM::factory('Convention')->find_all()->select_list('id', 'name');		
+		$crows = ORM::factory('Convention')->find_all()->as_array('id', 'name');		
 		$fields = $pass->default_fields;
 		$fields['convention_id']['values'] = $crows;
 		
@@ -475,14 +479,14 @@ class Controller_Admin extends Base_MainTemplate
     }
 	
 	/* Step 1 */
-	function createRegistration() {
+	function action_createRegistration() {
 		// Set headers
 		$this->template->title = "Administration: Create Registration";
 		$this->template->heading = "Administration: Create Registration";
 		$this->template->subheading = "Create a registration for a convention.";
 	
 		$reg = ORM::factory('Registration');
-		$crows = ORM::factory('Convention')->find_all()->select_list('id', 'name');	
+		$crows = ORM::factory('Convention')->find_all()->as_array('id', 'name');	
 		
 		$fields = $reg->formo_defaults;
 		$fields['convention_id'] = array( 'type'  => 'select', 'label' => 'Convention', 'required'=>true );
@@ -518,7 +522,7 @@ class Controller_Admin extends Base_MainTemplate
 	}
 	
 	/* Step 2 */
-	function createRegistration2($cid = NULL, $aid = NULL) {
+	function action_createRegistration2($cid = NULL, $aid = NULL) {
 	
 		//Not allowed to be lazy in checking input here.
 		if ( (!isset($cid) || !is_numeric($cid) || $cid <= 0) || (!isset($aid) || !is_numeric($aid) || $aid <= 0))
@@ -526,10 +530,10 @@ class Controller_Admin extends Base_MainTemplate
 			
 		//TODO: Deal with the case where one of the below fails to load.
 		$reg = ORM::factory('Registration');
-		$crows = ORM::factory('Convention')->find_all()->select_list('id', 'name');	
+		$crows = ORM::factory('Convention')->find_all()->as_array('id', 'name');	
 		$fields = $reg->formo_defaults;
 		
-		$fields['pass_id']['values'] = ORM::Factory('Pass')->where("convention_id=$cid")->find_all()->select_list('id', 'name');
+		$fields['pass_id']['values'] = ORM::Factory('Pass')->where("convention_id=$cid")->find_all()->as_array('id', 'name');
 		
 		if ($post = $this->request->post())
 		{
@@ -588,7 +592,7 @@ class Controller_Admin extends Base_MainTemplate
 	/*
 	* $rid - Registration ID to add payment to. The rest can be determined using the registration ID.
 	*/
-	function createPayment($rid = NULL)
+	function action_createPayment($rid = NULL)
 	{
 		if ($rid == NULL || !is_numeric($rid))
 			die('Get out of here!');
@@ -649,7 +653,8 @@ class Controller_Admin extends Base_MainTemplate
 		}
 	}	
 	
-	function editAccount($id = NULL) {	
+    function action_editAccount($id = NULL)
+    { 
 		// Set headers
 		$this->template->title = "Administration: Edit an Account";
 		$this->template->heading = " Administration: Edit an Account";
@@ -709,7 +714,8 @@ class Controller_Admin extends Base_MainTemplate
 		}	
 	}
 	
-	function editPass($id = NULL) {
+    function action_editPass($id = NULL)
+    {
 		// Set headers
 		$this->template->title = "Administration: Edit a Pass";
 		$this->template->heading = " Administration: Edit a Pass";
@@ -720,7 +726,7 @@ class Controller_Admin extends Base_MainTemplate
 			die('No direct access allowed. Go away D:');
 				
 		$pass = ORM::factory('Pass',$id);
-		$crows = ORM::factory('Convention')->find_all()->select_list('id', 'name');		
+		$crows = ORM::factory('Convention')->find_all()->as_array('id', 'name');		
 		$fields = $pass->default_fields;
 		$fields['convention_id']['values'] = $crows;
 		
@@ -845,7 +851,7 @@ class Controller_Admin extends Base_MainTemplate
 		}	
 	}
 	
-	function editRegistration($rid = NULL)
+	function action_editRegistration($rid = NULL)
 	{
 		/* Can change all fields. */	
 		//Not allowed to be lazy in checking input here.
@@ -860,10 +866,10 @@ class Controller_Admin extends Base_MainTemplate
 			$this->request->redirect('admin/manageRegistrations/');
 		}
 		
-		$crows = ORM::factory('Convention')->find_all()->select_list('id', 'name');	
+		$crows = ORM::factory('Convention')->find_all()->as_array('id', 'name');	
 		$fields = $reg->formo_defaults;
 		
-		$fields['pass_id']['values'] = ORM::Factory('Pass')->where("convention_id", $reg->convention_id)->find_all()->select_list('id', 'name');
+		$fields['pass_id']['values'] = ORM::Factory('Pass')->where("convention_id", $reg->convention_id)->find_all()->as_array('id', 'name');
 		
 		if ($post = $this->request->post())
 		{
@@ -1210,7 +1216,7 @@ class Controller_Admin extends Base_MainTemplate
 		$this->template->subheading = "Export Registration Info to CSV";
 	
 		$reg = ORM::factory('Registration');
-		$crows = ORM::factory('Convention')->find_all()->select_list('id', 'name');	
+		$crows = ORM::factory('Convention')->find_all()->as_array('id', 'name');	
 		
 		$fields = $reg->formo_defaults;
 		$fields['convention_id'] = array( 'type'  => 'select', 'label' => 'Convention', 'required'=>true );
