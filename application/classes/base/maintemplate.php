@@ -166,7 +166,7 @@ class Base_MainTemplate extends Controller_Template
         $this->template->menu = $items;
     }
 
-    public function accessDenied()
+    public function action_accessDenied()
     {
         $this->template->title = __('auth.accessDenied_title');
         $this->template->heading = __('auth.accessDenied_heading');

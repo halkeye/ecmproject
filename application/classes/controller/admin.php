@@ -284,7 +284,7 @@ class Controller_Admin extends Base_MainTemplate
 	*
 	*
 	*/
-	function manageAdmin()
+	function action_manageAdmin()
 	{
 		$this->requirePermission('superAdmin'); //Require extra permissions to manage administrators.
 		
