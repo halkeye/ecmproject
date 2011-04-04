@@ -120,11 +120,11 @@ class Controller_User extends Base_MainTemplate
         return $this->action_loginOrRegister( array('form'=>$form, 'errors'=>$errors) );
     }
 
-    function action_validate($uid = 0, $key = '')
+    function action_validate($uid = NULL, $key = '')
     {
         $this->template->title = "Verification";
 
-        if (!$uid) 
+        if ($uid === NULL) 
         {
             $this->requireLogin();
             $account = $this->auth->getAccount();
@@ -132,27 +132,22 @@ class Controller_User extends Base_MainTemplate
         }
         else 
         {
-            $account = ORM::factory('account')->find($uid); 
+            $account = ORM::factory('account')->where('id','=', $uid)->find(); 
         }
         if (!$key) { $key = $this->request->post('verifyCode'); }
 
         /* Validate incomingness */
-        if (!$account)
-            $this->_badVerify();
-        if (!$key) 
-            $this->_badVerify();
-        $vcode = ORM::Factory('verificationcode')->where('code','=',sha1($account->salt.$key))->find();
-
         /* We have no account */
-        if (!$account->loaded()) 
-            $this->_badVerify();
+        if (!$account || !$account->loaded()) $this->_badVerify();
+        if (!$key)     $this->_badVerify();
+
+        $vcode = ORM::Factory('verificationcode')
+            ->where('account_id','=', $uid)
+            ->where('code','=',sha1($account->salt.$key))
+            ->find();
         
         /* We don't have a valid code */
-        if (!$vcode || !$vcode->loaded() || 
-             $vcode->account_id != $account->id)
-        {
-            $this->_badVerify();
-        }
+        if (!$vcode->loaded()) $this->_badVerify();
 
         /* Verify the account */
         if ($vcode->type == Model_Verificationcode::TYPE_EMAIL_CHANGE)
@@ -405,8 +400,11 @@ class Controller_User extends Base_MainTemplate
     function action_testEmail()
     {
 
-        $account = ORM::Factory('account',1);
-        $account->sendValidateEmail(1);
+        $account = ORM::Factory('account')->where('id','=',55)->find();
+        if (!$account->loaded())
+            die("not loaded");
+        $vcode = $account->generateVerifyCode(Model_Verificationcode::TYPE_VALIDATE_EMAIL);
+        $account->sendValidateEmail($vcode->original_code);
     }
 }
 

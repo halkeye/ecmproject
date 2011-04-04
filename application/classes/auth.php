@@ -129,8 +129,9 @@ class Auth {
         array_push($groups, 1); // registered
         foreach ($account->Usergroups->find_all() as $group)
         {
-            array_push($groups, $group->id);
+            array_push($groups, int($group->id));
         }
+        array_unique($groups);
         $query = DB::select(array('g.name','groupName'), array('p.pkey','pkey'))
             ->from(array('usergroups', 'g'))
             ->join(array('usergroups_permissions','up'))
