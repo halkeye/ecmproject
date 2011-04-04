@@ -35,17 +35,7 @@ class Model_Payment extends ORM
             'receipt_id' => array ('type' => 'string','length' => '19', ),
             'mod_time' => array ('type' => 'int','max' => 2147483647,'unsigned' => true,'null' => true,),
     );
-	
-	public function __construct($id = NULL)
-	{
-        parent::__construct($id);
-    }
-	
-	public function __set($key, $value)
-	{
-		parent::__set($key, $value);
-	}
-	
+m
 	public function save()
 	{
 		if ($this->id == 0)
@@ -109,7 +99,7 @@ class Model_Payment extends ORM
 	
 	public function lastModifiedName()
 	{
-		$acct = ORM::Factory('Account')->find($this->last_modified);
+		$acct = ORM::Factory('Account',$this->last_modified)->find();
 		if (! $acct->loaded)
 			return $this->id;
 		else

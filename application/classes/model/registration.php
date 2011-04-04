@@ -203,7 +203,7 @@ class Model_Registration extends ORM
 //            return;
         $ageTime = strtotime($array['dob']);
 
-        $pass = ORM::Factory('Pass')->with('convention')->find($array['pass_id']);
+        $pass = ORM::Factory('Pass')->with('convention')->where('id','=',$array['pass_id'])->find();
         $conventionStartTime = $pass->convention->start_date;
         # Code from http://forums.webmasterhub.net/viewtopic.php?f=23&t=1831 - Option 4
         $yearsOld = abs(substr(date('Ymd', $conventionStartTime) - date('Ymd', $ageTime), 0, -4));
@@ -394,9 +394,9 @@ class Model_Registration extends ORM
 	
 	private function sendConfirmationEmail()
 	{		
-		$conv = ORM::Factory('Convention')->find($this->convention_id);
-		$pass = ORM::Factory('Pass')->find($this->pass_id);
-		$acct = ORM::Factory('Account')->find($this->account_id);
+		$conv = ORM::Factory('Convention',$this->convention_id)->find();
+		$pass = ORM::Factory('Pass',$this->pass_id)->find();
+		$acct = ORM::Factory('Account',$this->account_id)->find();
 		
 		if (!$conv->loaded || !$pass->loaded)
 		{

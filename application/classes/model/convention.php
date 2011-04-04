@@ -114,7 +114,7 @@ class Model_Convention extends ORM
         if (!is_numeric($cid) || $cid == -1)
             return false;
 
-        $res = ORM::factory('Convention')->find($cid);
+        $res = ORM::factory('Convention', $cid)->find();
         if ($res->loaded())
             return true;
         else

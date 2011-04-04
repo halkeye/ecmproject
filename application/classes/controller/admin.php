@@ -46,7 +46,7 @@ class Controller_Admin extends Base_MainTemplate
 								
 		// Calculate the offset.
 		$start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );	
-		$rows = ORM::factory('Convention')->find_all( Controller_Admin::ROWS_PER_PAGE, $start );
+		$rows = ORM::factory('Convention')->limit(Controller_Admin::ROWS_PER_PAGE)->offset($start)->find_all();
 			
 		// Extra validation.
 		if (count($rows) == 0 && $total_rows > 0)
@@ -99,7 +99,7 @@ class Controller_Admin extends Base_MainTemplate
 								
 		// Calculate the offset.
 		$start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );	
-		$rows = ORM::factory('Account')->find_all( Controller_Admin::ROWS_PER_PAGE, $start );
+		$rows = ORM::factory('Account')->limit( Controller_Admin::ROWS_PER_PAGE )->offset($start)->find_all();
 			
 		// Extra validation.
 		if (count($rows) == 0 && $total_rows > 0)
@@ -151,7 +151,7 @@ class Controller_Admin extends Base_MainTemplate
 							
 		// Calculate the offset.
 		$start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );	
-		$rows = ORM::factory('Pass')->where("convention_id = $convention_id")->find_all( Controller_Admin::ROWS_PER_PAGE, $start );
+		$rows = ORM::factory('Pass')->where("convention_id = $convention_id")->limit( Controller_Admin::ROWS_PER_PAGE )->offset( $start )->find_all();
 			
 		// Extra validation.
 		if (count($rows) == 0 && $total_rows > 0)
@@ -202,7 +202,7 @@ class Controller_Admin extends Base_MainTemplate
 		
 		// Calculate the offset.
 		$start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );	
-		$rows = ORM::factory('Registration')->where("convention_id = $convention_id")->find_all( Controller_Admin::ROWS_PER_PAGE, $start );
+		$rows = ORM::factory('Registration')->where("convention_id = $convention_id")->limit( Controller_Admin::ROWS_PER_PAGE )->offset( $start )->find_all();
 			
 		// Extra validation.
 		if (count($rows) == 0 && $total_rows > 0)
@@ -243,15 +243,15 @@ class Controller_Admin extends Base_MainTemplate
 			die('Get out of here!');
 			
 		//Get registration and then get associated payment entries (if any)	
-		$reg = ORM::Factory('Registration')->find($rid);
+		$reg = ORM::Factory('Registration',$rid);
 		if (! $reg->loaded() )
 		{
 			$this->addError('Invalid registration. Maybe someone deleted it when you weren\'t looking?');
 			$this->request->redirect('manageRegistrations');
 		}		
 
-		$rows = ORM::Factory('Payment')->where("register_id=$rid")->find_all();
-		$pass = ORM::Factory('Pass')->find($reg->pass_id);
+		$rows = ORM::Factory('Payment')->where("register_id",'=',$rid)->find_all();
+		$pass = ORM::Factory('Pass',$reg->pass_id);
 		if (count($rows) == 0)
 		{
 			$this->addError("This person hasn't paid anything yet!");
@@ -571,7 +571,7 @@ class Controller_Admin extends Base_MainTemplate
 				'callback' => "createRegistration2/$cid/$aid"
 			));
 		} else {
-			$acct = ORM::factory('Account')->find($aid);
+			$acct = ORM::factory('Account',$aid);
 			if (!$acct->loaded())
 				die('Serious error here. The account is supposed to exist but it doesn\'t.');
 				
@@ -595,8 +595,8 @@ class Controller_Admin extends Base_MainTemplate
 			die('Get out of here!');
 			
 		$pay = ORM::Factory('Payment'); 
-		$reg = ORM::Factory('Registration')->find($rid);
-		$pass = ORM::Factory('Pass')->find($reg->pass_id);
+		$reg = ORM::Factory('Registration',$rid);
+		$pass = ORM::Factory('Pass',$reg->pass_id);
 		
 		//TODO: Redirect properly.
 		if (!$reg->loaded())
@@ -660,7 +660,7 @@ class Controller_Admin extends Base_MainTemplate
 		if ($id == NULL || !is_numeric($id))
 			die('No direct access allowed. Go away D:');
 				
-		$acct = ORM::factory('Account')->find($id);
+		$acct = ORM::factory('Account',$id);
 		$fields = $acct->default_fields;
 		$fields['status']['values'] = Model_Account::getVerifySelectList();
 		
@@ -720,7 +720,7 @@ class Controller_Admin extends Base_MainTemplate
 		if ($id == NULL || !is_numeric($id))
 			die('No direct access allowed. Go away D:');
 				
-		$pass = ORM::factory('Pass')->find($id);
+		$pass = ORM::factory('Pass',$id);
 		$crows = ORM::factory('Convention')->find_all()->select_list('id', 'name');		
 		$fields = $pass->default_fields;
 		$fields['convention_id']['values'] = $crows;
@@ -791,7 +791,7 @@ class Controller_Admin extends Base_MainTemplate
 		if ($id == NULL || !is_numeric($id))
 			die('No direct access allowed. Go away D:');
 		
-		$conv = ORM::factory('Convention')->find($id);	
+		$conv = ORM::factory('Convention', $id);	
 		$fields = $conv->default_fields;
 		
 		/* If pass is not loaded, we have a problem */
@@ -854,7 +854,7 @@ class Controller_Admin extends Base_MainTemplate
 			die("You're not allowed to be here!");
 			
 		//TODO: Deal with the case where one of the below fails to load.
-		$reg = ORM::factory('Registration')->find($rid);
+		$reg = ORM::factory('Registration',$rid);
 		if (! $reg->loaded() )
 		{
 			$this->addError('Grace says this registration does not exist.');
@@ -922,9 +922,9 @@ class Controller_Admin extends Base_MainTemplate
 		if ($id == NULL || !is_numeric($id))
 			die('Get out of here!');
 			
-		$pay = ORM::Factory('Payment')->find($id); 
-		$reg = ORM::Factory('Registration')->find($pay->register_id);
-		$pass = ORM::Factory('Pass')->find($reg->pass_id);
+		$pay = ORM::Factory('Payment', $id); 
+		$reg = ORM::Factory('Registration',$pay->register_id);
+		$pass = ORM::Factory('Pass',$reg->pass_id);
 
 		if (!$pay->loaded())
 		{
@@ -1014,7 +1014,7 @@ class Controller_Admin extends Base_MainTemplate
 		{
             $post['email'] = trim($post['email']);
             $group = ORM::Factory('usergroup', Controller_Admin::ADMIN_USERGROUP);
-			$acct = ORM::Factory('Account')->where('email', $post['email'])->find();
+			$acct = ORM::Factory('Account')->where('email', '=', $post['email'])->find();
 			if ($acct->loaded() && !$acct->has($group))
 			{
 				$acct->add($group);
@@ -1040,7 +1040,7 @@ class Controller_Admin extends Base_MainTemplate
 		if ($id == NULL || !is_numeric($id))
 			die('Get out of here!');
 			
-		$acct = ORM::Factory('Account')->find($id);
+		$acct = ORM::Factory('Account',$id);
 		if ($acct->loaded() && $acct->has(ORM::Factory('usergroup', 3)))
 		{
 			$acct->remove(ORM::Factory('usergroup', 3));
@@ -1134,7 +1134,7 @@ class Controller_Admin extends Base_MainTemplate
 		if ($id == NULL || !is_numeric($id))
 			die('No direct access allowed. Go away D:');
 			
-		$row = ORM::factory($entityType)->find($id);			
+		$row = ORM::factory($entityType,$id);			
 		
 		if (isset($row->name))
 			$entityName = $row->name;
@@ -1152,9 +1152,9 @@ class Controller_Admin extends Base_MainTemplate
 				if ($updatePaymentStatus)
 				{
 						//We need to fetch reg, pass, and payment objects...
-						$pay = ORM::Factory('Payment')->find($id);
-						$reg = ORM::Factory('Registration')->find($pay->register_id);
-						$pass = ORM::Factory('Pass')->find($reg->pass_id);						
+						$pay = ORM::Factory('Payment',$id);
+						$reg = ORM::Factory('Registration',$pay->register_id);
+						$pass = ORM::Factory('Pass',$reg->pass_id);						
 				}			
 			
 				if ($row->delete()) 
