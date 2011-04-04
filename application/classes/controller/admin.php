@@ -298,20 +298,19 @@ class Controller_Admin extends Base_MainTemplate
 		// Calculate the offset.
 		//$start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );	
 		$rows = ORM::factory('Account')
-            ->join('accounts_usergroups', 'accounts_usergroups.account_id', 'accounts.id')
-            ->join('usergroups', 'accounts_usergroups.usergroup_id', 'usergroups.id')
-            ->where('usergroups.name', Controller_Admin::ADMIN_USERGROUP)
-            //->limit(
-            ->find_all(); 
-			
+            ->join('accounts_usergroups')->on('accounts_usergroups.account_id', '=', 'accounts.id')
+            ->join('usergroups')->on('accounts_usergroups.usergroup_id', '=', 'usergroups.id')
+            ->where('usergroups.name', '=', Controller_Admin::ADMIN_USERGROUP)
+            ->find_all();
+
 		// Header entry. (View with no data generates a header)
 		$data['entries'][0] = new View('admin/ListItems/AdminAccountEntry');
 		foreach ($rows as $row)
 		{
-            $data['actions']['edit'] = html::anchor('admin/deleteAdmin/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), __('admin.edit_account')));
+            $data['actions']['edit'] = html::anchor('admin/deleteAdmin/' . $row->id, html::image(url::site('/static/img/edit-delete.png',TRUE), NULL, __('admin.edit_account')));
             //$data['actions']['delete'] = html::anchor('admin/deleteAccount/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), __('admin.delete_account')));			
             $data['entries'][$row->id] = new View('admin/ListItems/AdminAccountEntry', array('row' => $row, 'actions' => $data['actions']));				
-		}	
+        }
 		
 		// Set callback path for form submit (change convention, jump to page)
 	

@@ -17,8 +17,6 @@ class Model_Account extends ORM
 
     // Account specific Stuff
     public $saltLength = 10;
-    //public $groups = array();
-    //public $permissions = array();
 
     // Current relationships
     public $_has_many = array(
@@ -55,7 +53,12 @@ class Model_Account extends ORM
     public function filters()
     {
         $filters = parent::filters();
-        $filters['*'] = array('trim');
+        $filters[TRUE] = array(
+            array('trim')
+        );
+        $filters['password'] = array(
+            array(array($this, '_set_password'))
+        );
         return $filters;
     }
 
@@ -90,6 +93,7 @@ class Model_Account extends ORM
         }
     }
 	
+    /*
     public function __set($key, $value)
 	{
 		if ($key === 'password')
@@ -106,6 +110,17 @@ class Model_Account extends ORM
 
 		parent::__set($key, $value);
 	}
+     */
+    public function _set_password($value)
+    {
+        if (empty($this->salt))
+        {
+            $this->salt = substr(md5(uniqid(rand(), true)), 0, $this->saltLength);
+            Kohana::$log->add(Log::DEBUG, 'Generated Salt: ' . $this->salt);
+        }
+        // Use Auth to hash the password
+        return $this->_encryptValue($value);
+    }
 
     function _encryptValue($value)
     {
