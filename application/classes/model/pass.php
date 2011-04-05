@@ -22,6 +22,18 @@ class Model_Pass extends ORM
         )
     );
 
+    protected $_table_columns = array(
+        'id' => array('type' => 'int', 'min' => '0', 'max' => '4294967295', 'column_name' => 'id', 'column_default' => NULL, 'data_type' => 'int unsigned', 'is_nullable' => false, 'ordinal_position' => 1, 'display' => '10', 'comment' => '', 'extra' => 'auto_increment', 'key' => 'PRI', 'privileges' => 'select,insert,update,references',),
+        'convention_id' => array('type' => 'int', 'min' => '0', 'max' => '4294967295', 'column_name' => 'convention_id', 'column_default' => NULL, 'data_type' => 'int unsigned', 'is_nullable' => false, 'ordinal_position' => 2, 'display' => '10', 'comment' => '', 'extra' => '', 'key' => 'MUL', 'privileges' => 'select,insert,update,references',), 
+        'name' => array('type' => 'string', 'column_name' => 'name', 'column_default' => NULL, 'data_type' => 'varchar', 'is_nullable' => false, 'ordinal_position' => 3, 'character_maximum_length' => '100', 'collation_name' => 'utf8_general_ci', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
+        'price' => array('type' => 'float', 'exact' => true, 'column_name' => 'price', 'column_default' => NULL, 'data_type' => 'decimal', 'is_nullable' => false, 'ordinal_position' => 4, 'numeric_scale' => '2', 'numeric_precision' => '10', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
+        'isPurchasable' => array('type' => 'int', 'min' => '-128', 'max' => '127', 'column_name' => 'isPurchasable', 'column_default' => NULL, 'data_type' => 'tinyint', 'is_nullable' => false, 'ordinal_position' => 5, 'display' => '4', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
+        'minAge' => array('type' => 'int', 'min' => '0', 'max' => '255', 'column_name' => 'minAge', 'column_default' => NULL, 'data_type' => 'tinyint unsigned', 'is_nullable' => true, 'ordinal_position' => 6, 'display' => '3', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
+        'maxAge' => array('type' => 'int', 'min' => '0', 'max' => '255', 'column_name' => 'maxAge', 'column_default' => NULL, 'data_type' => 'tinyint unsigned', 'is_nullable' => true, 'ordinal_position' => 7, 'display' => '3', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
+        'startDate' => array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647', 'column_name' => 'startDate', 'column_default' => NULL, 'data_type' => 'int', 'is_nullable' => true, 'ordinal_position' => 8, 'display' => '11', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
+        'endDate' => array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647', 'column_name' => 'endDate', 'column_default' => NULL, 'data_type' => 'int', 'is_nullable' => true, 'ordinal_position' => 9, 'display' => '11', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',)
+    );
+
 	public function rules()
 	{
 		return array(
@@ -57,6 +69,12 @@ class Model_Pass extends ORM
         $filters = parent::filters();
         $filters[TRUE] = array(
             array('trim')
+        );
+        $filters['startDate'] = array(
+            array('strtotime')
+        );
+        $filters['endDate'] = array(
+            array('strtotime'),
         );
         return $filters;
     }   

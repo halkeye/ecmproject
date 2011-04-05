@@ -723,47 +723,30 @@ class Controller_Admin extends Base_MainTemplate
         {
             $post['startDate'] = Controller_Admin::parseSplitDate($post, 'startDate');
             $post['endDate'] = Controller_Admin::parseSplitDate($post, 'endDate');
-            
-            if ($pass->validate_admin($post))
-            {           
-                $pass->startDate = strtotime($post['startDate']);
-                $pass->endDate = strtotime($post['endDate']);               
-                
+            $pass->values($post);
+            try {
                 $pass->save();                              
-                if ($pass->saved()) {
-                    $this->addMessage('Edited the pass (now) named: ' . $pass->name);
-                    $this->request->redirect('admin/managePasses');
-                }
-                else
-                {
-                    $this->addError("Oops. Something went wrong and it's not your fault. Try again or contact the system maintainer please!");
-                }
+                $this->addMessage('Edited the pass (now) named: ' . $pass->name);
+                $this->request->redirect('admin/managePasses');
             }
-                        
-            $errorMsg = 'Oops. You entered something bad! Please fix it! <br />';               
-            $errors = $post->errors('form_error_messages');
-            foreach ($errors as $error)
-                $errorMsg = $errorMsg . ' ' . $error . '<br />';                    
-        
-            $this->addError($errorMsg);
-            
-            $this->template->content = new View('admin/Pass', array(
-                'crows' => $crows,  
-                'row' => $post,
-                'fields' => $fields,
-                'callback' => "editPass/$id"
-            ));
-                    
+            catch (ORM_Validation_Exception $e)
+            {
+                $this->parseErrorMessages($e);      
+            }               
+            catch (Exception $e)
+            {
+                $this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
+            }
         }   
         else {      
-            //Parse UNIX timestamp back to something we can use.        
-            $this->template->content = new View('admin/Pass', array(
-                'crows' => $crows,  
-                'row' => $pass->as_array(),
-                'fields' => $fields,
-                'callback' => "editPass/$id"
-            ));
+            $post = $pass->as_array();
         }   
+        $this->template->content = new View('admin/Pass', array(
+            'crows' => $crows,  
+            'row' => $post,
+            'fields' => $fields,
+            'callback' => "editPass/$id"
+        ));
     }
     
 
