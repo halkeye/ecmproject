@@ -33,10 +33,10 @@ Account Status: <?php echo $acctDetails->statusToString(); ?>
 	{
 		$class_row = text::alternate('odd','even');
 		echo '<tr class="'.$class_row.'">';
-		echo '<td>' . html::specialchars($reg->id) . '</td>';
-		echo '<td>' . html::specialchars($reg->gname . ' ' . $reg->sname) . '</td>';
-		echo '<td>' . html::specialchars($reg->pass->name) . '</td>';
-		echo '<td>' . html::specialchars(sprintf('$%01.2F', $reg->pass->price)) . '</td>';
+		echo '<td>' . html::chars($reg->id) . '</td>';
+		echo '<td>' . html::chars($reg->gname . ' ' . $reg->sname) . '</td>';
+		echo '<td>' . html::chars($reg->pass->name) . '</td>';
+		echo '<td>' . html::chars(sprintf('$%01.2F', $reg->pass->price)) . '</td>';
 		echo '<td>'.$reg->statusToString().'</td>';
 		echo '</tr>';
 	}

@@ -29,7 +29,7 @@ foreach ($registrations as $reg)
     $class_row = text::alternate('row_odd','row_even');
     echo '<li class="'.$class_row.'">';
     $name = $reg->pass->name . ' - ' . $reg->badge;
-    echo html::specialchars($name);
+    echo html::chars($name);
     echo form::hidden("item_number_$id", $reg->id . '|'. $reg->pass->id);
     echo form::hidden("item_name_$id", $name);
     echo form::hidden("amount_$id", sprintf('%01.2F', $reg->pass->price));

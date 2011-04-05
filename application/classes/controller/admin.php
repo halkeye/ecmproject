@@ -151,7 +151,11 @@ class Controller_Admin extends Base_MainTemplate
 							
 		// Calculate the offset.
 		$start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );	
-		$rows = ORM::factory('Pass')->where("convention_id = $convention_id")->limit( Controller_Admin::ROWS_PER_PAGE )->offset( $start )->find_all();
+        $rows = ORM::factory('Pass')
+            ->where('convention_id','=',$convention_id)
+            ->limit( Controller_Admin::ROWS_PER_PAGE )
+            ->offset( $start )
+            ->find_all();
 			
 		// Extra validation.
 		if (count($rows) == 0 && $total_rows > 0)
@@ -167,9 +171,9 @@ class Controller_Admin extends Base_MainTemplate
 		$data['entries'][0] = new View('admin/ListItems/PassEntry');
 		foreach ($rows as $row)
 		{
-			$data['actions']['edit'] = html::anchor('admin/editPass/'. $row->id, html::image(url::site('/static/img/edit-copy.png'), __('admin.edit_account')));
-			$data['actions']['delete'] = html::anchor('admin/deletePass/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), __('admin.delete_account')));			
-			$data['entries'][$row->id] = new View('admin/ListItems/PassEntry', array('row' => $row, 'actions' => $data['actions']));				
+			$data['actions']['edit'] = html::anchor('admin/editPass/'. $row->id, html::image(url::site('/static/img/edit-copy.png',TRUE), array('title'=>__('admin.edit_account'))));
+			$data['actions']['delete'] = html::anchor('admin/deletePass/' . $row->id, html::image(url::site('/static/img/edit-delete.png',TRUE), array('title'=>__('admin.delete_account'))));			
+			$data['entries'][$row->id] = new View('admin/ListItems/PassEntry', array('row' => $row, 'actions' => $data['actions']));
 		}	
 		
 		// Set callback path for form submit (change convention, jump to page)

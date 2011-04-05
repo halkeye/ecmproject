@@ -15,7 +15,7 @@ if (count($errors))
 
 echo '<div id="form">';
 echo form::open();
-echo '<h1>'.html::specialchars(__('convention.registration_form_header')) . '</h1>';
+echo '<h1>'.html::chars(__('convention.registration_form_header')) . '</h1>';
 echo '<p>'.__('ecmproject.form_required') . '</p>';
 
 echo "<fieldset>";

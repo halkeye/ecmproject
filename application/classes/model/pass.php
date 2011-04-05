@@ -94,13 +94,9 @@ class Model_Pass extends ORM
 			$this->startDate = $array->$field;
 	}
 	
-	public function getTotalPasses($convention_id)
+	public static function getTotalPasses($cid)
 	{
-		$cid = htmlspecialchars($convention_id);
-		$db = new Database();
-		$result = $db->query('SELECT COUNT(*) as count FROM passes WHERE convention_id = ' . $cid);
-		
-		return (int) $result[0]->count;
+        return ORM::Factory('Pass')->where('convention_id','=',$cid)->count_all();
 	}
 	
 	//Get all passes related to the convention regardless of status.
