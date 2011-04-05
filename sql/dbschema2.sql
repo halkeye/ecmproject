@@ -19,41 +19,41 @@ CREATE TABLE accounts (
    phone VARCHAR(25), 
    password CHAR(40) NOT NULL, -- You save one WHOLE byte by using CHAR instead of VARCHAR! lol.
    salt CHAR(10) NOT NULL, 		-- etc...
-   status TINYINT NOT NULL 	-- Status of account (unverified, verified, banned, etc)
+   status TINYINT NOT NULL 	  -- Status of account (unverified, verified, banned, etc)
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `events`;
--- Describes events. 
-CREATE TABLE events (
+DROP TABLE IF EXISTS `conventions`;
+-- Describes events.
+CREATE TABLE conventions (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    name VARCHAR(255) NOT NULL,
    location VARCHAR(255)
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `tickets`;
+DROP TABLE IF EXISTS `passes`;
 -- Table that describes the various passes. 
 -- isPurchasable indicates whether a ticket can be purchased (or if it has to be given by an admin)
-CREATE TABLE tickets (
+CREATE TABLE passes (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-   event_id INT UNSIGNED NOT NULL,
+   convention_id INT UNSIGNED NOT NULL,
    name VARCHAR(255) NOT NULL,
    price DECIMAL(10,2) NOT NULL,
    startDate INT,
    endDate INT,
    isPurchasable TINYINT NOT NULL,
-   FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE -- Cascade deletion of passes. Will (should) still fail if registrations have started.
+   FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE CASCADE -- Cascade deletion of passes. Will (should) still fail if registrations have started.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `registrations`;
 CREATE TABLE registrations (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-   event_id INT UNSIGNED NOT NULL,
-   ticket_id INT UNSIGNED NOT NULL,
+   convention_id INT UNSIGNED NOT NULL,
+   pass_id INT UNSIGNED NOT NULL,
    account_id INT UNSIGNED,
    reg_id CHAR(25) NOT NULL, -- [Event ID]_[Sale Prefix]_[ID #] corresponds to 10_5_10 -> 25 characters where length 5 sale prefix is a chosen number.
    status TINYINT NOT NULL, -- Status of registration?
-   FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE RESTRICT, -- Events shouldn't be deleted if in use already.
-   FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE RESTRICT, -- Ticket types shouldn't be deleted if in use already.
+   FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE RESTRICT, -- Events shouldn't be deleted if in use already.
+   FOREIGN KEY (pass_id) REFERENCES passes(id) ON DELETE RESTRICT, -- Ticket types shouldn't be deleted if in use already.
    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE SET NULL -- Even if an account is deleted, leave registrations for stat purposes. (necessary?)
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 

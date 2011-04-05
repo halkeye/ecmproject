@@ -244,16 +244,15 @@ class Model_Registration extends ORM
         }
         else 
         {
-            $conventionWhere = ':startTime BETWEEN c.start_date AND c.end_date';
-            $vars[':startTime'] = time();
+            //$conventionWhere = ':startTime BETWEEN c.start_date AND c.end_date';
+			$conventionWhere = '1=1';
+            //$vars[':startTime'] = time();
         }
 
         $query = DB::query(Database::SELECT, "
                 SELECT 
                     r.*,
                     c.name as convention_name,
-                    c.start_date as convention_start_date,
-                    c.end_date as convention_end_date,
                     c.location as convention_location,
                     p.name as pass_name
                 FROM 

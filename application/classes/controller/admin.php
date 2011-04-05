@@ -38,9 +38,9 @@ class Controller_Admin extends Base_MainTemplate
 	function action_manageConventions($page = NULL)
 	{
 		// Set headers
-		$this->template->title = "Administration: Manage Conventions";
-		$this->template->heading = "Administration: Manage Conventions";
-		$this->template->subheading = "Create, edit and delete conventions";
+		$this->template->title = 		__('Admin: Event List');
+		$this->template->heading = 		__('Admin: Event List');
+		$this->template->subheading = 	__('Create, modify and delete events.');
 				
 		$total_rows = Model_Convention::getTotalConventions();
 								
@@ -55,7 +55,7 @@ class Controller_Admin extends Base_MainTemplate
 		}
 		else if ($total_rows == 0)
 		{
-			$this->addError("You need to setup a convention for starters.");
+			$this->addError("You should probably create an event to start with.");
 		}			
 		
 		// Header entry. (View with no data generates a header)
@@ -64,7 +64,7 @@ class Controller_Admin extends Base_MainTemplate
 		{
             $data['actions']['edit'] = html::anchor(
                 'admin/editConvention/'. $row->id,
-                html::image(url::site('/static/img/edit-copy.png', TRUE), array('title'=>_('admin.edit_convention')))
+                html::image(url::site('/static/img/edit-copy.png', TRUE), array('title'=>__('admin.edit_convention')))
             );
             $data['actions']['delete'] = html::anchor(
                 'admin/deleteConvention/' . $row->id,
@@ -80,7 +80,7 @@ class Controller_Admin extends Base_MainTemplate
 		$this->template->content = new View('admin/list', array(
 				'entity' => 'Convention',
 				'callback' => 'admin/manageConventions', 
-				'createText' => 'Create new Convention',
+				'createText' => __('Create new Event'),
 				'createLink' => 'admin/createConvention', 
 				'rows' => $data['entries'], 
 				'page' => $page,
@@ -437,20 +437,16 @@ class Controller_Admin extends Base_MainTemplate
 	}
 	
 	function action_createConvention() {
-		// Set headers
-		$this->template->title = "Administration: Create a Convention";
-		$this->template->heading = "Administration: Create a Convention";
-		$this->template->subheading = "Create a convention.";
+		$this->template->title = 		__('Admin: Create an Event');
+		$this->template->heading = 		__('Admin: Create an Event');
+		$this->template->subheading = 	__('Create a new event');
 		
 		$conv = ORM::factory('Convention');	
 		$fields = $conv->default_fields;
         $post = $conv->as_array();
 		
 		if ($post = $this->request->post())
-		{			
-			$post['start_date'] = Controller_Admin::parseSplitDate($post, 'start_date');
-			$post['end_date'] = Controller_Admin::parseSplitDate($post, 'end_date');
-		
+		{					
             $conv->values($post);
             try {
                 $conv->save();
@@ -459,16 +455,11 @@ class Controller_Admin extends Base_MainTemplate
             }
             catch (ORM_Validation_Exception $e)
             {
-                $errorMsg = 'Oops. You entered something bad! Please fix it! <br />';				
-                $errors = $e->errors('form_error_messages');
-                foreach ($errors as $error)
-                    $errorMsg = $errorMsg . ' ' . $error . '<br />';					
-            
-                $this->addError($errorMsg);					
+				$this->parseErrorMessages($e);		
             }				
             catch (Exception $e)
             {
-                $this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
+                $this->addError("Oops. Something went wrong ... but it's not your fault. Contact the system maintainer please!");
             }
         }
         $this->template->content = new View('admin/Convention', array(
@@ -476,8 +467,8 @@ class Controller_Admin extends Base_MainTemplate
             'fields' => $fields,
             'callback' => 'createConvention'
         )); 
-    }
-	
+    }	
+
 	/* Step 1 */
 	function action_createRegistration() {
 		// Set headers
@@ -786,12 +777,7 @@ class Controller_Admin extends Base_MainTemplate
 	
 
 	function action_editConvention($id = NULL)
-	{
-		// Set headers
-		$this->template->title = "Administration: Edit a Convention";
-		$this->template->heading = "Administration: Edit a Convention";
-		$this->template->subheading = "Edit a convention.";
-		
+	{		
 		/* If no ID or bad ID defined, kill it with fire. */
 		if ($id == NULL || !is_numeric($id))
 			die('No direct access allowed. Go away D:');
@@ -806,49 +792,33 @@ class Controller_Admin extends Base_MainTemplate
 			$this->request->redirect('admin/manage');
 		}
 		
+		$this->template->title = 		__('Admin: Editing ' . $conv->name); //Escape output?
+		$this->template->heading = 		__('Admin: Editing ' . $conv->name);
+		$this->template->subheading = 	__('Edit the details of this event');
+		
 		if ($post = $this->request->post())
-		{			
-			$post['start_date'] = Controller_Admin::parseSplitDate($post, 'start_date');
-			$post['end_date'] = Controller_Admin::parseSplitDate($post, 'end_date');
-		
-			if ($conv->validate_admin($post, false, true))
-			{			
-				$conv->start_date = strtotime($post['start_date']);
-				$conv->end_date = strtotime($post['end_date']); //Bug - does not work for dates before the base time.
- 			
-				$conv->save();				
-				if ($conv->saved()) {
-					$this->addMessage('Successfully changed the convention (now) named ' . $conv->name);
-					$this->request->redirect('admin/manageConventions');
-				}
-				else
-				{
-					$this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
-				}				
-			}
-					
-			$errorMsg = 'Oops. You entered something bad! Please fix it! <br />';				
-			$errors = $post->errors('form_error_messages');
-			foreach ($errors as $error)
-				$errorMsg = $errorMsg . ' ' . $error . '<br />';					
-		
-			$this->addError($errorMsg);					
-			
-			$this->template->content = new View('admin/Convention', array(
-				'row' => $post,
-				'fields' => $fields,
-				'callback' => "editConvention/$id"
-			)); 
-					
+		{	
+			$conv->values($post);
+            try {
+                $conv->save();
+                $this->addMessage('Created a newly minted convention named ' . $conv->name);
+                $this->request->redirect('admin/manageConventions');
+            }
+            catch (ORM_Validation_Exception $e)
+            {
+				$this->parseErrorMessages($e);		
+            }				
+            catch (Exception $e)
+            {
+                $this->addError("Oops. Something went wrong ... but it's not your fault. Contact the system maintainer please!");
+            }					
 		} 
-		else 
-		{		
-			$this->template->content = new View('admin/Convention', array(
-				'row' => $conv->as_array(),
-				'fields' => $fields,
-				'callback' => "editConvention/$id"
-			));
-		}	
+			
+		$this->template->content = new View('admin/Convention', array(
+			'row' => $conv->as_array(),
+			'fields' => $fields,
+			'callback' => "editConvention/$id"
+		));			
 	}
 	
 	function action_editRegistration($rid = NULL)
@@ -1060,8 +1030,10 @@ class Controller_Admin extends Base_MainTemplate
 		$this->request->redirect('admin/manageAdmin');
 	}
 	
-	function search($entity = NULL)	
+	function action_search($entity = NULL)	
 	{		
+		$this->template->subheading = __('Displaying search results');
+	
 		//Determine search term (POST).
 		$post = $this->request->post();	
 		
@@ -1074,47 +1046,54 @@ class Controller_Admin extends Base_MainTemplate
 		$rows = null;
 		if ($entity == 'Registration' && $search_term != null)
 		{
-			$this->template->heading = "Searching for Registrations";
+			$this->template->heading = __('Searching for Registrations');
 			$rows = ORM::Factory('Registration')
-				->orlike('email', $search_term)
-				->orlike('gname', $search_term)
-				->orlike('sname', $search_term)
-				->orwhere('id',$search_term)
+				->or_where('email', 'LIKE', $search_term)
+				->or_where('gname', 'LIKE', $search_term)
+				->or_where('sname', 'LIKE', $search_term)
+				->or_where('id', '=', $search_term)
 				->find_all();
 		}
 		else if ($entity == 'Account' && $search_term != null)
 		{
-			$this->template->heading = "Searching for Accounts";
+			$this->template->heading = __('Searching for Accounts');
 			$rows = ORM::Factory('Account')
-				->orlike('email', $search_term)
-				->orwhere('id',$search_term)
+				->or_where('email', 'LIKE', $search_term)
+				->or_where('id', '=', $search_term)
 				->find_all();
 		}
 		else if ($entity == 'Convention' && $search_term != null)
 		{
-			$this->template->heading = "Searching for Conventions";
+			$this->template->heading = __('Searching for Events');
 			$rows = ORM::Factory('Convention')
-				->orlike('name', $search_term)
-				->orwhere('id',$search_term)
+				->or_where('name', 'LIKE', $search_term)
+				->or_where('id', '=', $search_term)
 				->find_all();
 		}
 		else if ($entity == 'Pass' && $search_term != null)
 		{
-			$this->template->heading = "Searching for Passes";
+			$this->template->heading = __('Searching for Tickets');
 			$rows = ORM::Factory('Pass')
-				->orlike('name', $search_term)
-				->orwhere('id',$search_term)
+				->or_where('name', 'LIKE', $search_term)
+				->or_where('id', '=', $search_term)
 				->find_all();
 		}
 	
 		// Header entry. (View with no data generates a header)					
 		if ($rows != null)
 		{			
-			$data['entries'][0] = new View("admin/ListItems/$entity" . 'Entry');
+			$data['entries'][0] = new View("admin/ListItems/$entity" . 'Entry');			
 			foreach ($rows as $row)
 			{
-				$data['actions']['edit'] = html::anchor("admin/edit$entity/". $row->id, html::image(url::site('/static/img/edit-copy.png'), __('admin.edit_account')));
-				$data['actions']['delete'] = html::anchor("admin/delete$entity/" . $row->id, html::image(url::site('/static/img/edit-delete.png'), __('admin.delete_account')));			
+				$data['actions']['edit'] = html::anchor(
+					"admin/edit$entity/". $row->id,
+					html::image(url::site('/static/img/edit-copy.png', TRUE), array('title'=>__("Edit $entity")))
+				);
+				$data['actions']['delete'] = html::anchor(
+					"admin/delete$entity/" . $row->id,
+					html::image(url::site('/static/img/edit-delete.png',TRUE), array('title'=>__("Delete $entity")))
+				);			
+			
 				$data['entries'][$row->id] = new View("admin/ListItems/$entity" . 'Entry', array('row' => $row, 'actions' => $data['actions']));				
 			}			
 		} else if ($search_term == null) {
@@ -1453,6 +1432,17 @@ class Controller_Admin extends Base_MainTemplate
 	    exit;		
 	}
 
+	private function parseErrorMessages($e) 
+	{
+		$errorMsg = 'Oops. You entered something bad! Please fix it! <br />';				
+		$errors = $e->errors('form_error_messages');
+		foreach ($errors as $error)
+			$errorMsg = $errorMsg . ' ' . $error . '<br />';					
+	
+		$this->addError($errorMsg);		
+	}
+	
+	
     public function action_testClock()
     {
         header("Content-type: text/plain");

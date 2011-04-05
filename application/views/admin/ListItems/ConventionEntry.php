@@ -3,8 +3,8 @@
 if(isset($row)) { ?>
 
 <tr>
-	<td><?php print $row->name; ?></td>
-	<td><?php print $row->location; ?></td>	
+	<td><?php print htmlspecialchars($row->name, ENT_COMPAT, "UTF-8") ?></td>
+	<td><?php print htmlspecialchars($row->location, ENT_COMPAT, "UTF-8") ?></td>	
 	<?php
 		foreach ($actions as $action): 		
 			print '<td>' . $action; '</td>';

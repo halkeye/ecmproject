@@ -18,7 +18,7 @@
 	 setting the start and end dates are very important as pass purchases times may depend on them.</p>		
 	<fieldset>		
 		<?php
-			foreach (array('name', 'start_date', 'end_date', 'location') as $field)
+			foreach (array('name', 'location') as $field)
 			{
 				echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $row[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
 			}		
