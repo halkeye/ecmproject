@@ -38,9 +38,9 @@ class Controller_Admin extends Base_MainTemplate
 	function action_manageConventions($page = NULL)
 	{
 		// Set headers
-		$this->template->title = "Administration: Manage Conventions";
-		$this->template->heading = "Administration: Manage Conventions";
-		$this->template->subheading = "Create, edit and delete conventions";
+		$this->template->title = 		__('Admin: Event List');
+		$this->template->heading = 		__('Admin: Event List');
+		$this->template->subheading = 	__('Create, modify and delete events.');
 				
 		$total_rows = Model_Convention::getTotalConventions();
 								
@@ -55,7 +55,7 @@ class Controller_Admin extends Base_MainTemplate
 		}
 		else if ($total_rows == 0)
 		{
-			$this->addError("You need to setup a convention for starters.");
+			$this->addError("You should probably create an event to start with.");
 		}			
 		
 		// Header entry. (View with no data generates a header)
@@ -80,7 +80,7 @@ class Controller_Admin extends Base_MainTemplate
 		$this->template->content = new View('admin/list', array(
 				'entity' => 'Convention',
 				'callback' => 'admin/manageConventions', 
-				'createText' => 'Create new Convention',
+				'createText' => __('Create new Event'),
 				'createLink' => 'admin/createConvention', 
 				'rows' => $data['entries'], 
 				'page' => $page,
