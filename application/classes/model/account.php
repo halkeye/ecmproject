@@ -17,8 +17,6 @@ class Model_Account extends ORM
 
     // Account specific Stuff
     public $saltLength = 10;
-    //public $groups = array();
-    //public $permissions = array();
 
     // Current relationships
     public $_has_many = array(
@@ -55,7 +53,12 @@ class Model_Account extends ORM
     public function filters()
     {
         $filters = parent::filters();
-        $filters['*'] = array('trim');
+        $filters[TRUE] = array(
+            array('trim')
+        );
+        $filters['password'] = array(
+            array(array($this, '_set_password'))
+        );
         return $filters;
     }
 
@@ -90,27 +93,38 @@ class Model_Account extends ORM
         }
     }
 	
+    /*
     public function __set($key, $value)
 	{
 		if ($key === 'password')
 		{
+            if (empty($this->salt))
+            {
+                $this->salt = substr(md5(uniqid(rand(), true)), 0, $this->saltLength);
+                Kohana::$log->add(Log::DEBUG, 'Generated Salt: ' . $this->salt);
+                die();
+            }
 			// Use Auth to hash the password
-            //
             $value = $this->_encryptValue($value);
 		}
 
 		parent::__set($key, $value);
 	}
+     */
+    public function _set_password($value)
+    {
+        if (empty($this->salt))
+        {
+            $this->salt = substr(md5(uniqid(rand(), true)), 0, $this->saltLength);
+            Kohana::$log->add(Log::DEBUG, 'Generated Salt: ' . $this->salt);
+        }
+        // Use Auth to hash the password
+        return $this->_encryptValue($value);
+    }
 
     function _encryptValue($value)
     {
         if (empty($value)) return;
-
-        // Generate a random salt if empty
-        if (empty($this->salt))
-        {
-            $this->salt = substr(md5(uniqid(rand(), true)), 0, $this->saltLength);
-        }
         return sha1($this->salt . $value);
     }
 	
@@ -207,33 +221,15 @@ class Model_Account extends ORM
         {
             throw new Verification_Exceeds_Exception();
         }
+        return ORM::Factory('verificationcode')->generate_code($this->id,$this->salt,$type,$value);
 
-        while (true)
-        {
-            try 
-            {
-                $code = substr(md5(uniqid(rand(), true)), 0, 10);
-                $vcode = ORM::Factory('verificationcode');
-                $vcode->original_code = $code;
-                $vcode->account_id = $this->id;
-                $vcode->code = sha1($this->salt. $code);
-                $vcode->type = $type;
-                $vcode->value = $value;
-                $vcode->save();
-                return $vcode;
-            }
-            catch (Kohana_Database_Exception $e) {
-                var_dump($e);
-                die($e);
-            }
-        }
     }
 
     public function validateAccount()
     {
         $this->status = Model_Account::ACCOUNT_STATUS_VERIFIED;
         /* Delete any outstanding validation codes */
-        $vcode = ORM::Factory('verificationcode')->where('account_id', $this->id)->delete_all();
+        ORM::Factory('verificationcode')->delete_all_for_account($this->id);
     }
 	
 	public function statusToString() {

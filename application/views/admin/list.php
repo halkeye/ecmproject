@@ -6,7 +6,7 @@
 	
 		<p class='right'>
 			<label for="convention_id">Viewing Convention: </label>		
-			<?php echo form::dropdown('convention_id', $crows, $convention_id); ?>	
+			<?php echo form::select('convention_id', $crows, $convention_id); ?>	
 			<button type='submit'>Go</button>			
 		</p>
 		
@@ -42,7 +42,6 @@
 				'uri_segment'    => "$convention_id", // pass a string as uri_segment to trigger former 'label' functionality
 				'total_items'    => $total_rows, // use db count query here of course
 				'items_per_page' => Controller_Admin::ROWS_PER_PAGE, // it may be handy to set defaults for stuff like this in config/pagination.php
-				'style'          => 'digg', // pick one from: classic (default), digg, extended, punbb, or add your own!				
 			));			
 		}
 		else
@@ -52,11 +51,10 @@
 			//'uri_segment'    => "$convention_id", // pass a string as uri_segment to trigger former 'label' functionality
 			'total_items'    => $total_rows, // use db count query here of course
 			'items_per_page' => Controller_Admin::ROWS_PER_PAGE, // it may be handy to set defaults for stuff like this in config/pagination.php
-			'style'          => 'digg', // pick one from: classic (default), digg, extended, punbb, or add your own!
 		));	
 		}
 			
-		echo $pagination->render('digg');		
+		echo $pagination->render();		
 		?>
 	</p>
 </div>
