@@ -64,7 +64,7 @@ class Controller_Admin extends Base_MainTemplate
 		{
             $data['actions']['edit'] = html::anchor(
                 'admin/editConvention/'. $row->id,
-                html::image(url::site('/static/img/edit-copy.png', TRUE), array('title'=>_('admin.edit_convention')))
+                html::image(url::site('/static/img/edit-copy.png', TRUE), array('title'=>__('admin.edit_convention')))
             );
             $data['actions']['delete'] = html::anchor(
                 'admin/deleteConvention/' . $row->id,
@@ -437,20 +437,16 @@ class Controller_Admin extends Base_MainTemplate
 	}
 	
 	function action_createConvention() {
-		// Set headers
-		$this->template->title = "Administration: Create a Convention";
-		$this->template->heading = "Administration: Create a Convention";
-		$this->template->subheading = "Create a convention.";
+		$this->template->title = 		__('Admin: Create an Event');
+		$this->template->heading = 		__('Admin: Create an Event');
+		$this->template->subheading = 	__('Create a new event');
 		
 		$conv = ORM::factory('Convention');	
 		$fields = $conv->default_fields;
         $post = $conv->as_array();
 		
 		if ($post = $this->request->post())
-		{			
-			$post['start_date'] = Controller_Admin::parseSplitDate($post, 'start_date');
-			$post['end_date'] = Controller_Admin::parseSplitDate($post, 'end_date');
-		
+		{					
             $conv->values($post);
             try {
                 $conv->save();
@@ -459,16 +455,11 @@ class Controller_Admin extends Base_MainTemplate
             }
             catch (ORM_Validation_Exception $e)
             {
-                $errorMsg = 'Oops. You entered something bad! Please fix it! <br />';				
-                $errors = $e->errors('form_error_messages');
-                foreach ($errors as $error)
-                    $errorMsg = $errorMsg . ' ' . $error . '<br />';					
-            
-                $this->addError($errorMsg);					
+				$this->parseErrorMessages($e);		
             }				
             catch (Exception $e)
             {
-                $this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
+                $this->addError("Oops. Something went wrong ... but it's not your fault. Contact the system maintainer please!");
             }
         }
         $this->template->content = new View('admin/Convention', array(
@@ -476,8 +467,8 @@ class Controller_Admin extends Base_MainTemplate
             'fields' => $fields,
             'callback' => 'createConvention'
         )); 
-    }
-	
+    }	
+
 	/* Step 1 */
 	function action_createRegistration() {
 		// Set headers
@@ -786,12 +777,7 @@ class Controller_Admin extends Base_MainTemplate
 	
 
 	function action_editConvention($id = NULL)
-	{
-		// Set headers
-		$this->template->title = "Administration: Edit a Convention";
-		$this->template->heading = "Administration: Edit a Convention";
-		$this->template->subheading = "Edit a convention.";
-		
+	{		
 		/* If no ID or bad ID defined, kill it with fire. */
 		if ($id == NULL || !is_numeric($id))
 			die('No direct access allowed. Go away D:');
@@ -806,49 +792,33 @@ class Controller_Admin extends Base_MainTemplate
 			$this->request->redirect('admin/manage');
 		}
 		
+		$this->template->title = 		__('Admin: Editing ' . $conv->name); //Escape output?
+		$this->template->heading = 		__('Admin: Editing ' . $conv->name);
+		$this->template->subheading = 	__('Edit the details of this event');
+		
 		if ($post = $this->request->post())
-		{			
-			$post['start_date'] = Controller_Admin::parseSplitDate($post, 'start_date');
-			$post['end_date'] = Controller_Admin::parseSplitDate($post, 'end_date');
-		
-			if ($conv->validate_admin($post, false, true))
-			{			
-				$conv->start_date = strtotime($post['start_date']);
-				$conv->end_date = strtotime($post['end_date']); //Bug - does not work for dates before the base time.
- 			
-				$conv->save();				
-				if ($conv->saved()) {
-					$this->addMessage('Successfully changed the convention (now) named ' . $conv->name);
-					$this->request->redirect('admin/manageConventions');
-				}
-				else
-				{
-					$this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
-				}				
-			}
-					
-			$errorMsg = 'Oops. You entered something bad! Please fix it! <br />';				
-			$errors = $post->errors('form_error_messages');
-			foreach ($errors as $error)
-				$errorMsg = $errorMsg . ' ' . $error . '<br />';					
-		
-			$this->addError($errorMsg);					
-			
-			$this->template->content = new View('admin/Convention', array(
-				'row' => $post,
-				'fields' => $fields,
-				'callback' => "editConvention/$id"
-			)); 
-					
+		{	
+			$conv->values($post);
+            try {
+                $conv->save();
+                $this->addMessage('Created a newly minted convention named ' . $conv->name);
+                $this->request->redirect('admin/manageConventions');
+            }
+            catch (ORM_Validation_Exception $e)
+            {
+				$this->parseErrorMessages($e);		
+            }				
+            catch (Exception $e)
+            {
+                $this->addError("Oops. Something went wrong ... but it's not your fault. Contact the system maintainer please!");
+            }					
 		} 
-		else 
-		{		
-			$this->template->content = new View('admin/Convention', array(
-				'row' => $conv->as_array(),
-				'fields' => $fields,
-				'callback' => "editConvention/$id"
-			));
-		}	
+			
+		$this->template->content = new View('admin/Convention', array(
+			'row' => $conv->as_array(),
+			'fields' => $fields,
+			'callback' => "editConvention/$id"
+		));			
 	}
 	
 	function action_editRegistration($rid = NULL)
@@ -985,7 +955,7 @@ class Controller_Admin extends Base_MainTemplate
 		}
 	}
 	
-	function deleteConvention($id = NULL)
+	function action_deleteConvention($id = NULL)
 	{
 		Controller_Admin::__delete($id, 'Convention', 'deleteConvention', 'manageConventions');
 	}
@@ -1453,6 +1423,17 @@ class Controller_Admin extends Base_MainTemplate
 	    exit;		
 	}
 
+	private function parseErrorMessages($e) 
+	{
+		$errorMsg = 'Oops. You entered something bad! Please fix it! <br />';				
+		$errors = $e->errors('form_error_messages');
+		foreach ($errors as $error)
+			$errorMsg = $errorMsg . ' ' . $error . '<br />';					
+	
+		$this->addError($errorMsg);		
+	}
+	
+	
     public function action_testClock()
     {
         header("Content-type: text/plain");
