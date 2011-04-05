@@ -1032,6 +1032,8 @@ class Controller_Admin extends Base_MainTemplate
 	
 	function action_search($entity = NULL)	
 	{		
+		$this->template->subheading = __('Displaying search results');
+	
 		//Determine search term (POST).
 		$post = $this->request->post();	
 		
@@ -1044,7 +1046,7 @@ class Controller_Admin extends Base_MainTemplate
 		$rows = null;
 		if ($entity == 'Registration' && $search_term != null)
 		{
-			$this->template->heading = "Searching for Registrations";
+			$this->template->heading = __('Searching for Registrations');
 			$rows = ORM::Factory('Registration')
 				->or_where('email', 'LIKE', $search_term)
 				->or_where('gname', 'LIKE', $search_term)
@@ -1054,7 +1056,7 @@ class Controller_Admin extends Base_MainTemplate
 		}
 		else if ($entity == 'Account' && $search_term != null)
 		{
-			$this->template->heading = "Searching for Accounts";
+			$this->template->heading = __('Searching for Accounts');
 			$rows = ORM::Factory('Account')
 				->or_where('email', 'LIKE', $search_term)
 				->or_where('id', '=', $search_term)
@@ -1062,7 +1064,7 @@ class Controller_Admin extends Base_MainTemplate
 		}
 		else if ($entity == 'Convention' && $search_term != null)
 		{
-			$this->template->heading = "Searching for Conventions";
+			$this->template->heading = __('Searching for Events');
 			$rows = ORM::Factory('Convention')
 				->or_where('name', 'LIKE', $search_term)
 				->or_where('id', '=', $search_term)
@@ -1070,7 +1072,7 @@ class Controller_Admin extends Base_MainTemplate
 		}
 		else if ($entity == 'Pass' && $search_term != null)
 		{
-			$this->template->heading = "Searching for Passes";
+			$this->template->heading = __('Searching for Tickets');
 			$rows = ORM::Factory('Pass')
 				->or_where('name', 'LIKE', $search_term)
 				->or_where('id', '=', $search_term)
