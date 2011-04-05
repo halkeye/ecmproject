@@ -1030,7 +1030,7 @@ class Controller_Admin extends Base_MainTemplate
 		$this->request->redirect('admin/manageAdmin');
 	}
 	
-	function search($entity = NULL)	
+	function action_search($entity = NULL)	
 	{		
 		//Determine search term (POST).
 		$post = $this->request->post();	
@@ -1046,45 +1046,52 @@ class Controller_Admin extends Base_MainTemplate
 		{
 			$this->template->heading = "Searching for Registrations";
 			$rows = ORM::Factory('Registration')
-				->orlike('email', $search_term)
-				->orlike('gname', $search_term)
-				->orlike('sname', $search_term)
-				->orwhere('id',$search_term)
+				->or_where('email', 'LIKE', $search_term)
+				->or_where('gname', 'LIKE', $search_term)
+				->or_where('sname', 'LIKE', $search_term)
+				->or_where('id', '=', $search_term)
 				->find_all();
 		}
 		else if ($entity == 'Account' && $search_term != null)
 		{
 			$this->template->heading = "Searching for Accounts";
 			$rows = ORM::Factory('Account')
-				->orlike('email', $search_term)
-				->orwhere('id',$search_term)
+				->or_where('email', 'LIKE', $search_term)
+				->or_where('id', '=', $search_term)
 				->find_all();
 		}
 		else if ($entity == 'Convention' && $search_term != null)
 		{
 			$this->template->heading = "Searching for Conventions";
 			$rows = ORM::Factory('Convention')
-				->orlike('name', $search_term)
-				->orwhere('id',$search_term)
+				->or_where('name', 'LIKE', $search_term)
+				->or_where('id', '=', $search_term)
 				->find_all();
 		}
 		else if ($entity == 'Pass' && $search_term != null)
 		{
 			$this->template->heading = "Searching for Passes";
 			$rows = ORM::Factory('Pass')
-				->orlike('name', $search_term)
-				->orwhere('id',$search_term)
+				->or_where('name', 'LIKE', $search_term)
+				->or_where('id', '=', $search_term)
 				->find_all();
 		}
 	
 		// Header entry. (View with no data generates a header)					
 		if ($rows != null)
 		{			
-			$data['entries'][0] = new View("admin/ListItems/$entity" . 'Entry');
+			$data['entries'][0] = new View("admin/ListItems/$entity" . 'Entry');			
 			foreach ($rows as $row)
 			{
-				$data['actions']['edit'] = html::anchor("admin/edit$entity/". $row->id, html::image(url::site('/static/img/edit-copy.png'), __('admin.edit_account')));
-				$data['actions']['delete'] = html::anchor("admin/delete$entity/" . $row->id, html::image(url::site('/static/img/edit-delete.png'), __('admin.delete_account')));			
+				$data['actions']['edit'] = html::anchor(
+					"admin/edit$entity/". $row->id,
+					html::image(url::site('/static/img/edit-copy.png', TRUE), array('title'=>__("Edit $entity")))
+				);
+				$data['actions']['delete'] = html::anchor(
+					"admin/delete$entity/" . $row->id,
+					html::image(url::site('/static/img/edit-delete.png',TRUE), array('title'=>__("Delete $entity")))
+				);			
+			
 				$data['entries'][$row->id] = new View("admin/ListItems/$entity" . 'Entry', array('row' => $row, 'actions' => $data['actions']));				
 			}			
 		} else if ($search_term == null) {
