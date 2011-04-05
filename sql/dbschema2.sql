@@ -20,6 +20,8 @@ CREATE TABLE accounts (
    password CHAR(40) NOT NULL, -- You save one WHOLE byte by using CHAR instead of VARCHAR! lol.
    salt CHAR(10) NOT NULL, 		-- etc...
    status TINYINT NOT NULL 	  -- Status of account (unverified, verified, banned, etc)
+   created INT NOT NULL, -- Creation date
+   login INT -- Last login.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `conventions`;
