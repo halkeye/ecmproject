@@ -985,26 +985,26 @@ class Controller_Admin extends Base_MainTemplate
 		}
 	}
 	
-	function deleteConvention($id = NULL)
+	function action_deleteConvention($id = NULL)
 	{
 		Controller_Admin::__delete($id, 'Convention', 'deleteConvention', 'manageConventions');
 	}
 	
-	function deleteAccount($id = NULL) {
+	function action_deleteAccount($id = NULL) {
 		Controller_Admin::__delete($id, 'Account', 'deleteAccount', 'manageAccounts');
 	}
 	
-	function deletePass($id = NULL)
+	function action_deletePass($id = NULL)
 	{
 		Controller_Admin::__delete($id, 'Pass', 'deletePass', 'managePasses');		
 	}
 	
-	function deleteRegistration($id = NULL)
+	function action_deleteRegistration($id = NULL)
 	{
 		Controller_Admin::__delete($id, 'Registration', 'deleteRegistration', 'manageRegistrations');
 	}
 	
-	function deletePayment($rid = NULL, $id = NULL)
+	function action_deletePayment($rid = NULL, $id = NULL)
 	{	
 		//TODO: Update status as necessary!
 		Controller_Admin::__delete($id, 'Payment', "deletePayment/$rid", "managePayments/$rid", true);				
