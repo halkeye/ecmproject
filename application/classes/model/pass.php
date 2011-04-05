@@ -21,16 +21,45 @@ class Model_Pass extends ORM
             'foreign_key' => 'convention_id',
         )
     );
-		
-	public function __construct($id = NULL)
+
+	public function rules()
 	{
-        parent::__construct($id);
-    }
-	
-	public function __set($key, $value)
-	{
-		parent::__set($key, $value);
-	}
+		return array(
+			'name'		=> array( 
+				array('not_empty'), 
+			),
+			'isPurchasable' => array( 
+                array('range', array(':value',0,1))
+			),
+			'convention_id' => array( 
+                /* FIXME - should be a valid convention too */
+                /* Convention_id's should be numeric. */
+				array('not_empty'), 
+                array('is_numeric'),
+			),
+			'price' => array( 
+				array('not_empty'), 
+                array('numeric'),
+			),
+			'startDate' => array( 
+				array('not_empty'), 
+                array(array($this, '__validateISODate')),
+			),
+			'endDate' => array( 
+				array('not_empty'), 
+                array(array($this, '__validateISODate')),
+			),
+		);	
+	}	
+    
+    public function filters()
+    {
+        $filters = parent::filters();
+        $filters[TRUE] = array(
+            array('trim')
+        );
+        return $filters;
+    }   
 
 	public function save(Validation $validation = null)
 	{
@@ -44,54 +73,22 @@ class Model_Pass extends ORM
 		if (!isset($this->isPurchasable) || empty($this->isPurchasable))
 			$this->isPurchasable = 0;
 			
-		parent::save();	
+		parent::save($validation);	
 	}
 	
 	/* Only admin will modify passes anyways.*/
-	public function validate_admin(array & $array, $save = FALSE) 
-	{
-		$array = Validation::factory($array);
-        $array->pre_filter('trim');
-
-		$array->add_rules('isPurchasable', 'is_numeric');
-		$array->add_rules('convention_id', 'required');
-		$array->add_rules('convention_id', 'is_numeric'); //Convention_id's should be numeric.
-		$array->add_rules('name', 'required');
-		$array->add_rules('price', 'required'); //Also set
-		
-		// Some extra work is needed for this.		
-		$array->add_rules('startDate', 'required');
-		$array->add_rules('endDate', 'required');
-		$array->add_callbacks('startDate', array($this, '__validateISODate')); //Non-set start date will be set to today
-		$array->add_callbacks('endDate', array($this, '__validateISODate')); //Non-set end date will be set to convention end.
-
-		// Non-selected convention_id input is less than 1.
-		if (isset($array['convention_id']) && is_numeric($array['convention_id']) && $array['convention_id'] < 1) {
-			$array->add_error('convention_id', 'convention_id_invalid');
-		}	
-		
-		if (!isset($array['isPurchasable']))
-			$array['isPurchasable'] = 0;
-		
-        $array->add_rules('minAge', 'required', 'numeric');
-        $array->add_rules('maxAge', 'required', 'numeric');
-
-		return parent::validate($array, $save);
-	}
-	
     public function __toString()
     {
         return $this->name . ' - ' . sprintf('$%01.2F', $this->price);
     }
 	
-	public function __validateISODate(Validation $array, $field)
+	public function __validateISODate($value)
 	{
 		// previous to PHP 5.1.0 you would compare with -1, instead of false
-		if (($time = strtotime($array->$field)) === false) {
-			$array->add_error($field, 'invalid_date');
+		if (($time = strtotime($value)) === false) {
+            return 0;
 		}
-		else
-			$this->startDate = $array->$field;
+        return 1;
 	}
 	
 	public static function getTotalPasses($cid)
@@ -100,10 +97,9 @@ class Model_Pass extends ORM
 	}
 	
 	//Get all passes related to the convention regardless of status.
-	public function getAllPasses($convention_id)
+	public function getAllPasses($cid)
 	{
-		$cid = htmlspecialchars($convention_id);
-		return ORM::Factory('Pass')->where("convention_id=$convention_id")->find_all();
+        return ORM::Factory('Pass')->where('convention_id','=',$cid)->find_all();
 	}
 }
 

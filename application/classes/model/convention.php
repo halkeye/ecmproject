@@ -37,7 +37,7 @@ class Model_Convention extends ORM
     public function filters()
     {
         $filters = parent::filters();
-        $filters['*'] = array('trim');
+        $filters[TRUE] = array('trim');
         return $filters;
     }   
     public static function getTotalConventions()
