@@ -37,8 +37,8 @@ foreach ($registrations as $reg)
     {
         echo '<td class="expiredReg" colspan="2">The registration pass you\'ve selected has expired. Please click edit to choose a different pass.</td>';
     }
-    echo '<td>'.HTML::anchor('/convention/editReg/'.$reg->id,   HTML::image(url::site('/static/img/edit-copy.png'), array('tite'=>'Edit this account'))) . '</td>';
-    echo '<td>'.HTML::anchor('/convention/deleteReg/'.$reg->id, HTML::image(url::site('/static/img/edit-delete.png'), array('tite'=>'Delete this account'))) . '</td>';
+    echo '<td>'.HTML::anchor('/convention/editReg/'.$reg->id,   HTML::image(url::site('/static/img/edit-copy.png',TRUE), array('tite'=>'Edit this account'))) . '</td>';
+    echo '<td>'.HTML::anchor('/convention/deleteReg/'.$reg->id, HTML::image(url::site('/static/img/edit-delete.png',TRUE), array('tite'=>'Delete this account'))) . '</td>';
     echo '<td>'.$reg->statusToString().'</td>';
     echo '</tr>';
 }
