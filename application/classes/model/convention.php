@@ -22,6 +22,7 @@ class Model_Convention extends ORM
 	
 	public function rules()
 	{
+		
 		return array(
 			'name'		=> array( 
 				array('not_empty'), 
@@ -35,10 +36,9 @@ class Model_Convention extends ORM
 
     public function filters()
     {
-		return array(
-			'name'		=>  array( (array('trim')) ),
-			'location'	=>	array( (array('trim')) )
-		);	
+		$filters = parent::filters();
+		$filters[TRUE] = array ( array('trim') );
+		return $filters;
     }   
     public static function getTotalConventions()
     {
