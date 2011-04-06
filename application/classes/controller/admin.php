@@ -28,9 +28,9 @@ class Controller_Admin extends Base_MainTemplate
 
     function action_index()
     {
-        $this->template->title = __('admin.admin_area');
-        $this->template->heading = __('admin.admin_area');
-        $this->template->subheading = __('admin.admin_area_desc');
+        $this->template->title = 		__('Administration');
+        $this->template->heading = 		__('Administration');
+        $this->template->subheading = 	__('Manage the various parts of this system.');
                     
         $this->template->content = new View('admin/main');
     }
@@ -43,38 +43,11 @@ class Controller_Admin extends Base_MainTemplate
         $this->template->subheading =   __('Create, modify and delete events.');
                 
         $total_rows = Model_Convention::getTotalConventions();
-                                
-        // Calculate the offset.
         $start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );  
         $rows = ORM::factory('Convention')->limit(Controller_Admin::ROWS_PER_PAGE)->offset($start)->find_all();
-            
-        // Extra validation.
-        if (count($rows) == 0 && $total_rows > 0)
-        {
-            $this->addError('Invalid page number.');
-        }
-        else if ($total_rows == 0)
-        {
-            $this->addError("You should probably create an event to start with.");
-        }           
-        
-        // Header entry. (View with no data generates a header)
-        $data['entries'][0] = new View('admin/ListItems/ConventionEntry');
-        foreach ($rows as $row)
-        {
-            $data['actions']['edit'] = html::anchor(
-                'admin/editConvention/'. $row->id,
-                html::image(url::site('/static/img/edit-copy.png', TRUE), array('title'=>__('admin.edit_convention')))
-            );
-            $data['actions']['delete'] = html::anchor(
-                'admin/deleteConvention/' . $row->id,
-                html::image(url::site('/static/img/edit-delete.png',TRUE), array('title'=>__('admin.delete_convention')))
-            );
-            $data['entries'][$row->id] = new View(
-                'admin/ListItems/ConventionEntry', 
-                array('row' => $row, 'actions' => $data['actions'])
-            );
-        }   
+               
+        $this->validateRows($rows, $total_rows, 'event');      
+        $data = $this->generateViewRows($rows, 'Convention');       
         
         // Set callback path for form submit (change convention, jump to page)
         $this->template->content = new View('admin/list', array(
@@ -137,19 +110,15 @@ class Controller_Admin extends Base_MainTemplate
     function action_managePasses($convention_id = NULL, $page = NULL) 
     {
         // Set headers
-        $this->template->title = "Administration: Manage Passes";
-        $this->template->heading = "Administration: Manage Passes";
-        $this->template->subheading = "Create, edit and delete passes related to any convention";
+        $this->template->title = 		__('Admin: Manage Tickets');
+        $this->template->heading = 		__('Admin: Manage Tickets');
+        $this->template->subheading = 	__('Create, modify and delete tickets associated with events.');
             
-                            
-        // Get all conventions, determine and validate convention_id, and get total number of passes for the particular convention_id.
         $crows = ORM::factory('Convention')->find_all();    
         $convention_id = Controller_Admin::getConventionId($convention_id, $crows);                     
-        $crows = $crows->as_array('id', 'name');                    
+        $crows = $crows->as_array('id', 'name');    
+		
         $total_rows = Model_Pass::getTotalPasses($convention_id);
-                            
-                            
-        // Calculate the offset.
         $start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );  
         $rows = ORM::factory('Pass')
             ->where('convention_id','=',$convention_id)
@@ -157,25 +126,9 @@ class Controller_Admin extends Base_MainTemplate
             ->offset( $start )
             ->find_all();
             
-        // Extra validation.
-        if (count($rows) == 0 && $total_rows > 0)
-        {
-            $this->addError('Invalid page number.');
-        }
-        else if ($total_rows == 0)
-        {
-            $this->addError("This convention has no passes setup!");
-        }           
-        
-        // Header entry. (View with no data generates a header)
-        $data['entries'][0] = new View('admin/ListItems/PassEntry');
-        foreach ($rows as $row)
-        {
-            $data['actions']['edit'] = html::anchor('admin/editPass/'. $row->id, html::image(url::site('/static/img/edit-copy.png',TRUE), array('title'=>__('admin.edit_account'))));
-            $data['actions']['delete'] = html::anchor('admin/deletePass/' . $row->id, html::image(url::site('/static/img/edit-delete.png',TRUE), array('title'=>__('admin.delete_account'))));          
-            $data['entries'][$row->id] = new View('admin/ListItems/PassEntry', array('row' => $row, 'actions' => $data['actions']));
-        }   
-        
+        $this->validateRows($rows, $total_rows, 'ticket');             
+        $data = $this->generateViewRows($rows, 'Pass');   
+                
         // Set callback path for form submit (change convention, jump to page)
         $this->template->content = new View('admin/list', array(
                 'entity' => 'Pass',
@@ -385,13 +338,13 @@ class Controller_Admin extends Base_MainTemplate
     function action_createPass()
     {
         // Set headers
-        $this->template->title = "Administration: Create a Pass";
-        $this->template->heading = "Administration: Create a Pass";
-        $this->template->subheading = "Create a pass for a convention.";
+        $this->template->title = 		__('Admin: Create a Ticket');
+        $this->template->heading = 		__('Admin: Create a Ticket');
+        $this->template->subheading = 	__('Create a ticket associated to an event');
         
-        $pass = ORM::factory('Pass');
-        $crows = ORM::factory('Convention')->find_all()->as_array('id', 'name');        
+        $pass = ORM::factory('Pass');             
         $fields = $pass->default_fields;
+		$crows = ORM::factory('Convention')->find_all()->as_array('id', 'name');   
         $fields['convention_id']['values'] = $crows;
         
         if ($post = $this->request->post())
@@ -399,10 +352,10 @@ class Controller_Admin extends Base_MainTemplate
             $post['startDate'] = Controller_Admin::parseSplitDate($post, 'startDate');
             $post['endDate'] = Controller_Admin::parseSplitDate($post, 'endDate');
             $pass->values($post);
-
+			
             try {
                 $pass->save();
-                $this->addMessage('Created a newly minted pass called: ' . $pass->name);
+                $this->addMessage( __('Created a new ticket, ') . $pass->name);
                 $this->request->redirect('admin/managePasses');
             }
             catch (ORM_Validation_Exception $e)
@@ -441,7 +394,7 @@ class Controller_Admin extends Base_MainTemplate
             $conv->values($post);
             try {
                 $conv->save();
-                $this->addMessage('Created a newly minted convention named ' . $conv->name);
+                $this->addMessage(__('Created a new event, ') . $conv->name);
                 $this->request->redirect('admin/manageConventions');
             }
             catch (ORM_Validation_Exception $e)
@@ -698,10 +651,7 @@ class Controller_Admin extends Base_MainTemplate
     
     function action_editPass($id = NULL)
     {
-        // Set headers
-        $this->template->title = "Administration: Edit a Pass";
-        $this->template->heading = " Administration: Edit a Pass";
-        $this->template->subheading = "Edit a pass associated with a convention. ";
+        // Set headers       
         
         /* If no ID or bad ID defined, kill it with fire. */
         if ($id == NULL || !is_numeric($id))
@@ -718,6 +668,10 @@ class Controller_Admin extends Base_MainTemplate
             $errorMsg = 'That pass does not exist! Maybe someone deleted it while you were busy?<br />';                
             $this->request->redirect('admin/managePasses');
         }
+		
+		$this->template->title = 		__('Admin: Editing ticket "' . $pass->name . '"');
+        $this->template->heading = 		__('Admin: Editing ticket "' . $pass->name . '"');
+        $this->template->subheading = 	__('Edit the details of this ticket.');
         
         if ($post = $this->request->post())
         {
@@ -726,7 +680,7 @@ class Controller_Admin extends Base_MainTemplate
             $pass->values($post);
             try {
                 $pass->save();                              
-                $this->addMessage('Edited the pass (now) named: ' . $pass->name);
+                $this->addMessage('Successfully edited ' . $pass->name);
                 $this->request->redirect('admin/managePasses');
             }
             catch (ORM_Validation_Exception $e)
@@ -1405,7 +1359,46 @@ class Controller_Admin extends Base_MainTemplate
         print $csv_content;
         exit;       
     }
+	
+	/*
+	* Generic row generation method which adds two actions (edit and delete) per row.
+	* 
+	* $rows - The database results to be used in generating rows.
+	* $entity - The entity matching those rows.
+	*/
+	private function generateViewRows($rows, $entity) {
+		//'admin/ListItems/ConventionEntry'
+		$data['entries'][0] = new View("admin/ListItems/$entity" . 'Entry');
+        foreach ($rows as $row)
+        {
+            $data['actions']['edit'] = html::anchor(
+                "admin/edit$entity/". $row->id,
+                html::image(url::site('/static/img/edit-copy.png', TRUE), array('title'=>__("Edit $entity")))
+            );
+            $data['actions']['delete'] = html::anchor(
+                "admin/delete$entity/" . $row->id,
+                html::image(url::site('/static/img/edit-delete.png',TRUE), array('title'=>__("Delete $entity")))
+            );
+            $data['entries'][$row->id] = new View(                
+				"admin/ListItems/$entity" . 'Entry', 
+                array('row' => $row, 'actions' => $data['actions'])
+            );
+        } 
 
+		return $data;
+	}
+	
+	private function validateRows($rows, $total_rows, $entity) {
+		if (count($rows) == 0 && $total_rows > 0)
+        {
+            $this->addError('Invalid page number.');
+        }
+        else if ($total_rows == 0)
+        {
+            $this->addError("You should probably create an $entity to start with.");
+        }     
+	}
+	
     private function parseErrorMessages($e) 
     {
         $errorMsg = 'Oops. You entered something bad! Please fix it! <br />';               

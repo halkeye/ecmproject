@@ -2,7 +2,6 @@
 
 class Model_Convention extends ORM
 {
-
     /* On unserialize never check the db */
     protected $_reload_on_wakeup = false;
 

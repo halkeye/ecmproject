@@ -2,17 +2,13 @@
 
 class Model_Pass extends ORM
 {
-    var $table_name = 'passes';
-
 	public $default_fields = array(
-            'name' => array( 'type'  => 'text', 'label' => 'Pass Name', 'required'=>true ),
-            'price' => array( 'type'  => 'text', 'label' => 'Price', 'required'=>true    ),
-            'convention_id' => array( 'type'  => 'select', 'label' => 'Convention', 'required'=>true    ),
-            'startDate' => array( 'type'  => 'date', 'label' => 'Start Date', 'required'=>true    ),
-            'endDate'   => array( 'type'  => 'date', 'label' => 'End Date', 'required'=>true ),
-            'minAge' => array( 'type'  => 'text', 'label' => 'Minimum Age', 'required'=>true ),
-            'maxAge' => array( 'type'  => 'text', 'label' => 'Maximum Age', 'required' => true),
-            'isPurchasable'  => array( 'type'  => 'boolean', 'label' => 'Purchasable', 'required' => false),
+            'name' 				=> array( 'type'  => 'text', 	'label' => 'Pass Name', 	'required'=>true ),
+            'price' 			=> array( 'type'  => 'text', 	'label' => 'Price', 		'required'=>true ),
+            'convention_id' 	=> array( 'type'  => 'select', 	'label' => 'Convention', 	'required'=>true ),
+            'startDate' 		=> array( 'type'  => 'date', 	'label' => 'Start Date', 	'required'=>true ),
+            'endDate'   		=> array( 'type'  => 'date', 	'label' => 'End Date', 		'required'=>true ),
+            'isPurchasable'  	=> array( 'type'  => 'boolean', 'label' => 'Purchasable', 	'required'=>false),
     );
     
     protected $_has_one = array(
@@ -23,15 +19,13 @@ class Model_Pass extends ORM
     );
 
     protected $_table_columns = array(
-        'id' => array('type' => 'int', 'min' => '0', 'max' => '4294967295', 'column_name' => 'id', 'column_default' => NULL, 'data_type' => 'int unsigned', 'is_nullable' => false, 'ordinal_position' => 1, 'display' => '10', 'comment' => '', 'extra' => 'auto_increment', 'key' => 'PRI', 'privileges' => 'select,insert,update,references',),
-        'convention_id' => array('type' => 'int', 'min' => '0', 'max' => '4294967295', 'column_name' => 'convention_id', 'column_default' => NULL, 'data_type' => 'int unsigned', 'is_nullable' => false, 'ordinal_position' => 2, 'display' => '10', 'comment' => '', 'extra' => '', 'key' => 'MUL', 'privileges' => 'select,insert,update,references',), 
-        'name' => array('type' => 'string', 'column_name' => 'name', 'column_default' => NULL, 'data_type' => 'varchar', 'is_nullable' => false, 'ordinal_position' => 3, 'character_maximum_length' => '100', 'collation_name' => 'utf8_general_ci', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
-        'price' => array('type' => 'float', 'exact' => true, 'column_name' => 'price', 'column_default' => NULL, 'data_type' => 'decimal', 'is_nullable' => false, 'ordinal_position' => 4, 'numeric_scale' => '2', 'numeric_precision' => '10', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
-        'isPurchasable' => array('type' => 'int', 'min' => '-128', 'max' => '127', 'column_name' => 'isPurchasable', 'column_default' => NULL, 'data_type' => 'tinyint', 'is_nullable' => false, 'ordinal_position' => 5, 'display' => '4', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
-        'minAge' => array('type' => 'int', 'min' => '0', 'max' => '255', 'column_name' => 'minAge', 'column_default' => NULL, 'data_type' => 'tinyint unsigned', 'is_nullable' => true, 'ordinal_position' => 6, 'display' => '3', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
-        'maxAge' => array('type' => 'int', 'min' => '0', 'max' => '255', 'column_name' => 'maxAge', 'column_default' => NULL, 'data_type' => 'tinyint unsigned', 'is_nullable' => true, 'ordinal_position' => 7, 'display' => '3', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
-        'startDate' => array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647', 'column_name' => 'startDate', 'column_default' => NULL, 'data_type' => 'int', 'is_nullable' => true, 'ordinal_position' => 8, 'display' => '11', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
-        'endDate' => array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647', 'column_name' => 'endDate', 'column_default' => NULL, 'data_type' => 'int', 'is_nullable' => true, 'ordinal_position' => 9, 'display' => '11', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',)
+        'id' 				=> array('type' => 'int', 'min' => '0', 'max' => '4294967295', 'column_name' => 'id', 'column_default' => NULL, 'data_type' => 'int unsigned', 'is_nullable' => false, 'ordinal_position' => 1, 'display' => '10', 'comment' => '', 'extra' => 'auto_increment', 'key' => 'PRI', 'privileges' => 'select,insert,update,references',),
+        'convention_id' 	=> array('type' => 'int', 'min' => '0', 'max' => '4294967295', 'column_name' => 'convention_id', 'column_default' => NULL, 'data_type' => 'int unsigned', 'is_nullable' => false, 'ordinal_position' => 2, 'display' => '10', 'comment' => '', 'extra' => '', 'key' => 'MUL', 'privileges' => 'select,insert,update,references',), 
+        'name' 				=> array('type' => 'string', 'column_name' => 'name', 'column_default' => NULL, 'data_type' => 'varchar', 'is_nullable' => false, 'ordinal_position' => 3, 'character_maximum_length' => '100', 'collation_name' => 'utf8_general_ci', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
+        'price' 			=> array('type' => 'float', 'exact' => true, 'column_name' => 'price', 'column_default' => NULL, 'data_type' => 'decimal', 'is_nullable' => false, 'ordinal_position' => 4, 'numeric_scale' => '2', 'numeric_precision' => '10', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
+        'isPurchasable' 	=> array('type' => 'int', 'min' => '-128', 'max' => '127', 'column_name' => 'isPurchasable', 'column_default' => NULL, 'data_type' => 'tinyint', 'is_nullable' => false, 'ordinal_position' => 5, 'display' => '4', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
+        'startDate' 		=> array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647', 'column_name' => 'startDate', 'column_default' => NULL, 'data_type' => 'int', 'is_nullable' => true, 'ordinal_position' => 6, 'display' => '11', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
+        'endDate' 			=> array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647', 'column_name' => 'endDate', 'column_default' => NULL, 'data_type' => 'int', 'is_nullable' => true, 'ordinal_position' => 7, 'display' => '11', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',)
     );
 
 	public function rules()
@@ -44,7 +38,7 @@ class Model_Pass extends ORM
                 array('range', array(':value',0,1))
 			),
 			'convention_id' => array( 
-                /* FIXME - should be a valid convention too */
+                /* TODO - should be a valid convention too */
                 /* Convention_id's should be numeric. */
 				array('not_empty'), 
                 array('is_numeric'),
@@ -60,6 +54,7 @@ class Model_Pass extends ORM
 			'endDate' => array( 
 				array('not_empty'), 
                 array(array($this, '__validateISODate')),
+				array(array($this, 'valid_range'), array(':validation', ':field')),
 			),
 		);	
 	}	
@@ -81,13 +76,7 @@ class Model_Pass extends ORM
 
 	public function save(Validation $validation = null)
 	{
-		/* Fill in optional fields.*/
-		if (!isset($this->minAge) || empty($this->minAge))
-			$this->minAge = 0;
-			
-		if (!isset($this->maxAge) || empty($this->maxAge))
-			$this->maxAge = 255;
-			
+		/* Fill in optional fields.*/			
 		if (!isset($this->isPurchasable) || empty($this->isPurchasable))
 			$this->isPurchasable = 0;
 			
@@ -107,6 +96,17 @@ class Model_Pass extends ORM
             return 0;
 		}
         return 1;
+	}
+	
+	/* This is cheap (since I hardcoded stuff) But it works :) */
+	public function valid_range(Validation $validation, $field)
+	{				
+		$start = $validation['startDate'];
+		$end = $validation['endDate'];
+		
+		if (!$start || !$end || $start >= $end) {			
+			$validation->error($field, 'valid_range', array($validation[$field]));
+		}
 	}
 	
 	public static function getTotalPasses($cid)

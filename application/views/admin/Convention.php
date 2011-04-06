@@ -2,7 +2,7 @@
 <br />
 <!-- CONTENT: Expect initial convention id for this pass to be associated to. -->
 <?php 	
-	View::set_global('field_lang_prefix', 'admin.pass_field_conv_');
+	View::set_global('field_lang_prefix', 'field_');
 	
 	/* Set default values for unset variables. */
 	if (!isset($row['name']))
@@ -14,8 +14,7 @@
 	echo form::open("admin/$callback"); 
 ?>
 	<h1>General Information</h1>
-	<p>The below information defines a convention - it's name, when it will start, when it will end, and it's location. Of these fields,
-	 setting the start and end dates are very important as pass purchases times may depend on them.</p>		
+	<p>The below information defines an event - the name of the event and it's location (optional)</p>		
 	<fieldset>		
 		<?php
 			foreach (array('name', 'location') as $field)
