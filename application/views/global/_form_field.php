@@ -50,7 +50,7 @@ switch ($fieldData['type'])
     case 'boolean':
         #selected should be value, value should be if $fieldData['value]'
 		$attributes['class'] = 'checkbox'; //Hack (for the time being).
-        echo form::checkbox($field, 1, $value, $attributes);
+        echo form::checkbox($field, 1, (bool)$value, $attributes);
         break;
     case 'checkbox':
         echo form::checkbox($field, $value, @$fieldData['selected'], $attributes);
