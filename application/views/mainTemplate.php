@@ -5,11 +5,11 @@
 <head> 
 <title>Electronic Convention Management (ECM)<?php echo $title ? "::$title" : "" ?></title> 
 <?php {
-    echo HTML::style('static/css/main.css', NULL, TRUE);
+    echo HTML::style(url::site('static/css/main.css',TRUE), NULL, TRUE);
     foreach (Assets::getCSS() as $style)
-        echo HTML::style("static/css/$style", NULL, TRUE);
+        echo HTML::style(url::site("static/css/$style",TRUE), NULL, TRUE);
     foreach (Assets::getJS() as $js)
-        echo HTML::script("static/js/$js", NULL, TRUE);
+        echo HTML::script(url::site("static/js/$js",TRUE), NULL, TRUE);
 } ?>
 </head> 
  
