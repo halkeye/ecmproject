@@ -219,10 +219,9 @@ body {
 }
 
 #form input.checkbox {
-	display: block;
+	display: inline;
 	margin: 0px 0px 5px 0px;
 	padding: 2px 2px;
-	width: 240px; 
 }
 
 #form select {
