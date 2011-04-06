@@ -52,7 +52,7 @@ class Controller_Convention extends Base_MainTemplate
 		$reg_id = isset($reg_id) ? intval($reg_id) : NULL;
 		$reg = ORM::factory('registration', $reg_id);
 		
-		if (!$reg->loaded)
+		if (!$reg->loaded())
 		{
 			$this->addError(__('convention.not_loaded'));
 			$this->request->redirect("convention/checkout");
@@ -69,11 +69,11 @@ class Controller_Convention extends Base_MainTemplate
 		{
 			$this->addError(__('convention.registration_already_processed_unable_to_edit'));
 			$this->request->redirect("convention/checkout");
-		}
+        }
 				
-		if ($post = $this->input->post())
+		if ($post = $this->request->post())
         {
-			if ($val = $this->input->post('Yes'))
+			if ($val = $post['Yes'])
 			{
 				if ($reg->delete())
 				{
