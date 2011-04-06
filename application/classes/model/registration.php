@@ -17,18 +17,18 @@ class Model_Registration extends ORM
         'convention' => array (
             'model' => 'convention', 
             'foreign_key' => 'convention_id'
-        )
-    );
-
-    protected $_has_one = array(
+        ),
         'pass' => array(
             'model' => 'pass', 
-            'foreign_key' => 'id',
+            'foreign_key' => 'pass_id',
         ),
         'account' => array(
             'model' => 'account', 
-            'foreign_key' => 'id',
+            'foreign_key' => 'account_id',
         ),
+    );
+
+    protected $_has_one = array(
     );
 
 //    protected $load_with = array('convention','pass', 'account');
@@ -74,39 +74,65 @@ class Model_Registration extends ORM
             /*'heard_from' => array( 'type'  => 'text', 'label' => 'Heard from', 'required'=>false ),
             'attendance_reason' => array( 'type'  => 'textarea', 'rows'  => 10, 'label' => 'Reason For Attendance', 'required'=>false), */
     );
+    
+    public function rules()
+	{
+        $rules = array();
+        $rules['agree_toc'] = array(array('range', array(':value',0,1)));
+        $rules['email'] = array(array('email'));
+        $rules['phone'] = array(array('phone'));
+        $rules['ephone'] = array(array('phone'));
+        $rules['cell'] = array(array('phone'));
+        $rules['dob'] = array(
+            array(array($this, '_valid_date')),
+            array(array($this, '_valid_birthdate'))
+        );
+        //$rules['pass_id'] = array(array(array($this, '_valid_pass_for_account'), array(':validation', ':value')));
+        //$rules['unique_badge'] = array(array(array($this, '_unique_badge'), array(':validation')));
+        foreach ($this->formo_defaults as $field => $fieldData)
+        {
+            if (!isset($rules[$field])) $rules[$field] = array();
+            if (isset($fieldData['required']) && $fieldData['required'])
+            {
+                array_push($rules[$field], array('not_empty'));
+            }
+            else
+            {
+                array_push($rules[$field], array('min_length', array(':value', 0)));
+            }
+            array_push($rules[$field], array('max_length', array(':value', 255)));
+        }
+        return arr::merge(parent::rules(), $rules);
+	}	
+    
+    public function filters()
+    {
+        $filters = parent::filters();
+        $filters[TRUE] = array(
+            array('trim')
+        );
+        $filters['startDate'] = array(
+            array('strtotime')
+        );
+        $filters['endDate'] = array(
+            array('strtotime'),
+        );
+        $filters['pass_id'] = array(
+            array(array($this, '_update_convention_from_pass')),
+        );
+        return $filters;
+    }   
 
     public function __toString()
     {
         return $this->pass . ' - ' . $this->badge;
     }
 
-    /**
-     * Validates and optionally saves a new user record from an array.
-     *
-     * @param  array    values to check
-     * @param  boolean  save[Optional] the record when validation succeeds
-     * @return boolean
-     */
-    public function validate(array & $array, $save = FALSE)
+    public function _update_convention_from_pass($value)
     {
-        // Initialise the validation library and setup some rules
-        $array = Validation::factory($array);
-        // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
-        $this->addValidationRules($array);
-		
-        /* Keep track of what really changed so we don't update fields we havn't changed */
-        $realChanged = $this->changed;
-        foreach ($array->safe_array() as $field=>$value)
-        {
-            if (isset($this->ignored_columns[$field])) { continue; }
-            if ($this->$field != $value) 
-            {
-                $realChanged[$field] = $this->$field; 
-            }
-        }
-        $ret = parent::validate($array, $save);
-        $this->changed = $realChanged;
-        return $ret;
+        $pass = ORM::Factory('Pass')->where('passes.id','=',$value)->find();
+        $this->convention_id = $pass->convention_id;
+        return $value;
     }
 
 	/**
@@ -139,33 +165,7 @@ class Model_Registration extends ORM
 	
     private function addValidationRules($form)
     {
-        $form->pre_filter('trim');
-
-
-        $fields = $this->formo_defaults;
-        foreach ($fields as $field => $fieldData)
-        {
-            if (isset($fieldData['required']) && $fieldData['required'])
-                $form->add_rules($field, 'required');
-            else
-                $form->add_rules($field, 'length[0,255]');
-        }
-
-        // Add Rules
-        //$form->add_rules('heard_from', 'standard_text');
-        //$form->add_rules('attendance_reason', array($this, '_true'));
-        if (isset($form['agree_toc']))
-        {
-            $form->add_rules('agree_toc', 'required');
-        }
-        $form->add_rules('email', 'required', array('valid','email'));		
-		$form->add_rules('phone', 'phone[7,9,10,11,14,15]');
-        $form->add_rules('cell', 'phone[7,9,10,11,14,15]');
-        $form->add_rules('ephone', 'phone[7,9,10,11,14,15]');
         //$form->add_rules('dob', 'date');
-		$form->add_callbacks('dob', array($this, '_valid_birthdate'));
-        $form->add_callbacks('pass_id', array($this, '_valid_pass_for_account'));
-        $form->add_callbacks('unique_badge', array($this, '_unique_badge'));
     }
 	
 	private function addValidationRules_admin($form)
@@ -193,40 +193,39 @@ class Model_Registration extends ORM
         //$form->add_callbacks('pass_id', array($this, '_valid_pass_for_account'));
     }
 	
-    public function _valid_pass_for_account(Validation $array, $field)
+    public function _valid_pass_for_account(Validation $array, $value)
     {
-        /*
-         * If add->rules validation found any errors, get me out of here!
-         * Saves us doing any sql lookups before its valid data 
-         */
-//        if (array_key_exists('pass_id', $array->errors()))
-//            return;
         $ageTime = strtotime($array['dob']);
 
-        $pass = ORM::Factory('Pass')->with('convention')->where('id','=',$array['pass_id'])->find();
+        $pass = ORM::Factory('Pass')->with('convention')->where('passes.id','=',$value)->find();
         $conventionStartTime = $pass->convention->start_date;
         # Code from http://forums.webmasterhub.net/viewtopic.php?f=23&t=1831 - Option 4
         $yearsOld = abs(substr(date('Ymd', $conventionStartTime) - date('Ymd', $ageTime), 0, -4));
 
         $query = $this->getPossiblePassesQuery();
-        $query->where('minAge <=', $yearsOld);
-        $query->where('maxAge >=', $yearsOld);
-        $query->where('id', $array['pass_id']);
-        if (!(bool)$query->count_all())
-            $array->add_error($field, 'invalid_pass_age');
+        $query->where('minAge','<=', $yearsOld);
+        $query->where('maxAge','>=', $yearsOld);
+        $query->where('id','=', $value);
+        return !(bool)$query->count_all();
     }
 	
 	/* Takes in a date in the format: YYYY-MM-DD (ISO_8601) */
-	public function _valid_birthdate(Validation $array, $field)
+	public function _valid_date($value)
 	{
-		$date = strtotime($array[$field]);
+		$date = strtotime($value);
 		
 		/* If date validation failed (not a date string) or date does not match expected... */
-		if (!$date || date("Y-m-d", $date) != $array[$field])
-			$array->add_error($field, 'invalid_birthdate');
+		if (!$date || date("Y-m-d", $date) != $value)
+            return FALSE;
+        return TRUE;
+    }
+	public function _valid_birthdate($value)
+    {
+		$date = strtotime($value);
         /* if someone isn't born yet, they can't have a badge (mostly because they don't have a birthday) */
         if ($date > time())
-			$array->add_error($field, 'invalid_birthdate');
+            return FALSE;
+        return TRUE;
 	}
 	
     /**
@@ -294,9 +293,7 @@ class Model_Registration extends ORM
     
     public function save(Validation $validation = null)
     {
-        $this->convention_id = $this->pass->convention_id;
-        $originalChanged = $this->changed;
-        $this->changed = array_keys($this->changed);
+        $originalChanged = $this->_changed;
 		
 		//Only set status to UNPROCESSED if it's a new registration! (Else it'll keep blanking my status updates).
 		if ($this->id == 0)
@@ -421,19 +418,18 @@ class Model_Registration extends ORM
         email::send($to, $from, $subject, $message, TRUE);    
 	}
     
-    public function _unique_badge(Validation $array, $field)
+    public function _unique_badge(Validation $array)
     {
         $query = ORM::Factory('registration');
         // TODO: use config
         // TODO: switch this to be a config. name bool, and badge bool, so name and badge can be enforced unique
-        $query->where('gname', $array['gname']);
-        $query->where('sname', $array['sname']);
-        $query->where('account_id', $array['account_id']);
+        $query->where('gname', '=',$array['gname']);
+        $query->where('sname', '=',$array['sname']);
+        $query->where('account_id', '=',$array['account_id']);
         if ($this->loaded) 
-            $query->where('id !=', $this->id);
+            $query->where('id','!=', $this->id);
 
-        if ((bool)$query->count_all())
-            $array->add_error($field, 'unique');
+        return ((bool)$query->count_all());
     }
 }
 

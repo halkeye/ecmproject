@@ -152,39 +152,31 @@ class Controller_Convention extends Base_MainTemplate
             {
                 if ($fieldData['type'] == 'date')
                 {
-                    $post[$fieldName] = implode('-', 
-                        array(
-                            @sprintf("%04d", $post[$fieldName . '-year']), 
-                            @sprintf("%02d", $post[$fieldName . '-month']), 
-                            @sprintf("%02d", $post[$fieldName . '-day'])
-                        )
-                    );
-                    unset($post[$fieldName.'-year']);
-                    unset($post[$fieldName.'-month']);
-                    unset($post[$fieldName.'-day']);
+                    $post[$fieldName] = ECM_Form::parseSplitDate($post, $fieldName);
                 }
             }
 
             if (!isset($post['agree_toc']))
                 $post['agree_toc'] = false;
             $post['account_id'] = $this->auth->getAccount()->id;
-            if ($reg->validate($post))
-            {
+            $reg->values($post);
+            try {
                 $reg->save();
                 $this->request->redirect(Controller_Convention::STEP2);
                 return;
             }
+            catch (ORM_Validation_Exception $e)
+            {
+                $errors = $e->errors('form_error_messages');
+            }
 
             // repopulate the form fields
-            $form = arr::overwrite($form, $post->as_array());
-
-            // populate the error fields, if any
-            // We need to already have created an error message file, for Kohana to use
-            // Pass the error message file name to the errors() method
-            //$errors = arr::overwrite($errors, $post->errors('form_error_messages'));
-            $errors = $post->errors('form_error_messages');
+            $form = arr::overwrite($form, $post);
         }
-        $this->template->content = new View('convention/register', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
+        $this->template->content = new View('convention/register', array(
+            'form'=>$form, 'errors'=> $errors,
+            'fields'=>$fields, 'url' => ($reg_id ? 'convention/editReg/'. $reg_id : 'convention/editReg')
+        ));
     }
     
     function action_registrationCancel($reg_id)

@@ -14,7 +14,13 @@ class Model_Pass extends ORM
     protected $_has_one = array(
         'convention' => array(
             'model' => 'Convention',
-            'foreign_key' => 'convention_id',
+            'foreign_key' => 'id',
+        )
+    );
+    protected $_has_many = array(
+        'passes' => array(
+            'model' => 'Pass',
+            'foreign_key' => 'pass_id',
         )
     );
 
