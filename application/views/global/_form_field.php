@@ -31,6 +31,7 @@ if ($hasError) { $attributes['class'] = "fieldError"; }
 
 switch ($fieldData['type'])
 {
+	
     case 'radio':
         if ($fieldData['values'])
         {
@@ -48,6 +49,7 @@ switch ($fieldData['type'])
     case 'bool':
     case 'boolean':
         #selected should be value, value should be if $fieldData['value]'
+		$attributes['class'] = 'checkbox'; //Hack (for the time being).
         echo form::checkbox($field, 1, $value, $attributes);
         break;
     case 'checkbox':
