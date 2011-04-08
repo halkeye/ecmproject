@@ -17,7 +17,7 @@ return array
 			 *
 			 * Ports and sockets may be appended to the hostname.
 			 */
-			'hostname'   => 'localhost',
+			'hostname'   => ':/tmp/mysql.sock',
 			'database'   => 'ecms',
 			'username'   => 'root',
 			'password'   => FALSE,

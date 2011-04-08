@@ -15,6 +15,6 @@ foreach ($menu as $m)
         $attributes['class'] .= ' currentMenuChoice'; 
     }
     echo '<li ' . html::attributes($attributes) . '>';
-    echo html::anchor($m['url'], $m['title']); 
+    echo html::anchor(url::site($m['url'], TRUE), $m['title']); 
     echo '</li>';
 }

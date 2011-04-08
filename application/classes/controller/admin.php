@@ -54,7 +54,7 @@ class Controller_Admin extends Base_MainTemplate
                 'entity' => 'Convention',
                 'callback' => 'admin/manageConventions', 
                 'createText' => __('Create new Event'),
-                'createLink' => 'admin/createConvention', 
+                'createLink' => url::site('admin/createConvention',TRUE), 
                 'rows' => $data['entries'], 
                 'page' => $page,
                 'total_rows' => $total_rows)
@@ -135,7 +135,7 @@ class Controller_Admin extends Base_MainTemplate
                 'crows' => $crows, 
                 'callback' => 'admin/managePasses', 
                 'createText' => 'Create new Pass',
-                'createLink' => 'admin/createPass',
+                'createLink' => url::site('admin/createPass',TRUE),
                 'rows' => $data['entries'], 
                 'convention_id' => $convention_id,
                 'page' => $page,

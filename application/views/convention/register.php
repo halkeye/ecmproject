@@ -14,7 +14,7 @@ if (count($errors))
 }
 
 echo '<div id="form">';
-echo form::open($url);
+echo form::open(url::site($url, TRUE));
 echo '<h1>'.HTML::chars(__('convention.registration_form_header')) . '</h1>';
 echo '<p>' . __('ecmproject.form_required') . '</p>';
 
