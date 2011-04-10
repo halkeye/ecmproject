@@ -11,8 +11,7 @@
 	echo form::open("admin/$callback"); 
 ?>
 	<h1>General Information</h1>
-	<p>At a minimum, a badge requires a name and a price. Upon creation, this badge will be available for purchase through
-	normal registration unless otherwise specified. </p>		
+	<p>An account is defined by an email address. Password must be typed in twice for verification.</p>		
 	<fieldset>		
 		<?php
 			foreach (array('email') as $field)
