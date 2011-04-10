@@ -22,7 +22,7 @@
 	<?php echo form::close(); ?>
 
 	<p>
-		<?php echo html::anchor($createLink, $createText); ?>
+		<?php echo html::anchor($createLink, $createText, null, null, true); ?>
 	</p>
 	
 	<table width='100%'>

@@ -54,7 +54,7 @@ class Controller_Admin extends Base_MainTemplate
                 'entity' => 'Convention',
                 'callback' => 'admin/manageConventions', 
                 'createText' => __('Create new Event'),
-                'createLink' => url::site('admin/createConvention',TRUE), 
+                'createLink' => url::site('admin/createConvention', TRUE), 
                 'rows' => $data['entries'], 
                 'page' => $page,
                 'total_rows' => $total_rows)
@@ -1328,12 +1328,14 @@ class Controller_Admin extends Base_MainTemplate
         foreach ($rows as $row)
         {
             $data['actions']['edit'] = html::anchor(
-                "admin/edit$entity/". $row->id,
-                html::image(url::site('/static/img/edit-copy.png', TRUE), array('title'=>__("Edit $entity")))
+                "/admin/edit$entity/". $row->id ,
+                html::image(url::site('/static/img/edit-copy.png', TRUE), array('title'=>__("Edit $entity"))), 
+				null, null, true
             );
             $data['actions']['delete'] = html::anchor(
-                "admin/delete$entity/" . $row->id,
-                html::image(url::site('/static/img/edit-delete.png',TRUE), array('title'=>__("Delete $entity")))
+                "/admin/delete$entity/" . $row->id,
+                html::image(url::site('/static/img/edit-delete.png',TRUE), array('title'=>__("Delete $entity"))),
+				null, null, true
             );
             $data['entries'][$row->id] = new View(                
 				"admin/ListItems/$entity" . 'Entry', 
@@ -1366,6 +1368,7 @@ class Controller_Admin extends Base_MainTemplate
     }
     
 	private function hasValue($value) {
+		$value = trim($value);
 		return !( !isset($value) || empty($value) );
 	}	
     
