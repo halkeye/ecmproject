@@ -135,7 +135,7 @@ class Controller_Admin extends Base_MainTemplate
                 'entity' => 'Pass',
                 'crows' => $crows, 
                 'callback' => 'admin/managePasses', 
-                'createText' => 'Create new Pass',
+                'createText' => __('Create new Ticket'),
                 'createLink' => 'admin/createPass',
                 'rows' => $data['entries'], 
                 'convention_id' => $convention_id,
