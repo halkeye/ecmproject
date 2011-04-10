@@ -41,10 +41,10 @@ class Model_Account extends ORM
     // var_export($model->list_columns());
 	
 	public $default_fields = array(
-            'email' => array( 'type'  => 'text', 'label' => 'Email', 'required'=>true 								),
-            'password' => array( 'type'  => 'text', 'label' => 'Password', 'required'=>true     					),
-			'confirm_password' => array( 'type'  => 'text', 'label' => 'Confirm Password', 'required'=>true    		),
-            'status' => array( 'type'  => 'select', 'label' => 'Status', 'required'=>false    						)
+            'email' 			=> array( 'type'  => 'text', 	'label' => 'Email', 			'required'=>true 		),
+            'password' 			=> array( 'type'  => 'text', 	'label' => 'Password', 			'required'=>true     	),
+			'confirm_password' 	=> array( 'type'  => 'text', 	'label' => 'Confirm Password', 	'required'=>true    	),
+            'status' 			=> array( 'type'  => 'select', 	'label' => 'Status', 			'required'=>false  		)
     );
 	
     protected $ignored_columns = array('confirm_password', 'groups', 'permissions');
@@ -68,16 +68,13 @@ class Model_Account extends ORM
         $rules['email'] = array(
             array('not_empty'),
             array('email'),
+			array(array($this, '_valid_unique_email'))
         );
 		$rules['password'] = array(
 			array('not_empty'),
 			array('min_length', array(':value',6)),
 			array('max_length', array(':value',255)),		
 		);		
-        // Email unique validation
-        $rules['email'] = array(
-            array(array($this, '_valid_unique_email'))
-        );
 		$rules['status'] = array(
 			array(array($this, '_valid_status_code'))
 		);
