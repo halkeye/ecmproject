@@ -115,7 +115,8 @@ class Controller_Admin extends Base_MainTemplate
         $this->template->subheading = 	__('Create, modify and delete tickets associated with events.');
             
         $crows = ORM::factory('Convention')->find_all();    
-        $convention_id = Controller_Admin::getConventionId($convention_id, $crows);                     
+		
+		$convention_id = $this->session->get_once('admin_convention_id', Controller_Admin::getConventionId($convention_id, $crows) );                              
         $crows = $crows->as_array('id', 'name');    
 		
         $total_rows = Model_Pass::getTotalPasses($convention_id);
@@ -149,8 +150,7 @@ class Controller_Admin extends Base_MainTemplate
         $this->template->title = "Administration: Manage Registrations";
         $this->template->heading = "Administration: Manage Registrations";
         $this->template->subheading = "Create, edit and delete registrations related to a convention";
-        
-        
+                
         // Get all conventions, determine and validate convention_id, and get total number of passes for the particular convention_id.
         $crows = ORM::factory('Convention')->find_all();    
         $convention_id = Controller_Admin::getConventionId($convention_id, $crows);                     
@@ -356,7 +356,8 @@ class Controller_Admin extends Base_MainTemplate
             try {
                 $pass->save();
                 $this->addMessage( __('Created a new ticket, ') . $pass->name);
-                $this->request->redirect('admin/managePasses');
+				$this->session->set('admin_convention_id', $post['convention_id']);
+                $this->request->redirect('admin/managePasses'); 				
             }
             catch (ORM_Validation_Exception $e)
             {
@@ -681,7 +682,8 @@ class Controller_Admin extends Base_MainTemplate
             try {
                 $pass->save();                              
                 $this->addMessage('Successfully edited ' . $pass->name);
-                $this->request->redirect('admin/managePasses');
+				$this->session->set('admin_convention_id', $post['convention_id']);
+                $this->request->redirect('admin/managePasses');			
             }
             catch (ORM_Validation_Exception $e)
             {
