@@ -269,51 +269,39 @@ class Controller_Admin extends Base_MainTemplate
     
     function action_createAccount() 
     {
-        $this->template->title = "Administration: Create an Account";
-        $this->template->heading = "Administration: Create an Account";
-        $this->template->subheading = "Create an Account for a convention.";
+        $this->template->title = 		__('Admin: Create an Account');
+        $this->template->heading = 		__('Admin: Create an Account');
+        $this->template->subheading = 	__('Create an Account');
 
         $acct = ORM::factory('Account');    
         $fields = $acct->default_fields;
         $fields['status']['values'] = Model_Account::getVerifySelectList();
         
         if ($post = $this->request->post())
-        {           
-            if ($acct->validate_admin($post, false, true))
-            {                           
-                $acct->save();              
-                if ($acct->saved()) {
-                    $this->addMessage('Created a newly minted account with email: ' . $acct->email);
-                    $this->request->redirect('admin/manageAccounts');
-                }
-                else
-                {
-                    $this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
-                }               
+        {     
+			$extra_validation = Validation::Factory($post);
+			$extra_validation->rule('password', 'matches', array(':validation', 'password', 'confirm_password'));
+			$acct->values($post);
+			try {
+                $acct->save($extra_validation);                              
+                $this->addMessage( __('Created a new account, ') . $acct->email);
+				$this->requireVerification($acct); // Require verification if status UNVERIFIED.			
+                $this->request->redirect('admin/manageAccounts');			
             }
-                    
-            $errorMsg = 'Oops. You entered something bad! Please fix it! <br />';               
-            $errors = $post->errors('form_error_messages');
-            foreach ($errors as $error)
-                $errorMsg = $errorMsg . ' ' . $error . '<br />';                    
-        
-            $this->addError($errorMsg);                 
-            
-            $this->template->content = new View('admin/Account', array(
-                'row' => $post,
-                'fields' => $fields,
-                'callback' => 'createAccount'
-            )); 
-                    
+            catch (ORM_Validation_Exception $e)
+            {
+                $this->parseErrorMessages($e);      
+            } 		    
         } 
-        else 
-        {       
-            $this->template->content = new View('admin/Account', array(
-                'row' => $acct->as_array(),
-                'fields' => $fields,
-                'callback' => 'createAccount'
-            ));
-        }
+		else { 		     
+			$post = $acct->as_array();
+		}
+           
+		$this->template->content = new View('admin/Account', array(
+			'row' => $acct->as_array(),
+			'fields' => $fields,
+			'callback' => 'createAccount'
+		));      
     }
     
     function action_createPass()
@@ -605,12 +593,17 @@ class Controller_Admin extends Base_MainTemplate
 			try {
                 $acct->save($extra_validation);                              
                 $this->addMessage('Successfully edited ' . $acct->email);
+				$this->requireVerification($acct); // Require verification if status UNVERIFIED.	
                 $this->request->redirect('admin/manageAccounts');			
             }
             catch (ORM_Validation_Exception $e)
             {
                 $this->parseErrorMessages($e);      
-            }               	
+            }             
+			catch (Exception $e)
+            {
+                $this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
+            }
         }   
         else { 		     
 			$post = $acct->as_array();
@@ -1355,6 +1348,14 @@ class Controller_Admin extends Base_MainTemplate
         {
             $this->addError("You should probably create an $entity to start with.");
         }     
+	}
+	
+	private function requireVerification($account)
+	{
+		if (!$account->isVerified()) {
+			$vcode = $account->generateVerifyCode(Model_Verificationcode::TYPE_VALIDATE_EMAIL);
+			$account->sendValidateEmail($vcode->original_code);
+		}
 	}
 	
     private function parseErrorMessages($e) 
