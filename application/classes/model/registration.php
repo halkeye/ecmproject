@@ -42,27 +42,18 @@ class Model_Registration extends ORM
             'convention_id' => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true,                      ),
             'pass_id'       => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true,                      ),
             'account_id'    => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true,                      ),
-            'gname'         => array ( 'type' => 'string', 'length' => '55'                                              ),
-            'sname'         => array ( 'type' => 'string', 'length' => '55'                                              ),
-            'badge'         => array ( 'type' => 'string', 'length' => '55', 'null' => true                              ),
-            'dob'           => array ( 'type' => 'string', 'format' => '0000-00-00',                                     ),
-            'phone'         => array ( 'type' => 'string', 'length' => '15'                                              ),
-            'cell'          => array ( 'type' => 'string', 'length' => '15'                                              ),
-            'city'          => array ( 'type' => 'string', 'length' => '85'                                              ),
-            'prov'          => array ( 'type' => 'string', 'length' => '50'                                              ),
-            'email'         => array ( 'type' => 'string', 'length' => '55', 'null' => true                              ),
-            'econtact'      => array ( 'type' => 'string', 'length' => '55', 'null' => true                              ),
-            'ephone'        => array ( 'type' => 'string', 'length' => '15', 'null' => true                              ),
-            'heard_from'    => array ( 'type' => 'text',                     'null' => true,                             ),
-            'attendance_reason'    => array ( 'type' => 'text',              'null' => true,                             ), 
+
+            'reg_id'        => array ( 'type' => 'string', 'length' => 25,                                               ),
+
             'status'      => array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                       ),
     );
 
     public $formo_defaults = array(
+            'pass_id' => array( 'type'  => 'select', 'label' => 'Pass', 'required'=>true, 'adminRequired'=>true    ),
+            /*
             'gname' => array( 'type'  => 'text', 'label' => 'Given Name', 'required'=>true, 'adminRequired'=>true ),
             'sname' => array( 'type'  => 'text', 'label' => 'Surname', 'required'=>true, 'adminRequired'=>true    ),
             'badge' => array( 'type'  => 'text', 'label' => 'Badge', 'required'=>true    ),
-            'pass_id' => array( 'type'  => 'select', 'label' => 'Pass', 'required'=>true, 'adminRequired'=>true    ),
             'dob'   => array( 'type'  => 'date', 'label' => 'Date of Birth', 'required'=>true ),
             'email' => array( 'type'  => 'text', 'label' => 'Email', 'required'=>true ),
             'phone' => array( 'type'  => 'text', 'label' => 'Phone', 'required' => true),
@@ -71,8 +62,7 @@ class Model_Registration extends ORM
             'prov'  => array( 'type'  => 'text', 'label' => 'Province', 'required' => true),
             'econtact'  => array( 'type'  => 'text', 'label' => 'Emergency Contact Name', 'required' => true),
             'ephone'  => array( 'type'  => 'text', 'label' => 'Emergency Contact Phone', 'required' => true),
-            /*'heard_from' => array( 'type'  => 'text', 'label' => 'Heard from', 'required'=>false ),
-            'attendance_reason' => array( 'type'  => 'textarea', 'rows'  => 10, 'label' => 'Reason For Attendance', 'required'=>false), */
+            */
     );
     
     public function rules()

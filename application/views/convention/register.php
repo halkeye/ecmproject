@@ -21,6 +21,7 @@ echo '<p>' . __('ecmproject.form_required') . '</p>';
 echo "<fieldset>";
 foreach (array('gname','sname', 'badge', 'dob', 'email', 'phone','cell', 'city', 'prov', 'econtact', 'ephone') as $field)
 {
+    if (!@$fields[$field]) continue;
     echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $form[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
 }
 echo '</fieldset>';

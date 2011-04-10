@@ -73,29 +73,10 @@ class Controller_Admin extends Base_MainTemplate
         // Calculate the offset.
         $start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );  
         $rows = ORM::factory('Account')->limit( Controller_Admin::ROWS_PER_PAGE )->offset($start)->find_all();
-            
-        // Extra validation.
-        if (count($rows) == 0 && $total_rows > 0)
-        {
-            $this->addError('Invalid page number.');
-        }
-        else if ($total_rows == 0)
-        {
-            //TODO: Add string to the language file.
-            $this->addError("D: No one's used our system yet! (You shouldn't be getting this - if you are, something's wrong) D:");
-        }           
         
-        // Header entry. (View with no data generates a header)
-        $data['entries'][0] = new View('admin/ListItems/AccountEntry');
-        foreach ($rows as $row)
-        {
-            $data['actions']['edit'] = html::anchor('admin/editAccount/'. $row->id, html::image(url::site('/static/img/edit-copy.png'), __('admin.edit_account')));
-            $data['actions']['delete'] = html::anchor('admin/deleteAccount/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), __('admin.delete_account')));            
-            $data['entries'][$row->id] = new View('admin/ListItems/AccountEntry', array('row' => $row, 'actions' => $data['actions']));             
-        }   
-        
-        // Set callback path for form submit (change convention, jump to page)
-    
+		$this->validateRows($rows, $total_rows, 'event');  	
+        $data = $this->generateViewRows($rows, 'Account');       
+           
         $this->template->content = new View('admin/list', array(
                 'entity' => 'Account',
                 'callback' => 'admin/manageAccounts', 
@@ -115,7 +96,8 @@ class Controller_Admin extends Base_MainTemplate
         $this->template->subheading = 	__('Create, modify and delete tickets associated with events.');
             
         $crows = ORM::factory('Convention')->find_all();    
-        $convention_id = Controller_Admin::getConventionId($convention_id, $crows);                     
+		
+		$convention_id = $this->session->get_once('admin_convention_id', Controller_Admin::getConventionId($convention_id, $crows) );                              
         $crows = $crows->as_array('id', 'name');    
 		
         $total_rows = Model_Pass::getTotalPasses($convention_id);
@@ -134,7 +116,7 @@ class Controller_Admin extends Base_MainTemplate
                 'entity' => 'Pass',
                 'crows' => $crows, 
                 'callback' => 'admin/managePasses', 
-                'createText' => 'Create new Pass',
+                'createText' => __('Create new Ticket'),
                 'createLink' => url::site('admin/createPass',TRUE),
                 'rows' => $data['entries'], 
                 'convention_id' => $convention_id,
@@ -149,8 +131,7 @@ class Controller_Admin extends Base_MainTemplate
         $this->template->title = "Administration: Manage Registrations";
         $this->template->heading = "Administration: Manage Registrations";
         $this->template->subheading = "Create, edit and delete registrations related to a convention";
-        
-        
+                
         // Get all conventions, determine and validate convention_id, and get total number of passes for the particular convention_id.
         $crows = ORM::factory('Convention')->find_all();    
         $convention_id = Controller_Admin::getConventionId($convention_id, $crows);                     
@@ -356,7 +337,8 @@ class Controller_Admin extends Base_MainTemplate
             try {
                 $pass->save();
                 $this->addMessage( __('Created a new ticket, ') . $pass->name);
-                $this->request->redirect('admin/managePasses');
+				$this->session->set('admin_convention_id', $post['convention_id']);
+                $this->request->redirect('admin/managePasses'); 				
             }
             catch (ORM_Validation_Exception $e)
             {
@@ -605,42 +587,42 @@ class Controller_Admin extends Base_MainTemplate
         }
         
         if ($post = $this->request->post())
-        {           
-            if ($acct->validate_admin($post, false, false))
-            {                       
-                $acct->save();              
-                if ($acct->saved()) {
-                    $this->addMessage('Edited successfully the Account with email: ' . $acct->email);
-                    $this->request->redirect('admin/manageAccounts');
-                }
-                else
-                {
-                    $this->addError("Oops. Something went wrong and it's not your fault. Try again or contact the system maintainer please!");
-                }
+        {		
+			//Why not just add to ruleset of account...? Unset password fields for editing an account so validation rules don't trigger?			
+			$extra_validation = Validation::Factory($post);
+          		
+			if ( $this->hasValue( $post['password'] ) || $this->hasValue( $post['confirm_password'] ) )
+			{
+                $extra_validation->rule('password', 'matches', array(':validation', 'password', 'confirm_password'));
+			}
+			else 
+			{
+				unset($post['password']);
+				unset($post['confirm_password']);
+			}
+		
+			$acct->values($post);
+			try {
+                $acct->save($extra_validation);                              
+                $this->addMessage('Successfully edited ' . $acct->email);
+                $this->request->redirect('admin/manageAccounts');			
             }
-                        
-            $errorMsg = 'Oops. You entered something bad! Please fix it! <br />';               
-            $errors = $post->errors('form_error_messages');
-            foreach ($errors as $error)
-                $errorMsg = $errorMsg . ' ' . $error . '<br />';                    
+            catch (ORM_Validation_Exception $e)
+            {
+                $this->parseErrorMessages($e);      
+            }               	
+        }   
+        else { 		     
+			$post = $acct->as_array();
+		}
+         
+        //Parse UNIX timestamp back to something we can use.        
+        $this->template->content = new View('admin/Account', array(
+            'row' => $acct->as_array(),
+            'fields' => $fields,
+            'callback' => "editAccount/$id"
+        ));
         
-            $this->addError($errorMsg);
-            
-            $this->template->content = new View('admin/Account', array( 
-                'row' => $post,
-                'fields' => $fields,
-                'callback' => "editAccount/$id" 
-            ));
-                    
-        }   
-        else {      
-            //Parse UNIX timestamp back to something we can use.        
-            $this->template->content = new View('admin/Account', array(
-                'row' => $acct->as_array(),
-                'fields' => $fields,
-                'callback' => "editAccount/$id"
-            ));
-        }   
     }
     
     function action_editPass($id = NULL)
@@ -675,7 +657,8 @@ class Controller_Admin extends Base_MainTemplate
             try {
                 $pass->save();                              
                 $this->addMessage('Successfully edited ' . $pass->name);
-                $this->request->redirect('admin/managePasses');
+				$this->session->set('admin_convention_id', $post['convention_id']);
+                $this->request->redirect('admin/managePasses');			
             }
             catch (ORM_Validation_Exception $e)
             {
@@ -1382,6 +1365,9 @@ class Controller_Admin extends Base_MainTemplate
         $this->addError($errorMsg);     
     }
     
+	private function hasValue($value) {
+		return !( !isset($value) || empty($value) );
+	}	
     
     public function action_testClock()
     {

@@ -1,27 +1,27 @@
 <div id="list">
 	<table>
 	<tr>
-		<th class='header' width=50%><?php echo html::anchor(url::site('admin/manageConventions',TRUE), 'Manage Conventions') ?></th>
-		<th class='header' width=50%><?php echo html::anchor(url::site('admin/managePasses',TRUE), 'Manage Passes') ?></th>
+		<th class='header' width=50%><?php echo html::anchor(url::site('admin/manageConventions', TRUE), __('Manage Events') ) ?></th>
+		<th class='header' width=50%><?php echo html::anchor(url::site('admin/managePasses', TRUE), __('Manage Tickets')) ?></th>
 	</tr>
 	<tr>
-		<td>Add, modify or delete conventions in the system.</td>
-		<td>Add, modify or delete pass types associated with a convention - purchasable or otherwise</td>
+		<td>Add, modify or delete events in the system.</td>
+		<td>Add, modify or delete tickets associated with a convention - purchasable or otherwise</td>
 	</tr>
 	<tr>
-		<th class='header'><?php echo html::anchor(url::site('admin/manageAccounts', TRUE), 'Manage Accounts') ?></th>
-		<th class='header'><?php echo html::anchor(url::site('admin/manageRegistrations', TRUE), 'Manage Registrations') ?></th>	
+		<th class='header'><?php echo html::anchor(url::site('admin/manageAccounts', TRUE), __('Manage Accounts')) ?></th>
+		<th class='header'><?php echo html::anchor(url::site('admin/manageRegistrations', TRUE), __('Manage Registrations')) ?></th>	
 	</tr>
 	<tr>
 		<td>Add, modify, or delete user accounts in the system.</td>
-		<td>Add, modify or delete convention registrations for user(s) as well as view and manage payments.</td>
+		<td>Add, modify or delete event registrations.</td>
 	</tr>
 	<tr>
-		<th class='header'><?php echo html::anchor(url::site('admin/export', TRUE), 'Export Registration Information (CSV)') ?></th>
-		<th class='header'><?php echo html::anchor(url::site('admin/manageAdmin', TRUE), 'Manage Administrators') ?></th>
+		<th class='header'><?php echo html::anchor(url::site('admin/export', TRUE), __('Export Registration Information (CSV)')) ?></th>
+		<th class='header'><?php echo html::anchor(url::site('admin/manageAdmin', TRUE), __('Manage Administrators')) ?></th>
 	</tr>
 	<tr>
-		<td>Exports selected (or all) registration information for a particular convention to a CSV file which can be opened in Excel.</td>
+		<td>Exports selected (or all) registration information for a particular event to a CSV file which can be opened in Excel.</td>
 		<td>Grant and manage administrator access to accounts</td>
 	</tr>
 </table>

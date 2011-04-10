@@ -119,7 +119,7 @@ class Controller_Convention extends Base_MainTemplate
         if (!$reg->loaded())
         {
             $reg->account_id    = $this->auth->get_user()->id;
-            $reg->email         = $this->auth->getAccount()->email;
+            //$reg->email         = $this->auth->getAccount()->email;
         }
         else
         {
