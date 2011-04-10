@@ -14,7 +14,7 @@ if (count($errors))
 }
 
 echo '<div id="form">';
-echo form::open();
+echo form::open($url);
 echo '<h1>'.HTML::chars(__('convention.registration_form_header')) . '</h1>';
 echo '<p>' . __('ecmproject.form_required') . '</p>';
 
@@ -40,7 +40,7 @@ echo '<h1>'.HTML::chars(__('convention.registration_tac_header')) . '</h1>';
 echo '<p>'.HTML::chars(__('convention.registration_tac_desc')) . '</p>';
 
 echo '<fieldset>';
-echo form::textarea(array('rows'=>15, 'style'=>'width:95%; margin-left: 2%;'), __('convention.registration_tac'));
+echo form::textarea('agree_toc', __('convention.registration_tac'), array('rows'=>15, 'style'=>'width:95%; margin-left: 2%;'));
 {
     $field = 'agree_toc';
     $fields[$field]['type'] = 'boolean';

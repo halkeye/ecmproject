@@ -46,15 +46,13 @@ class Model_Convention extends ORM
         $row = $query->execute();
         return (int) $row[0]['count'];
     }
+
     public function validConvention($cid)
     {
         if (!is_numeric($cid) || $cid == -1)
             return false;
 
-        $res = ORM::factory('Convention', $cid)->find();
-        if ($res->loaded())
-            return true;
-        else
-            return false;
+        $res = ORM::factory('Convention', $cid);
+        return $res->loaded();
     }
 }

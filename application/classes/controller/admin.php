@@ -1,4 +1,4 @@
-<?php
+<?php defined('SYSPATH') OR die('No Direct Script Access');
 
 /**
  * Admin Controller
@@ -330,8 +330,8 @@ class Controller_Admin extends Base_MainTemplate
         
         if ($post = $this->request->post())
         {
-            $post['startDate'] = Controller_Admin::parseSplitDate($post, 'startDate');
-            $post['endDate'] = Controller_Admin::parseSplitDate($post, 'endDate');
+            $post['startDate'] = ECM_Form::parseSplitDate($post, 'startDate');
+            $post['endDate'] = ECM_Form::parseSplitDate($post, 'endDate');
             $pass->values($post);
 			
             try {
@@ -455,13 +455,7 @@ class Controller_Admin extends Base_MainTemplate
         if ($post = $this->request->post())
         {
             $fieldName = 'dob';
-            $post[$fieldName] = implode('-', 
-                        array(
-                            @sprintf("%04d", $post[$fieldName . '-year']), 
-                            @sprintf("%02d", $post[$fieldName . '-month']), 
-                            @sprintf("%02d", $post[$fieldName . '-day'])
-                        )
-                    );      
+            $post[$fieldName] = ECM_Form::parseSplitDate($post, $fieldName);
         
             if ($reg->validate_admin($post))
             {           
@@ -657,8 +651,8 @@ class Controller_Admin extends Base_MainTemplate
         
         if ($post = $this->request->post())
         {
-            $post['startDate'] = Controller_Admin::parseSplitDate($post, 'startDate');
-            $post['endDate'] = Controller_Admin::parseSplitDate($post, 'endDate');
+            $post['startDate'] = ECM_Form::parseSplitDate($post, 'startDate');
+            $post['endDate'] = ECM_Form::parseSplitDate($post, 'endDate');
             $pass->values($post);
             try {
                 $pass->save();                              
@@ -668,7 +662,7 @@ class Controller_Admin extends Base_MainTemplate
             }
             catch (ORM_Validation_Exception $e)
             {
-                $this->parseErrorMessages($e);      
+                $this->parseErrorMessages($e);
             }               
             catch (Exception $e)
             {
@@ -755,13 +749,7 @@ class Controller_Admin extends Base_MainTemplate
         if ($post = $this->request->post())
         {
             $fieldName = 'dob';
-            $post[$fieldName] = implode('-', 
-                        array(
-                            @sprintf("%04d", $post[$fieldName . '-year']), 
-                            @sprintf("%02d", $post[$fieldName . '-month']), 
-                            @sprintf("%02d", $post[$fieldName . '-day'])
-                        )
-                    );      
+            $post[$fieldName] = ECM_Form::parseSplitDate($post, $fieldName);
         
             if ($reg->validate_admin($post))
             {           
@@ -1212,21 +1200,6 @@ class Controller_Admin extends Base_MainTemplate
             return $row->id;
         else
             return -1;      
-    }
-    
-    private function parseSplitDate(array & $post, $fieldName)
-    {
-        $ret = implode('-', 
-            array(
-                @sprintf("%04d", $post[$fieldName . '-year']), 
-                @sprintf("%02d", $post[$fieldName . '-month']), 
-                @sprintf("%02d", $post[$fieldName . '-day'])
-            )
-        );  
-        unset ($post[$fieldName . '-year']); 
-        unset ($post[$fieldName . '-month']);
-        unset ($post[$fieldName . '-day']);
-        return $ret;
     }
     
     /*
