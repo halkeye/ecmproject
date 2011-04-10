@@ -1,6 +1,5 @@
 <?php
-
-
+//Not sure what this is?
 define('MAX_VERIFICATION_ITEMS', 2);
 class Verification_Exceeds_Exception extends Exception {}
 
@@ -49,7 +48,7 @@ class Model_Account extends ORM
     );
 	
     protected $ignored_columns = array('confirm_password', 'groups', 'permissions');
-    
+	
     public function filters()
     {
         $filters = parent::filters();
@@ -70,15 +69,18 @@ class Model_Account extends ORM
             array('not_empty'),
             array('email'),
         );
-        $rules['password'] = array(
-            array('not_empty'),
-            array('min_length', array(':value',6)),
-            array('max_length', array(':value',255)),
-        );
+		$rules['password'] = array(
+			array('not_empty'),
+			array('min_length', array(':value',6)),
+			array('max_length', array(':value',255)),		
+		);		
         // Email unique validation
         $rules['email'] = array(
             array(array($this, '_valid_unique_email'))
         );
+		$rules['status'] = array(
+			array(array($this, '_valid_status_code'))
+		);
         return $rules;
     }
 
@@ -127,7 +129,7 @@ class Model_Account extends ORM
         if (empty($value)) return;
         return sha1($this->salt . $value);
     }
-	
+
     function isBanned()   { return $this->status == Model_Account::ACCOUNT_STATUS_BANNED; }
     function isVerified() { return $this->status == Model_Account::ACCOUNT_STATUS_VERIFIED; }
 
@@ -161,23 +163,7 @@ class Model_Account extends ORM
 	{
         $data = (array) $array;
 		// Initialise the validation library and setup some rules
-		$array = Validation::factory($array);
-        // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
-        $array->pre_filter('trim');
-		
-		$array->add_rules('email', 'required', array('valid','email')); //Email is always required. 
-		
-		/* If password is filled in, set additional rules. */
-		if (isset($data['password']) && isset($data['confirm_password']) 
-				&& (!empty($data['password']) || !empty($data['password']) ||
-                    $passRequired))
-		{
-            $array->add_rules('password', 'length[0-255]');
-			$array->add_rules('confirm_password', 'required');
-			$array->add_rules('confirm_password',  'matches[password]');
-		}
-		
-		$array->add_rules('status', 'required');
+		$array = Validation::factory($array);		
 		
 		/* Password is not required, but if it is...the new passwords should match. */		
 		return parent::validate($array, $save);
@@ -209,6 +195,17 @@ class Model_Account extends ORM
         $ret = $query->count_all();
         return !$ret;
     }
+	public function _valid_status_code($code)
+	{
+		if ($code == Model_Account::ACCOUNT_STATUS_UNVERIFIED 	|| 
+			$code == Model_Account::ACCOUNT_STATUS_VERIFIED 	|| 
+			$code == Model_Account::ACCOUNT_STATUS_BANNED) 
+		{		
+			return true;
+		}
+	
+		return false;
+	}
 
     public function generateVerifyCode($type, $value = NULL)
     {
@@ -253,16 +250,15 @@ class Model_Account extends ORM
 	
 	}	
 	
-	public function getVerifySelectList() {
+	public static function getVerifySelectList() {
 		return array('0' => 'Unverified', '1' => 'Confirmed', '99' => 'Banned');
 	}
 	
-	public function getTotalAccounts()
-	{
-		$db = new Database();
-		$result = $db->query('SELECT COUNT(*) as count FROM accounts');
-		
-		return (int) $result[0]->count;
+	public static function getTotalAccounts()
+	{	
+		$query = DB::query(Database::SELECT, 'SELECT COUNT(*) as count FROM accounts');
+        $row = $query->execute();
+        return (int) $row[0]['count'];
 	}
 	
 	/**
