@@ -17,7 +17,7 @@ return array
 			 *
 			 * Ports and sockets may be appended to the hostname.
 			 */
-			'hostname'   => ':/tmp/mysql.sock',
+			'hostname'   => file_exists('/tmp/mysql.sock') ? ':/tmp/mysql.sock' : 'localhost',
 			'database'   => 'ecms',
 			'username'   => 'root',
 			'password'   => FALSE,
