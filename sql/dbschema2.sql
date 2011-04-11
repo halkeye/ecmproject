@@ -16,10 +16,9 @@ DROP TABLE IF EXISTS `accounts`;
 CREATE TABLE accounts (
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    email VARCHAR(55) UNIQUE,
-   phone VARCHAR(25), 
    password CHAR(40) NOT NULL, -- You save one WHOLE byte by using CHAR instead of VARCHAR! lol.
    salt CHAR(10) NOT NULL, 		-- etc...
-   status TINYINT NOT NULL, 	  -- Status of account (unverified, verified, banned, etc)
+   status TINYINT NOT NULL 	  -- Status of account (unverified, verified, banned, etc)
    created INT NOT NULL, -- Creation date
    login INT -- Last login.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
@@ -52,11 +51,24 @@ CREATE TABLE registrations (
    convention_id INT UNSIGNED NOT NULL,
    pass_id INT UNSIGNED NOT NULL,
    account_id INT UNSIGNED,
+   gname VARCHAR(55) NOT NULL, -- Given name
+   sname VARCHAR(55) NOT NULL, -- Surname
    reg_id CHAR(25) NOT NULL, -- [Event ID]_[Sale Prefix]_[ID #] corresponds to 10_5_10 -> 25 characters where length 5 sale prefix is a chosen number.
+   phone VARCHAR(25),
    status TINYINT NOT NULL, -- Status of registration?
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE RESTRICT, -- Events shouldn't be deleted if in use already.
    FOREIGN KEY (pass_id) REFERENCES passes(id) ON DELETE RESTRICT, -- Ticket types shouldn't be deleted if in use already.
    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE SET NULL -- Even if an account is deleted, leave registrations for stat purposes. (necessary?)
+) ENGINE=Innodb DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `ticket_counters`;
+CREATE TABLE ticket_counters (
+   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   pass_id INT UNSIGNED NOT NULL,
+   tickets_assigned INT UNSIGNED NOT NULL,
+   tickets_total INT UNSIGNED NOT NULL,
+   next_id INT UNSIGNED NOT NULL,
+   FOREIGN KEY(pass_id) REFERENCES passes(id) ON DELETE CASCADE
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `payments`;
@@ -76,6 +88,13 @@ CREATE TABLE payments (
    mod_time INT,
    FOREIGN KEY (reg_id) REFERENCES registrations(id) ON DELETE RESTRICT -- Registrations with payment information shouldn't be deleted.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `locations`;
+CREATE TABLE `locations` (
+  prefix CHAR(6) NOT NULL,
+  location VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`prefix`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `usergroups`;
 -- Expand on permissions later.
