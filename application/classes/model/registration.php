@@ -41,22 +41,25 @@ class Model_Registration extends ORM
             'id'            => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, 'sequenced' => true, ),
             'convention_id' => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true,                      ),
             'pass_id'       => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true,                      ),
+			'gname'			=> array ( 'type' => 'string', 'length' => 55												 ),
+			'sname'			=> array ( 'type' => 'string', 'length' => 55												 ),
+			'email'			=> array ( 'type' => 'string', 'length' => 55												 ),
+			'phone'			=> array ( 'type' => 'string', 'length' => 25												 ),
             'account_id'    => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true,                      ),
-
             'reg_id'        => array ( 'type' => 'string', 'length' => 25,                                               ),
-
-            'status'      => array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                       ),
+            'status'      	=> array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                     ),
     );
 
     public $formo_defaults = array(
-            'pass_id' => array( 'type'  => 'select', 'label' => 'Pass', 'required'=>true, 'adminRequired'=>true    ),
-            /*
-            'gname' => array( 'type'  => 'text', 'label' => 'Given Name', 'required'=>true, 'adminRequired'=>true ),
-            'sname' => array( 'type'  => 'text', 'label' => 'Surname', 'required'=>true, 'adminRequired'=>true    ),
+            'pass_id' 	=> array( 'type'  => 'select', 	'label' => 'Pass', 			'required'	=> true, 'adminRequired'=>true    ),            
+            'gname' 	=> array( 'type'  => 'text', 	'label' => 'Given Name', 	'required'	=> true, 'adminRequired'=>true 	  ),
+            'sname' 	=> array( 'type'  => 'text', 	'label' => 'Surname', 		'required'	=> true, 'adminRequired'=>true    ),
+			'phone' 	=> array( 'type'  => 'text', 	'label' => 'Phone', 													  ),
+			
+			/*
             'badge' => array( 'type'  => 'text', 'label' => 'Badge', 'required'=>true    ),
             'dob'   => array( 'type'  => 'date', 'label' => 'Date of Birth', 'required'=>true ),
-            'email' => array( 'type'  => 'text', 'label' => 'Email', 'required'=>true ),
-            'phone' => array( 'type'  => 'text', 'label' => 'Phone', 'required' => true),
+            'email' => array( 'type'  => 'text', 'label' => 'Email', 'required'=>true ),           
             'cell'  => array( 'type'  => 'text', 'label' => 'Cell Phone', 'required' => false),
             'city'  => array( 'type'  => 'text', 'label' => 'City', 'required' => true),
             'prov'  => array( 'type'  => 'text', 'label' => 'Province', 'required' => true),
@@ -67,18 +70,23 @@ class Model_Registration extends ORM
     
     public function rules()
 	{
-        $rules = array();
-        $rules['agree_toc'] = array(array('range', array(':value',0,1)));
-        $rules['email'] = array(array('email'));
-        $rules['phone'] = array(array('phone'));
-        $rules['ephone'] = array(array('phone'));
-        $rules['cell'] = array(array('phone'));
+        $rules = parent::rules();
+		$rules['phone'] = array(array('phone'));
+		$rules['agree_toc'] = array(array('range', array(':value',0,1)));
+		
+		/*
         $rules['dob'] = array(
             array(array($this, '_valid_date')),
             array(array($this, '_valid_birthdate'))
         );
-        //$rules['pass_id'] = array(array(array($this, '_valid_pass_for_account'), array(':validation', ':value')));
-        //$rules['unique_badge'] = array(array(array($this, '_unique_badge'), array(':validation')));
+        $rules['pass_id'] = array(
+			array(array($this, '_valid_pass_for_account'), array(':validation', ':value'))
+		);
+        $rules['unique_badge'] = array(
+			array(array($this, '_unique_badge'), array(':validation'))
+		);
+		*/
+		
         foreach ($this->formo_defaults as $field => $fieldData)
         {
             if (!isset($rules[$field])) $rules[$field] = array();
@@ -92,7 +100,7 @@ class Model_Registration extends ORM
             }
             array_push($rules[$field], array('max_length', array(':value', 255)));
         }
-        return arr::merge(parent::rules(), $rules);
+        return $rules;
 	}	
     
     public function filters()

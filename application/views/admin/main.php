@@ -17,12 +17,18 @@
 		<td>Add, modify or delete event registrations.</td>
 	</tr>
 	<tr>
-		<th class='header'><?php echo html::anchor(url::site('admin/export', TRUE), __('Export Registration Information (CSV)')) ?></th>
+		<th class='header'><?php echo html::anchor(url::site('admin/manageLocations', TRUE), __('Manage Locations')) ?></th>
 		<th class='header'><?php echo html::anchor(url::site('admin/manageAdmin', TRUE), __('Manage Administrators')) ?></th>
 	</tr>
 	<tr>
-		<td>Exports selected (or all) registration information for a particular event to a CSV file which can be opened in Excel.</td>
+		<td>Manage the list of sale locations and their prefixes (which are used to help generate registration ID's)</td>
 		<td>Grant and manage administrator access to accounts</td>
+	</tr>	
+	<tr>
+		<th class='header'><?php echo html::anchor(url::site('admin/export', TRUE), __('Export Registration Information (CSV)')) ?></th>
+	</tr>
+	<tr>
+		<td>Exports selected (or all) registration information for a particular event to a CSV file which can be opened in Excel.</td>
 	</tr>
 </table>
 </div>

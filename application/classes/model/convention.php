@@ -47,7 +47,7 @@ class Model_Convention extends ORM
         return (int) $row[0]['count'];
     }
 
-    public function validConvention($cid)
+    public static function validConvention($cid)
     {
         if (!is_numeric($cid) || $cid == -1)
             return false;

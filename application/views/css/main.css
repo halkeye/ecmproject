@@ -211,6 +211,17 @@ body {
 	display: inline;
 }
 
+#form input.short {
+	width: 75px;
+	text-align: center;
+}
+
+#form input.short_inline {
+	width: 75px;
+	display: inline;
+	text-align: center;
+}
+
 #form input.datebox {
 	width: 50px;
 	display: inline;
@@ -228,6 +239,11 @@ body {
 	display: inline;
 	margin: 0px 0px 10px 0px;
 	padding: 2px 2px;
+}
+
+#form select.inline {
+	margin: 0px 5px 0px 5px;
+	display: inline;
 }
 
 #form select.block {

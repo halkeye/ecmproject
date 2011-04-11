@@ -2,32 +2,36 @@
 <br />
 <!-- CONTENT: Expect initial convention id for this pass to be associated to. -->
 <?php 	
-	View::set_global('field_lang_prefix', 'convention.registration_field_');	
+	View::set_global('field_lang_prefix', '');	
 	echo form::open("admin/$callback"); 	
 ?>
-	<h1>Step 2: General Information</h1>
-	<p>NOTE: Age restrictions for badges are <strong>not</strong> enforced when creating a registration as an Administrator.</p>		
-	<fieldset>			
-		<?php	
-			//var_dump($row);
-			foreach (array('gname','sname', 'badge', 'dob', 'email', 'phone','cell', 'city', 'prov', 'econtact', 'ephone',) as $field)
-			{				
-                $fields[$field]['required'] = @$fields[$field]['adminRequired'];
-				echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $row[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
-			}		
-		?>
-	</fieldset>
-	
-	<h1>Step 3: Select a Pass</h1>
-	<p>NOTE: Age restrictions for badges are <strong>not</strong> enforced when creating a registration as an Administrator.</p>
+	<h1>Step 1: Select a Ticket</h1>
+	<p>The ticket that will be given. Any restrictions that have been placed on the ticket are not enforced.</p>
 	<fieldset>
 		<?php
 			$field = 'pass_id';
-            $fields[$field]['required'] = @$fields[$field]['adminRequired'];
+			$fields[$field]['required'] = @$fields[$field]['adminRequired'];
 			echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $row[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
 		?>
 	</fieldset>
-	<fieldset>				
+
+	<h1>Step 2: Ticket Information</h1>
+	<p>Registration ID Numbers are <strong>final</strong> once assigned and cannot be changed.</p>		
+	<fieldset>			
+		<?php	
+			echo Form::hidden('convention_id', $fields['convention_id']);
+			echo new View('admin/InputRegID', array('row' => $row) );		
+			
+			foreach (array('gname', 'sname', 'email', 'phone') as $field)
+			{			
+                $fields[$field]['required'] = @$fields[$field]['adminRequired'];
+				echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $row[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
+			}		
+			
+		?>
+	</fieldset>	
+	
+	<fieldset>		
 		<button type="submit">Create Registration</button>
 	</fieldset>							
 <?php echo form::close(); ?>

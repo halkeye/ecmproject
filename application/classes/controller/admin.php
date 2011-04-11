@@ -5,8 +5,10 @@
  * 
  * All admin functionality is implemented here.
  * @author Stephen Tiu <stt@sfu.ca>
- * @version 1.0
+ * @version 1.1
  * @package ecm
+ *
+ * TODO: Generize manage/create/edit.
  */
 
 
@@ -35,8 +37,7 @@ class Controller_Admin extends Base_MainTemplate
         $this->template->content = new View('admin/main');
     }
 
-    function action_manageConventions($page = NULL)
-    {
+    function action_manageConventions($page = NULL) {
         // Set headers
         $this->template->title =        __('Admin: Event List');
         $this->template->heading =      __('Admin: Event List');
@@ -59,10 +60,8 @@ class Controller_Admin extends Base_MainTemplate
                 'page' => $page,
                 'total_rows' => $total_rows)
             );  
-    }
-    
-    function action_manageAccounts($page = NULL)
-    {
+    }    
+    function action_manageAccounts($page = NULL) {
         // Set headers
         $this->template->title = "Administration: Manage Accounts";
         $this->template->heading = "Administration: Manage Accounts";
@@ -87,9 +86,7 @@ class Controller_Admin extends Base_MainTemplate
                 'total_rows' => $total_rows)
             );
     }
-    
-    function action_managePasses($convention_id = NULL, $page = NULL) 
-    {
+    function action_managePasses($convention_id = NULL, $page = NULL) {
         // Set headers
         $this->template->title = 		__('Admin: Manage Tickets');
         $this->template->heading = 		__('Admin: Manage Tickets');
@@ -124,9 +121,7 @@ class Controller_Admin extends Base_MainTemplate
                 'total_rows' => $total_rows)
             );
     }
-    
-    function action_manageRegistrations($convention_id = NULL, $page = NULL)
-    {
+    function action_manageRegistrations($convention_id = NULL, $page = NULL) {
         // Set headers
         $this->template->title = "Administration: Manage Registrations";
         $this->template->heading = "Administration: Manage Registrations";
@@ -178,9 +173,7 @@ class Controller_Admin extends Base_MainTemplate
                 'total_rows' => $total_rows)
             );  
     }
-    
-    function action_managePayments($rid = NULL)
-    {
+    function action_managePayments($rid = NULL) {
         if (!isset($rid) || !is_numeric($rid))
             die('Get out of here!');
             
@@ -220,14 +213,7 @@ class Controller_Admin extends Base_MainTemplate
                 'rows' => $data['entries'])
             );
     }
-    
-    /*
-    * List accounts with admin powers. Only action is to remove account from list of administrators or to add one.
-    *
-    *
-    */
-    function action_manageAdmin()
-    {
+    function action_manageAdmin() {
         $this->requirePermission('superAdmin'); //Require extra permissions to manage administrators.
         
         // Set headers
@@ -266,9 +252,32 @@ class Controller_Admin extends Base_MainTemplate
                 'total_rows' => count($rows))
             );
     }
-    
-    function action_createAccount() 
-    {
+    function action_manageLocations($page = NULL) {
+        $this->template->title = 		__('Admin: Locations');
+        $this->template->heading = 		__('Admin: Locations');
+        $this->template->subheading = 	__('Manage Ticket Sale Locations and their prefixes (used for registration ID generation)');
+		
+		$total_rows = Model_Location::getTotalLocations();
+		$start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );  
+        $rows = ORM::factory('Location')->limit(Controller_Admin::ROWS_PER_PAGE)->offset($start)->find_all();
+               
+        $this->validateRows($rows, $total_rows, 'location');      
+        $data = $this->generateViewRows($rows, 'Location');       
+        
+        // Set callback path for form submit (change convention, jump to page)
+        $this->template->content = new View('admin/list', array(
+                'entity' => 'Location',
+                'callback' => 'admin/manageLocations', 
+                'createText' => __('Create new Location'),
+                'createLink' => url::site('admin/createLocation', TRUE), 
+                'rows' => $data['entries'], 
+                'page' => $page,
+                'total_rows' => $total_rows)
+            );  
+	}
+   
+    /* CREATE Actions */   
+    function action_createAccount() {
         $this->template->title = 		__('Admin: Create an Account');
         $this->template->heading = 		__('Admin: Create an Account');
         $this->template->subheading = 	__('Create an Account');
@@ -303,9 +312,7 @@ class Controller_Admin extends Base_MainTemplate
 			'callback' => 'createAccount'
 		));      
     }
-    
-    function action_createPass()
-    {
+    function action_createPass()  {
         // Set headers
         $this->template->title = 		__('Admin: Create a Ticket');
         $this->template->heading = 		__('Admin: Create a Ticket');
@@ -349,7 +356,6 @@ class Controller_Admin extends Base_MainTemplate
             'callback' => 'createPass'
         ));
     }
-    
     function action_createConvention() {
         $this->template->title =        __('Admin: Create an Event');
         $this->template->heading =      __('Admin: Create an Event');
@@ -382,13 +388,11 @@ class Controller_Admin extends Base_MainTemplate
             'callback' => 'createConvention'
         )); 
     }   
-
-    /* Step 1 */
     function action_createRegistration() {
         // Set headers
-        $this->template->title = "Administration: Create Registration";
-        $this->template->heading = "Administration: Create Registration";
-        $this->template->subheading = "Create a registration for a convention.";
+        $this->template->title = 		__('Admin: Create Registration(s)');
+        $this->template->heading = 		__('Admin: Create Registration(s)');
+        $this->template->subheading = 	__('Create registrations for an existing event.');
     
         $reg = ORM::factory('Registration');
         $crows = ORM::factory('Convention')->find_all()->as_array('id', 'name');    
@@ -399,100 +403,69 @@ class Controller_Admin extends Base_MainTemplate
     
         if ($post = $this->request->post())
         {
-            //Validate valid convention id, validate account - create if not exist email. Then pass it on as a POST.
-            if (Model_Convention::validConvention($post['convention_id']) && isset($post['email']) && !empty($post['email']))
-            {
-                $aid = Model_Account::createAccount($post['email']);
-                if ($aid != -1)
-                    $this->request->redirect("admin/createRegistration2/" . $post['convention_id'] . "/$aid"); //Move to next STEP
-                else
-                    $this->addError("Oops. An internal error occured. Try again.");
-            }
-                        
-            $this->addError("One or more fields are blank!");   //pass_field_reg_error_convention_id_missing    
-            $this->template->content = new View('admin/Registration', array(
-                'row' => $post,
-                'fields' => $fields,
-                'callback' => 'createRegistration'
-            ));
+			if (Model_Convention::validConvention($post['convention_id'])) 
+			{
+				$this->session->set('admin_convention_id', $post['convention_id']);
+				$this->request->redirect('admin/createRegistration2/');
+			}
+			else 
+			{
+				$this->addError("You must select a valid convention before you can continue.");   
+			}           
         }
-        else 
-        {
-            $this->template->content = new View('admin/Registration', array(
-                'row' => $reg->as_array(),
-                'fields' => $fields,
-                'callback' => 'createRegistration'
-            ));     
-        }   
+
+		$this->template->content = new View('admin/Registration', array(
+			'row' => $reg->as_array(),
+			'fields' => $fields,
+			'callback' => 'createRegistration'
+		));             
     }
+    function action_createRegistration2() {
     
-    /* Step 2 */
-    function action_createRegistration2($cid = NULL, $aid = NULL) {
-    
-        //Not allowed to be lazy in checking input here.
-        if ( (!isset($cid) || !is_numeric($cid) || $cid <= 0) || (!isset($aid) || !is_numeric($aid) || $aid <= 0))
-            die("You're not allowed to be here!");
+		$post = $this->request->post();
+		$alt_convention_id = $this->hasValue($post, 'convention_id') ? $post['convention_id'] : 0;
+		$convention_id = $this->session->get_once('admin_convention_id', $alt_convention_id); 
+		
+		if (!$convention_id && !isset($post['convention_id']))
+		{
+			$this->addError("You must select a valid convention before you can continue");
+			$this->request->redirect('admin/createRegistration');
+		}		
             
-        //TODO: Deal with the case where one of the below fails to load.
         $reg = ORM::factory('Registration');
-        $crows = ORM::factory('Convention')->find_all()->as_array('id', 'name');    
-        $fields = $reg->formo_defaults;
-        
-        $fields['pass_id']['values'] = ORM::Factory('Pass')->where("convention_id=$cid")->find_all()->as_array('id', 'name');
-        
-        if ($post = $this->request->post())
+		$con = ORM::factory('Convention', $convention_id);
+		if (! $con->loaded() )
         {
-            $fieldName = 'dob';
-            $post[$fieldName] = ECM_Form::parseSplitDate($post, $fieldName);
-        
-            if ($reg->validate_admin($post))
-            {           
-                $reg->convention_id = $cid;
-                $reg->account_id = $aid;
-                $reg->save();               
-                if ($reg->saved()) {
-                    $this->addMessage('Created a newly minted registration for: ' . $reg->gname . ' ' . $reg->sname);
-                    $this->request->redirect('admin/manageRegistrations');
-                }
-                else
-                {
-                    $this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
-                }
-            }
-                        
-            $errorMsg = 'Oops. You entered something bad! Please fix it! <br />';               
-            $errors = $post->errors('form_error_messages');
-            foreach ($errors as $error)
-                $errorMsg = $errorMsg . ' ' . $error . '<br />';                    
-        
-            $this->addError($errorMsg);
-            
-            $this->template->content = new View('admin/Registration2', array(
-                'row' => $post,
-                'fields' => $fields,
-                'callback' => "createRegistration2/$cid/$aid"
-            ));
-        } else {
-            $acct = ORM::factory('Account',$aid);
-            if (!$acct->loaded())
-                die('Serious error here. The account is supposed to exist but it doesn\'t.');
-                
-            $reg->email = $acct->email;
-            
-            /* Full registration at this step. */
-            $this->template->content = new View('admin/Registration2', array(
-                    'row' => $reg->as_array(),
-                    'fields' => $fields,
-                    'callback' => "createRegistration2/$cid/$aid"
-                ));
+            $this->addError('This convention appears to have disappeared into the nether. Please select again.');
+            $this->request->redirect('admin/createRegistration/');
         }
+		
+        $fields = $reg->formo_defaults;        
+        $fields['pass_id']['values'] = ORM::Factory('Pass')->where('convention_id', '=', $convention_id)->find_all()->as_array('id', 'name');
+		$fields['convention_id'] = $convention_id;
+        
+		$this->template->title = 		__('Admin: Create Registration(s) for ') . $con->name;
+        $this->template->heading = 		__('Admin: Create Registration(s) for ') . $con->name;
+        $this->template->subheading = 	__('Create registrations for ') . $con->name;
+		
+        if ($post)
+        {           
+            $post['agree_toc'] = 1; //Auto-agree.			
+        }
+		else
+        {
+            $post = $reg->as_array();
+			$post['convention_id'] = $convention_id;
+        }
+		
+		/* Full registration at this step. */
+		$this->template->content = new View('admin/Registration2', array(
+			'row' => $post,
+			'fields' => $fields,
+			'callback' => "createRegistration2"
+		));
     }
-    
-    /*
-    * $rid - Registration ID to add payment to. The rest can be determined using the registration ID.
-    */
-    function action_createPayment($rid = NULL)
-    {
+    function action_createPayment($rid = NULL) {
         if ($rid == NULL || !is_numeric($rid))
             die('Get out of here!');
             
@@ -551,14 +524,41 @@ class Controller_Admin extends Base_MainTemplate
                 ));
         }
     }   
-    
-    function action_editAccount($id = NULL)
-    { 
-        // Set headers
-        $this->template->title = "Administration: Edit an Account";
-        $this->template->heading = " Administration: Edit an Account";
-        $this->template->subheading = "Edit an Account associated with a convention. ";
+    function action_createLocation() {
+		$this->template->title =        __('Admin: Create a Location');
+        $this->template->heading =      __('Admin: Create a Location');
+        $this->template->subheading =   __('Create a new location');
         
+        $loc = ORM::factory('Location'); 
+        $fields = $loc->formo_defaults;
+        $post = $loc->as_array();
+        
+        if ($post = $this->request->post())
+        {                   
+            $loc->values($post);
+            try {
+                $loc->save();
+                $this->addMessage(__('Created a new location, ') . $loc->location);
+                $this->request->redirect('admin/manageLocations');
+            }
+            catch (ORM_Validation_Exception $e)
+            {
+                $this->parseErrorMessages($e);      
+            }               
+            catch (Exception $e)
+            {
+                $this->addError("Oops. Something went wrong ... but it's not your fault. Contact the system maintainer please!");
+            }
+        }
+        $this->template->content = new View('admin/Location', array(
+            'row' => $post,
+            'fields' => $fields,
+            'callback' => 'createLocation'
+        ));
+	}
+	
+	/* EDIT Actions */
+	function action_editAccount($id = NULL) {         
         /* If no ID or bad ID defined, kill it with fire. */
         if ($id == NULL || !is_numeric($id))
             die('No direct access allowed. Go away D:');
@@ -573,13 +573,18 @@ class Controller_Admin extends Base_MainTemplate
             $errorMsg = 'That pass does not exist! Maybe someone deleted it while you were busy?<br />';                
             $this->request->redirect('admin/manageAccounts');
         }
+		
+		// Set headers
+        $this->template->title = 		__('Admin: Editing account, ') . $acct->email;
+        $this->template->heading = 	 	__('Admin: Editing account, ') . $acct->email;
+        $this->template->subheading = 	__('Edit the details of an account');
         
         if ($post = $this->request->post())
         {		
 			//Why not just add to ruleset of account...? Unset password fields for editing an account so validation rules don't trigger?			
 			$extra_validation = Validation::Factory($post);
           		
-			if ( $this->hasValue( $post['password'] ) || $this->hasValue( $post['confirm_password'] ) )
+			if ( $this->hasValue( $post, 'password' ) || $this->hasValue( $post, 'confirm_password' ) )
 			{
                 $extra_validation->rule('password', 'matches', array(':validation', 'password', 'confirm_password'));
 			}
@@ -617,9 +622,7 @@ class Controller_Admin extends Base_MainTemplate
         ));
         
     }
-    
-    function action_editPass($id = NULL)
-    {
+    function action_editPass($id = NULL) {
         // Set headers       
         
         /* If no ID or bad ID defined, kill it with fire. */
@@ -672,10 +675,7 @@ class Controller_Admin extends Base_MainTemplate
             'callback' => "editPass/$id"
         ));
     }
-    
-
-    function action_editConvention($id = NULL)
-    {       
+    function action_editConvention($id = NULL) {       
         /* If no ID or bad ID defined, kill it with fire. */
         if ($id == NULL || !is_numeric($id))
             die('No direct access allowed. Go away D:');
@@ -687,7 +687,7 @@ class Controller_Admin extends Base_MainTemplate
         if (!$conv->loaded())
         {
             $errorMsg = 'That pass does not exist! Maybe someone deleted it while you were busy?<br />';                
-            $this->request->redirect('admin/manage');
+            $this->request->redirect('admin/manageConventions');
         }
         
         $this->template->title =        __('Admin: Editing ' . $conv->name); //Escape output?
@@ -718,9 +718,7 @@ class Controller_Admin extends Base_MainTemplate
             'callback' => "editConvention/$id"
         ));         
     }
-    
-    function action_editRegistration($rid = NULL)
-    {
+    function action_editRegistration($rid = NULL) {
         /* Can change all fields. */    
         //Not allowed to be lazy in checking input here.
         if ( (!isset($rid) || !is_numeric($rid) || $rid <= 0) )
@@ -783,9 +781,7 @@ class Controller_Admin extends Base_MainTemplate
         }
         
     }
-    
-    function editPayment($id = NULL)
-    {
+    function editPayment($id = NULL) {
         if ($id == NULL || !is_numeric($id))
             die('Get out of here!');
             
@@ -846,7 +842,54 @@ class Controller_Admin extends Base_MainTemplate
                 ));
         }
     }
-    
+    function action_editLocation($id = NULL) {
+		/* TODO: Add a check to see if a location is in use. */
+        if ($id == NULL || !is_numeric($id))
+            die('No direct access allowed. Go away D:');
+				
+        $loc = ORM::factory('Location', $id); 
+        $fields = $loc->formo_defaults;
+		
+		/* If pass is not loaded, we have a problem */
+        if (!$loc->loaded())
+        {
+            $errorMsg = 'Non-existent location! Maybe someone wiped it off the map when you weren\'t looking?<br />';                
+            $this->request->redirect('admin/manageLocation');
+        }
+        
+		$this->template->title =        __('Admin: Editing ') . $loc->location;
+        $this->template->heading =      __('Admin: Editing ') . $loc->location;
+        $this->template->subheading =   __('Edit the details of a location.');
+		
+        if ($post = $this->request->post())
+        {                   
+            $loc->values($post);
+            try {
+                $loc->save();
+                $this->addMessage(__('Edited location, ') . $loc->location);
+                $this->request->redirect('admin/manageLocations');
+            }
+            catch (ORM_Validation_Exception $e)
+            {
+                $this->parseErrorMessages($e);      
+            }               
+            catch (Exception $e)
+            {
+                $this->addError("Oops. Something went wrong ... but it's not your fault. Contact the system maintainer please!");
+            }
+        }
+		else {
+			$post = $loc->as_array();
+		}
+		
+        $this->template->content = new View('admin/Location', array(
+            'row' => $post,
+            'fields' => $fields,
+            'callback' => "editLocation/$id"
+        ));
+	}
+	
+	
     function action_deleteConvention($id = NULL)
     {
         Controller_Admin::__delete($id, 'Convention', 'deleteConvention', 'manageConventions');
@@ -871,6 +914,10 @@ class Controller_Admin extends Base_MainTemplate
         //TODO: Update status as necessary!
         Controller_Admin::__delete($id, 'Payment', "deletePayment/$rid", "managePayments/$rid", true);              
     }
+	function action_deleteLocation($id = NULL) {   
+        Controller_Admin::__delete($id, 'Location', 'deleteLocation', 'manageLocations');             
+    }
+	
     
     function setAdmin()
     {   
@@ -1016,6 +1063,8 @@ class Controller_Admin extends Base_MainTemplate
             $entityName = $row->name;
         else if (isset($row->email))
             $entityName = $row->email;
+		else if (isset($row->location))
+			$entityName = $row->location;
         else
             $entityName = 'Type: ' . $row->type; //hack.
         
@@ -1350,16 +1399,14 @@ class Controller_Admin extends Base_MainTemplate
         }     
 	}
 	
-	private function requireVerification($account)
-	{
+	private function requireVerification($account) {
 		if (!$account->isVerified()) {
 			$vcode = $account->generateVerifyCode(Model_Verificationcode::TYPE_VALIDATE_EMAIL);
 			$account->sendValidateEmail($vcode->original_code);
 		}
 	}
 	
-    private function parseErrorMessages($e) 
-    {
+    private function parseErrorMessages($e) {
         $errorMsg = 'Oops. You entered something bad! Please fix it! <br />';               
         $errors = $e->errors('form_error_messages');
         foreach ($errors as $error)
@@ -1368,13 +1415,16 @@ class Controller_Admin extends Base_MainTemplate
         $this->addError($errorMsg);     
     }
     
-	private function hasValue($value) {
-		$value = trim($value);
-		return !( !isset($value) || empty($value) );
+	private function hasValue($model, $field) {
+		if (!isset($model[$field])) {
+			return false;
+		}
+	
+		$value = trim($model[$field]);
+		return !( empty($value) );
 	}	
     
-    public function action_testClock()
-    {
+    public function action_testClock() {
         header("Content-type: text/plain");
         print date("r");
         exit;       

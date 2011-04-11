@@ -5,12 +5,11 @@
 	View::set_global('field_lang_prefix', 'admin.reg_field_');	
 	echo form::open("admin/$callback"); 
 ?>
-	<h1>Step 1: Select Account & Convention</h1>
-	<p>All registrations are for a particular convention. By default, the active convention is the selected choice but you can specify a different one
-if you need to. NOTE: Once a registration is created, it <strong>cannot</strong> be moved to a different convention.</p>		
+	<h1>Step 1: Select Convention</h1>
+	<p>Select the event you wish to add registrations to. Registrations <strong>cannot</strong> be moved between events once they have been created.</p>		
 	<fieldset>		
 		<?php
-			foreach (array('email', 'convention_id') as $field)
+			foreach (array('convention_id') as $field)
 			{
 				echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $row[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
 			}		
