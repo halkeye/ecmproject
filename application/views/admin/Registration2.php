@@ -16,18 +16,17 @@
 	</fieldset>
 
 	<h1>Step 2: Ticket Information</h1>
-	<p>Registration ID Numbers are <strong>final</strong> once assigned and cannot be changed.</p>		
+	<p>Registration ID Numbers are <strong>final</strong> once assigned and cannot be changed. You must provide <strong>either</strong> a phone number or an email.</p>		
 	<fieldset>			
 		<?php	
 			echo Form::hidden('convention_id', $fields['convention_id']);
-			echo new View('admin/InputRegID', array('row' => $row) );		
+			echo new View('admin/InputRegID', array('row' => $row, 'fields' => $fields) );		
 			
-			foreach (array('gname', 'sname', 'email', 'phone') as $field)
-			{			
+			foreach (array('gname', 'sname', 'email', 'phone', 'status') as $field)
+			{							
                 $fields[$field]['required'] = @$fields[$field]['adminRequired'];
 				echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $row[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
-			}		
-			
+			}	
 		?>
 	</fieldset>	
 	

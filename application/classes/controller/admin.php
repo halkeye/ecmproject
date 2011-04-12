@@ -339,10 +339,6 @@ class Controller_Admin extends Base_MainTemplate
             {
                 $this->parseErrorMessages($e);      
             }               
-            catch (Exception $e)
-            {
-                $this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
-            }
         }   
         else
         {
@@ -441,7 +437,11 @@ class Controller_Admin extends Base_MainTemplate
         }
 		
         $fields = $reg->formo_defaults;        
+		$locations = ORM::Factory('Location')->find_all()->as_array('prefix', 'prefix');
+		
         $fields['pass_id']['values'] = ORM::Factory('Pass')->where('convention_id', '=', $convention_id)->find_all()->as_array('id', 'name');
+		$fields['status']['values']	 = Model_Registration::getStatusValues();		
+		$fields['comp_loc']['values'] = $locations;
 		$fields['convention_id'] = $convention_id;
         
 		$this->template->title = 		__('Admin: Create Registration(s) for ') . $con->name;
@@ -450,12 +450,38 @@ class Controller_Admin extends Base_MainTemplate
 		
         if ($post)
         {           
-            $post['agree_toc'] = 1; //Auto-agree.			
-        }
+			$reg->values($post); //Deal with web allocation?
+			$reg->reg_id = $this->build_regID($post, $locations, $convention_id); //If validation fails, empty regID and save() will fail.
+			$extra_validation = $this->validateEmailOrPhone($post);
+			
+			//Validate non-object fields comp_loc, comp_id and return a reg_id if fields are valid.		
+			//TODO: Merge/fix validation errors.
+			try {
+				if ( $reg->reserveTickets() ) { //Reserve tickets. Return at least 1 except in case of failure (not enough tickets left).
+					$reg->save($extra_validation); 
+					$reg->finalizeTickets(); //Save has gone through. Finalize reservation.
+					$this->addMessage( __('Created a new registration, ') . $reg->reg_id);
+					$this->session->set('admin_convention_id', $post['convention_id']);
+				}
+				else if ($reg->pass_id > 0) {					
+					$this->addError("No more tickets to allocate for " . $fields['pass_id']['values'][$reg->pass_id] . '. Please select a different pass.');				
+				}	
+				else {
+					$this->addError("No pass selected. Please select a pass."); 
+				}
+			}
+			catch (ORM_Validation_Exception $e)
+			{				
+				$this->parseErrorMessages($e);   			
+			}     
+			
+			$reg->releaseTickets(); //Something went wrong during saving. Rollback everything.
+		}
 		else
-        {
+        {			
             $post = $reg->as_array();
 			$post['convention_id'] = $convention_id;
+			$post['status'] = Model_Registration::STATUS_PAID;
         }
 		
 		/* Full registration at this step. */
@@ -1408,10 +1434,17 @@ class Controller_Admin extends Base_MainTemplate
 	
     private function parseErrorMessages($e) {
         $errorMsg = 'Oops. You entered something bad! Please fix it! <br />';               
-        $errors = $e->errors('form_error_messages');
-        foreach ($errors as $error)
-            $errorMsg = $errorMsg . ' ' . $error . '<br />';                    
-    
+        $errors = $e->errors('admin'); //Loads from directory specified by argument here.
+        foreach ($errors as $error)		
+			if ( is_array($error) ) {
+				foreach($error as $nested_error) {
+					$errorMsg = $errorMsg . ' ' . $nested_error . '<br />'; 
+				}			
+			}
+			else {
+				$errorMsg = $errorMsg . ' ' . $error . '<br />';                    
+			}
+			
         $this->addError($errorMsg);     
     }
     
@@ -1422,6 +1455,43 @@ class Controller_Admin extends Base_MainTemplate
 	
 		$value = trim($model[$field]);
 		return !( empty($value) );
+	}	
+	private function validateEmailOrPhone($post) {
+		$extra_validation = Validation::Factory($post);
+		
+		if (empty($post['phone'])) {
+			$extra_validation->rule('email', 'not_empty');
+		}		
+		else if (empty($post['email'])) {
+			$extra_validation->rule('phone', 'not_empty');
+		}		
+		
+		return $extra_validation;
+	}
+	private function build_regID($post, $locations, $convention_id) {
+		//ticket_counters
+		$validate = Validation::Factory($post)
+			->rule('comp_loc', 'in_array', array(':value', array_values($locations)))
+			->rule('comp_id', 'numeric')
+			->rule('comp_id', 'not_empty');
+		//				
+			
+		if ( !$validate->check() )
+		{	
+			$error = '';
+			foreach($validate->errors('reg_id') as $error_msg) 
+			{
+				$error .= $error_msg . '<br />';
+			}
+			
+			if ($error) {
+				$this->addError($error);
+			}
+			
+			return '';
+		}
+			
+		return sprintf('%s_%s_%s', $convention_id, $post['comp_loc'], $post['comp_id']);
 	}	
     
     public function action_testClock() {
