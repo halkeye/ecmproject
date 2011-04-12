@@ -8,7 +8,7 @@ class Model_Registration extends ORM
 	const STATUS_FAILED		 = 98; //Registration no longer valid (cancelled, refunded, etc).
     const STATUS_PAID        = 99; // Fully working and paid
     
-    protected $_ignored_columns = array('agree_toc', 'unique_badge');
+    protected $_ignored_columns = array('agree_toc', 'unique_badge', 'comp_cid', 'comp_loc', 'comp_id');
 
     /* On unserialize never check the db */
     protected $_reload_on_wakeup = false;
@@ -28,10 +28,7 @@ class Model_Registration extends ORM
         ),
     );
 
-    protected $_has_one = array(
-    );
-
-//    protected $load_with = array('convention','pass', 'account');
+	//protected $load_with = array('convention','pass', 'account');
 
     // Table primary key and value
     protected $_primary_key = 'id';
@@ -55,6 +52,7 @@ class Model_Registration extends ORM
             'gname' 	=> array( 'type'  => 'text', 	'label' => 'Given Name', 	'required'	=> true, 'adminRequired'=>true 	  ),
             'sname' 	=> array( 'type'  => 'text', 	'label' => 'Surname', 		'required'	=> true, 'adminRequired'=>true    ),
 			'phone' 	=> array( 'type'  => 'text', 	'label' => 'Phone', 													  ),
+			'status'	=> array( 'type'  => 'select',  'label' => 'Status',		'required'	=> true							  ),
 			
 			/*
             'badge' => array( 'type'  => 'text', 'label' => 'Badge', 'required'=>true    ),
@@ -68,27 +66,23 @@ class Model_Registration extends ORM
             */
     );
     
+	/* Used for ticket allocation */
+	private $ticket_reserved = 0;
+	private $ticket_next_id = 0;
+	
     public function rules()
 	{
         $rules = parent::rules();
 		$rules['phone'] = array(array('phone'));
-		$rules['agree_toc'] = array(array('range', array(':value',0,1)));
-		
-		/*
-        $rules['dob'] = array(
-            array(array($this, '_valid_date')),
-            array(array($this, '_valid_birthdate'))
-        );
-        $rules['pass_id'] = array(
-			array(array($this, '_valid_pass_for_account'), array(':validation', ':value'))
+		$rules['agree_toc'] = array(array('range', array(':value',0,1))); //This field is not triggered?
+		$rules['pass_id'] = array(
+			array(array($this, '__valid_pass')),
 		);
-        $rules['unique_badge'] = array(
-			array(array($this, '_unique_badge'), array(':validation'))
+		$rules['reg_id'] = array(
+			array(array($this, '__check_regID_availability')),
 		);
-		*/
 		
-        foreach ($this->formo_defaults as $field => $fieldData)
-        {
+        foreach ($this->formo_defaults as $field => $fieldData) {
             if (!isset($rules[$field])) $rules[$field] = array();
             if (isset($fieldData['required']) && $fieldData['required'])
             {
@@ -100,6 +94,7 @@ class Model_Registration extends ORM
             }
             array_push($rules[$field], array('max_length', array(':value', 255)));
         }
+		
         return $rules;
 	}	
     
@@ -121,111 +116,97 @@ class Model_Registration extends ORM
         return $filters;
     }   
 
-    public function __toString()
-    {
-        return $this->pass . ' - ' . $this->badge;
+	/* Validation callbacks */
+    public function __valid_pass($value) {
+		return (bool) ORM::Factory('Pass', $value)->where('convention_id', '=', $this->convention_id)->count_all();
     }
-
-    public function _update_convention_from_pass($value)
+	public function __check_regID_availability($value) {
+		return ! (bool) ORM::Factory('Registration')->where('reg_id', '=', $value)->count_all();
+	}
+	public function __update_convention_from_pass($value)
     {
         $pass = ORM::Factory('Pass')->where('passes.id','=',$value)->find();
         $this->convention_id = $pass->convention_id;
         return $value;
     }
-
-	/**
-     * Validates and optionally saves a new user record from an array. Same as validate minus pass restriction checking.
-     *
-     * @param  array    values to check
-     * @param  boolean  save[Optional] the record when validation succeeds
-     * @return boolean
-     */
-    public function validate_admin(array & $array, $save = FALSE)
-    {
-        // Initialise the validation library and setup some rules
-        $array = Validation::factory($array);
-        // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
-        $this->addValidationRules_admin($array);
-		
-        /* Keep track of what really changed so we don't update fields we haven't changed */
-        $realChanged = $this->changed;
-        foreach ($array->safe_array() as $field=>$value)
-        {
-            if ($this->$field != $value) 
-            {
-                $realChanged[$field] = $this->$field; 
-            }
-        }
-        $ret = parent::validate($array, $save);
-        $this->changed = $realChanged;
-        return $ret;
-    }
 	
-    private function addValidationRules($form)
-    {
-        //$form->add_rules('dob', 'date');
-    }
-	
-	private function addValidationRules_admin($form)
-    {
-        $form->pre_filter('trim');
-
-        $fields = $this->formo_defaults;
-        foreach ($fields as $field => $fieldData)
-        {
-            if (isset($fieldData['adminRequired']) && $fieldData['adminRequired'])
-            {
-                $form->add_rules($field, 'required');
-            }
-        }
-		
-        // Add Rules
-        $form->add_rules('heard_from', 'standard_text');
-        $form->add_rules('attendance_reason', array($this, '_true'));
-        $form->add_rules('email', 'required', array('valid','email'));
-		$form->add_rules('phone', 'phone[7,9,10,11,14,15]');
-        $form->add_rules('cell', 'phone[7,9,10,11,14,15]');
-        $form->add_rules('ephone', 'phone[7,9,10,11,14,15]');
-        //$form->add_rules('dob', 'date');
-		$form->add_callbacks('dob', array($this, '_valid_birthdate'));
-        //$form->add_callbacks('pass_id', array($this, '_valid_pass_for_account'));
-    }
-	
-    public function _valid_pass_for_account(Validation $array, $value)
-    {
-        $ageTime = strtotime($array['dob']);
-
-        $pass = ORM::Factory('Pass')->with('convention')->where('passes.id','=',$value)->find();
-        $conventionStartTime = $pass->convention->start_date;
-        # Code from http://forums.webmasterhub.net/viewtopic.php?f=23&t=1831 - Option 4
-        $yearsOld = abs(substr(date('Ymd', $conventionStartTime) - date('Ymd', $ageTime), 0, -4));
-
-        $query = $this->getPossiblePassesQuery();
-        $query->where('minAge','<=', $yearsOld);
-        $query->where('maxAge','>=', $yearsOld);
-        $query->where('id','=', $value);
-        return !(bool)$query->count_all();
-    }
-	
-	/* Takes in a date in the format: YYYY-MM-DD (ISO_8601) */
-	public function _valid_date($value)
-	{
+	/* Non-used validation callbacks */
+	public function _valid_date($value)	{
 		$date = strtotime($value);
-		
-		/* If date validation failed (not a date string) or date does not match expected... */
+
 		if (!$date || date("Y-m-d", $date) != $value)
             return FALSE;
         return TRUE;
     }
-	public function _valid_birthdate($value)
-    {
+	public function _valid_birthdate($value) {
 		$date = strtotime($value);
         /* if someone isn't born yet, they can't have a badge (mostly because they don't have a birthday) */
         if ($date > time())
             return FALSE;
         return TRUE;
 	}
+	public function _unique_badge(Validation $array) {
+        $query = ORM::Factory('registration');
+        // TODO: use config
+        // TODO: switch this to be a config. name bool, and badge bool, so name and badge can be enforced unique
+        $query->where('gname', '=',$array['gname']);
+        $query->where('sname', '=',$array['sname']);
+        $query->where('account_id', '=',$array['account_id']);
+        if ($this->loaded) 
+            $query->where('id','!=', $this->id);
+
+        return ((bool)$query->count_all());
+    }
+    	
+	/* Ticket allocation methods */	
+	public function reserveTickets($amount = 1) {
+		DB::query(NULL, 'START TRANSACTION')->execute();
+		$query = DB::query(Database::SELECT, 'SELECT * FROM ticket_counters WHERE pass_id = :pass_id FOR UPDATE'); 
+		$query->param(':pass_id', $this->pass_id);				
+		$result = $query->execute();
+		
+		/* No ticket counter, non-numeric reservation amount, amount less than zero, or not enough tickets to allocate */
+		if ( !$result->count() || !is_numeric($amount) || $amount <= 0 || $result->get('tickets_total') - $result->get('tickets_assigned') < $amount ) {
+			DB::query(NULL, 'ROLLBACK');
+			return false;
+		}	
+		else {
+			$this->ticket_reserved = $amount;
+			$this->ticket_next_id  = $result->get('next_id');
+		}
+		
+		return $this->ticket_next_id;
+	}
+	public function finalizeTickets($amount = 1) {
+		$alloc = $amount <= $tickets_reserved ? $amount : $this->tickets_reserved; //Don't "allocate" more than what was originally reserved.
 	
+		$allocate_query = DB::query(Database::UPDATE, 'UPDATE ticket_counters SET tickets_assigned = tickets_assigned + :alloc, next_id = next_id + :next_id');
+		$query->param(':alloc', $alloc);
+		$query->param(':next_id', $alloc); 
+		
+		DB::query(NULL, 'COMMIT');
+		$this->tickets_reserved = 0;
+		$this->tickets_next_id = 0;
+	}
+	public function releaseTickets() {
+		if ($this->tickets_reserved) {
+			DB::query(NULL, 'ROLLBACK'); //Incidentally, if a save() actually got through but then an exception gets thrown while in the same block, everything gets rolled back.			
+		}
+		
+		$this->tickets_reserved = 0;
+		$this->tickets_next_id = 0;
+	}	
+    
+	/* Utility methods */
+	public static function getTotalRegistrations($cid) {
+        return ORM::Factory('Registration')->where('convention_id','=',$cid)->count_all();
+	}
+	public function toString() {
+        return $this->pass . ' - ' . $this->badge;
+    }
+	
+	/* Unsorted methods. TODO: CLEANUP. */
+		
     /**
      * @param $accountId Account Id
      * @param $conventionId [optional] Convention id, defaults to most recent one
@@ -264,7 +245,6 @@ class Model_Registration extends ORM
         $query->parameters($vars);
         return $query->execute();
     }
-
     public function getPossiblePassesQuery()
     {
         return ORM::Factory('pass')
@@ -289,41 +269,7 @@ class Model_Registration extends ORM
             ->find_all();
     }
     
-    public function save(Validation $validation = null)
-    {
-        $originalChanged = $this->_changed;
-		
-		//Only set status to UNPROCESSED if it's a new registration! (Else it'll keep blanking my status updates).
-		if ($this->id == 0)
-			$this->status = Model_Registration::STATUS_UNPROCESSED;
 
-		if (isset($originalChanged['status']) && $this->status == Model_Registration::STATUS_PAID)
-			$this->sendConfirmationEmail();
-				
-        $ret = parent::save($validation);
-
-        if ( ! empty($originalChanged))
-        {
-            foreach ($originalChanged as $column=>$oldValue)
-            {
-                // Compile changed data
-                $log = ORM::Factory('log');
-                $log->target_account_id = $this->account_id;
-                $log->target_registration_id = $this->id;
-                $log->target_badge_id = $this->pass_id;
-                $log->description = sprintf("%s => %s => %s", $column, ($column == $oldValue ? '--unknown--' : $oldValue), $this->$column);
-                $log->save();
-            }
-        }
-    }
-
-    /* for validation */
-    public function _true() { return TRUE; }
-	
-	public static function getTotalRegistrations($cid)
-	{
-        return ORM::Factory('Registration')->where('convention_id','=',$cid)->count_all();
-	}
 	
 	/*
 	* getAllRegistrationsByConvention
@@ -334,14 +280,9 @@ class Model_Registration extends ORM
 	public static function getAllRegistrationsByConvention($account_id)	{
 		
 		return ORM::Factory('Registration')->where('account_id', '=', $account_id)->order_by('convention_id', 'DESC')->find_all();	
-	}
+	}	
 	
-	public function statusToString()
-	{
-		return Model_Registration::regStatusToString($this->status);
-	}
-	
-	public function regStatusToString($status) 
+	public function statusToString($status) 
     {
 		if ($status == Model_Registration::STATUS_UNPROCESSED)
 			return 'UNPROCESSED';
@@ -415,20 +356,6 @@ class Model_Registration extends ORM
 		
         email::send($to, $from, $subject, $message, TRUE);    
 	}
-    
-    public function _unique_badge(Validation $array)
-    {
-        $query = ORM::Factory('registration');
-        // TODO: use config
-        // TODO: switch this to be a config. name bool, and badge bool, so name and badge can be enforced unique
-        $query->where('gname', '=',$array['gname']);
-        $query->where('sname', '=',$array['sname']);
-        $query->where('account_id', '=',$array['account_id']);
-        if ($this->loaded) 
-            $query->where('id','!=', $this->id);
-
-        return ((bool)$query->count_all());
-    }
 }
 
 /* End of file user.php */
