@@ -82,11 +82,20 @@ class Model_Pass extends ORM
 
 	public function save(Validation $validation = null)
 	{
+		$loaded = $this->loaded();
 		/* Fill in optional fields.*/			
 		if (!isset($this->isPurchasable) || empty($this->isPurchasable))
 			$this->isPurchasable = 0;
 			
-		parent::save($validation);	
+		$ret = parent::save($validation);	
+		
+		/* Create ticket counter on CREATE. */
+		if ($!loaded) {
+			$query = DB::query(Database::INSERT, 'INSERT INTO ticket_counters (pass_id, tickets_assigned, tickets_total, next_id) VALUES (:pass_id, 0, :total, 1)'); 
+			$query->param(':pass_id', $this->id);
+			$query->param(':total', 20);
+			$query->execute();
+		}
 	}
 	
 	/* Only admin will modify passes anyways.*/
