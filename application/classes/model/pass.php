@@ -90,7 +90,7 @@ class Model_Pass extends ORM
 		$ret = parent::save($validation);	
 		
 		/* Create ticket counter on CREATE. */
-		if ($!loaded) {
+		if (!$loaded) {
 			$query = DB::query(Database::INSERT, 'INSERT INTO ticket_counters (pass_id, tickets_assigned, tickets_total, next_id) VALUES (:pass_id, 0, :total, 1)'); 
 			$query->param(':pass_id', $this->id);
 			$query->param(':total', 20);
