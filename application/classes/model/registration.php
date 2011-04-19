@@ -295,15 +295,15 @@ class Model_Registration extends ORM
 	
 	public static function statusToString($status) 
     {
-		if ($status == Model_Registration::STATUS_UNPROCESSED)
+		if ($this->status == Model_Registration::STATUS_UNPROCESSED)
 			return 'UNPROCESSED';
-		else if ($status == Model_Registration::STATUS_PROCESSING )
+		else if ($this->status == Model_Registration::STATUS_PROCESSING )
 			return 'PROCESSING';
-		else if ($status == Model_Registration::STATUS_PAID)
+		else if ($this->status == Model_Registration::STATUS_PAID)
 			return 'PAID';
-		else if ($status == Model_Registration::STATUS_NOT_ENOUGH)
+		else if ($this->status == Model_Registration::STATUS_NOT_ENOUGH)
 			return 'PARTIAL PAYMENT';
-		else if ($status == Model_Registration::STATUS_FAILED)
+		else if ($this->status == Model_Registration::STATUS_FAILED)
 			return 'CANCELLED';
 		else
 			return 'IN LIMBO';
