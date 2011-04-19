@@ -957,7 +957,7 @@ class Controller_Admin extends Base_MainTemplate
         $post = $this->request->post(); 
         
         if (isset($post['search_term']))
-            $search_term = $post['search_term'];        
+            $search_term = '%' . $post['search_term'] . '%';        
         else
             $search_term = null;
     
