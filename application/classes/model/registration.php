@@ -293,7 +293,7 @@ class Model_Registration extends ORM
 		return ORM::Factory('Registration')->where('account_id', '=', $account_id)->order_by('convention_id', 'DESC')->find_all();	
 	}	
 	
-	public function statusToString($status) 
+	public static function statusToString($status) 
     {
 		if ($status == Model_Registration::STATUS_UNPROCESSED)
 			return 'UNPROCESSED';

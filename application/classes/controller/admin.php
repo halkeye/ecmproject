@@ -42,24 +42,8 @@ class Controller_Admin extends Base_MainTemplate
         $this->template->title =        __('Admin: Event List');
         $this->template->heading =      __('Admin: Event List');
         $this->template->subheading =   __('Create, modify and delete events.');
-                
-        $total_rows = Model_Convention::getTotalConventions();
-        $start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );  
-        $rows = ORM::factory('Convention')->limit(Controller_Admin::ROWS_PER_PAGE)->offset($start)->find_all();
-               
-        $this->validateRows($rows, $total_rows, 'event');      
-        $data = $this->generateViewRows($rows, 'Convention');       
-        
-        // Set callback path for form submit (change convention, jump to page)
-        $this->template->content = new View('admin/list', array(
-                'entity' => 'Convention',
-                'callback' => 'admin/manageConventions', 
-                'createText' => __('Create new Event'),
-                'createLink' => url::site('admin/createConvention', TRUE), 
-                'rows' => $data['entries'], 
-                'page' => $page,
-                'total_rows' => $total_rows)
-            );  
+		
+        $this->genericManageEntity('Convention', $page);            
     }    
     function action_manageAccounts($page = NULL) {
         // Set headers
@@ -67,25 +51,12 @@ class Controller_Admin extends Base_MainTemplate
         $this->template->heading = "Administration: Manage Accounts";
         $this->template->subheading = "Create, edit and delete accounts";
                 
-        $total_rows = Model_Account::getTotalAccounts();
-                                
-        // Calculate the offset.
-        $start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );  
-        $rows = ORM::factory('Account')->limit( Controller_Admin::ROWS_PER_PAGE )->offset($start)->find_all();
-        
-		$this->validateRows($rows, $total_rows, 'event');  	
-        $data = $this->generateViewRows($rows, 'Account');       
-           
-        $this->template->content = new View('admin/list', array(
-                'entity' => 'Account',
-                'callback' => 'admin/manageAccounts', 
-                'createText' => 'Create new Account',
-                'createLink' => 'admin/createAccount', 
-                'rows' => $data['entries'], 
-                'page' => $page,
-                'total_rows' => $total_rows)
-            );
+		$this->genericManageEntity('Account', $page); 					
     }
+	
+	//Have two optional attributes: convention_id and convention rows for a select.
+	//Allow for n attributes to be included as necessary? array($k => $v)
+	
     function action_managePasses($convention_id = NULL, $page = NULL) {
         // Set headers
         $this->template->title = 		__('Admin: Manage Tickets');
@@ -235,8 +206,7 @@ class Controller_Admin extends Base_MainTemplate
         $data['entries'][0] = new View('admin/ListItems/AdminAccountEntry');
         foreach ($rows as $row)
         {
-            $data['actions']['edit'] = html::anchor('admin/deleteAdmin/' . $row->id, html::image(url::site('/static/img/edit-delete.png',TRUE), NULL, __('admin.edit_account')));
-            //$data['actions']['delete'] = html::anchor('admin/deleteAccount/' . $row->id, html::image(url::site('/static/img/edit-delete.png'), __('admin.delete_account')));          
+            $data['actions']['edit'] = html::anchor('admin/deleteAdmin/' . $row->id, html::image(url::site('/static/img/edit-delete.png',TRUE), NULL, __('admin.edit_account')));          
             $data['entries'][$row->id] = new View('admin/ListItems/AdminAccountEntry', array('row' => $row, 'actions' => $data['actions']));                
         }
         
@@ -257,23 +227,7 @@ class Controller_Admin extends Base_MainTemplate
         $this->template->heading = 		__('Admin: Locations');
         $this->template->subheading = 	__('Manage Ticket Sale Locations and their prefixes (used for registration ID generation)');
 		
-		$total_rows = Model_Location::getTotalLocations();
-		$start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );  
-        $rows = ORM::factory('Location')->limit(Controller_Admin::ROWS_PER_PAGE)->offset($start)->find_all();
-               
-        $this->validateRows($rows, $total_rows, 'location');      
-        $data = $this->generateViewRows($rows, 'Location');       
-        
-        // Set callback path for form submit (change convention, jump to page)
-        $this->template->content = new View('admin/list', array(
-                'entity' => 'Location',
-                'callback' => 'admin/manageLocations', 
-                'createText' => __('Create new Location'),
-                'createLink' => url::site('admin/createLocation', TRUE), 
-                'rows' => $data['entries'], 
-                'page' => $page,
-                'total_rows' => $total_rows)
-            );  
+		$this->genericManageEntity('Location', $page);  
 	}
    
     /* CREATE Actions */   
@@ -1384,6 +1338,95 @@ class Controller_Admin extends Base_MainTemplate
         exit;       
     }
 	
+	
+	
+	/*
+	* Generic data listing method. Generates a list view with create/edit/delete actions based on the $entity name
+	* and a page number. 
+	*
+	* Notes: The $entity name must match the name of the Model and the action must be named accordingly: action_manage$entity
+	* 		 Any custom functionality is not supported currently - you must implement your own manage controller code.
+	*
+	* TODO: Add callback support to override default logic (page data, row processing, required information).
+	*
+	* string $entity
+	* int $page
+	* array opt_conditions = NULL
+	* array opt_viewAttributes = NULL
+	*
+	* returns null
+	*/
+	private function genericManageEntity($entity, $page = NULL, $opt_conditions = NULL, $opt_viewAttributes = NULL) {
+		//Get total number of rows. 
+		$total_rows = ORM::Factory($entity)->count_all();
+				
+		//Get the page data. Errors automatically generated in the event of an empty result.
+		if ( $rows = $this->getPageData($total_rows, $entity, $page, $opt_conditions) )
+		{
+			$data = $this->generateViewRows($rows, $entity); 						
+		}  
+		//Invalid page number. Set required variables.
+		else 
+		{
+			$data = array();
+			$data['entries'] = array();
+		}
+		
+		$this->template->content = new View('admin/list', array(
+			'entity' => $entity,
+			'callback' => "admin/manage$entity", 
+			'createText' => __("Create new $entity"),
+			'createLink' => url::site("admin/create$entity", TRUE), 
+			'rows' => $data['entries'], 
+			'page' => $page,
+			'total_rows' => $total_rows)
+		); 
+	}
+	
+	/*
+	* Given an entity, calculate the current page and fetch the entity data associated with that page. 
+	* Number of data rows retrieved is defined by the Controller_Admin::ROWS_PER_PAGE constant.
+	*
+	* int $total_rows
+	* string $entity
+	* int $page
+	* returns Database_Result array()
+	* @ref http://kohanaframework.org/3.1/guide/api/ORM#find_all
+	*/
+	private function getPageData($total_rows, $entity, $page, $opt_conditions = NULL) 
+	{					
+		//If $page is not a number, getMultiplier will return 0.
+		$start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );
+		$rows = ORM::factory($entity)->limit(Controller_Admin::ROWS_PER_PAGE)->offset($start)->find_all();		
+		
+		//Add optional where conditions.
+		
+		//Error conditions.
+		if (count($rows) == 0 && $total_rows > 0) 
+		{
+			$this->addError( __('Invalid page number') );
+		}
+		else if(!count($rows))
+		{
+			$this->addError( __("You should probably create an $entity to start with.") );
+		}		
+		
+		return $rows;
+	}
+	
+	/* DEPRECATED: Remove all references. */
+	private function validateRows($rows, $total_rows, $entity) {
+		if (count($rows) == 0 && $total_rows > 0)
+        {
+            $this->addError('Invalid page number.');
+        }
+        else if ($total_rows == 0)
+        {
+            $this->addError("You should probably create an $entity to start with.");
+        }     
+	}
+	
+	
 	/*
 	* Generic row generation method which adds two actions (edit and delete) per row.
 	* 
@@ -1414,16 +1457,7 @@ class Controller_Admin extends Base_MainTemplate
 		return $data;
 	}
 	
-	private function validateRows($rows, $total_rows, $entity) {
-		if (count($rows) == 0 && $total_rows > 0)
-        {
-            $this->addError('Invalid page number.');
-        }
-        else if ($total_rows == 0)
-        {
-            $this->addError("You should probably create an $entity to start with.");
-        }     
-	}
+	
 	
 	private function requireVerification($account) {
 		if (!$account->isVerified()) {
