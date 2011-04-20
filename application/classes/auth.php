@@ -117,10 +117,7 @@ class Auth {
     public function complete_login(Model_Account $account)
     {
         // Update the number of logins
-        $account->login = time();
-
-        // Save the account
-        $account->save();
+        $account->incrNumLogins();
 
         $this->groups = array();
         $this->permissions = array();
@@ -150,6 +147,7 @@ class Auth {
         $this->session->regenerate();
 
         $this->account = serialize($account);
+
         $this->storeAccount($account);
 
     }

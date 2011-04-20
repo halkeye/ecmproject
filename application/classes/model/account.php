@@ -76,7 +76,7 @@ class Model_Account extends ORM
             array('not_empty'),
         );
         $rules['phone'] = array(
-            array('not_empty'),
+            //array('not_empty'),
             array('phone'),
 			array(array($this, '_valid_unique'), array('phone', ':value'))
         );
@@ -102,24 +102,6 @@ class Model_Account extends ORM
         }
     }
 	
-    /*
-    public function __set($key, $value)
-	{
-		if ($key === 'password')
-		{
-            if (empty($this->salt))
-            {
-                $this->salt = substr(md5(uniqid(rand(), true)), 0, $this->saltLength);
-                Kohana::$log->add(Log::DEBUG, 'Generated Salt: ' . $this->salt);
-                die();
-            }
-			// Use Auth to hash the password
-            $value = $this->_encryptValue($value);
-		}
-
-		parent::__set($key, $value);
-	}
-     */
     public function _set_password($value)
     {
         if (empty($this->salt))
@@ -299,6 +281,16 @@ class Model_Account extends ORM
 			return -1;
 		}		
 	}
+
+    public function incrNumLogins()
+    {
+        DB::update($this->_table_name)
+            ->set(array(
+                'login'=>DB::expr('login + 1')
+            ))
+            ->where('id','=',$this->pk())
+            ->execute();
+    }
 }
 
 /* End of file user.php */
