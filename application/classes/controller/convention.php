@@ -229,13 +229,17 @@ class Controller_Convention extends Base_MainTemplate
         $this->template->heading    = __('convention.checkout_heading');
         $this->template->subheading = __('convention.checkout_subheading'); 
 
+
         $data = Kohana::config('paypal');
+        $data['passes'] = ORM::Factory('registration')->getPossiblePassesQuery()->find_all();
+
         /* get all the registrations we need */
         $data['registrations'] = ORM::Factory('registration')->getForAccount($this->auth->getAccount()->id);
-        if (!$data['registrations']->count()) 
+        /*if (!$data['registrations']->count()) 
         {
 			$this->request->redirect('user/index'); 
         }
+         */
 
         /* Config file is currently 'url', lets map it to 'paypal_url' incase any other url is used */
         $data['paypal_url'] = $data['url'];
@@ -245,8 +249,8 @@ class Controller_Convention extends Base_MainTemplate
         $data['notify_url'] = url::site('/paypal/registrationPaypalIPN');
 		
         ### FIXME - This needs an external url, so can't be localhost
-        if (strpos($data['notify_url'], 'localhost') !== FALSE) {
-            $data['notify_url'] = 'http://barkdog.halkeye.net:6080/ecmproject/index.php/paypal/registrationPaypalIPN';
+        if (strpos($data['notify_url'], 'moocow.localhost') !== FALSE) {
+            $data['notify_url'] = 'http://moocow.halkeye.net:4080/ecmproject/index.php/paypal/registrationPaypalIPN';
         }
 
         /* Where to send the user when we complete */ 
@@ -281,6 +285,51 @@ class Controller_Convention extends Base_MainTemplate
 		
         /* Our "checkout template" */
         $this->template->content = new View('convention/checkoutOther', $data);
+    }
+
+    public function action_addRegistration()
+    {
+        $reg = ORM::factory('registration');
+        
+        $pass = $reg->getPossiblePassesQuery()->where('id', '=', $_POST['pass_id'])->find();
+        if (!$pass->loaded())
+        {
+            $this->addError('Pass provided is no longer valid');
+            $this->request->redirect('/convention/checkout'); 
+        }
+
+        $reg->pass_id = $pass->id;
+        list($reg->gname, $reg->sname) = explode(' ', $this->auth->getAccount()->name, 2);
+
+        // FIXME - hardcoded reg_id to be 1
+        $reg->reg_id = sprintf('%s_%s_%s', $pass->convention_id, 'ECM', '1');
+
+        //$reg->email = $this->auth->getAccount()->email;
+        $reg->phone = $this->auth->getAccount()->phone;
+        $reg->account_id = $this->auth->getAccount()->id;
+        $reg->status = Model_Registration::STATUS_UNPROCESSED;
+
+        try {
+            if ( $reg->reserveTickets() ) { //Reserve tickets. Return at least 1 except in case of failure (not enough tickets left).
+                $reg->save(); 
+                $reg->finalizeTickets(); //Save has gone through. Finalize reservation.
+                $this->addMessage( __('Created a new registration, ') . $reg->reg_id);
+            }
+            else if ($reg->pass_id > 0) {					
+                $this->addError("No more tickets to allocate for " . $fields['pass_id']['values'][$reg->pass_id] . '. Please select a different pass.');				
+            }	
+            else {
+                $this->addError("No pass selected. Please select a pass."); 
+            }
+        }
+        catch (ORM_Validation_Exception $e)
+        {				
+            foreach ($e->errors() as $field => $msg)
+            {
+                $this->addError("$field is $msg");
+            }
+        }
+        $this->request->redirect('/convention/checkout'); 
     }
 
 
