@@ -279,8 +279,6 @@ class Model_Registration extends ORM
             )
             ->find_all();
     }
-    
-
 	
 	/*
 	* getAllRegistrationsByConvention
@@ -293,7 +291,7 @@ class Model_Registration extends ORM
 		return ORM::Factory('Registration')->where('account_id', '=', $account_id)->order_by('convention_id', 'DESC')->find_all();	
 	}	
 	
-	public static function statusToString($status) 
+	public function statusToString() 
     {
 		if ($this->status == Model_Registration::STATUS_UNPROCESSED)
 			return 'UNPROCESSED';
@@ -383,6 +381,37 @@ class Model_Registration extends ORM
 
         return ((bool)$query->count_all());
     }
+	
+	/*
+	* Builds a registration identifier given a post, valid locations and a unique id number.
+	*
+	* array $post 
+	* array $locations
+	* int $convention_id 
+	* returns an empty array on success or an array with error messages on failure.	
+	*/
+	public function build_regID($post, $locations, $convention_id) {
+		$validate = Validation::Factory($post)
+			->rule('comp_loc', 'in_array', array(':value', array_values($locations)))
+			->rule('comp_id', 'numeric')
+			->rule('comp_id', 'not_empty');
+					
+		$errors = array();	
+		if ( !$validate->check() || !is_numeric($convention_id) )
+		{				
+			foreach($validate->errors('reg_id') as $error_msg) 
+			{
+				array_push($errors, $error_msg);
+			}
+			
+			$this->reg_id = '';
+		}
+		else {
+			$this->reg_id = sprintf('%s_%s_%s', $convention_id, $post['comp_loc'], $post['comp_id']);
+		}
+					
+		return $errors;
+	}
 }
 
 /* End of file user.php */

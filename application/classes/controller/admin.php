@@ -404,16 +404,16 @@ class Controller_Admin extends Base_MainTemplate
 		
         if ($post)
         {           
-			$reg->values($post); //Deal with web allocation?
-			$reg->reg_id = $this->build_regID($post, $locations, $convention_id); //If validation fails, empty regID and save() will fail.
+			$reg->values($post); 
+			$errors = $reg->build_regID($post, $locations, $convention_id); //If validation fails, empty regID and save() will fail.
 			$extra_validation = $this->validateEmailOrPhone($post);
-			
-			//Validate non-object fields comp_loc, comp_id and return a reg_id if fields are valid.		
-			//TODO: Merge/fix validation errors.
+
 			try {
-				if ( $reg->reserveTickets() ) { //Reserve tickets. Return at least 1 except in case of failure (not enough tickets left).
+			
+				//Reserve tickets. Return at least 1 except in case of failure (not enough tickets left).
+				if ( $reg->reserveTickets() ) { 
 					$reg->save($extra_validation); 
-					$reg->finalizeTickets(); //Save has gone through. Finalize reservation.
+					$reg->finalizeTickets(); //Finalize the reservation.
 					$this->addMessage( __('Created a new registration, ') . $reg->reg_id);
 					$this->session->set('admin_convention_id', $post['convention_id']);
 				}
@@ -423,10 +423,11 @@ class Controller_Admin extends Base_MainTemplate
 				else {
 					$this->addError("No pass selected. Please select a pass."); 
 				}
+				
 			}
 			catch (ORM_Validation_Exception $e)
 			{				
-				$this->parseErrorMessages($e);   			
+				$this->parseErrorMessages($e, $errors);   			
 			}     
 			
 			$reg->releaseTickets(); //Something went wrong during saving. Rollback everything.
@@ -1338,8 +1339,7 @@ class Controller_Admin extends Base_MainTemplate
         exit;       
     }
 	
-	
-	
+
 	/*
 	* Generic data listing method. Generates a list view with create/edit/delete actions based on the $entity name
 	* and a page number. 
@@ -1457,8 +1457,6 @@ class Controller_Admin extends Base_MainTemplate
 		return $data;
 	}
 	
-	
-	
 	private function requireVerification($account) {
 		if (!$account->isVerified()) {
 			$vcode = $account->generateVerifyCode(Model_Verificationcode::TYPE_VALIDATE_EMAIL);
@@ -1466,19 +1464,23 @@ class Controller_Admin extends Base_MainTemplate
 		}
 	}
 	
-    private function parseErrorMessages($e) {
+    private function parseErrorMessages($e, $extra_e = NULL) {
         $errorMsg = 'Oops. You entered something bad! Please fix it! <br />';               
         $errors = $e->errors('admin'); //Loads from directory specified by argument here.
-        foreach ($errors as $error)		
-			if ( is_array($error) ) {
-				foreach($error as $nested_error) {
-					$errorMsg = $errorMsg . ' ' . $nested_error . '<br />'; 
-				}			
-			}
-			else {
-				$errorMsg = $errorMsg . ' ' . $error . '<br />';                    
-			}
-			
+		
+		//Add standard (ORM usually) errors.
+        foreach ($errors as $error)	{	
+			$errorMsg = $errorMsg . ' ' . $error . '<br />';           
+		}
+		
+		//Add extra errors from an external source.
+		if ( is_array($extra_e) && $extra_e ) {
+			foreach ($extra_e as $error) {
+				$errorMsg = $errorMsg . ' ' . $error . '<br />';            				
+			}		
+		}
+		
+		//Display errors.
         $this->addError($errorMsg);     
     }
     
@@ -1502,31 +1504,7 @@ class Controller_Admin extends Base_MainTemplate
 		
 		return $extra_validation;
 	}
-	private function build_regID($post, $locations, $convention_id) {
-		//ticket_counters
-		$validate = Validation::Factory($post)
-			->rule('comp_loc', 'in_array', array(':value', array_values($locations)))
-			->rule('comp_id', 'numeric')
-			->rule('comp_id', 'not_empty');
-		//				
-			
-		if ( !$validate->check() )
-		{	
-			$error = '';
-			foreach($validate->errors('reg_id') as $error_msg) 
-			{
-				$error .= $error_msg . '<br />';
-			}
-			
-			if ($error) {
-				$this->addError($error);
-			}
-			
-			return '';
-		}
-			
-		return sprintf('%s_%s_%s', $convention_id, $post['comp_loc'], $post['comp_id']);
-	}	
+		
     
     public function action_testClock() {
         header("Content-type: text/plain");
