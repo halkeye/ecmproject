@@ -48,6 +48,7 @@ class Model_Pass extends ORM
                 /* Convention_id's should be numeric. */
 				array('not_empty'), 
                 array('is_numeric'),
+				array(array($this, '__validConventionID')),
 			),
 			'price' => array( 
 				array('not_empty'), 
@@ -111,6 +112,14 @@ class Model_Pass extends ORM
             return 0;
 		}
         return 1;
+	}
+	public function __validConventionID($value)
+	{
+		if (is_numeric($value) && $value > 0) {
+			return (bool) ORM::Factory('Convention', $value);
+		}
+		
+		return false;
 	}
 	
 	/* This is cheap (since I hardcoded stuff) But it works :) */
