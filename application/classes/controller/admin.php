@@ -45,6 +45,83 @@ class Controller_Admin extends Base_MainTemplate
 		
         $this->genericManageEntity('Convention', $page);            
     }    
+	function action_createConvention() {
+        $this->template->title =        __('Admin: Create an Event');
+        $this->template->heading =      __('Admin: Create an Event');
+        $this->template->subheading =   __('Create a new event');
+        
+        $conv = ORM::factory('Convention'); 
+        $fields = $conv->default_fields;
+        $post = $conv->as_array();
+        
+        if ($post = $this->request->post())
+        {                   
+            $conv->values($post);
+            try {
+                $conv->save();
+                $this->addMessage(__('Created a new event, ') . $conv->name);
+                $this->request->redirect('admin/manageConventions');
+            }
+            catch (ORM_Validation_Exception $e)
+            {
+                $this->parseErrorMessages($e);      
+            }               
+            catch (Exception $e)
+            {
+                $this->addError("Oops. Something went wrong ... but it's not your fault. Contact the system maintainer please!");
+            }
+        }
+        $this->template->content = new View('admin/Convention', array(
+            'row' => $post,
+            'fields' => $fields,
+            'callback' => 'createConvention'
+        )); 
+    }	
+	function action_editConvention($id = NULL) {       
+        /* If no ID or bad ID defined, kill it with fire. */
+        if ($id == NULL || !is_numeric($id))
+            die('No direct access allowed. Go away D:');
+        
+        $conv = ORM::factory('Convention', $id);    
+        $fields = $conv->default_fields;
+        
+        /* If pass is not loaded, we have a problem */
+        if (!$conv->loaded())
+        {
+            $errorMsg = 'That pass does not exist! Maybe someone deleted it while you were busy?<br />';                
+            $this->request->redirect('admin/manageConventions');
+        }
+        
+        $this->template->title =        __('Admin: Editing ' . $conv->name); //Escape output?
+        $this->template->heading =      __('Admin: Editing ' . $conv->name);
+        $this->template->subheading =   __('Edit the details of this event');
+        
+        if ($post = $this->request->post())
+        {   
+            $conv->values($post);
+            try {
+                $conv->save();
+                $this->addMessage('Successfully edited ' . $conv->name);
+                $this->request->redirect('admin/manageConventions');
+            }
+            catch (ORM_Validation_Exception $e)
+            {
+                $this->parseErrorMessages($e);      
+            }               
+            catch (Exception $e)
+            {
+                $this->addError("Oops. Something went wrong ... but it's not your fault. Contact the system maintainer please!");
+            }                   
+        } 
+            
+        $this->template->content = new View('admin/Convention', array(
+            'row' => $conv->as_array(),
+            'fields' => $fields,
+            'callback' => "editConvention/$id"
+        ));         
+    }
+	
+	
     function action_manageAccounts($page = NULL) {
         // Set headers
         $this->template->title = "Administration: Manage Accounts";
@@ -306,38 +383,7 @@ class Controller_Admin extends Base_MainTemplate
             'callback' => 'createPass'
         ));
     }
-    function action_createConvention() {
-        $this->template->title =        __('Admin: Create an Event');
-        $this->template->heading =      __('Admin: Create an Event');
-        $this->template->subheading =   __('Create a new event');
-        
-        $conv = ORM::factory('Convention'); 
-        $fields = $conv->default_fields;
-        $post = $conv->as_array();
-        
-        if ($post = $this->request->post())
-        {                   
-            $conv->values($post);
-            try {
-                $conv->save();
-                $this->addMessage(__('Created a new event, ') . $conv->name);
-                $this->request->redirect('admin/manageConventions');
-            }
-            catch (ORM_Validation_Exception $e)
-            {
-                $this->parseErrorMessages($e);      
-            }               
-            catch (Exception $e)
-            {
-                $this->addError("Oops. Something went wrong ... but it's not your fault. Contact the system maintainer please!");
-            }
-        }
-        $this->template->content = new View('admin/Convention', array(
-            'row' => $post,
-            'fields' => $fields,
-            'callback' => 'createConvention'
-        )); 
-    }   
+       
     function action_createRegistration() {
         // Set headers
         $this->template->title = 		__('Admin: Create Registration(s)');
@@ -656,49 +702,7 @@ class Controller_Admin extends Base_MainTemplate
             'callback' => "editPass/$id"
         ));
     }
-    function action_editConvention($id = NULL) {       
-        /* If no ID or bad ID defined, kill it with fire. */
-        if ($id == NULL || !is_numeric($id))
-            die('No direct access allowed. Go away D:');
-        
-        $conv = ORM::factory('Convention', $id);    
-        $fields = $conv->default_fields;
-        
-        /* If pass is not loaded, we have a problem */
-        if (!$conv->loaded())
-        {
-            $errorMsg = 'That pass does not exist! Maybe someone deleted it while you were busy?<br />';                
-            $this->request->redirect('admin/manageConventions');
-        }
-        
-        $this->template->title =        __('Admin: Editing ' . $conv->name); //Escape output?
-        $this->template->heading =      __('Admin: Editing ' . $conv->name);
-        $this->template->subheading =   __('Edit the details of this event');
-        
-        if ($post = $this->request->post())
-        {   
-            $conv->values($post);
-            try {
-                $conv->save();
-                $this->addMessage('Created a newly minted convention named ' . $conv->name);
-                $this->request->redirect('admin/manageConventions');
-            }
-            catch (ORM_Validation_Exception $e)
-            {
-                $this->parseErrorMessages($e);      
-            }               
-            catch (Exception $e)
-            {
-                $this->addError("Oops. Something went wrong ... but it's not your fault. Contact the system maintainer please!");
-            }                   
-        } 
-            
-        $this->template->content = new View('admin/Convention', array(
-            'row' => $conv->as_array(),
-            'fields' => $fields,
-            'callback' => "editConvention/$id"
-        ));         
-    }
+    
     function action_editRegistration($rid = NULL) {
         /* Can change all fields. */    
         //Not allowed to be lazy in checking input here.
@@ -1469,8 +1473,15 @@ class Controller_Admin extends Base_MainTemplate
         $errors = $e->errors('admin'); //Loads from directory specified by argument here.
 		
 		//Add standard (ORM usually) errors.
-        foreach ($errors as $error)	{	
-			$errorMsg = $errorMsg . ' ' . $error . '<br />';           
+        foreach ($errors as $error)	{
+			if ( is_array($error) ) {
+				foreach($error as $inline_error) {
+					$errorMsg = $errorMsg . ' ' . $inline_error . '<br />';    
+				}
+			}
+			else {
+				$errorMsg = $errorMsg . ' ' . $error . '<br />';           
+			}
 		}
 		
 		//Add extra errors from an external source.
