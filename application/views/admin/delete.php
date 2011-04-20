@@ -1,5 +1,5 @@
 <p><strong>
-You are deleting the <?php echo $entityType ?>: <?php echo $entityName ?>.</strong> 
+You are deleting the <?php echo $entityType ?>: <?php print htmlspecialchars($entityName, ENT_COMPAT, "UTF-8") ?>.</strong> 
 This action is <strong>NOT</strong> reversible. Do you wish to continue? </p>
 <br />
 <?php echo form::open("admin/$callback/$id"); ?>
