@@ -1,8 +1,8 @@
 <?php
 
-class Paypal_Controller extends Controller_Core
+class Controller_Paypal extends Controller
 {
-    function registrationPaypalIPN()
+    public function action_registrationPaypalIPN()
     {
 
         $p = new Paypal();

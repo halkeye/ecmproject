@@ -64,7 +64,7 @@ else
                 echo form::hidden('currency_code', 'CAD');
                 foreach (array('business', 'notify_url', 'cancel_url') as $key) {
                     if (!isset($$key)) { continue; }
-                    echo form::hidden($key, url::site($$key, TRUE)); 
+                    echo form::hidden($key, $$key); 
                 }
                 echo form::hidden('return', $return_url); 
                 echo form::hidden('cbt', "Return to Anime Evolution Registration"); 

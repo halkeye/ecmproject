@@ -191,9 +191,10 @@ class Controller_Convention extends Base_MainTemplate
         $regids = array();
         /* Pull out some of the data returned from paypal success link */
         $count = 1;
-        while ($this->input->get('item_number'.$count))
+        var_dump($_REQUEST);
+        while ($_GET['item_number'.$count])
         {
-            $data = explode('|', $this->input->get('item_number'.$count));
+            $data = explode('|', $_GET['item_number'.$count]);
             $regids[$data[0]] = array('id' => $data[0], 'pass_id' => $data[1]); 
             $count++;
         }
@@ -246,7 +247,7 @@ class Controller_Convention extends Base_MainTemplate
         unset($data['url']);
 
         /* Where paypal should tell us about successful transactions */
-        $data['notify_url'] = url::site('/paypal/registrationPaypalIPN');
+        $data['notify_url'] = url::site('/paypal/registrationPaypalIPN',TRUE);
 		
         ### FIXME - This needs an external url, so can't be localhost
         if (strpos($data['notify_url'], 'moocow.localhost') !== FALSE) {
@@ -254,9 +255,9 @@ class Controller_Convention extends Base_MainTemplate
         }
 
         /* Where to send the user when we complete */ 
-        $data['return_url'] = url::site('/convention/registrationReturn');
+        $data['return_url'] = url::site('/convention/registrationReturn',TRUE);
         /* where to send the user if they back out */
-        $data['cancel_url'] = url::site('/convention/registrationCancel');
+        $data['cancel_url'] = url::site('/convention/registrationCancel',TRUE);
 
         /* Our "checkout template" */
         $this->template->content = new View('convention/checkout');
