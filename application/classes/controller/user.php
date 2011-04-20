@@ -76,6 +76,8 @@ class Controller_User extends Base_MainTemplate
         // using the factory enables method chaining
         $form = array(
                 'email'     => '',
+                'name'     => '',
+                'phone'     => '',
                 'password'  => '',
                 'confirm_password'  => '',
         );

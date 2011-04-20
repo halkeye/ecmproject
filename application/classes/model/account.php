@@ -32,6 +32,8 @@ class Model_Account extends ORM
     protected $_table_columns = array (
             'id'          => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, 'sequenced' => true, ),
             'email'       => array ( 'type' => 'string', 'length' => '55'                                              ),
+            'name'        => array ( 'type' => 'string', 'length' => '55'                                              ),
+            'phone'       => array ( 'type' => 'string', 'length' => '55'                                              ),
             'password'    => array ( 'type' => 'string', 'length' => '40'                                              ),
             'salt'        => array ( 'type' => 'string', 'length' => '10',                                             ),
             'status'      => array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                     ),
@@ -68,7 +70,15 @@ class Model_Account extends ORM
         $rules['email'] = array(
             array('not_empty'),
             array('email'),
-			array(array($this, '_valid_unique_email'))
+			array(array($this, '_valid_unique'), array('email', ':value'))
+        );
+        $rules['name'] = array(
+            array('not_empty'),
+        );
+        $rules['phone'] = array(
+            //array('not_empty'),
+            array('phone'),
+			array(array($this, '_valid_unique'), array('phone', ':value'))
         );
 		$rules['password'] = array(
 			array('not_empty'),
@@ -92,24 +102,6 @@ class Model_Account extends ORM
         }
     }
 	
-    /*
-    public function __set($key, $value)
-	{
-		if ($key === 'password')
-		{
-            if (empty($this->salt))
-            {
-                $this->salt = substr(md5(uniqid(rand(), true)), 0, $this->saltLength);
-                Kohana::$log->add(Log::DEBUG, 'Generated Salt: ' . $this->salt);
-                die();
-            }
-			// Use Auth to hash the password
-            $value = $this->_encryptValue($value);
-		}
-
-		parent::__set($key, $value);
-	}
-     */
     public function _set_password($value)
     {
         if (empty($this->salt))
@@ -180,11 +172,10 @@ class Model_Account extends ORM
         return parent::unique_key($id);
     }
     
-    public function _valid_unique_email($email)
+    public function _valid_unique($field, $email)
     {
         $query = ORM::factory('Account');
-        $query->where('email','=',$email);
-        $fields['email'] = $email;
+        $query->where($field,'=',$email);
         if ($this->loaded())
             $query->where($this->_primary_key, '!=', $this->pk());
 
@@ -290,6 +281,16 @@ class Model_Account extends ORM
 			return -1;
 		}		
 	}
+
+    public function incrNumLogins()
+    {
+        DB::update($this->_table_name)
+            ->set(array(
+                'login'=>DB::expr('login + 1')
+            ))
+            ->where('id','=',$this->pk())
+            ->execute();
+    }
 }
 
 /* End of file user.php */

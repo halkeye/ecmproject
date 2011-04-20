@@ -12,7 +12,7 @@ class Paypal
     public function __construct($config = array())
     {
         // Append default auth configuration
-        $config += Kohana::config('paypal');
+        $config =  Arr::merge((array) Kohana::config('paypal'), $config);
 
         // Save the config in the object
         $this->config = $config;
@@ -25,8 +25,7 @@ class Paypal
     public function validateIPN()
     {
         $post_string = '';
-        #foreach ($_POST as $field=>$value)
-        foreach (Input::instance()->originalPost as $field=>$value)
+        foreach ($_POST as $field=>$value)
         { 
             // Handle escape characters, which depends on setting of magic quotes 
             $value = stripslashes($value); 
@@ -51,17 +50,18 @@ class Paypal
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
             curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
-            Kohana::log('debug', 'Paypal - Sent to curl: '. $post_string);
+            Kohana::$log->add(Log::DEBUG, 'Paypal - Sent to curl: '. $post_string);
             $response = @curl_exec($ch);
             $curl_err = curl_error($ch);
             curl_close($ch);
             
-            Kohana::log('debug', 'Paypal - Got to curl: '. $response);
+            Kohana::$log->add(Log::DEBUG,'Paypal - Got to curl: '. $response);
           
             if (stripos($response, "VERIFIED") !== FALSE)
                 return true;       
             
-            throw new Kohana_User_Exception('Paypal Error - validation', "IPN Validation Failed.");
+            Kohana::$log->add(Log::ERROR,'Paypal Error - validation: IPN Validation Failed.');
+            throw new Exception('Paypal Error - validation - IPN Validation Failed.');
             return;
         }
 

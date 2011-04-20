@@ -5,14 +5,20 @@
         <h1>Create Log-in ID</h1>
         <p class='fixed'>Please enter your e-mail address and a password of your choice and click Continue. The e-mail address will serve as your login ID.</p>
         <fieldset>			
+            <?php $field = 'name'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?>
+            <label for="name"><span class="required">*</span> Name <span class="small">Your name.</span></label>
+            <input name="name" type="text" />
             <?php $field = 'email'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?>
-            <label for="email">Email Address <span class="small">Add a valid email address</span></label>
+            <label for="email"><span class="required">*</span> Email Address <span class="small">Add a valid email address</span></label>
             <input name="email" type="text" />
+            <?php $field = 'phone'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?>
+            <label for="phone">Phone Number <span class="small">Phone number</span></label>
+            <input name="phone" type="text" />
             <?php $field = 'password'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?>
-            <label for="password">Password <span class="small">Min. size 6 characters</span></label>
+            <label for="password"><span class="required">*</span> Password <span class="small">Min. size 6 characters</span></label>
             <input name="password" type="password" />
             <?php $field = 'confirm_password'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?>
-            <label for="confirm_password">Re-type Password <span class="small">Type in the same characters again.</span></label>
+            <label for="confirm_password"><span class="required">*</span> Re-type Password <span class="small">Type in the same characters again.</span></label>
             <input name="confirm_password" type="password" />
         </fieldset>
         <fieldset class='left'>
