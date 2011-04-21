@@ -16,7 +16,8 @@ DROP TABLE IF EXISTS `accounts`;
 CREATE TABLE accounts (
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    email VARCHAR(55) UNIQUE,
-   name VARCHAR(110) NOT NULL, -- name
+   gname VARCHAR(55) NOT NULL, -- Given Name
+   sname VARCHAR(55) NOT NULL, -- Surname
    phone VARCHAR(25),
    password CHAR(40) NOT NULL, -- You save one WHOLE byte by using CHAR instead of VARCHAR! lol.
    salt CHAR(10) NOT NULL, 		-- etc...
