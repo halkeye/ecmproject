@@ -273,6 +273,17 @@ body {
 	display: block;
 }
 
+#form p.center {
+	text-align: center;
+}
+
+#form p.centerID {
+	margin-top: 20px;
+	font-size: 24px;
+	font-weight: bold;
+	text-align: center;
+}
+
 #list p {
 	padding: 3px;
 	margin: 5px 0px 5px 10px;
