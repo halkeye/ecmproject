@@ -210,6 +210,8 @@ class Controller_Admin extends Base_MainTemplate
         {
             $post['startDate'] = ECM_Form::parseSplitDate($post, 'startDate');
             $post['endDate'] = ECM_Form::parseSplitDate($post, 'endDate');
+			$post['isPurchasable'] = empty($post['isPurchasable']) ? 0 : $post['isPurchasable'];
+			
             $pass->values($post);
             try {
                 $pass->save();                              
