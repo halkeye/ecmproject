@@ -95,7 +95,9 @@ else
         <tr>
             <td><?php
                 echo form::open(url::site('/convention/addRegistration', TRUE), array('method'=>'post')); 
-                $options = array();
+                $options = array(
+                    "" => array ("-1" => ""),
+                );
                 foreach ($passes as $pass)
                 {
                     $options[$pass->convention->name][$pass->id] = "$pass";
