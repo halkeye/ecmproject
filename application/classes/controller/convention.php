@@ -227,7 +227,7 @@ class Controller_Convention extends Base_MainTemplate
     {
         $reg = ORM::factory('registration');
         
-        $pass = $reg->getPossiblePassesQuery()->where('id', '=', $_POST['pass_id'])->find();
+        $pass = $reg->getPossiblePassesQuery()->with('convention')->where('passes.id', '=', $_POST['pass_id'])->find();
         if (!$pass->loaded())
         {
             $this->addError('Pass provided is no longer valid');
@@ -235,10 +235,8 @@ class Controller_Convention extends Base_MainTemplate
         }
 
         $reg->pass_id = $pass->id;
-        list($reg->gname, $reg->sname) = explode(' ', $this->auth->getAccount()->name, 2);
-
-        // FIXME - hardcoded reg_id to be 1
-        $reg->reg_id = sprintf('%s_%s_%s', $pass->convention_id, 'ECM', '1');
+        $reg->sname = $this->auth->getAccount()->sname;
+        $reg->gname = $this->auth->getAccount()->gname;
 
         //$reg->email = $this->auth->getAccount()->email;
         $reg->phone = $this->auth->getAccount()->phone;
@@ -246,13 +244,16 @@ class Controller_Convention extends Base_MainTemplate
         $reg->status = Model_Registration::STATUS_UNPROCESSED;
 
         try {
-            if ( $reg->reserveTickets() ) { //Reserve tickets. Return at least 1 except in case of failure (not enough tickets left).
+
+            $id = $reg->reserveTickets(1);
+            if ( $id ) { //Reserve tickets. Return at least 1 except in case of failure (not enough tickets left).
+                $reg->build_regID($pass->convention_id, 'WEB', $id);
                 $reg->save(); 
                 $reg->finalizeTickets(); //Save has gone through. Finalize reservation.
                 $this->addMessage( __('Created a new registration, ') . $reg->reg_id);
             }
             else if ($reg->pass_id > 0) {					
-                $this->addError("No more tickets to allocate for " . $fields['pass_id']['values'][$reg->pass_id] . '. Please select a different pass.');				
+                $this->addError("No more tickets to allocate for " . $pass->convention->name . ' - ' . $pass->name . ". Please select a different pass.");
             }	
             else {
                 $this->addError("No pass selected. Please select a pass."); 
