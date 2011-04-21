@@ -4,11 +4,12 @@ class Controller_Paypal extends Controller
 {
     public function action_registrationPaypalIPN()
     {
+        Kohana::$log->add(Log::DEBUG, "REQUEST_URI: " . $_SERVER['REQUEST_URI']);
 
         $p = new Paypal();
 
         $p->validateIPN();
-        $data = $this->input->post();
+        $data = $_POST;
         
         $total_items = 1;
         if (isset($data['num_cart_items']))
@@ -20,16 +21,16 @@ class Controller_Paypal extends Controller
         {
             if (!isset($data['item_number'.$count]) || strpos($data['item_number'.$count], "|") === FALSE ) 
             {
-                Kohana::log('error',"[PAYPAL] unable to find item $count - " . var_export($_POST,1));
+                Kohana::$log->add(Log::ERROR, "[PAYPAL] unable to find item $count - " . var_export($_POST,1));
                 break;
             }
             list($reg_id, $pass_id) = explode('|', $data['item_number'.$count]);
-            Kohana::log('info',"[PAYPAL] Starting $count - $reg_id/$pass_id");
+            Kohana::$log->add(Log::NOTICE, "[PAYPAL] Starting $count - $reg_id/$pass_id");
             
             $reg = ORM::Factory('registration')->where('id', $reg_id)->find();
             if (!$reg->loaded)
             {
-                Kohana::log('error',"[PAYPAL] processing $count - Unable to load $reg_id");
+                Kohana::$log->add(Log::ERROR,"[PAYPAL] processing $count - Unable to load $reg_id");
                 continue;
             }
             /* To make sure they paid the right one */
@@ -52,10 +53,9 @@ class Controller_Paypal extends Controller
             $payment->save();
             $reg->save();
             
-            Kohana::log('info',"[PAYPAL] Finished $count - $reg_id/$pass_id");
+            Kohana::$log->add(Log::NOTICE,"[PAYPAL] Finished $count - $reg_id/$pass_id");
         }
         
         return;
-   
     }
 }

@@ -12,7 +12,6 @@
             <th width='40%'>For</th>
             <th width='30%'>Item</th>
             <th width='10%'>Price</th>  
-            <th width='5%'>Edit</th>
             <th width='5%'>Delete</th>
             <th width='10%'>Status</th>  
         </tr><?php
@@ -40,7 +39,6 @@ if (count($registrations) > 0)
         {
             echo '<td class="expiredReg" colspan="2">The registration pass you\'ve selected has expired. Please click edit to choose a different pass.</td>';
         }
-        echo '<td>'.HTML::anchor('/convention/editReg/'.$reg->id,   HTML::image(url::site('/static/img/edit-copy.png',TRUE), array('tite'=>'Edit this account'))) . '</td>';
         echo '<td>'.HTML::anchor('/convention/deleteReg/'.$reg->id, HTML::image(url::site('/static/img/edit-delete.png',TRUE), array('tite'=>'Delete this account'))) . '</td>';
         echo '<td>'.$reg->statusToString().'</td>';
         echo '</tr>';
@@ -81,15 +79,20 @@ else
                     echo form::hidden("amount_$id", sprintf('%01.2F', $reg->pass->price));
                     echo form::hidden("quantity_$id", 1);
                 }
+                # from http://corpocrat.com/2010/12/31/paypal-return-url-issue-with-missing-get-parameters/
+                echo form::hidden('rm', '2');
+
                 echo form::hidden("custom", implode('|', $regids));
                 echo form::submit('', __('convention.checkout_with_paypal')); 
                 echo form::close();
             ?></td>
+<?php if (0) { ?>
             <td><?php
                 echo form::open('/convention/checkoutOther', array('method'=>'get')); 
                 echo form::submit('', __('convention.checkout_with_other')); 
                 echo form::close();
             ?></td>
+<?php } ?>
         </tr>
         <?php endif ?>
         <tr>
