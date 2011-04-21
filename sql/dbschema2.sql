@@ -55,8 +55,9 @@ CREATE TABLE registrations (
    account_id INT UNSIGNED,
    gname VARCHAR(55) NOT NULL, -- Given name
    sname VARCHAR(55) NOT NULL, -- Surname
-   reg_id CHAR(25) NOT NULL, -- [Event ID]_[Sale Prefix]_[ID #] corresponds to 10_5_10 -> 25 characters where length 5 sale prefix is a chosen number.
+   email VARCHAR(55),
    phone VARCHAR(25),
+   reg_id CHAR(25) NOT NULL, -- [Event ID]_[Sale Prefix]_[ID #] corresponds to 10_5_10 -> 25 characters where length 5 sale prefix is a chosen number.
    status TINYINT NOT NULL, -- Status of registration?
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE RESTRICT, -- Events shouldn't be deleted if in use already.
    FOREIGN KEY (pass_id) REFERENCES passes(id) ON DELETE RESTRICT, -- Ticket types shouldn't be deleted if in use already.
@@ -90,13 +91,6 @@ CREATE TABLE payments (
    mod_time INT,
    FOREIGN KEY (reg_id) REFERENCES registrations(id) ON DELETE RESTRICT -- Registrations with payment information shouldn't be deleted.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `locations`;
-CREATE TABLE `locations` (
-  prefix CHAR(6) NOT NULL,
-  location VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`prefix`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `usergroups`;
 -- Expand on permissions later.
@@ -143,6 +137,13 @@ CREATE TABLE `verificationcodes` (
    UNIQUE (`code`)
 );
 
+DROP TABLE IF EXISTS `locations`;
+CREATE TABLE locations (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  prefix CHAR(6) NOT NULL,
+  location VARCHAR(255) NOT NULL
+) ENGINE=Innodb DEFAULT CHARSET=utf8;
+
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
 /*!40000 ALTER TABLE `usergroups` DISABLE KEYS */;
 /*!40000 ALTER TABLE `accounts_usergroups` DISABLE KEYS */;
@@ -163,21 +164,24 @@ INSERT INTO `usergroups_permissions` SET usergroup_id = 3, permission_id = 1;
 INSERT INTO `accounts` SET
     id         = 1,
     email      = 'halkeye@gmail.com',
+    name       = 'Halkeye',
     password   = 'c1537a66964e2acbb3a8232a20b6d8338cb206c5',
     salt       = '3e215344f1',
-    status     = 1
-    -- created    = 1249191871,
-    -- login      = 1249793436
+    status     = 1,
+    created    = 1249191871,
+    login      = 1249793436
 ;
 INSERT INTO `accounts` SET
     id         = 2,
     email      = 'stt@sfu.ca',
+    name       = 'Uchikoma',
     password   = '59e9c0e9d8e1f1b26b7f867a58ee6edf93becb33',
     salt       = '9f8d6875ac',
-    status     = 1
-    -- created    = 1257639234,
-    -- login      = 1262579714
+    status     = 1,
+    created    = 1257639234,
+    login      = 1262579714
 ;
+/*
 -- Heather from ae reg
 INSERT INTO `accounts` SET
     id         = 3,
@@ -188,10 +192,11 @@ INSERT INTO `accounts` SET
     -- created    = 1257483052,
     -- login      = 1257484338
 ;
+*/
 
 INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 1;
 INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 2;
-INSERT INTO `accounts_usergroups` SET usergroup_id = 1, account_id = 3;
+-- INSERT INTO `accounts_usergroups` SET usergroup_id = 1, account_id = 3;
 
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 /*!40000 ALTER TABLE `usergroups` ENABLE KEYS */;
