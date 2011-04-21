@@ -98,7 +98,7 @@ else
                 $options = array();
                 foreach ($passes as $pass)
                 {
-                    $options[$pass->id] = "$pass";
+                    $options[$pass->convention->name][$pass->id] = "$pass";
                 }
                 echo form::select('pass_id', $options);
                 echo form::submit('', __('Add new registration to checkout')); 

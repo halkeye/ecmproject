@@ -165,8 +165,8 @@ INSERT INTO `usergroups_permissions` SET usergroup_id = 3, permission_id = 1;
 INSERT INTO `accounts` SET
     id         = 1,
     email      = 'halkeye@gmail.com',
-    gname      = 'Halk',
-    sname      = 'eye',
+    gname      = 'Gavin',
+    sname      = 'Mogan',
     password   = 'c1537a66964e2acbb3a8232a20b6d8338cb206c5',
     salt       = '3e215344f1',
     status     = 1,
@@ -184,18 +184,24 @@ INSERT INTO `accounts` SET
     created    = 1257639234,
     login      = 1262579714
 ;
-/*
--- Heather from ae reg
-INSERT INTO `accounts` SET
-    id         = 3,
-    email      = 'queens_net@yahoo.ca',
-    password   = 'f7a2752cdd4239075c6a8241c8a8ce77c0d3fb8f',
-    salt       = '74feb3d02f',
-    status     = 1
-    -- created    = 1257483052,
-    -- login      = 1257484338
+
+INSERT INTO `conventions` SET
+    id         = 1,
+    name       = 'Cos & Effect',
+    location   = 'UBC'
 ;
-*/
+
+-- start = 1304226000 = 05 / 01 / 2011 @ 0:0:0 EST
+-- start = 1306904400 = 06 / 01 / 2011 @ 0:0:0 EST
+INSERT INTO `passes` SET
+    id            = 1,
+    convention_id = 1,
+    name          = 'Weekend Pass',
+    price         = '35.00',
+    startDate     = 1204226000, 
+    endDate       = 1306904400,
+    isPurchasable = 1
+;
 
 INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 1;
 INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 2;
