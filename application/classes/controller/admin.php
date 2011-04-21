@@ -293,7 +293,6 @@ class Controller_Admin extends Base_MainTemplate
 		));             
     }
     function action_createRegistration2() {
-    
 		$post = $this->request->post();
 		$alt_convention_id = $this->hasValue($post, 'convention_id') ? $post['convention_id'] : 0;
 		$convention_id = $this->session->get_once('admin_convention_id', $alt_convention_id); 
@@ -319,7 +318,7 @@ class Controller_Admin extends Base_MainTemplate
 
 		//Check if passes exist.
 		if (!$passes) {
-			$this->addError("This convention has no passes! Create some passes first before you create registrations.");
+			$this->addError("This event has no tickets! Create some tickets first before you create registrations.");
 			$this->request->redirect('admin/createRegistration');
 		}
 		
@@ -346,6 +345,14 @@ class Controller_Admin extends Base_MainTemplate
 					$reg->finalizeTickets(); //Finalize the reservation.
 					$this->addMessage( __('Created a new registration, ') . $reg->reg_id);
 					$this->session->set('admin_convention_id', $post['convention_id']);
+					
+					$new_reg = ORM::factory('Registration');
+					$new_reg->pass_id = $reg->pass_id;
+					$comp_loc = $post['comp_loc'];
+				
+					$post = $new_reg->as_array();
+					$post['comp_loc'] = $comp_loc;
+					$post['status'] = Model_Registration::STATUS_PAID;
 				}
 				else if ($reg->pass_id > 0) {					
 					$this->addError("No more tickets to allocate for " . $fields['pass_id']['values'][$reg->pass_id] . '. Please select a different pass.');				
@@ -377,12 +384,11 @@ class Controller_Admin extends Base_MainTemplate
 		));
     }
 	function action_editRegistration($rid = NULL) {
-        /* Can change all fields. */    
         //Not allowed to be lazy in checking input here.
         if ( (!isset($rid) || !is_numeric($rid) || $rid <= 0) )
             die("You're not allowed to be here!");
             
-        //TODO: Deal with the case where one of the below fails to load.
+		$post = $this->request->post();
         $reg = ORM::factory('Registration',$rid);
         if (! $reg->loaded() )
         {
@@ -390,59 +396,49 @@ class Controller_Admin extends Base_MainTemplate
             $this->request->redirect('admin/manageRegistrations/');
         }
         
-        $crows = ORM::factory('Convention')->find_all()->as_array('id', 'name');    
-        $fields = $reg->formo_defaults;
-        
-        $passes = ORM::Factory('Pass')->where("convention_id", $reg->convention_id)->find_all()->as_array('id', 'name');
-
+		$fields = $reg->formo_defaults; 
+		$fields['convention_name'] = ORM::Factory('Convention', $reg->convention_id)->name;
+		$fields['status']['values']	 = Model_Registration::getStatusValues();	
+		$passes = ORM::Factory('Pass')->where("convention_id", '=', $reg->convention_id)->find_all()->as_array('id', 'name'); 	
+		
+        //Check if passes exist.
 		if (!$passes) {
-			$this->addError("This convention has no passes! Create some passes first before you create registrations.");
+			$this->addError("This event has no tickets! Create some passes first before you create registrations.");
 			$this->request->redirect('admin/createRegistration');
-		}
+		}     
+		
 		$fields['pass_id']['values'] = $passes;
         
-        if ($post = $this->request->post())
+        if ($post)
         {
-            $fieldName = 'dob';
-            $post[$fieldName] = ECM_Form::parseSplitDate($post, $fieldName);
+			//Disallow changing of convention and registration id's.
+			unset($post['convention_id']);
+			unset($post['reg_id']);		
+			$reg->values($post);
+            $extra_validation = $this->validateEmailOrPhone($post);
         
-            if ($reg->validate_admin($post))
-            {           
-                // die ('stop!' . $post['city'] . $post['prov'] . '|' . $reg->city . $reg->prov);
-                // Non-required fields. Validate doesn't seem to set fields that aren't required.
-                $reg->city = $post['city'];
-                $reg->prov = $post['prov'];
-                $reg->save();               
-                if ($reg->saved()) {
-                    $this->addMessage('Successfully edited registatration for: ' . $reg->gname . ' ' . $reg->sname);
-                    $this->request->redirect('admin/manageRegistrations');
-                }
-                else
-                {
-                    $this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
-                }
-            }
-                        
-            $errorMsg = 'Oops. You entered something bad! Please fix it! <br />';               
-            $errors = $post->errors('form_error_messages');
-            foreach ($errors as $error)
-                $errorMsg = $errorMsg . ' ' . $error . '<br />';                    
-        
-            $this->addError($errorMsg);
-            
-            $this->template->content = new View('admin/Registration2', array(
-                'row' => $post,
-                'fields' => $fields,
-                'callback' => "editRegistration/$rid"
-            ));
+			//No tickets are being allocated or deleted so no call necessary to ticket allocation methods.
+			try {
+				$reg->save(); 
+				$this->addMessage( __('Successfully edited registration, ') . $reg->reg_id);
+				$this->session->set('admin_convention_id', $reg->convention_id);
+				$this->request->redirect('admin/manageRegistrations');
+			}
+			catch (ORM_Validation_Exception $e)
+			{				
+				$this->parseErrorMessages($e);   			
+			} 
         } else {
-            /* Full registration at this step. */
-            $this->template->content = new View('admin/Registration2', array(
-                    'row' => $reg->as_array(),
-                    'fields' => $fields,
-                    'callback' => "editRegistration/$rid"
-                ));
+			$post = $reg->as_array();
         }
+		
+		 /* Full registration at this step. */
+		$fields['convention_id'] = $reg->convention_id;
+		$this->template->content = new View('admin/EditRegistration', array(
+			'row' => $post,
+			'fields' => $fields,
+			'callback' => "editRegistration/$rid"
+		));
         
     }
 	function action_deleteRegistration($id = NULL) {
