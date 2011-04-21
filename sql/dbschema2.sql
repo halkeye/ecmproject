@@ -58,7 +58,7 @@ CREATE TABLE registrations (
    sname VARCHAR(55) NOT NULL, -- Surname
    email VARCHAR(55),
    phone VARCHAR(25),
-   reg_id CHAR(25) NOT NULL, -- [Event ID]_[Sale Prefix]_[ID #] corresponds to 10_5_10 -> 25 characters where length 5 sale prefix is a chosen number.
+   reg_id CHAR(25) NOT NULL UNIQUE, -- [Event ID]_[Sale Prefix]_[ID #] corresponds to 10_5_10 -> 25 characters where length 5 sale prefix is a chosen number.
    status TINYINT NOT NULL, -- Status of registration?
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE RESTRICT, -- Events shouldn't be deleted if in use already.
    FOREIGN KEY (pass_id) REFERENCES passes(id) ON DELETE RESTRICT, -- Ticket types shouldn't be deleted if in use already.
@@ -80,7 +80,7 @@ DROP TABLE IF EXISTS `payments`;
 CREATE TABLE payments (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    reg_id INT UNSIGNED NOT NULL,
-   payment_type VARCHAR(20) NOT NULL, -- Type of payment (paypal, etc).   
+   payment_type VARCHAR(20) NOT NULL, -- Type of payment (paypal, etc).
    -- Payment processor specific fields to follow? That or link to another table matching type of payment (processor used)
    type VARCHAR(55) NOT NULL,
    mc_gross DECIMAL(10,2) NOT NULL,
@@ -165,8 +165,8 @@ INSERT INTO `usergroups_permissions` SET usergroup_id = 3, permission_id = 1;
 INSERT INTO `accounts` SET
     id         = 1,
     email      = 'halkeye@gmail.com',
-    gname      = 'Gavin',
-    sname      = 'Mogan',
+    gname      = 'Halk',
+    sname      = 'eye',
     password   = 'c1537a66964e2acbb3a8232a20b6d8338cb206c5',
     salt       = '3e215344f1',
     status     = 1,
@@ -184,24 +184,18 @@ INSERT INTO `accounts` SET
     created    = 1257639234,
     login      = 1262579714
 ;
-
-INSERT INTO `conventions` SET
-    id         = 1,
-    name       = 'Cos & Effect',
-    location   = 'UBC'
+/*
+-- Heather from ae reg
+INSERT INTO `accounts` SET
+    id         = 3,
+    email      = 'queens_net@yahoo.ca',
+    password   = 'f7a2752cdd4239075c6a8241c8a8ce77c0d3fb8f',
+    salt       = '74feb3d02f',
+    status     = 1
+    -- created    = 1257483052,
+    -- login      = 1257484338
 ;
-
--- start = 1304226000 = 05 / 01 / 2011 @ 0:0:0 EST
--- start = 1306904400 = 06 / 01 / 2011 @ 0:0:0 EST
-INSERT INTO `passes` SET
-    id            = 1,
-    convention_id = 1,
-    name          = 'Weekend Pass',
-    price         = '35.00',
-    startDate     = 1204226000, 
-    endDate       = 1306904400,
-    isPurchasable = 1
-;
+*/
 
 INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 1;
 INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 2;
