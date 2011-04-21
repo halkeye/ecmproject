@@ -130,6 +130,11 @@ class Model_Registration extends ORM
 		return (bool) ORM::Factory('Pass', $value)->where('convention_id', '=', $this->convention_id)->count_all();
     }
 	public function __check_regID_availability($value) {
+		$changed = $this->_changed;
+		if ( empty($changed['reg_id'])) {
+			return true;
+		}
+		
 		return ! (bool) ORM::Factory('Registration')->where('reg_id', '=', $value)->count_all();
 	} 
 

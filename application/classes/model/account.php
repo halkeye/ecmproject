@@ -32,7 +32,8 @@ class Model_Account extends ORM
     protected $_table_columns = array (
             'id'          => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, 'sequenced' => true, ),
             'email'       => array ( 'type' => 'string', 'length' => '55'                                              ),
-            'name'        => array ( 'type' => 'string', 'length' => '55'                                              ),
+            'gname'        => array ( 'type' => 'string', 'length' => '55'                                              ),
+			'sname'        => array ( 'type' => 'string', 'length' => '55'                                              ),
             'phone'       => array ( 'type' => 'string', 'length' => '55'                                              ),
             'password'    => array ( 'type' => 'string', 'length' => '40'                                              ),
             'salt'        => array ( 'type' => 'string', 'length' => '10',                                             ),
@@ -44,6 +45,9 @@ class Model_Account extends ORM
 	
 	public $default_fields = array(
             'email' 			=> array( 'type'  => 'text', 	'label' => 'Email', 			'required'=>true 		),
+			'gname' 			=> array( 'type'  => 'text', 	'label' => 'First Name', 		'required'=>true 		),
+			'sname' 			=> array( 'type'  => 'text', 	'label' => 'Last Name', 		'required'=>true 		),
+			'phone' 			=> array( 'type'  => 'text', 	'label' => 'Phone', 			'required'=>false		),
             'password' 			=> array( 'type'  => 'text', 	'label' => 'Password', 			'required'=>true     	),
 			'confirm_password' 	=> array( 'type'  => 'text', 	'label' => 'Confirm Password', 	'required'=>true    	),
             'status' 			=> array( 'type'  => 'select', 	'label' => 'Status', 			'required'=>false  		)
@@ -72,7 +76,10 @@ class Model_Account extends ORM
             array('email'),
 			array(array($this, '_valid_unique'), array('email', ':value'))
         );
-        $rules['name'] = array(
+        $rules['gname'] = array(
+            array('not_empty'),
+        );
+		$rules['sname'] = array(
             array('not_empty'),
         );
         $rules['phone'] = array(

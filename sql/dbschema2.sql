@@ -176,7 +176,7 @@ INSERT INTO `accounts` SET
 INSERT INTO `accounts` SET
     id         = 2,
     email      = 'stt@sfu.ca',
-    gname      = 'Uchi',
+    gname       = 'Uchi',
     sname      = 'koma',
     password   = '59e9c0e9d8e1f1b26b7f867a58ee6edf93becb33',
     salt       = '9f8d6875ac',
@@ -205,6 +205,7 @@ INSERT INTO `passes` SET
 
 INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 1;
 INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 2;
+INSERT INTO `locations` SET id = 1, prefix = 'WEB', location = 'ECMS';
 -- INSERT INTO `accounts_usergroups` SET usergroup_id = 1, account_id = 3;
 
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
