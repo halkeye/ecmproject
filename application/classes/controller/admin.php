@@ -314,8 +314,16 @@ class Controller_Admin extends Base_MainTemplate
 		
         $fields = $reg->formo_defaults;        
 		$locations = ORM::Factory('Location')->find_all()->as_array('prefix', 'prefix');
+				
+		$passes = ORM::Factory('Pass')->where('convention_id', '=', $convention_id)->find_all()->as_array('id', 'name');
+
+		//Check if passes exist.
+		if (!$passes) {
+			$this->addError("This convention has no passes! Create some passes first before you create registrations.");
+			$this->request->redirect('admin/createRegistration');
+		}
 		
-        $fields['pass_id']['values'] = ORM::Factory('Pass')->where('convention_id', '=', $convention_id)->find_all()->as_array('id', 'name');
+		$fields['pass_id']['values'] = $passes;
 		$fields['status']['values']	 = Model_Registration::getStatusValues();		
 		$fields['comp_loc']['values'] = $locations;
 		$fields['convention_id'] = $convention_id;
@@ -385,7 +393,13 @@ class Controller_Admin extends Base_MainTemplate
         $crows = ORM::factory('Convention')->find_all()->as_array('id', 'name');    
         $fields = $reg->formo_defaults;
         
-        $fields['pass_id']['values'] = ORM::Factory('Pass')->where("convention_id", $reg->convention_id)->find_all()->as_array('id', 'name');
+        $passes = ORM::Factory('Pass')->where("convention_id", $reg->convention_id)->find_all()->as_array('id', 'name');
+
+		if (!$passes) {
+			$this->addError("This convention has no passes! Create some passes first before you create registrations.");
+			$this->request->redirect('admin/createRegistration');
+		}
+		$fields['pass_id']['values'] = $passes;
         
         if ($post = $this->request->post())
         {
