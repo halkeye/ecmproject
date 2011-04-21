@@ -23,7 +23,7 @@ class Controller_Admin extends Base_MainTemplate
         $this->requireLogin();
         $this->requirePermission('admin'); //Force requirement of full administrative access minimum.
     
-        $this->addMenuItem(array('title'=>'Add Registration', 'url'=>'convention/editReg'));
+        $this->addMenuItem(array('title'=>'Add Registration', 'url'=>Controller_Convention::STEP1));
 
         return $ret;
     }

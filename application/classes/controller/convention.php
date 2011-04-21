@@ -12,7 +12,7 @@
 
 class Controller_Convention extends Base_MainTemplate 
 {
-    const STEP1 = "convention/editReg";
+    const STEP1 = "convention/checkout";
     const STEP2 = "convention/checkout";
 
     function before()
@@ -111,74 +111,6 @@ class Controller_Convention extends Base_MainTemplate
 		$this->template->content = new View('convention/viewReg', array('reg' => $reg, 'pass' => $pass));
 	}
 	
-    function action_editReg($reg_id = NULL)
-    {
-        $reg_id = isset($reg_id) ? intval($reg_id) : NULL;
-
-        $reg = $reg_id ? ORM::factory('registration',$reg_id) : ORM::factory('registration');
-        if (!$reg->loaded())
-        {
-            $reg->account_id    = $this->auth->get_user()->id;
-            //$reg->email         = $this->auth->getAccount()->email;
-        }
-        else
-        {
-            if ($reg->status != Model_Registration::STATUS_UNPROCESSED)
-            {
-                $this->addError(__('convention.registration_already_processed_unable_to_edit'));
-                $this->request->redirect('/convention/viewReg/'.$reg_id);
-                return;
-            }
-        }
-        $passesQuery = $reg->getPossiblePassesQuery();
-            
-        $fields = $reg->formo_defaults;
-        $form = array();
-        $errors = array();
-
-        foreach (array_keys($fields) as $field) 
-        { 
-            $form[$field] = $reg->$field; 
-            /*$errors[$field] = '';*/
-        }
-        foreach ($passesQuery->find_all() as $pass)
-        {
-            $fields['pass_id']['values'][$pass->id] = $pass->__toString();
-        }
-
-        if ($post = $this->request->post())
-        {
-            foreach ($fields as $fieldName=>$fieldData)
-            {
-                if ($fieldData['type'] == 'date')
-                {
-                    $post[$fieldName] = ECM_Form::parseSplitDate($post, $fieldName);
-                }
-            }
-
-            if (!isset($post['agree_toc']))
-                $post['agree_toc'] = false;
-            $post['account_id'] = $this->auth->getAccount()->id;
-            $reg->values($post);
-            try {
-                $reg->save();
-                $this->request->redirect(Controller_Convention::STEP2);
-                return;
-            }
-            catch (ORM_Validation_Exception $e)
-            {
-                $errors = $e->errors('form_error_messages');
-            }
-
-            // repopulate the form fields
-            $form = arr::overwrite($form, $post);
-        }
-        $this->template->content = new View('convention/register', array(
-            'form'=>$form, 'errors'=> $errors,
-            'fields'=>$fields, 'url' => ($reg_id ? 'convention/editReg/'. $reg_id : 'convention/editReg')
-        ));
-    }
-    
     function action_registrationCancel($reg_id)
     {
         $reg_id = intval($reg_id);
@@ -232,7 +164,10 @@ class Controller_Convention extends Base_MainTemplate
 
 
         $data = Kohana::config('paypal');
-        $data['passes'] = ORM::Factory('registration')->getPossiblePassesQuery()->find_all();
+        $data['passes'] = ORM::Factory('registration')
+            ->getPossiblePassesQuery()
+            ->with('convention')
+            ->find_all();
 
         /* get all the registrations we need */
         $data['registrations'] = ORM::Factory('registration')->getForAccount($this->auth->getAccount()->id);
