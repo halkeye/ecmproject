@@ -123,10 +123,9 @@ class Controller_Convention extends Base_MainTemplate
         $regids = array();
         /* Pull out some of the data returned from paypal success link */
         $count = 1;
-        var_dump($_REQUEST);
-        while ($_GET['item_number'.$count])
+        while (isset($_POST['item_number'.$count]) && $_POST['item_number'.$count])
         {
-            $data = explode('|', $_GET['item_number'.$count]);
+            $data = explode('|', $_POST['item_number'.$count]);
             $regids[$data[0]] = array('id' => $data[0], 'pass_id' => $data[1]); 
             $count++;
         }
@@ -134,7 +133,7 @@ class Controller_Convention extends Base_MainTemplate
         $registrations = ORM::factory('registration')
             ->with('account')
             ->with('pass')
-            ->in('registrations.id', array_keys($regids))
+            ->where('registrations.id', 'IN', array_keys($regids))
             ->find_all();
         foreach ($registrations as $reg)
         {
@@ -185,7 +184,7 @@ class Controller_Convention extends Base_MainTemplate
         $data['notify_url'] = url::site('/paypal/registrationPaypalIPN',TRUE);
 		
         ### FIXME - This needs an external url, so can't be localhost
-        if (strpos($data['notify_url'], 'moocow.localhost') !== FALSE) {
+        if (strpos($data['notify_url'], 'moocow.local') !== FALSE) {
             $data['notify_url'] = 'http://moocow.halkeye.net:4080/ecmproject/index.php/paypal/registrationPaypalIPN';
         }
 
@@ -247,7 +246,8 @@ class Controller_Convention extends Base_MainTemplate
 
             $id = $reg->reserveTickets(1);
             if ( $id ) { //Reserve tickets. Return at least 1 except in case of failure (not enough tickets left).
-                $reg->build_regID($pass->convention_id, 'WEB', $id);
+                $reg->build_regID(array('comp_loc'=>'WEB', 'comp_id'=> $id), array('WEB') , $pass->convention_id);
+                #$reg->reg_id = sprintf('%s_%s_%s', $pass->convention_id, 'ECM', $id);
                 $reg->save(); 
                 $reg->finalizeTickets(); //Save has gone through. Finalize reservation.
                 $this->addMessage( __('Created a new registration, ') . $reg->reg_id);
