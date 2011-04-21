@@ -27,6 +27,10 @@ class Paypal
         $post_string = '';
         foreach ($_POST as $field=>$value)
         { 
+            # Kohana very "nicely" sanitizes the $_POST variable, but leaves the $_REQUEST behind
+            # so lets use that instead
+            $value = $_REQUEST[$field];
+
             // Handle escape characters, which depends on setting of magic quotes 
             $value = stripslashes($value); 
             $value = urlencode($value); 
