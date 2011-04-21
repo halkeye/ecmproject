@@ -125,6 +125,18 @@ class Model_Registration extends ORM
         return $filters;
     }   
 	
+	public function delete()
+	{
+		$pass_id = $this->pass_id;
+		$result = parent::delete();
+		
+		if ($result) {
+			$this->deleteTicket($pass_id);
+		}
+		
+		return $result;
+	}
+	
 	/* Validation callbacks */
     public function __valid_pass($value) {
 		return (bool) ORM::Factory('Pass', $value)->where('convention_id', '=', $this->convention_id)->count_all();
@@ -181,16 +193,20 @@ class Model_Registration extends ORM
 		return $this->ticket_next_id;
 	}
 	public function finalizeTickets($amount = 1) {
+		//Reserve tickets is not open. Do nothing (or throw an exception)
+		if (!$this->ticket_reserved) {
+			return;
+		}
+	
 		$alloc = ($amount <= $this->ticket_reserved) ? $amount : $this->ticket_reserved; //Don't "allocate" more than what was originally reserved.
 	
 		//If reserveTickets reserved 0, this query will change nothing. ticket_reserved/ticket_next_id fields are inaccessible from anywhere outside this class.
-		$allocate_query = DB::query(Database::UPDATE, 'UPDATE ticket_counters SET tickets_assigned = tickets_assigned + :alloc, next_id = next_id + :next_id');
+		$allocate_query = DB::query(Database::UPDATE, 'UPDATE ticket_counters SET tickets_assigned = tickets_assigned + :alloc, next_id = next_id + :next_id WHERE pass_id = :pass_id');
 		$allocate_query->param(':alloc', $alloc);
 		$allocate_query->param(':next_id', $alloc); 
-		print "Rows changed: " . $allocate_query->execute();
-	
-		print (string)$allocate_query;
-	
+		$allocate_query->param(':pass_id', $this->pass_id);
+		$allocate_query->execute();
+		
 		DB::query(NULL, 'COMMIT')->execute();
 		$this->ticket_reserved = 0;
 		$this->ticket_next_id = 0;
@@ -203,6 +219,21 @@ class Model_Registration extends ORM
 		$this->ticket_reserved = 0;
 		$this->ticket_next_id = 0;
 	}	
+	private function deleteTicket($pass_id) {
+		if ($this->ticket_reserved) {
+			return;
+		}
+		
+		DB::query(NULL, 'START TRANSACTION')->execute();
+		$query = DB::query(Database::SELECT, 'SELECT * FROM ticket_counters WHERE pass_id = :pass_id FOR UPDATE'); 
+		$query->param(':pass_id', $pass_id);				
+		$result = $query->execute();
+		
+		$allocate_query = DB::query(Database::UPDATE, 'UPDATE ticket_counters SET tickets_assigned = tickets_assigned - 1 WHERE pass_id = :pass_id');
+		$allocate_query->param(':pass_id', $pass_id);
+		$allocate_query->execute();
+		DB::query(NULL, 'COMMIT')->execute();	
+	}
     
 	/* Utility methods */
 	public static function getTotalRegistrations($cid) {
