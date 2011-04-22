@@ -15,7 +15,7 @@
 class Controller_Admin extends Base_MainTemplate 
 { 
     const ROWS_PER_PAGE = 10;
-    const ADMIN_USERGROUP = 'Administrator';
+    const ADMIN_USERGROUP = 3;
 
     function before()
     {
@@ -670,22 +670,21 @@ class Controller_Admin extends Base_MainTemplate
                                        
         // Calculate the offset.
         //$start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );    
-        $rows = ORM::factory('Account')
-            ->join('accounts_usergroups')->on('accounts_usergroups.account_id', '=', 'accounts.id')
-            ->join('usergroups')->on('accounts_usergroups.usergroup_id', '=', 'usergroups.id')
-            ->where('usergroups.name', '=', Controller_Admin::ADMIN_USERGROUP)
-            ->find_all();
-
+		$rows = ORM::factory('usergroup', Controller_Admin::ADMIN_USERGROUP)->Accounts->find_all();
+       
         // Header entry. (View with no data generates a header)
         $data['entries'][0] = new View('admin/ListItems/AdminAccountEntry');
         foreach ($rows as $row)
         {
-            $data['actions']['edit'] = html::anchor('admin/deleteAdmin/' . $row->id, html::image(url::site('/static/img/edit-delete.png',TRUE), NULL, __('admin.edit_account')));          
+			$data['actions']['delete'] = html::anchor(
+                "/admin/deleteAdmin/". $row->id ,
+                html::image(url::site('/static/img/edit-delete.png', TRUE), array('title'=>__("Remove Admin Priviledges"))), 
+				null, null, true
+            );               
             $data['entries'][$row->id] = new View('admin/ListItems/AdminAccountEntry', array('row' => $row, 'actions' => $data['actions']));                
         }
         
-        // Set callback path for form submit (change convention, jump to page)
-    
+        // Set callback path for form submit (change convention, jump to page)    
         $this->template->content = new View('admin/list', array(
                 'entity' => 'Account',
                 'callback' => 'admin/manageAccounts', 
@@ -698,6 +697,7 @@ class Controller_Admin extends Base_MainTemplate
     }
     function action_setAdmin() {   
         $this->requirePermission('superAdmin'); //Require extra permissions to manage administrators.
+		
         $fields = array('email' => array( 'type'  => 'text', 'label' => 'Email', 'required'=>true ));
         
         if ($post = $this->request->post())
@@ -705,9 +705,9 @@ class Controller_Admin extends Base_MainTemplate
             $post['email'] = trim($post['email']);
             $group = ORM::Factory('usergroup', Controller_Admin::ADMIN_USERGROUP);
             $acct = ORM::Factory('Account')->where('email', '=', $post['email'])->find();
-            if ($acct->loaded() && !$acct->has($group))
+            if ($acct->loaded() && !$acct->has('Usergroups', $group))
             {
-                $acct->add($group);
+                $acct->add('Usergroups', $group);
                 $acct->save();
                 $this->addMessage('Account login ' . $acct->email . ' was granted administrator access.');
                 $this->request->redirect('admin/manageAdmin');
@@ -723,15 +723,17 @@ class Controller_Admin extends Base_MainTemplate
             ));     
         }
     }
-    function deleteAdmin($id = NULL) {
+    function action_deleteAdmin($id = NULL) {
         $this->requirePermission('superAdmin'); //Require extra permissions to manage administrators.
+		
         if ($id == NULL || !is_numeric($id))
             die('Get out of here!');
             
-        $acct = ORM::Factory('Account',$id);
-        if ($acct->loaded() && $acct->has(ORM::Factory('usergroup', 3)))
+        $acct = ORM::Factory('Account', $id);
+		$group = ORM::Factory('usergroup', Controller_Admin::ADMIN_USERGROUP);
+        if ($acct->loaded() && $acct->has('Usergroups', $group))
         {
-            $acct->remove(ORM::Factory('usergroup', 3));
+            $acct->remove('Usergroups', $group);
             $acct->save();      
             $this->addMessage('Account login ' . $acct->email . ' was stripped of admin access.');
         }

@@ -16,6 +16,10 @@ class Model_Usergroup extends orm
             'model' => 'permission',
             'through' => 'usergroups_permissions',
             'foreign_key' => 'usergroup_id',
+        ),
+		'Accounts' => array ( 
+            'model' => 'account',
+            'through' => 'accounts_usergroups',
         )
     );
     
