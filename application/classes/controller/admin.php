@@ -313,7 +313,13 @@ class Controller_Admin extends Base_MainTemplate
 		
         $fields = $reg->formo_defaults;        
 		$locations = ORM::Factory('Location')->find_all()->as_array('prefix', 'prefix');
-				
+		if ( !$locations )
+        {
+            $this->addError('No purchase locations defined! Please define some locations before continuing.');
+            $this->request->redirect('admin/createRegistration/');
+        }
+
+			
 		$passes = ORM::Factory('Pass')->where('convention_id', '=', $convention_id)->find_all()->as_array('id', 'name');
 
 		//Check if passes exist.
@@ -612,8 +618,8 @@ class Controller_Admin extends Base_MainTemplate
 		/* If pass is not loaded, we have a problem */
         if (!$loc->loaded())
         {
-            $errorMsg = 'Non-existent location! Maybe someone wiped it off the map when you weren\'t looking?<br />';                
-            $this->request->redirect('admin/manageLocation');
+			$this->addError('Non-existent location! Maybe someone wiped it off the map when you weren\'t looking?');                
+            $this->request->redirect('admin/manageLocations');
         }
         
 		$this->template->title =        __('Admin: Editing ') . $loc->location;
