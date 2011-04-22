@@ -16,6 +16,12 @@ class Model_Location extends ORM
         'prefix' 	=> array( 'type'  => 'text', 	'label' => 'Pass', 			'required'	=> true, 'adminRequired'=>true    ),            
         'location' 	=> array( 'type'  => 'text', 	'label' => 'Given Name', 	'required'	=> true, 'adminRequired'=>true 	  ),
 	);
+
+	public function find() 
+	{
+		$this->where('prefix', '!=', Model_Location::RESERVED_LOCATION);
+		return parent::find();
+	}
 	
 	public function find_all() 
 	{
