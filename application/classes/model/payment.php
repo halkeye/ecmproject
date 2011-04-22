@@ -16,16 +16,15 @@ class Model_Payment extends ORM
     );
     
     /* On unserialize never check the db */
-    protected $reload_on_wakeup = false;
+    protected $_reload_on_wakeup = false;
 
     // Table primary key and value
-    protected $primary_key = 'id';
+    protected $_primary_key = 'id';
 
     // Model table information
-    protected $table_columns = array (
+    protected $_table_columns = array (
             'id' => array ( 'type' => 'int','max' => 2147483647,'unsigned' => true,'sequenced' => true, ),
-            'register_id'   => array ( 'type' => 'int', 'max' => 2147483647, 'unsigned' => true,  ),
-            'last_modified' => array ( 'type' => 'int','max' => 2147483647,'unsigned' => true,'null' => true,  ),
+            'reg_id'   => array ( 'type' => 'int', 'max' => 2147483647, 'unsigned' => true,  ),
             'type' => array ('type' => 'string','length' => '55',),
             'mc_gross' => array ('type' => 'float','length' => '10,2',),
             'payer_id' => array ('type' => 'string','length' => '13',),
@@ -35,13 +34,14 @@ class Model_Payment extends ORM
             'receipt_id' => array ('type' => 'string','length' => '19', ),
             'mod_time' => array ('type' => 'int','max' => 2147483647,'unsigned' => true,'null' => true,),
     );
-m
-	public function save()
+
+	public function __construct($id = NULL)
 	{
-		if ($this->id == 0)
+        parent::__construct($id);
+        if (!$this->loaded())
+        {
 			$this->payment_date = time();
-			
-		$ret = parent::save();
+        }
 	}
 	
 	public function validate_admin(array & $array, $save = FALSE)
@@ -92,32 +92,29 @@ m
 	public function getTotalPayments($reg)
 	{
 		$db = new Database();
-		$result = $db->query('SELECT COUNT(*) as count FROM payments WHERE register_id=?', $db->escape($reg));
+		$result = $db->query('SELECT COUNT(*) as count FROM payments WHERE reg_id=?', $db->escape($reg));
 		
 		return (int) $result[0]->count;
 	}
 	
 	public function lastModifiedName()
 	{
-		$acct = ORM::Factory('Account',$this->last_modified)->find();
-		if (! $acct->loaded)
-			return $this->id;
-		else
-			return $acct->email;
+        /* FIXME UCHI< YOU ARE MY ONLY HOPE */
+        return $this->id;
 	}
 	
 	public function getTotal()
 	{
 		$db = new Database();				
-		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE register_id=? AND payment_status=?',$this->register_id, Model_Payment::STATUS_COMPLETED);
+		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE reg_id=? AND payment_status=?',$this->reg_id, Model_Payment::STATUS_COMPLETED);
 		
 		return (int) $result[0]->gross;		
 	}
 	
-	public function staticGetTotal($register_id)
+	public function staticGetTotal($reg_id)
 	{
 		$db = new Database();
-		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE register_id=? AND payment_status=?',$register_id, Model_Payment::STATUS_COMPLETED);
+		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE reg_id=? AND payment_status=?',$reg_id, Model_Payment::STATUS_COMPLETED);
 		
 		return (int) $result[0]->gross;		
 	}

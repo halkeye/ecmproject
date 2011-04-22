@@ -27,6 +27,10 @@ class Paypal
         $post_string = '';
         foreach ($_POST as $field=>$value)
         { 
+            # Kohana very "nicely" sanitizes the $_POST variable, but leaves the $_REQUEST behind
+            # so lets use that instead
+            $value = $_REQUEST[$field];
+
             // Handle escape characters, which depends on setting of magic quotes 
             $value = stripslashes($value); 
             $value = urlencode($value); 
@@ -45,7 +49,7 @@ class Paypal
             curl_setopt($ch, CURLOPT_POSTFIELDS, $post_string);
             curl_setopt($ch, CURLOPT_HTTPHEADER,
                     array("Content-Type: application/x-www-form-urlencoded", "Content-Length: " . strlen($post_string)));
-            curl_setopt($ch, CURLOPT_HEADER , 0);  
+            curl_setopt($ch, CURLOPT_HEADER , 0);
             curl_setopt($ch, CURLOPT_VERBOSE, 1);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
             curl_setopt($ch, CURLOPT_TIMEOUT, 30);
@@ -60,8 +64,8 @@ class Paypal
             if (stripos($response, "VERIFIED") !== FALSE)
                 return true;       
             
-            Kohana::$log->add(Log::ERROR,'Paypal Error - validation: IPN Validation Failed.');
-            throw new Exception('Paypal Error - validation - IPN Validation Failed.');
+            Kohana::$log->add(Log::ERROR,'Paypal Error - validation: IPN Validation Failed. - ' . $response);
+            throw new Exception('Paypal Error - validation - IPN Validation Failed. - ' . $response);
             return;
         }
 
