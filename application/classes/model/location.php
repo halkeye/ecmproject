@@ -2,6 +2,9 @@
 
 class Model_Location extends ORM 
 {
+	/* Prevent the retrieval of this location (internally reserved) */
+	const RESERVED_LOCATION = 'WEB';
+
 	protected $_primary_key = 'id';
 	protected $_table_columns = array(
 		'id'            => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, 'sequenced' => true, ),
@@ -13,6 +16,17 @@ class Model_Location extends ORM
         'prefix' 	=> array( 'type'  => 'text', 	'label' => 'Pass', 			'required'	=> true, 'adminRequired'=>true    ),            
         'location' 	=> array( 'type'  => 'text', 	'label' => 'Given Name', 	'required'	=> true, 'adminRequired'=>true 	  ),
 	);
+	
+	public function find_all() 
+	{
+		$this->where('prefix', '!=', Model_Location::RESERVED_LOCATION);
+		return parent::find_all();
+	}
+	
+	public function count_all()
+	{
+		return parent::count_all() - 1;
+	}
 	
 	 public function filters()
     {
