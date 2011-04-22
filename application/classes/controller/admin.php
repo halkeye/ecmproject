@@ -878,7 +878,7 @@ class Controller_Admin extends Base_MainTemplate
         if (!isset($cid) || !is_numeric($cid) || $cid <= 0)
             die('Get out of here!');
     
-        $passes = ORM::Factory('Pass')->where("convention_id", $cid)->find_all();
+        $passes = ORM::Factory('Pass')->where("convention_id", '=', $cid)->find_all();
         $status_values = Model_Registration::getStatusValues();
         
         if ($post = $this->request->post())
@@ -1046,7 +1046,7 @@ class Controller_Admin extends Base_MainTemplate
     * 
     * $age is a single value of either "all", "minor", "adult", or "none".
     */
-    private function action_doExport($cid, $passes, $status) {
+    private function doExport($cid, $passes, $status) {
         $query = ORM::Factory('Registration');
         
         if ($cid == null || !is_numeric($cid)) {
@@ -1055,16 +1055,16 @@ class Controller_Admin extends Base_MainTemplate
     
         if ($passes != null && is_array($passes) && count($passes) > 0)
         {
-            $query = $query->in('registrations.pass_id', implode(",", $passes));
+            $query = $query->where('registrations.pass_id', 'IN', $passes);
         }
     
         if ($status != null && is_array($status) && count($status) > 0)
         {
-            $query = $query->in('registrations.status', implode(",", $status));
+            $query = $query->where('registrations.status', 'IN', $status);
         }   
     
         //Lazy vs eager? We're going to use it all...get it all in one go.
-        $results = $query->where("registrations.convention_id", $cid)->with('pass')->with('account')->with('convention')->find_all();       
+        $results = $query->where("registrations.convention_id", '=', $cid)->with('pass')->with('account')->with('convention')->find_all();       
         $csv_content = "";  
         
         /* Generate the content */
@@ -1078,7 +1078,7 @@ class Controller_Admin extends Base_MainTemplate
                 $temp['pass_id'] = $result->pass->name . ' ( $' . $result->pass->price . ' )';
                 $temp['account_id'] = $result->account->email;
                 $temp['convention_id'] = $result->convention->name;
-                $temp['status'] = Model_Registration::regStatusToString($temp['status']);       
+                $temp['status'] = $result->statusToString();       
                 
                 //$values = array_values($temp);    
                 //$csv_content .= implode(",", $values) . "\n";

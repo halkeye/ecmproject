@@ -346,11 +346,11 @@ class Model_Registration extends ORM
 	public function getColumns()
 	{
 		//return implode(",", array_keys($this->table_columns));
-		$keys = array_keys($this->table_columns);
+		$keys = array_keys($this->_table_columns);
 		$columns = array();
 		
 		foreach($keys as $key):
-			$columns[$key] = __('convention.registration_field_' . $key);					
+			$columns[$key] = __($key);					
 		endforeach;
 		
 		return implode(",", $columns);
