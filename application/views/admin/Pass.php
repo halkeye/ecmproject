@@ -45,13 +45,17 @@
 		?>
 	</fieldset>
 	<h1>Restrictions</h1>
-	<p>Tickets can be restricted further by disabling it from being purchased. This is useful if certain ticket types must be given (instead of purchased through the system).</p>		
+	<p>Tickets can be restricted further by limiting the amount available (and/or) disabling it from being purchased. This is useful if certain ticket types must be given 
+	(instead of purchased through the system). <strong>Leave Tickets Available blank</strong> if no limit is being imposed.</p>		
 	<fieldset>	
-		<?php 	
+		<?php
+		echo Form::label('tickets_total', 'Tickets Available');
+		echo Form::input ('tickets_total', $row['tickets_total']);	
+		 	
 		foreach (array('isPurchasable') as $field)
 		{	
 			echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $row[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
-		}
+		}		
 		?>
 	</fieldset>
 	<fieldset>				

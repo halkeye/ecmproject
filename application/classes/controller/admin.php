@@ -158,10 +158,15 @@ class Controller_Admin extends Base_MainTemplate
         {
             $post['startDate'] = ECM_Form::parseSplitDate($post, 'startDate');
             $post['endDate'] = ECM_Form::parseSplitDate($post, 'endDate');
+		
+			$extra_validation = Validation::Factory($post);
+			$extra_validation->rule('tickets_total', 'numeric'); 
+			
             $pass->values($post);
+			$pass->tickets_total = $post['tickets_total'];
 			
             try {
-                $pass->save();
+                $pass->save($extra_validation);
                 $this->addMessage( __('Created a new ticket, ') . $pass->name);
 				$this->session->set('admin_convention_id', $post['convention_id']);
                 $this->request->redirect('admin/managePasses'); 				
@@ -174,6 +179,7 @@ class Controller_Admin extends Base_MainTemplate
         else
         {
             $post = $pass->as_array();
+			$post['tickets_total'] = '';
         }
 
         $this->template->content = new View('admin/Pass', array(
@@ -210,9 +216,15 @@ class Controller_Admin extends Base_MainTemplate
         {
             $post['startDate'] = ECM_Form::parseSplitDate($post, 'startDate');
             $post['endDate'] = ECM_Form::parseSplitDate($post, 'endDate');
+			
+			$extra_validation = Validation::Factory($post);
+			$extra_validation->rule('tickets_total', 'numeric'); 
+			
 			$post['isPurchasable'] = empty($post['isPurchasable']) ? 0 : $post['isPurchasable'];
 			
             $pass->values($post);
+			$pass->tickets_total = $post['tickets_total'];
+			
             try {
                 $pass->save();                              
                 $this->addMessage('Successfully edited ' . $pass->name);
@@ -230,6 +242,8 @@ class Controller_Admin extends Base_MainTemplate
         }   
         else {      
             $post = $pass->as_array();
+			$tc = $pass->ticketcounter->tickets_total;
+			$post['tickets_total'] = $tc < 0 ? '' : $tc;
         }   
         $this->template->content = new View('admin/Pass', array(
             'crows' => $crows,  
@@ -1286,8 +1300,7 @@ class Controller_Admin extends Base_MainTemplate
 		
 		return $extra_validation;
 	}
-		
-    
+		    	
     public function action_testClock() {
         header("Content-type: text/plain");
         print date("r");

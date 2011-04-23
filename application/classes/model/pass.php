@@ -15,7 +15,11 @@ class Model_Pass extends ORM
         'convention' => array(
             'model' => 'Convention',
             'foreign_key' => 'id',
-        )
+        ),
+		'ticketcounter' => array(
+			'model' => 'TicketCounter',
+			'foreign_key' => 'pass_id',
+		),
     );
     protected $_has_many = array(
         'passes' => array(
@@ -34,6 +38,8 @@ class Model_Pass extends ORM
         'endDate' 			=> array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647', 'column_name' => 'endDate', 'column_default' => NULL, 'data_type' => 'int', 'is_nullable' => true, 'ordinal_position' => 7, 'display' => '11', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',)
     );
 
+	public $tickets_total = -1;
+	
 	public function rules()
 	{
 		return array(
@@ -91,12 +97,34 @@ class Model_Pass extends ORM
 		$ret = parent::save($validation);	
 		
 		/* Create ticket counter on CREATE. */
-		if (!$loaded) {
-			$query = DB::query(Database::INSERT, 'INSERT INTO ticket_counters (pass_id, tickets_assigned, tickets_total, next_id) VALUES (:pass_id, 0, :total, 1)'); 
-			$query->param(':pass_id', $this->id);
-			$query->param(':total', 20);
-			$query->execute();
+		$this->setTicketCounter();
+		return $ret;
+	}
+	
+	private function setTicketCounter() 
+	{	
+		//Mrawr.
+		if ($this->tickets_total < -1 || empty($this->tickets_total) ) {
+			$this->tickets_total = -1;
 		}
+	
+		$tc = $this->ticketcounter;
+		if ( $tc->loaded() )
+		{
+			if ($tc->tickets_total !== $this->tickets_total )
+			{
+				$tc->tickets_total = $this->tickets_total;
+				$tc->save();
+			}
+		}
+		else 
+		{
+			$tc->pass_id = $this->id;
+			$tc->tickets_assigned = 0;
+			$tc->tickets_total = $this->tickets_total;
+			$tc->next_id = 1;
+			$tc->save();
+		}		
 	}
 	
 	/* Only admin will modify passes anyways.*/
