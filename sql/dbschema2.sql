@@ -10,7 +10,21 @@
 * Notes: For now, leave the issue of extra fields outside the picture.
 * Use ECM prefix for online reg. Issue of block purchases?
 */
+SET foreign_key_checks = 0;
 DROP TABLE IF EXISTS `accounts`;
+DROP TABLE IF EXISTS `accounts_usergroups`;
+DROP TABLE IF EXISTS `conventions`;
+DROP TABLE IF EXISTS `locations`;
+DROP TABLE IF EXISTS `passes`;
+DROP TABLE IF EXISTS `payments`;
+DROP TABLE IF EXISTS `permissions`;
+DROP TABLE IF EXISTS `registrations`;
+DROP TABLE IF EXISTS `ticketcounters`;
+DROP TABLE IF EXISTS `usergroups`;
+DROP TABLE IF EXISTS `usergroups_permissions`;
+DROP TABLE IF EXISTS `verificationcodes`;
+SET foreign_key_checks = 1;
+
 -- Reg form information among other things. Require email at a minimum.
 -- Salt column, usergroups storing?
 CREATE TABLE accounts (
@@ -26,7 +40,6 @@ CREATE TABLE accounts (
    login INT -- Last login.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `conventions`;
 -- Describes events.
 CREATE TABLE conventions (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -34,7 +47,6 @@ CREATE TABLE conventions (
    location VARCHAR(255)
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `passes`;
 -- Table that describes the various passes. 
 -- isPurchasable indicates whether a ticket can be purchased (or if it has to be given by an admin)
 CREATE TABLE passes (
@@ -48,7 +60,6 @@ CREATE TABLE passes (
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE CASCADE -- Cascade deletion of passes. Will (should) still fail if registrations have started.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `registrations`;
 CREATE TABLE registrations (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    convention_id INT UNSIGNED NOT NULL,
@@ -65,7 +76,6 @@ CREATE TABLE registrations (
    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE SET NULL -- Even if an account is deleted, leave registrations for stat purposes. (necessary?)
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `ticketcounters`;
 CREATE TABLE ticketcounters (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    pass_id INT UNSIGNED NOT NULL,
@@ -75,7 +85,6 @@ CREATE TABLE ticketcounters (
    FOREIGN KEY(pass_id) REFERENCES passes(id) ON DELETE CASCADE
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `payments`;
 -- Store payment processor data.
 CREATE TABLE payments (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -93,7 +102,6 @@ CREATE TABLE payments (
    FOREIGN KEY (reg_id) REFERENCES registrations(id) ON DELETE RESTRICT -- Registrations with payment information shouldn't be deleted.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `usergroups`;
 -- Expand on permissions later.
 CREATE TABLE usergroups (
    id int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -101,14 +109,12 @@ CREATE TABLE usergroups (
    description TEXT
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `permissions`;
 CREATE TABLE permissions (
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    pkey VARCHAR(100) NOT NULL,
    description TEXT
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `usergroups_permissions`;
 CREATE TABLE usergroups_permissions (
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    usergroup_id INT UNSIGNED,
@@ -117,7 +123,6 @@ CREATE TABLE usergroups_permissions (
    FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `accounts_usergroups`;
 CREATE TABLE accounts_usergroups (
    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    usergroup_id INT UNSIGNED,
@@ -127,7 +132,6 @@ CREATE TABLE accounts_usergroups (
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `verificationcodes`;
 CREATE TABLE `verificationcodes` (
    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    `account_id` INT UNSIGNED NOT NULL,
@@ -138,7 +142,6 @@ CREATE TABLE `verificationcodes` (
    UNIQUE (`code`)
 );
 
-DROP TABLE IF EXISTS `locations`;
 CREATE TABLE locations (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   prefix CHAR(6) NOT NULL,
