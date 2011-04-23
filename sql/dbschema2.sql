@@ -65,8 +65,8 @@ CREATE TABLE registrations (
    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE SET NULL -- Even if an account is deleted, leave registrations for stat purposes. (necessary?)
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `ticket_counters`;
-CREATE TABLE ticket_counters (
+DROP TABLE IF EXISTS `ticketcounters`;
+CREATE TABLE ticketcounters (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    pass_id INT UNSIGNED NOT NULL,
    tickets_assigned INT UNSIGNED NOT NULL,
