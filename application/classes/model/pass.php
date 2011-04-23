@@ -12,15 +12,17 @@ class Model_Pass extends ORM
     );
     
     protected $_has_one = array(
-        'convention' => array(
-            'model' => 'Convention',
-            'foreign_key' => 'id',
-        ),
 		'ticketcounter' => array(
 			'model' => 'TicketCounter',
 			'foreign_key' => 'pass_id',
 		),
     );
+	protected $_belongs_to = array(
+		'convention' => array(
+            'model' => 'Convention',
+            'foreign_key' => 'convention_id',
+        ),
+	);
     protected $_has_many = array(
         'passes' => array(
             'model' => 'Pass',
