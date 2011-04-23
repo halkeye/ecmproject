@@ -171,7 +171,7 @@ class Model_Registration extends ORM
 	/* Ticket allocation methods */	
 	public function reserveTickets($amount = 1) {
 		DB::query(NULL, 'START TRANSACTION')->execute();
-		$query = DB::query(Database::SELECT, 'SELECT * FROM ticket_counters WHERE pass_id = :pass_id FOR UPDATE'); 
+		$query = DB::query(Database::SELECT, 'SELECT * FROM ticketcounters WHERE pass_id = :pass_id FOR UPDATE'); 
 		$query->param(':pass_id', $this->pass_id);				
 		$result = $query->execute();
 		
@@ -201,7 +201,7 @@ class Model_Registration extends ORM
 		$alloc = ($amount <= $this->ticket_reserved) ? $amount : $this->ticket_reserved; //Don't "allocate" more than what was originally reserved.
 	
 		//If reserveTickets reserved 0, this query will change nothing. ticket_reserved/ticket_next_id fields are inaccessible from anywhere outside this class.
-		$allocate_query = DB::query(Database::UPDATE, 'UPDATE ticket_counters SET tickets_assigned = tickets_assigned + :alloc, next_id = next_id + :next_id WHERE pass_id = :pass_id');
+		$allocate_query = DB::query(Database::UPDATE, 'UPDATE ticketcounters SET tickets_assigned = tickets_assigned + :alloc, next_id = next_id + :next_id WHERE pass_id = :pass_id');
 		$allocate_query->param(':alloc', $alloc);
 		$allocate_query->param(':next_id', $alloc); 
 		$allocate_query->param(':pass_id', $this->pass_id);
@@ -225,11 +225,11 @@ class Model_Registration extends ORM
 		}
 		
 		DB::query(NULL, 'START TRANSACTION')->execute();
-		$query = DB::query(Database::SELECT, 'SELECT * FROM ticket_counters WHERE pass_id = :pass_id FOR UPDATE'); 
+		$query = DB::query(Database::SELECT, 'SELECT * FROM ticketcounters WHERE pass_id = :pass_id FOR UPDATE'); 
 		$query->param(':pass_id', $pass_id);				
 		$result = $query->execute();
 		
-		$allocate_query = DB::query(Database::UPDATE, 'UPDATE ticket_counters SET tickets_assigned = tickets_assigned - 1 WHERE pass_id = :pass_id');
+		$allocate_query = DB::query(Database::UPDATE, 'UPDATE ticketcounters SET tickets_assigned = tickets_assigned - 1 WHERE pass_id = :pass_id');
 		$allocate_query->param(':pass_id', $pass_id);
 		$allocate_query->execute();
 		DB::query(NULL, 'COMMIT')->execute();	
@@ -346,11 +346,11 @@ class Model_Registration extends ORM
 	public function getColumns()
 	{
 		//return implode(",", array_keys($this->table_columns));
-		$keys = array_keys($this->table_columns);
+		$keys = array_keys($this->_table_columns);
 		$columns = array();
 		
 		foreach($keys as $key):
-			$columns[$key] = __('convention.registration_field_' . $key);					
+			$columns[$key] = __($key);					
 		endforeach;
 		
 		return implode(",", $columns);

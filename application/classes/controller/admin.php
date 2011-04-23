@@ -15,7 +15,7 @@
 class Controller_Admin extends Base_MainTemplate 
 { 
     const ROWS_PER_PAGE = 10;
-    const ADMIN_USERGROUP = 'Administrator';
+    const ADMIN_USERGROUP = 3;
 
     function before()
     {
@@ -158,10 +158,15 @@ class Controller_Admin extends Base_MainTemplate
         {
             $post['startDate'] = ECM_Form::parseSplitDate($post, 'startDate');
             $post['endDate'] = ECM_Form::parseSplitDate($post, 'endDate');
+		
+			$extra_validation = Validation::Factory($post);
+			$extra_validation->rule('tickets_total', 'numeric'); 
+			
             $pass->values($post);
+			$pass->tickets_total = $post['tickets_total'];
 			
             try {
-                $pass->save();
+                $pass->save($extra_validation);
                 $this->addMessage( __('Created a new ticket, ') . $pass->name);
 				$this->session->set('admin_convention_id', $post['convention_id']);
                 $this->request->redirect('admin/managePasses'); 				
@@ -174,6 +179,7 @@ class Controller_Admin extends Base_MainTemplate
         else
         {
             $post = $pass->as_array();
+			$post['tickets_total'] = '';
         }
 
         $this->template->content = new View('admin/Pass', array(
@@ -210,9 +216,15 @@ class Controller_Admin extends Base_MainTemplate
         {
             $post['startDate'] = ECM_Form::parseSplitDate($post, 'startDate');
             $post['endDate'] = ECM_Form::parseSplitDate($post, 'endDate');
+			
+			$extra_validation = Validation::Factory($post);
+			$extra_validation->rule('tickets_total', 'numeric'); 
+			
 			$post['isPurchasable'] = empty($post['isPurchasable']) ? 0 : $post['isPurchasable'];
 			
             $pass->values($post);
+			$pass->tickets_total = $post['tickets_total'];
+			
             try {
                 $pass->save();                              
                 $this->addMessage('Successfully edited ' . $pass->name);
@@ -230,6 +242,8 @@ class Controller_Admin extends Base_MainTemplate
         }   
         else {      
             $post = $pass->as_array();
+			$tc = $pass->ticketcounter->tickets_total;
+			$post['tickets_total'] = $tc < 0 ? '' : $tc;
         }   
         $this->template->content = new View('admin/Pass', array(
             'crows' => $crows,  
@@ -313,7 +327,13 @@ class Controller_Admin extends Base_MainTemplate
 		
         $fields = $reg->formo_defaults;        
 		$locations = ORM::Factory('Location')->find_all()->as_array('prefix', 'prefix');
-				
+		if ( !$locations )
+        {
+            $this->addError('No purchase locations defined! Please define some locations before continuing.');
+            $this->request->redirect('admin/createRegistration/');
+        }
+
+			
 		$passes = ORM::Factory('Pass')->where('convention_id', '=', $convention_id)->find_all()->as_array('id', 'name');
 
 		//Check if passes exist.
@@ -612,8 +632,8 @@ class Controller_Admin extends Base_MainTemplate
 		/* If pass is not loaded, we have a problem */
         if (!$loc->loaded())
         {
-            $errorMsg = 'Non-existent location! Maybe someone wiped it off the map when you weren\'t looking?<br />';                
-            $this->request->redirect('admin/manageLocation');
+			$this->addError('Non-existent location! Maybe someone wiped it off the map when you weren\'t looking?');                
+            $this->request->redirect('admin/manageLocations');
         }
         
 		$this->template->title =        __('Admin: Editing ') . $loc->location;
@@ -664,22 +684,21 @@ class Controller_Admin extends Base_MainTemplate
                                        
         // Calculate the offset.
         //$start = ( Controller_Admin::getMultiplier($page) * Controller_Admin::ROWS_PER_PAGE );    
-        $rows = ORM::factory('Account')
-            ->join('accounts_usergroups')->on('accounts_usergroups.account_id', '=', 'accounts.id')
-            ->join('usergroups')->on('accounts_usergroups.usergroup_id', '=', 'usergroups.id')
-            ->where('usergroups.name', '=', Controller_Admin::ADMIN_USERGROUP)
-            ->find_all();
-
+		$rows = ORM::factory('usergroup', Controller_Admin::ADMIN_USERGROUP)->Accounts->find_all();
+       
         // Header entry. (View with no data generates a header)
         $data['entries'][0] = new View('admin/ListItems/AdminAccountEntry');
         foreach ($rows as $row)
         {
-            $data['actions']['edit'] = html::anchor('admin/deleteAdmin/' . $row->id, html::image(url::site('/static/img/edit-delete.png',TRUE), NULL, __('admin.edit_account')));          
+			$data['actions']['delete'] = html::anchor(
+                "/admin/deleteAdmin/". $row->id ,
+                html::image(url::site('/static/img/edit-delete.png', TRUE), array('title'=>__("Remove Admin Priviledges"))), 
+				null, null, true
+            );               
             $data['entries'][$row->id] = new View('admin/ListItems/AdminAccountEntry', array('row' => $row, 'actions' => $data['actions']));                
         }
         
-        // Set callback path for form submit (change convention, jump to page)
-    
+        // Set callback path for form submit (change convention, jump to page)    
         $this->template->content = new View('admin/list', array(
                 'entity' => 'Account',
                 'callback' => 'admin/manageAccounts', 
@@ -692,6 +711,7 @@ class Controller_Admin extends Base_MainTemplate
     }
     function action_setAdmin() {   
         $this->requirePermission('superAdmin'); //Require extra permissions to manage administrators.
+		
         $fields = array('email' => array( 'type'  => 'text', 'label' => 'Email', 'required'=>true ));
         
         if ($post = $this->request->post())
@@ -699,9 +719,9 @@ class Controller_Admin extends Base_MainTemplate
             $post['email'] = trim($post['email']);
             $group = ORM::Factory('usergroup', Controller_Admin::ADMIN_USERGROUP);
             $acct = ORM::Factory('Account')->where('email', '=', $post['email'])->find();
-            if ($acct->loaded() && !$acct->has($group))
+            if ($acct->loaded() && !$acct->has('Usergroups', $group))
             {
-                $acct->add($group);
+                $acct->add('Usergroups', $group);
                 $acct->save();
                 $this->addMessage('Account login ' . $acct->email . ' was granted administrator access.');
                 $this->request->redirect('admin/manageAdmin');
@@ -717,15 +737,17 @@ class Controller_Admin extends Base_MainTemplate
             ));     
         }
     }
-    function deleteAdmin($id = NULL) {
+    function action_deleteAdmin($id = NULL) {
         $this->requirePermission('superAdmin'); //Require extra permissions to manage administrators.
+		
         if ($id == NULL || !is_numeric($id))
             die('Get out of here!');
             
-        $acct = ORM::Factory('Account',$id);
-        if ($acct->loaded() && $acct->has(ORM::Factory('usergroup', 3)))
+        $acct = ORM::Factory('Account', $id);
+		$group = ORM::Factory('usergroup', Controller_Admin::ADMIN_USERGROUP);
+        if ($acct->loaded() && $acct->has('Usergroups', $group))
         {
-            $acct->remove(ORM::Factory('usergroup', 3));
+            $acct->remove('Usergroups', $group);
             $acct->save();      
             $this->addMessage('Account login ' . $acct->email . ' was stripped of admin access.');
         }
@@ -870,7 +892,7 @@ class Controller_Admin extends Base_MainTemplate
         if (!isset($cid) || !is_numeric($cid) || $cid <= 0)
             die('Get out of here!');
     
-        $passes = ORM::Factory('Pass')->where("convention_id", $cid)->find_all();
+        $passes = ORM::Factory('Pass')->where("convention_id", '=', $cid)->find_all();
         $status_values = Model_Registration::getStatusValues();
         
         if ($post = $this->request->post())
@@ -1038,7 +1060,7 @@ class Controller_Admin extends Base_MainTemplate
     * 
     * $age is a single value of either "all", "minor", "adult", or "none".
     */
-    private function action_doExport($cid, $passes, $status) {
+    private function doExport($cid, $passes, $status) {
         $query = ORM::Factory('Registration');
         
         if ($cid == null || !is_numeric($cid)) {
@@ -1047,16 +1069,16 @@ class Controller_Admin extends Base_MainTemplate
     
         if ($passes != null && is_array($passes) && count($passes) > 0)
         {
-            $query = $query->in('registrations.pass_id', implode(",", $passes));
+            $query = $query->where('registrations.pass_id', 'IN', $passes);
         }
     
         if ($status != null && is_array($status) && count($status) > 0)
         {
-            $query = $query->in('registrations.status', implode(",", $status));
+            $query = $query->where('registrations.status', 'IN', $status);
         }   
     
         //Lazy vs eager? We're going to use it all...get it all in one go.
-        $results = $query->where("registrations.convention_id", $cid)->with('pass')->with('account')->with('convention')->find_all();       
+        $results = $query->where("registrations.convention_id", '=', $cid)->with('pass')->with('account')->with('convention')->find_all();       
         $csv_content = "";  
         
         /* Generate the content */
@@ -1070,7 +1092,7 @@ class Controller_Admin extends Base_MainTemplate
                 $temp['pass_id'] = $result->pass->name . ' ( $' . $result->pass->price . ' )';
                 $temp['account_id'] = $result->account->email;
                 $temp['convention_id'] = $result->convention->name;
-                $temp['status'] = Model_Registration::regStatusToString($temp['status']);       
+                $temp['status'] = $result->statusToString();       
                 
                 //$values = array_values($temp);    
                 //$csv_content .= implode(",", $values) . "\n";
@@ -1278,8 +1300,7 @@ class Controller_Admin extends Base_MainTemplate
 		
 		return $extra_validation;
 	}
-		
-    
+		    	
     public function action_testClock() {
         header("Content-type: text/plain");
         print date("r");
