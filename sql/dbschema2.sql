@@ -200,7 +200,7 @@ INSERT INTO `accounts` SET
 ;
 */
 
-INSERT INTO ticket_counters (pass_id, tickets_assigned, tickets_total, next_id) VALUES (1, 0, 600, 1);
+INSERT INTO ticketcounters (pass_id, tickets_assigned, tickets_total, next_id) VALUES (1, 0, 600, 1);
 
 INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 1;
 INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 2;
