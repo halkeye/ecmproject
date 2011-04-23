@@ -51,6 +51,7 @@ class Controller_Paypal extends Controller
                         $payment->txn_id = $data['txn_id'];
                         $payment->receipt_id = "????-????-????-????";
                         $payment->mod_time = time();
+                        $payment->payment_type = 'paypal';
                         $payment->save();
 
                         $reg->save();
