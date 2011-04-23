@@ -12,7 +12,7 @@
 	url = https://github.com/zombor/KOstache.git
 [submodule "modules/log"]
 	path = modules/log
-	url = https://halkeye@github.com/halkeye/kohana-log.git
+	url = git@github.com:halkeye/kohana-log.git
 [submodule "modules/static"]
 	path = modules/static
 	url = git@github.com:halkeye/kohana-static.git
