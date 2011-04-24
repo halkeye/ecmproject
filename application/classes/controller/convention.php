@@ -157,8 +157,8 @@ class Controller_Convention extends Base_MainTemplate
         $this->requireVerified();
 		$user = $this->auth->get_user();
 		
-		$welcome = __('Welcome ') . htmlentities($user->gname) . ' ' . htmlentities($user->sname);
-		$edit_link = html::anchor('/user/', __('(Edit account)'), array('class' => 'small_link'), null, true);
+		$welcome = __('Purchase tickets for ') . htmlentities($user->gname) . ' ' . htmlentities($user->sname);
+		$edit_link = html::anchor('/user/', __('(Not you? Click here.)'), array('class' => 'small_link'), null, true);
 		
         $this->template->heading    = $welcome . ' ' . $edit_link;
         $this->template->subheading = __('Register and purchase tickets for events here.'); 
