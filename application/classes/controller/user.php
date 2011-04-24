@@ -15,11 +15,12 @@ class Controller_User extends Base_MainTemplate
     function action_index()
     {
         $this->requireLogin();		
-		$this->addMenuItem(
-                array('title'=>'Add Registration', 'url'=>Controller_Convention::STEP1)
-        );
-		$reg = Model_Registration::getAllRegistrationsByConvention($this->auth->getAccount()->id);		
-				
+		$account = $this->auth->getAccount();
+		$reg = Model_Registration::getAllRegistrationsByConvention($account->id);		
+		
+		$this->template->heading      = __('Account:') . ' ' . html::chars($account->gname) . ' ' . html::chars($account->sname);
+        $this->template->subheading = "Account settings as well as current and past ticket purchases.";
+		
         $this->template->content = new View('user/index', array('registrations'=>$reg));
     }
 
@@ -61,18 +62,14 @@ class Controller_User extends Base_MainTemplate
         $this->requireLogin();
         if (!$this->auth->is_logged_in()) 
         {
-            $this->addMessage(__('auth.not_logged_in'));
+            $this->addMessage(__('You are not logged in.'));
             $this->request->redirect('');
             return;
         }
 
-        $this->template->content = new View('user/logout');
-
-        if ($_SERVER['REQUEST_METHOD'] == 'POST')
-        {
-            $this->auth->logout();
-            $this->_redirect('');
-        }
+        $this->auth->logout();
+		$this->addMessage(__('You have been logged out.'));
+        $this->_redirect('');       
         return;
     }
 
@@ -364,7 +361,7 @@ class Controller_User extends Base_MainTemplate
         /* Get logged in account */
         $account = $this->auth->getAccount();
         
-        $fields = array('email' => array('type'=>'text', 'required'=> true));
+        $fields = ORM::Factory('Account')->default_fields;
         $form = array('email' => '');
         $errors = array();
 
