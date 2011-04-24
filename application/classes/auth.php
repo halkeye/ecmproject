@@ -67,19 +67,19 @@ class Auth {
     {
         if (!$account || !$account->loaded())
         {
-            $this->addError(__('auth.invalid_user_pass'));
+            $this->addError(__('Sorry, no account matched the email and password you provided.'));
             return FALSE;
         }
 
         if (empty($password))
         {
-            $this->addError(__('auth.invalid_user_pass'));
+            $this->addError(__('Sorry, no account matched the email and password you provided.'));
             return FALSE;
         }
 
         if ($account->isBanned())
         {
-            $this->addError(__('auth.banned'));
+            $this->addError(__('This account has been disabled.'));
             return FALSE;
         }
 

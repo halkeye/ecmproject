@@ -57,13 +57,6 @@ class Base_MainTemplate extends Controller_Template
                     $this->auth->storeAccount($user);
                 }
             }
-            $this->addMenuItem(array('title'=>'My Account', 'url'=>'user'));
-
-            if ($this->auth->hasPermission('admin'))
-            {
-                $this->addMenuItem(array('title'=>'Administration', 'url'=>'admin'));
-                $this->addMenuItem(array('seperator'=>1));
-            }
         }
         return $ret;
     }
@@ -91,12 +84,18 @@ class Base_MainTemplate extends Controller_Template
         
         if ($this->template->isLoggedIn)
         {
-            $this->addMenuItem(array('url'=>'convention/checkout', 'title'=>'Checkout'));
-            $this->addMenuItem(array('seperator'=>1));
-
-
+			
+			$this->addMenuItem(array('url'=>'convention/checkout', 'title'=>'Purchase Tickets'));
+			$this->addMenuItem(array('title'=>'My Account', 'url'=>'user'));
+			
+			if ($this->auth->hasPermission('admin'))
+			{
+				$this->addMenuItem(array('title'=>'Administration', 'url'=>'admin'));
+			}
+			
             $this->addMenuItem(array('url'=>'user/logout', 'title'=>'Logout'));
         }
+		
         return parent::after();
     }
 

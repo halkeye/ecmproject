@@ -20,9 +20,6 @@ class Controller_Convention extends Base_MainTemplate
         $ret = parent::before();
         $this->requireLogin();
         $this->requireVerified();
-        $this->addMenuItem(
-                array('title'=>'Add Registration', 'url'=>Controller_Convention::STEP1)
-        );
         return $ret;
     }
 
@@ -158,8 +155,13 @@ class Controller_Convention extends Base_MainTemplate
     public function action_checkout()
     {
         $this->requireVerified();
-        $this->template->heading    = __('convention.checkout_heading');
-        $this->template->subheading = __('convention.checkout_subheading'); 
+		$user = $this->auth->get_user();
+		
+		$welcome = __('Welcome ') . htmlentities($user->gname) . ' ' . htmlentities($user->sname);
+		$edit_link = html::anchor('/user/', __('(Edit account)'), array('class' => 'small_link'), null, true);
+		
+        $this->template->heading    = $welcome . ' ' . $edit_link;
+        $this->template->subheading = __('Register and purchase tickets for events here.'); 
 
 
         $data = Kohana::config('paypal');
@@ -179,7 +181,7 @@ class Controller_Convention extends Base_MainTemplate
         /* Config file is currently 'url', lets map it to 'paypal_url' incase any other url is used */
         $data['paypal_url'] = $data['url'];
         unset($data['url']);
-
+		
         /* Where paypal should tell us about successful transactions */
         $data['notify_url'] = url::site('/paypal/registrationPaypalIPN',TRUE);
 		
