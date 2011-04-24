@@ -36,6 +36,7 @@ class Controller_User extends Base_MainTemplate
         }
 
         // Load the user
+		$data = array();
         $user = ORM::factory('account')->where('email', '=', $this->request->post('email'))->find();
         if ($this->auth->login($user, $this->request->post('password')))
         {
@@ -43,12 +44,16 @@ class Controller_User extends Base_MainTemplate
             $this->_redirect('');
             return;
         }
+		else 
+		{
+			$data['email'] = $this->request->post('email');
+		}
 
         foreach ($this->auth->errors() as $err) 
             $this->addError($err);
         $this->auth->clearErrors();
 
-        return $this->action_loginOrRegister();
+        return $this->action_loginOrRegister($data);
     }
 
     function action_logout()
@@ -76,7 +81,8 @@ class Controller_User extends Base_MainTemplate
         // using the factory enables method chaining
         $form = array(
                 'email'     => '',
-                'name'     => '',
+                'sname'     => '',
+				'gname'		=> '',
                 'phone'     => '',
                 'password'  => '',
                 'confirm_password'  => '',
@@ -98,27 +104,34 @@ class Controller_User extends Base_MainTemplate
                 $account->sendValidateEmail($vcode->original_code);
 
                 $this->auth->complete_login($account);
-                $this->addMessage(__('ecmproject.registration_success_message'));
+                $this->addMessage(__('A verification email has been sent to your account. Please click the link in the email to activate your account.'));
                 $this->_redirect('');
                 return;
             }
             catch (ORM_Validation_Exception $e)
-            {
+            {		
                 // repopulate the form fields
                 $form = arr::overwrite($form, $post);
 
                 // populate the error fields, if any
                 // We need to already have created an error message file, for Kohana to use
                 // Pass the error message file name to the errors() method
-                $errors = arr::overwrite($errors, $e->errors('form_error_messages'));
+				$error_list = $e->errors('form_error_messages');
+                $errors = arr::overwrite($errors, $error_list);
+				
+				if ( !empty($error_list['_external']['password']) ) {
+					$errors['confirm_password'] = $error_list['_external']['password']; //This is a hack!
+				}
+				
             }
             catch (Verification_Exceeds_Exception $e) 
             {
-                $this->addError(__('auth.too_many_verification'));
+                $this->addError(__('Too many verification codes requested! Check your junk mail.'));
                 $this->template->content = "";
                 return;
-            }
+            }			
         }
+		
         return $this->action_loginOrRegister( array('form'=>$form, 'errors'=>$errors) );
     }
 
