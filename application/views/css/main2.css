@@ -1,0 +1,217 @@
+/* 
+   main2.css - uses CSS Reset: 
+   http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	background-color: #20232B; 
+	font-family: "Lucida Grande", "Trebuchet MS";   
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse:collapse;
+	padding: 5px 5px 5px 5px;
+	margin-bottom: 20px;
+	border: 1px solid #A2B0C8;
+}
+table.total {
+	border: 0px;
+}
+table tr {
+	background-color: #FFF;
+}
+table td {
+	border: 1px solid #A2B0C8;
+	padding: 5px;
+}
+table td.center {
+	text-align: center;
+}
+table td.total {
+	background-color: #C8A7A2;
+	font-weight: bold;
+}
+table td.total_header {
+	background-color: #CCC;
+	font-weight: bold;
+	border: 0px;
+}
+table th {
+	padding: 5px;
+	border: 1px solid #A2B0C8;
+	background-color: #CCC;
+	font-weight: bold;
+	text-align: left;	
+}
+strong {
+	font-weight: bold;
+}
+a { 	color: #00275E; text-decoration: underline; }
+a:hover { text-decoration: underline; }
+a:visited { color: #00275E; text-decoration: underline; }
+a.special { color: #F00; }
+a.special:visited { color: #F00; }
+
+/* Form */
+form {
+	padding: 5px 0px;
+}
+button {
+	padding: 4px 20px 4px 20px;
+}
+button.right {
+	float: right;
+}
+fieldset {
+	text-align: left;
+	border: 0px solid #000;
+	margin-bottom: 10px;
+	padding: 5px 0;
+}
+label {
+	float: left;
+	text-align: left;
+	display: inline;
+	width: 180px;
+}
+input {
+	display: block;
+	margin: 0px 0px 15px 0px;
+	padding: 2px 2px;
+	width: 246px;
+}
+span.small {
+	padding: 3px 0;
+	font-size: 9px;
+	color: #888;
+	display: block;
+}
+span.required {
+	color: #F00;
+}
+
+/* Container, header sections */
+#container { 
+  width: 1024px; 
+  margin: 15px auto;  
+}
+#header {    
+  height: 200px;  
+  background: #20232B url('../img/banner.jpg') no-repeat;  
+
+}
+#menu {
+	padding: 6px 20px;
+	text-align: left;
+	background-color: #FFF;
+	border-bottom: 3px solid #445772;
+}
+#menu ul li {
+	display: inline;	
+	font-size: 0.8em;
+	padding: 5px 10px;
+}
+#menu ul li.header {
+	font-weight: bold;
+}
+#menu ul li a, #menu ul a:visited {
+	text-decoration: none;
+	padding: 5px 10px;
+}
+#menu ul li a:hover, #menu ul a:active {
+	font-weight: bold;
+	color: #FFF;
+	background-color: #445772;
+}
+#content {
+	padding: 20px;
+	background-color: #FFF;
+	border-top: 3px solid #8A0917;
+	font-size: 14px;
+}
+#content h2 {
+	color: #8A0917;
+	padding: 2px 0px;
+	font-size: 20px;
+}
+#content h2.grey {
+	margin: 5px -10px;
+	padding: 7px 0px;
+	font-weight: bold;
+	font-size: 14px;
+	color: #000;
+	background-color: #DDD;	
+	text-align: center;
+}
+#content h3 {
+	color: #B8AE9C;
+	padding: 5px 0px;
+	font-size: 12px;
+}
+/* Table header */
+#content h4.theader {
+	background-color: #A2B0C8;
+	padding: 5px 5px;
+	font-weight: bold;
+}
+#content p {
+	padding: 10px 0px;
+	line-height: 1.5;
+}
+#content p.inline {
+	display: inline;
+}
+#content p.msg {
+	margin-top: 5px;
+	padding: 5px 5px;
+	background-color: #99FF99;
+	border: 1px solid #009900;
+}
+#content p.errormsg {
+	margin-top: 5px;
+	padding: 5px 5px;
+	background-color: #F33;
+	border: 1px solid #A00;
+}
+#content a.small_link {
+	font-size: 12px;
+}
+
