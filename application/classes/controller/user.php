@@ -39,7 +39,7 @@ class Controller_User extends Base_MainTemplate
         $user = ORM::factory('account')->where('email', '=', $this->request->post('email'))->find();
         if ($this->auth->login($user, $this->request->post('password')))
         {
-            $this->addMessage(__('auth.login_success'));
+            $this->addMessage(__('Welcome, ') . ' ' . html::chars($user->gname) . ' ' . html::chars($user->sname) . '!');
             $this->_redirect('');
             return;
         }
@@ -174,8 +174,8 @@ class Controller_User extends Base_MainTemplate
     function action_loginOrRegister($data = array())
     {
         if (!is_array($data)) $data = array();
-		$this->template->heading = __('auth.login_header');
-        $this->template->subheading = __('auth.login_subheader');
+		$this->template->heading = 		__('Login or Register');
+        $this->template->subheading = 	__('Login with an existing account or register for a new one.');
 
         $this->template->content = new View('user/loginOrRegister', $data);
         return;
