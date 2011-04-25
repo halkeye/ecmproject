@@ -1,34 +1,20 @@
-<?php
+<h3>Recover your password</h3>
+<p>To recover your password for an account, please provide us the account email address! An email will be sent to this email address with more instructions.</p>
 
-View::set_global('field_lang_prefix', 'auth.lostPassword_field_');
+<?php echo form::open('/user/lostPassword'); ?>
+<fieldset>
+	<?php
+	foreach (array('email') as $field)
+	{
+		echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $form[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
+	}
+	?>
+</fieldset>
 
-if (count($errors))
-{
-    foreach ($errors as $field => $error)
-    {
-        if (!$error) { continue; /* just incase of empty error */ }
-        echo '<p class="errormsg">';
-        echo $error;
-        echo '</p>';
-    }
-}
+<fieldset class='left'>
+<?php echo form::submit('Submit', __('Send Email'), array('class' => 'submit') ); ?>
+</fieldset>
 
-echo '<div id="form">';
-echo form::open('/user/lostPassword');
-echo '<h3>'.html::chars(__('Recover your password!')) . '</h3>';
-echo '<p>To recover your password for an account, please provide us the account email address! An email will be sent to this email address with more instructions.</p>';
+<?php echo form::close(); ?>
 
-echo "<fieldset>";
-foreach (array('email') as $field)
-{
-    echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $form[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
-}
-echo '</fieldset>';
- 
-echo "<fieldset>";
-echo form::button('Submit', __('Send Email'), array('type' => 'submit') );
-echo '</fieldset>'; 
-
-echo form::close();
-echo '</div>';
 

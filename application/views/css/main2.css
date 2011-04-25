@@ -30,9 +30,12 @@ article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
 	display: block;
 }
+html {
+	overflow-y: auto; /* Prevent the appearance of unnecessary vertical scrollbars in IE7 */
+}
 body {
 	background-color: #20232B; 
-	font-family: "Lucida Grande", "Trebuchet MS";   
+	font-family: "Lucida Grande", "Trebuchet MS";
 	line-height: 1;
 }
 ol, ul {
@@ -47,188 +50,196 @@ q:before, q:after {
 	content: none;
 }
 table {
-	border-collapse:collapse;
-	padding: 5px 5px 5px 5px;
-	margin-bottom: 20px;
-	border: 1px solid #A2B0C8;
+	border-collapse: collapse;
+	border-spacing: 0;
 }
-table.total {
-	border: 0px;
+
+/* User defined */
+a, a:visited {
+	color: #F22C43; 
+	text-decoration: underline;
 }
-table tr {
-	background-color: #FFF;
+a.small_link {
+	font-size: 0.65em;
 }
-table td {
-	border: 1px solid #A2B0C8;
-	padding: 5px;
+.float_left {
+	float: left;
 }
-table td.center {
-	text-align: center;
-}
-table td.total {
-	background-color: #C8A7A2;
-	font-weight: bold;
-}
-table td.total_header {
-	background-color: #CCC;
-	font-weight: bold;
-	border: 0px;
-}
-table th {
-	padding: 5px;
-	border: 1px solid #A2B0C8;
-	background-color: #CCC;
-	font-weight: bold;
-	text-align: left;	
+.float_right {
+	float: right;
 }
 strong {
 	font-weight: bold;
 }
-a { 	color: #00275E; text-decoration: underline; }
-a:hover { text-decoration: underline; }
-a:visited { color: #00275E; text-decoration: underline; }
-a.special { color: #F00; }
-a.special:visited { color: #F00; }
-
-/* Form */
-form {
-	padding: 5px 0px;
-}
-button {
-	padding: 4px 20px 4px 20px;
-}
-button.right {
-	float: right;
-}
-fieldset {
-	text-align: left;
-	border: 0px solid #000;
-	margin-bottom: 10px;
-	padding: 5px 0;
-}
-label {
-	float: left;
-	text-align: left;
-	display: inline;
-	width: 180px;
-	margin-left: 5px;
-}
-label.nosub {
-	margin-top: 4px;
-}
-input {
-	display: block;
-	margin: 0px 0px 15px 0px;
-	padding: 2px 2px;
-	width: 246px;
-}
-input.inline {
-	display: inline;
-}
-span.small {
-	padding: 3px 0;
-	font-size: 9px;
-	color: #888;
-	display: block;
-}
 span.required {
 	color: #F00;
 }
-
-/* Container, header sections */
-#container { 
-  width: 1024px; 
-  margin: 15px auto;  
+table {
+	margin: 5px 0;
+	vertical-align: middle;
+	border: 1px solid #A2B0C8;
 }
-#header {    
-  height: 200px;  
-  background: #20232B url('../img/banner.jpg') no-repeat;  
+table.border {
+	border: 1px solid #A2B0C8;
 }
-#header h1 {
-	overflow: hidden;
-	height: 0;
+table th {
+	text-align: left;
+	background-color: #CCC;
+	font-weight: bold;
+	padding: 5px;
+	border: 1px solid #A2B0C8;
+}
+table th.header {
+	background-color: #A2B0C8;	
+}
+table td {
+	padding: 5px;
+	border: 1px solid #A2B0C8;
+}
+table td.center {
+	text-align: center;
+}
+table td.total_header {
+	background-color: #CCC;
+}
+table td.total {
+	font-weight: bold;
+}
+#container {
+	width: 1024px; 
+	margin: 20px auto;
+	background-color: #FFF;
 }
 #menu {
-	padding: 6px 20px;
-	text-align: left;
-	background-color: #FFF;
-	border-bottom: 3px solid #445772;
+	padding: 8px 0px;
 }
 #menu ul li {
-	display: inline;	
-	font-size: 0.8em;
-	padding: 5px 10px;
+	display: inline;
+	font-size: 0.9em;
 }
 #menu ul li.header {
+	color: #FFF;
 	font-weight: bold;
+	background-color: #8A0917;
+	padding: 8px 40px;	
 }
 #menu ul li a, #menu ul a:visited {
-	text-decoration: none;
-	padding: 5px 10px;
+	text-decoration: underline;
+	padding: 8px 10px;
+	margin: 0 5px;
 }
 #menu ul li a:hover, #menu ul a:active {
+	text-decoration: none;
 	font-weight: bold;
 	color: #FFF;
-	background-color: #445772;
+	background-color: #8A0917;
+}
+#header {
+	height: 200px;  		
+	border-top: 3px solid #8A0917;
+	border-bottom: 3px solid #445772;
+	background: #20232B url('../img/banner.jpg') no-repeat;
+}
+#header h1 {
+	height: 0;
+	overflow: hidden;
 }
 #content {
 	padding: 20px;
-	background-color: #FFF;
-	border-top: 3px solid #8A0917;
-	font-size: 14px;
 }
 #content h2 {
 	color: #8A0917;
-	padding: 2px 0px;
-	font-size: 20px;
-}
-#content p.h2 {
-	color: #B8AE9C;
-	padding: 0px 0px;
-	font-size: 12px;
-	margin-bottom: 10px;
+	font-size: 1.25em;
+	font-weight: normal;
 }
 #content h3 {
 	margin: 5px -10px;
-	padding: 7px 0px;
+	padding: 7px 10px;
 	font-weight: bold;
 	font-size: 14px;
 	color: #000;
 	background-color: #DDD;	
-	text-align: center;
-}
-/* Table header */
-#content .theader {
-	background-color: #A2B0C8;
-	padding: 5px 5px;
-	font-weight: bold;
+	text-decoration: underline;
 }
 #content p {
-	padding: 10px 0px;
+	padding: 5px 0px;
+	font-size: 0.9em;
 	line-height: 1.5;
 }
-#content p.inline {
-	display: inline;
+#content p.h2 {
+	color: #B8AE9C;
+	font-size: 0.75em;
+	margin-bottom: 5px;
+	line-height: 1;
 }
 #content p.msg {
-	margin: 0px -5px 10px -5px;
 	padding: 5px 5px;
-	background-color: #99FF99;
-	border: 1px solid #009900;
+	background-color: #66F59D;
+	border: 1px solid #0DD359;
+	margin-bottom: 15px;
 }
 #content p.errormsg {
-	margin: 0px -5px 10px -5px;
 	padding: 5px 5px;
-	background-color: #F33;
+	background-color: #F99;
 	border: 1px solid #A00;
+	margin-bottom: 15px;
+}
+#content form {
+	padding: 5px 0px;
+}
+#content form div {
+	border: 0px solid #000;
+	margin: 15px 0px;
+}
+/* Giving the submit button space to itself will fail in IE7. */
+#content fieldset {
+	padding: 1px 0;
+}
+#content fieldset.left {
+	margin: 10px 0;
+}
+#content label {
+	font-size: 0.9em;
+	float: left;
+	width: 250px;
+	margin-top: -3px;
+}
+#content label.nosub {
+	margin-top: 2px;
+}
+#content label.nomar {
+	width: auto;
+	margin-right: 5px;
+	margin-top: 3px;
+}
+#content label span.small {
+	font-size: 0.7em;
+	display: block;
+	color: #888;
+}	
+#content input {
+	display: block;
+	width: 250px;
+}
+#content input.inline {
+	display: inline;
+	margin-bottom: 0;
+}
+#content input.submit {
+	display: inline;
+	width: 100px;
+}
+#content input.fsubmit {
+	float: right;
+}
+#content select {
+	padding: 2px 0;
 }
 #content form fieldset p.errormsg {
-	margin: 0;
-	padding: 2px 10px;
-	width: 246px; /* Same width as an input box. */
-	display: inline;
+	/* The star hack to align error messages properly. */
+	position: relative;
+	*top: -2px;
+	display: inline;	
+	padding: 2px 5px;
+	border: 0;
 }
-#content a.small_link {
-	font-size: 12px;
-}
-

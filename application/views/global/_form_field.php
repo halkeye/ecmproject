@@ -1,3 +1,4 @@
+<div>
 <?php
 if (!isset($fieldData['type'])) { $fieldData['type'] = 'text'; }
 $classRow = text::alternate('odd','even');
@@ -121,3 +122,5 @@ switch ($fieldData['type'])
         echo form::input($field, $value, $attributes);
         break;
 }
+?>
+</div>
