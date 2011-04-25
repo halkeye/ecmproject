@@ -44,16 +44,29 @@ class Model_Account extends ORM
     // var_export($model->list_columns());
 	
 	public $default_fields = array(
-            'email' 			=> array( 'type'  => 'text', 	'label' => 'Email', 			'required'=>true 		),
+            'email' 			=> array( 'type'  => 'text', 	'label' => 'Email', 			'sub_label' =>	'Account email address', 'required'=>true 		),
 			'gname' 			=> array( 'type'  => 'text', 	'label' => 'First Name', 		'required'=>true 		),
 			'sname' 			=> array( 'type'  => 'text', 	'label' => 'Last Name', 		'required'=>true 		),
 			'phone' 			=> array( 'type'  => 'text', 	'label' => 'Phone', 			'required'=>false		),
-            'password' 			=> array( 'type'  => 'text', 	'label' => 'Password', 			'required'=>true     	),
-			'confirm_password' 	=> array( 'type'  => 'text', 	'label' => 'Confirm Password', 	'required'=>true    	),
+            'password' 			=> array( 'type'  => 'password', 	'label' => 'Password', 			'required'=>true     	),
+			'confirm_password' 	=> array( 'type'  => 'password', 	'label' => 'Confirm Password', 	'required'=>true    	),
             'status' 			=> array( 'type'  => 'select', 	'label' => 'Status', 			'required'=>false  		)
     );
 	
+	private $_labels = array(
+		'email' => 'Email',
+		'gname' => 'First Name',
+		'sname' => 'Last Name',
+		'phone' => 'Phone number',
+		'password' => 'Password',
+	);
+	
     protected $ignored_columns = array('confirm_password', 'groups', 'permissions');
+	
+	public function labels()
+	{
+		return $this->_labels;
+	}
 	
     public function filters()
     {
