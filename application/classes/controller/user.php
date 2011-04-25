@@ -233,114 +233,178 @@ class Controller_User extends Base_MainTemplate
     function action_changeEmail()
     {
         /* Set page title */
-        $this->template->title = "Change Email";
-        $this->template->heading = __('auth.changeEmail_heading');
-        $this->template->subheading = __('auth.changeEmail_subheading');
+        $this->template->title = 		__('Change Email');
+        $this->template->heading =  	__('Change your Email Address');
+        $this->template->subheading = 	__('Change your email address. You will need to revalidate.');
+		
         /* Require login */
         $this->requireLogin();
 
         /* Get logged in account */
         $account = $this->auth->getAccount();
         
-        $fields = array('email' => array('type'=>'text', 'required'=> true));
+        $fields = array('email' => $account->default_fields['email']);
         $form = array('email' => '');
-        $errors = array();
+        $errors = $form;
 
         if ($post = $this->request->post())
         {
-            $post = new Validation($this->request->post());
-            // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
-            $post->pre_filter('trim');
+			$account->values($post); 
+			
+			try {
+				$account->status = Model_Account::ACCOUNT_STATUS_UNVERIFIED;
+				$account->save();
+				
+				$vcode = $account->generateVerifyCode(Model_Verificationcode::TYPE_EMAIL_CHANGE, $post['email']);
+				$account->sendValidateEmail($vcode->original_code, 'emailChange');
+				$this->addMessage("Email changed successfully. An email has been sent to your new email address.");
+				$this->request->redirect('user/index');
+			}
+			catch (ORM_Validation_Exception $e)
+			{		
+				// repopulate the form fields
+				$form = arr::overwrite($form, $post);
 
-            $post->add_rules('email', 'required', array('valid', 'email'));
-            $post->add_callbacks('email', array($account,'_unique_email_validation'));
-
-            if ( $post->validate())
-            {
-                /* Generate new code */
-                try {
-                    $vcode           = $account->generateVerifyCode(Model_Verificationcode::TYPE_EMAIL_CHANGE, $post['email']);
-                }
-                catch (Verification_Exceeds_Exception $e) 
-                {
-                    $this->addError(__('auth.too_many_verification'));
-                    $this->template->content = "";
-                    return;
-                }
-
-                /* Send out verification Email */
-                $account->sendValidateEmail($vcode->original_code, 'emailChange');
-                /* Tell the user what happened */
-                $this->addMessage(__('auth.emailChangeSuccess'));
-                /* Redirect to main page */
-                $this->request->redirect('user/index');
-            }
-            else
-            {
-                $errors = $post->errors();
-            }
-            
-            $form = arr::overwrite($form, $post->as_array());
-            $errors = $post->errors('form_error_messages');
+				// populate the error fields, if any
+				// We need to already have created an error message file, for Kohana to use
+				// Pass the error message file name to the errors() method
+				$error_list = $e->errors('form_error_messages');				
+				$errors = arr::overwrite($errors, $error_list);
+				
+				if ( !empty($error_list['_external']['password']) ) {
+					$errors['confirm_password'] = $error_list['_external']['password']; //This is a hack!
+				}
+				
+			}	
+			catch (Verification_Exceeds_Exception $e) 
+			{
+				$this->addError(__('auth.too_many_verification'));
+				$this->template->content = "";
+				return;
+			}			
+			catch (Exception $e)
+			{
+				$this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
+			}
         }
         $this->template->content = new View('user/emailChange', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
     }
     
-    function action_changePassword()
-    {
+    function action_changePassword()  {
         /* Set page title */
-        $this->template->title = "Change Password";
-        $this->template->heading = __('auth.changePassword_heading');
-        $this->template->subheading = __('auth.changePassword_subheading');
+        $this->template->title = 		__('Change Password');
+        $this->template->heading = 		__('Change Your Password');
+        $this->template->subheading = 	__('Change your account password.');
+		
         /* Require login */
         $this->requireLogin();
 
         /* Get logged in account */
         $account = $this->auth->getAccount();
         
-        $fields = array(
-                'password'         => array('type'=>'password', 'required'=> true),
-                'confirm_password' => array('type'=>'password', 'required'=> true),
-        );
+        $fields = $account->default_fields;
+		
         $form = array(
                 'password' => '',
                 'confirm_password' => '',
         );
-        $errors = array();
+		
+        $errors = $form;
+		if ($post = $this->request->post()) {
+			$extra_validation = Validation::Factory($post);
+			$account->values($post);
+			
+			try {				
+				$extra_validation->rule('password', 'matches', array(':validation', 'password', 'confirm_password'));
+				$account->save($extra_validation);
+				$this->addMessage('Successfully changed the password for ' . $account->email);
+				
+				/* Complete login, update hash, update timestamps, etc */
+				$account->salt = null;
+				$account->password = $post['password'];
+				$this->auth->complete_login($account);					
+				$this->request->redirect('user/index');	
+				return;
+			}
+			catch (ORM_Validation_Exception $e)
+			{		
+				// repopulate the form fields
+				$form = arr::overwrite($form, $post);
 
-        if ($post = $this->request->post())
-        {
-            $post = new Validation($this->request->post());
-            // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
-            $post->pre_filter('trim');
-            $post->add_rules('password', 'required');
-            $post->add_rules('password', 'length[6,255]');
-
-            $post->add_rules('confirm_password', 'required');
-            $post->add_rules('confirm_password',  'matches[password]');
-
-            if ( $post->validate())
-            {
-                $account->salt = null;
-                $account->password = $post['password'];
-                /* Complete login, update hash, update timestamps, etc */
-                $this->auth->complete_login($account);
-                /* Tell the user what happened */
-                $this->addMessage(__('auth.passwordChangeSuccess'));
-                /* Redirect to main page */
-                $this->request->redirect('user/index');
-            }
-            else
-            {
-                $errors = $post->errors();
-            }
-            
-            $form = arr::overwrite($form, $post->as_array());
-            $errors = $post->errors('form_error_messages');
-        }
+				// populate the error fields, if any
+				// We need to already have created an error message file, for Kohana to use
+				// Pass the error message file name to the errors() method
+				$error_list = $e->errors('form_error_messages');				
+				$errors = arr::overwrite($errors, $error_list);
+				
+				if ( !empty($error_list['_external']['password']) ) {
+					$errors['confirm_password'] = $error_list['_external']['password']; //This is a hack!
+				}
+				
+			}			
+			catch (Exception $e)
+			{
+				$this->addError("Oops. Something went wrong and it's not your fault. Contact the system maintainer please!");
+			}
+			
+		}
+		
         $this->template->content = new View('user/changePassword', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
     }
+	function action_changeName() {
+		/* Set page title */
+        $this->template->title = 		__('Change Your Name');
+        $this->template->heading = 		__('Change Your Name');
+        $this->template->subheading = 	__('Change the name associated to this account.');
+		
+        /* Require login */
+        $this->requireLogin();
 
+        /* Get logged in account */
+        $account = $this->auth->getAccount();
+        
+        $fields = $account->default_fields;
+		
+        $form = array(
+                'gname' => '',
+                'sname' => '',
+        );
+		
+		$errors = $form;
+		if ($post = $this->request->post()) { 
+			$account->values($post);
+			
+			try {				
+				$account->save();
+				$this->addMessage('Successfully changed your name to ' . $account->gname . ' ' . $account->sname);		
+				$this->request->redirect('user/index');	
+				return;
+			}
+			catch (ORM_Validation_Exception $e)
+			{		
+				// repopulate the form fields
+				$form = arr::overwrite($form, $post);
+
+				// populate the error fields, if any
+				// We need to already have created an error message file, for Kohana to use
+				// Pass the error message file name to the errors() method
+				$error_list = $e->errors('form_error_messages');				
+				$errors = arr::overwrite($errors, $error_list);
+				
+				if ( !empty($error_list['_external']['password']) ) {
+					$errors['confirm_password'] = $error_list['_external']['password']; //This is a hack!
+				}
+				
+			}			
+		}
+		else {
+			$form['gname'] = $account->gname;
+			$form['sname'] = $account->sname;
+		}
+	
+		$this->template->content = new View('user/changeName', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
+	}
+	
     function _findAccount(Validation $array, $field)
     {
         $exists = (bool)ORM::Factory('Account')
