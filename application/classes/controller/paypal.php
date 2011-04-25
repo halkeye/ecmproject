@@ -61,7 +61,7 @@ class Controller_Paypal extends Controller
 
         }
         catch (Exception $e) { 
-            print $e;
+            Kohana::$log->add(Log::ERROR,"[PAYPAL] Error doing stuff: $e");
             exit();
         }
         return;
