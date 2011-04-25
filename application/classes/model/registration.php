@@ -356,7 +356,7 @@ class Model_Registration extends ORM
 		return implode(",", $columns);
 	}
 	
-	private function sendConfirmationEmail()
+	public function sendConfirmationEmail()
 	{		
         $config = Kohana::config('ecmproject');
 		$conv = ORM::Factory('Convention',$this->convention_id)->find();
