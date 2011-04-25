@@ -358,6 +358,7 @@ class Model_Registration extends ORM
 	
 	private function sendConfirmationEmail()
 	{		
+        $config = Kohana::config('ecmproject');
 		$conv = ORM::Factory('Convention',$this->convention_id)->find();
 		$pass = ORM::Factory('Pass',$this->pass_id)->find();
 		$acct = ORM::Factory('Account',$this->account_id)->find();
@@ -381,13 +382,16 @@ class Model_Registration extends ORM
 			);
 
         $to      = $emailVars['email'];
-        $from    = __('ecmproject.outgoing_email_name') . ' <' . __('ecmproject.outgoing_email_address') . '>';
-        $subject = __('ecmproject.registration_subject');
  
         $view = new View('user/register_confirmation', $emailVars);
         $message = $view->render();
-		
-        email::send($to, $from, $subject, $message, TRUE);    
+
+        ### FIXME - MAKE SURE TO ADD non html version too
+        $email = Email::factory($config['registration_subject']);
+        $email->message($message,'text/html');
+        $email->to($emailVars['email']);
+        $email->from($config['outgoing_email_address'], $config['outgoing_email_name']);
+        $email->send();
 	}
 	
 	/* Non-used validation callbacks */
