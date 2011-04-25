@@ -2,18 +2,25 @@
 if (!isset($fieldData['type'])) { $fieldData['type'] = 'text'; }
 $classRow = text::alternate('odd','even');
 
-/* ex: View::set_global('field_lang_prefix', 'ecmproject.formtest_');
- * This is generating the label from the lang files 
- */
-if (!isset($field_lang_prefix)) { $field_lang_prefix = 'convention.registration_field_'; }
-$label = __($field_lang_prefix . $field);
-if (isset($fieldData['required']) && $fieldData['required'])
-    $label .= ' <span class="required">*</span>';
+/* Set main label: empty() checks both variable set and empty status (false) */
+$label = empty($fieldData['label']) ? $field : $fieldData['label'];	
+$sub_label = empty($fieldData['sub_label']) ? '' : $fieldData['sub_label'];
+$label_attributes = array();
 
-$sublabel = __($field_lang_prefix . $field . '_sub');
-if ($sublabel != $field_lang_prefix . $field . '_sub')
-	$label .= ' <span class="small">' . $sublabel . '</span>';
+/* Add required mark */
+if (isset($fieldData['required']) && $fieldData['required']) {
+	$label .= ' <span class="required">*</span>';	
+}
 
+/* Add sub-label or lack thereof */
+if ($sub_label) {
+	$label .= ' <span class="small">' . $sub_label . '</span>';	
+}
+else {
+	$label_attributes = array('class' => 'nosub');
+}
+
+/* Generate label */
 switch ($fieldData['type'])
 {
     case 'radio':
@@ -21,17 +28,17 @@ switch ($fieldData['type'])
         /* Don't show a label because we'll do something else */
         break;
     case 'date':
-        echo form::label($field.'-year', $label);
+        echo form::label($field.'-year', $label, $label_attributes);
         break;
     default:
-        echo form::label($field, $label);
+        echo form::label($field, $label, $label_attributes);
 }
+
 $attributes = array('class'=>'');
-if ($hasError) { $attributes['class'] = "fieldError"; }
+if ($hasError) { $attributes['class'] = "inline"; }
 
 switch ($fieldData['type'])
 {
-	
     case 'radio':
         if ($fieldData['values'])
         {

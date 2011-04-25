@@ -2,8 +2,8 @@
 <p>Listed here are the various actions you can perform on your account as well as your current and past history of registrations. Please note that <strong>changing your email </strong>
 address will require your account to be re-validated.</p>
 <table width='100%'>
-	<tr><th>Account Actions</th></tr>
-	<tr><td><?php echo html::anchor("/user/changeEmail","Change Email"); ?> | <?php echo html::anchor("/user/changePassword","Change Password"); ?></td></tr>	
+	<tr><th class="theader">Account Actions</th></tr>
+	<tr><td><?php echo html::anchor("/user/changeName","Change Name", null, null, true); ?> | <?php echo html::anchor("/user/changeEmail","Change Email", null, null, true); ?> | <?php echo html::anchor("/user/changePassword","Change Password", null, null, true); ?></td></tr>	
 </table>
 
 <table width = 100%>
@@ -15,13 +15,14 @@ address will require your account to be re-validated.</p>
 		//Print convention header if it's different than previous.
 		if ($cid != $r->convention_id)
 		{
-			print '<tr><th colspan=4>' . $r->convention->name . '</th></tr>';
+			print '<tr><th colspan=5 class="theader">' . $r->convention->name . '</th></tr>';
 			?>
 			<tr>
-				<th width='25%'>First Name</th>
-				<th width='25%'>Last Name</th>
-				<th width='25%'>Email</th>
-				<th width='25%'>Status</th>
+				<th width='25%'>Name</th>
+				<th width='25%'>Ticket</th>
+				<th width='25%'>Ticket ID</th>	
+				<th width='10%'>Price</th>				
+				<th width='15%'>Status</th>				
 			</tr>
 			<?php
 			$cid = $r->convention_id;
@@ -31,6 +32,7 @@ address will require your account to be re-validated.</p>
 		echo '<tr class="'.$class_row.'">';
 		echo '<td>' . HTML::chars($r->gname . ' ' . $r->sname) . '</td>';
 		echo '<td>' . HTML::chars($r->pass->name) . '</td>';
+		echo '<td>' . HTML::chars($r->reg_id) . '</td>';
 		echo '<td>' . HTML::chars(sprintf('$%01.2F', $r->pass->price)) . '</td>';
 		echo '<td>'.$r->statusToString().'</td>';
 		echo '</tr>';

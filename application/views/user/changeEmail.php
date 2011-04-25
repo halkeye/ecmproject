@@ -2,20 +2,9 @@
 
 View::set_global('field_lang_prefix', 'auth.changeEmail_field_');
 
-if (count($errors))
-{
-    foreach ($errors as $field => $error)
-    {
-        if (!$error) { continue; /* just incase of empty error */ }
-        echo '<p class="errormsg">';
-        echo $error;
-        echo '</p>';
-    }
-}
-
 echo '<div id="form">';
 echo form::open();
-echo '<h1>'.html::chars(__('convention.registration_form_header')) . '</h1>';
+echo '<h2 class="grey">'.html::chars(__('convention.registration_form_header')) . '</h2>';
 echo '<p>'.__('ecmproject.form_required') . '</p>';
 
 echo "<fieldset>";

@@ -5,7 +5,7 @@
 <head> 
 <title>Electronic Convention Management (ECM)<?php echo $title ? "::$title" : "" ?></title> 
 <?php {
-    echo HTML::style(url::site('static/css/main.css',TRUE), NULL, TRUE);
+    echo HTML::style(url::site('static/css/main2.css',TRUE), NULL, TRUE);
     foreach (Assets::getCSS() as $style)
         echo HTML::style(url::site("static/css/$style",TRUE), NULL, TRUE);
     foreach (Assets::getJS() as $js)
@@ -18,22 +18,16 @@
 <!-- Content container beings here --> 
 <div id="container"> 
     <!-- Header --> 
-    <div id="header"></div> 
- 
-    <!-- Left Sidebar. --> 
-    <?php if ($isLoggedIn || $menu): ?>
-    <div id="sidebar">
-        <ul> 
-            <li class="title"><a href="<?php echo url::base(); ?>">Welcome</a></li>
-            <?php if ($isLoggedIn): ?>
-            <li><b><?php echo htmlentities($account->email) ?></b></li>
-            <li>&nbsp;</li>
-            <?php endif; ?>
-
+	<?php if ($isLoggedIn || $menu): ?>
+    <div id="menu">
+        <ul>      
+			<li class='header'>Menu: </li>
             <?php if($menu) { echo View::Factory('global/menu', array('menu'=>$menu)); } ?>
         </ul>
     </div> 
     <?php endif; ?>
+    <div id="header"></div> 
+  
  
     <!-- Content Pane (Right side) --> 
     <div id="content"<?php if ($isLoggedIn || $menu) { echo " class='contentMenu'"; } else { echo " class='contentNoMenu'"; }?>>
@@ -42,15 +36,13 @@
     
     <?php foreach ($messages as $msg) { echo '<p class="msg">'.$msg.'</p>'; } ?>
     <?php foreach ($errors as $err) { echo '<p class="errormsg">'.$err.'</p>'; } ?>
-    <?php if ($messages || $errors) { echo '<br />'; } ?>
-
+   
     <!-- content start -->
     <?php print $content ?>
     <?php print $profiler ?>
     <!-- content end -->
     <br />
 </div> 
-<div id="footer" <?php if ($isLoggedIn || $menu) { echo " class='contentMenu'"; } else { echo " class='contentNoMenu'"; } ?>><p><a href="http://jigsaw.w3.org/css-validator/">CSS 2.1 Validated</a>, <a href="http://validator.w3.org/check?uri=referer">XHTML 1.0 Strict Validated</a>, <a href="mailto:stt@sfu.ca">Admin: stt@sfu.ca</a></p></div> 
  
 </div> 
 

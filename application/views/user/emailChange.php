@@ -2,31 +2,21 @@
 
 View::set_global('field_lang_prefix', 'auth.changeEmail_field_');
 
-if (count($errors))
-{
-    foreach ($errors as $field => $error)
-    {
-        if (!$error) { continue; /* just incase of empty error */ }
-        echo '<p class="errormsg">';
-        echo $error;
-        echo '</p>';
-    }
-}
-
 echo '<div id="form">';
-echo form::open();
-echo '<h1>'.html::chars(__('convention.registration_form_header')) . '</h1>';
-echo '<p>'.__('ecmproject.form_required') . '</p>';
+echo form::open('user/changeEmail');
+echo '<h2 class="grey">'.html::chars(__('Change Email Address')) . '</h2>';
+echo '<p>Please note that changing your email address will require you to <strong>re-validate</strong> your account.</p>';
 
 echo "<fieldset>";
 foreach (array('email') as $field)
 {
-    echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $form[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
+    echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $form[$field], 'hasError'=>isset($errors[$field]) && $errors[$field], 'class' => 'inline'));
+	echo (empty ($errors[$field])) ? '' : '&nbsp<p class="errormsg">'.$errors[$field].'</p><br />';
 }
 echo '</fieldset>';
  
 echo "<fieldset class='left'>";
-echo form::submit(null,__('auth.changeEmail_field_submit'));
+echo form::submit(null,__('Change email'));
 echo '</fieldset>'; 
 
 echo form::close();

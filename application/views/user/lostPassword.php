@@ -14,9 +14,9 @@ if (count($errors))
 }
 
 echo '<div id="form">';
-echo form::open();
-echo '<h1>'.html::chars(__('convention.registration_form_header')) . '</h1>';
-echo '<p>'.__('ecmproject.form_required') . '</p>';
+echo form::open('/user/lostPassword');
+echo '<h2 class="grey">'.html::chars(__('Recover your password!')) . '</h2>';
+echo '<p>To recover your password for an account, please provide us the account email address! An email will be sent to this email address with more instructions.</p>';
 
 echo "<fieldset>";
 foreach (array('email') as $field)
@@ -25,8 +25,8 @@ foreach (array('email') as $field)
 }
 echo '</fieldset>';
  
-echo "<fieldset class='left'>";
-echo form::submit(null,__('auth.lostPassword_field_submit'));
+echo "<fieldset>";
+echo form::button('Submit', __('Send Email'), array('type' => 'submit') );
 echo '</fieldset>'; 
 
 echo form::close();

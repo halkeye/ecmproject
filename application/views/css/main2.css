@@ -111,12 +111,19 @@ label {
 	text-align: left;
 	display: inline;
 	width: 180px;
+	margin-left: 5px;
+}
+label.nosub {
+	margin-top: 4px;
 }
 input {
 	display: block;
 	margin: 0px 0px 15px 0px;
 	padding: 2px 2px;
 	width: 246px;
+}
+input.inline {
+	display: inline;
 }
 span.small {
 	padding: 3px 0;
@@ -136,7 +143,6 @@ span.required {
 #header {    
   height: 200px;  
   background: #20232B url('../img/banner.jpg') no-repeat;  
-
 }
 #menu {
 	padding: 6px 20px;
@@ -187,7 +193,7 @@ span.required {
 	font-size: 12px;
 }
 /* Table header */
-#content h4.theader {
+#content .theader {
 	background-color: #A2B0C8;
 	padding: 5px 5px;
 	font-weight: bold;
@@ -200,16 +206,22 @@ span.required {
 	display: inline;
 }
 #content p.msg {
-	margin-top: 5px;
+	margin: 3px -10px;
 	padding: 5px 5px;
 	background-color: #99FF99;
 	border: 1px solid #009900;
 }
 #content p.errormsg {
-	margin-top: 5px;
+	margin: 3px -10px;
 	padding: 5px 5px;
 	background-color: #F33;
 	border: 1px solid #A00;
+}
+#content form fieldset p.errormsg {
+	margin: 0;
+	padding: 2px 10px;
+	width: 246px; /* Same width as an input box. */
+	display: inline;
 }
 #content a.small_link {
 	font-size: 12px;
