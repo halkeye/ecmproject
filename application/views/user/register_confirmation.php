@@ -1,4 +1,4 @@
-<h1>Anime Evolution Registration Confirmation</h1>
+<h1>IRL Events Registration Confirmation</h1>
 
 <p><strong>Please read the entire email lest you miss something important!</strong></p>
 
@@ -7,12 +7,7 @@ Details follow below. Registration will get back to you regarding any other impo
 
 <p>
 	<strong><?php echo $pass->name ?></strong><br /><br />
-	System Registration ID: <?php echo $reg->id; ?><br />
-	Email: <?php echo $reg->email; ?><br />
-	Badge Name: <?php echo $reg->badge; ?><br />
+    System Registration ID: <?php echo $reg->reg_id; ?><br />
+    Pickup Name: <?php echo $reg->gname; ?> <?php echo $reg->sname; ?><br />
 </p>
-
-<p><strong>NOTE: YOU ARE REQUIRED to fill in a parental consent form IF you are a MINOR.</strong> 
-Bring this form with you to the convention as without it, you will not be able to pick your pass!</p>
-
 

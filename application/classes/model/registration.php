@@ -359,37 +359,33 @@ class Model_Registration extends ORM
 	public function sendConfirmationEmail()
 	{		
         $config = Kohana::config('ecmproject');
-		$conv = ORM::Factory('Convention',$this->convention_id)->find();
-		$pass = ORM::Factory('Pass',$this->pass_id)->find();
-		$acct = ORM::Factory('Account',$this->account_id)->find();
 		
-		if (!$conv->loaded || !$pass->loaded)
+		if (!$this->convention->loaded() || !$this->pass->loaded())
 		{
 			die('Unexpected error encountered! Press back and try again else contact the system administrators');
 		}
 		
+        $emails = array();
+        if ($this->email) $emails[] = $this->email;
 		/* Prevent spamming the user twice. Ignore upper/lowercase? */
-		if ($this->email == $acct->email)
-			$email = $this->email;
-		else
-			$email = $this->email . ',' . $acct->email;
+		if ($this->email != $this->account->email) $emails[] = $this->account->email;
 		
         $emailVars = array(
-                'email'                    => $email,
                 'reg'            		   => $this,
-				'conv'					   => $conv,
-				'pass'					   => $pass
+				'conv'					   => $this->convention,
+				'pass'					   => $this->pass
 			);
 
-        $to      = $emailVars['email'];
- 
         $view = new View('user/register_confirmation', $emailVars);
         $message = $view->render();
 
         ### FIXME - MAKE SURE TO ADD non html version too
         $email = Email::factory($config['registration_subject']);
         $email->message($message,'text/html');
-        $email->to($emailVars['email']);
+        foreach ($emails as $rcpt)
+        {
+            $email->to($rcpt);
+        }
         $email->from($config['outgoing_email_address'], $config['outgoing_email_name']);
         $email->send();
 	}
