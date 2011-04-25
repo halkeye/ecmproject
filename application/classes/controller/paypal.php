@@ -55,6 +55,7 @@ class Controller_Paypal extends Controller
                         $payment->save();
 
                         $reg->save();
+                        $reg->sendConfirmationEmail();
 
                         Kohana::$log->add(Log::NOTICE,"[PAYPAL] Finished $count - $reg_id/$pass_id");
                     }
