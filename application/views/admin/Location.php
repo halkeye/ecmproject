@@ -13,7 +13,7 @@
 
 	echo form::open("admin/$callback"); 
 ?>
-	<h1>General Information</h1>
+	<h3>General Information</h3>
 	<p>The below information defines a location - a prefix (maximum 5 characters) and the full location name.</p>		
 	<fieldset>		
 		<?php

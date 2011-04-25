@@ -1,11 +1,11 @@
 <?php
 
 View::set_global('field_lang_prefix', 'auth.changeEmail_field_');
+echo '<h3>'.html::chars(__('Change Email Address')) . '</h3>';
+echo '<p>Please note that changing your email address will require you to <strong>re-validate</strong> your account.</p>';
 
 echo '<div id="form">';
 echo form::open('user/changeEmail');
-echo '<h2 class="grey">'.html::chars(__('Change Email Address')) . '</h2>';
-echo '<p>Please note that changing your email address will require you to <strong>re-validate</strong> your account.</p>';
 
 echo "<fieldset>";
 foreach (array('email') as $field)
@@ -16,7 +16,7 @@ foreach (array('email') as $field)
 echo '</fieldset>';
  
 echo "<fieldset class='left'>";
-echo form::submit(null,__('Change email'));
+echo form::submit(null,__('Change email'), array('class' => 'submit'));
 echo '</fieldset>'; 
 
 echo form::close();

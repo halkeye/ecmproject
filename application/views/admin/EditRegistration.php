@@ -5,12 +5,12 @@
 	View::set_global('field_lang_prefix', '');	
 	echo form::open("admin/$callback"); 	
 ?>
-	<h1>Registration ID</h1>
+	<h3>Registration ID</h3>
 	<p class='centerID'><?php print htmlspecialchars($row['reg_id'], ENT_COMPAT, "UTF-8") ?></p>
 	<p class='center'>Both the Registration ID and the Event it is associated with cannot be modified after creation. 
 	This registration is for <strong> <?php print htmlspecialchars($fields['convention_name'], ENT_COMPAT, "UTF-8") ?></strong>.</p>
 	
-	<h1>Editable Information</h1>
+	<h3>Editable Information</h3>
 	<p>You must provide <strong>either</strong> a phone number or an email.</p>		
 	<fieldset>	
 		<?php

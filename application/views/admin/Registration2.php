@@ -5,7 +5,7 @@
 	View::set_global('field_lang_prefix', '');	
 	echo form::open("admin/$callback"); 	
 ?>
-	<h1>Step 1: Select a Ticket</h1>
+	<h3>Step 1: Select a Ticket</h3>
 	<p>The ticket that will be given. Any restrictions that have been placed on the ticket are not enforced.</p>
 	<fieldset>
 		<?php
@@ -15,7 +15,7 @@
 		?>
 	</fieldset>
 
-	<h1>Step 2: Ticket Information</h1>
+	<h3>Step 2: Ticket Information</h3>
 	<p>Registration ID Numbers are <strong>final</strong> once assigned and cannot be changed. You must provide <strong>either</strong> a phone number or an email.</p>		
 	<fieldset>			
 		<?php	

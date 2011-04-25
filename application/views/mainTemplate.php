@@ -26,17 +26,18 @@
         </ul>
     </div> 
     <?php endif; ?>
-    <div id="header"></div> 
-  
+    <div id="header">
+		<h1>IRL Events Registration</h1>
+	</div>   
  
     <!-- Content Pane (Right side) --> 
-    <div id="content"<?php if ($isLoggedIn || $menu) { echo " class='contentMenu'"; } else { echo " class='contentNoMenu'"; }?>>
-    <?php if ($heading) echo "<h2>$heading</h2>"; ?>
-    <?php if ($subheading) echo "<h3>$subheading</h3>"; ?>
-    
-    <?php foreach ($messages as $msg) { echo '<p class="msg">'.$msg.'</p>'; } ?>
+    <div id="content">
+	<?php foreach ($messages as $msg) { echo '<p class="msg">'.$msg.'</p>'; } ?>
     <?php foreach ($errors as $err) { echo '<p class="errormsg">'.$err.'</p>'; } ?>
-   
+	
+    <?php if ($heading) echo "<h2>$heading</h2>"; ?>
+    <?php if ($subheading) echo "<p class='h2'>$subheading</p>"; ?>
+       
     <!-- content start -->
     <?php print $content ?>
     <?php print $profiler ?>

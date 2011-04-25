@@ -5,7 +5,7 @@
 	View::set_global('field_lang_prefix', 'admin.reg_field_');	
 	echo form::open("admin/$callback"); 
 ?>
-	<h1>Step 1: Select Convention</h1>
+	<h3>Step 1: Select Convention</h3>
 	<p>All registrations are for a particular convention. </p>		
 	<fieldset>		
 		<?php

@@ -5,7 +5,7 @@
 	View::set_global('field_lang_prefix', 'admin.reg_field_');	
 	echo form::open("admin/$callback"); 
 ?>
-	<h1>Step 2: Select Passes</h1>
+	<h3>Step 2: Select Passes</h3>
 	<p>Select (or unselect) the passes you wish to include in the exported CSV file.</p>		
 	<fieldset>		
 		<?php
@@ -15,7 +15,7 @@
 			endforeach;			
 		?>
 	</fieldset>
-	<h1>Step 3: Select Status Values</h1>
+	<h3>Step 3: Select Status Values</h3>
 	<p>You can choose to include only registrations that have a certain status within the system. For instance, you might want to export only the PAID registrations.</p>		
 	<fieldset>		
 		<?php

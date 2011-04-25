@@ -1,11 +1,8 @@
 <div id="list">	
-	<?php echo form::open("$callback"); ?>
-	<p class='floatRight'>
-		<label for='search_term'>Search: </label> <input type='text' id='search_term' name='search_term'></input> <button type='submit'>Search</button>	
-	</p>
-	<p>
-	
-	</p>
+	<?php echo form::open("$callback", array('class' => 'f_right')); ?>	
+	<label for='search_term'>Search: </label>
+	<input type='text' id='search_term' name='search_term' class='inline'></input> 	
+	<button type='submit'>Search</button>	
 	<?php echo form::close(); ?>
 	
 	<table width='100%'>

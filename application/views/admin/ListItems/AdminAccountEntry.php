@@ -16,7 +16,7 @@ if(isset($row)) { ?>
 	</td>	
 	<?php
 		foreach ($actions as $action): 		
-			print '<td>' . $action; '</td>';
+			print '<td class="center">' . $action; '</td>';
 		endforeach;
 	?>
 </tr>

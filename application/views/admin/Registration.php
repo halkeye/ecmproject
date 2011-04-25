@@ -5,7 +5,7 @@
 	View::set_global('field_lang_prefix', 'admin.reg_field_');	
 	echo form::open("admin/$callback"); 
 ?>
-	<h1>Step 1: Select Convention</h1>
+	<h3>Step 1: Select Convention</h3>
 	<p>Select the event you wish to add registrations to. Registrations <strong>cannot</strong> be moved between events once they have been created.</p>		
 	<fieldset>		
 		<?php

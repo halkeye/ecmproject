@@ -22,7 +22,7 @@
 
 	echo form::open("admin/$callback"); 
 ?>
-	<h1>General Information</h1>
+	<h3>General Information</h3>
 	<p>At a minimum, a ticket needs a name and a price. This ticket will then be available for purchase unless otherwise specified (see Availability and Restrictions) </p>		
 	<fieldset>		
 		<?php
@@ -32,7 +32,7 @@
 			}		
 		?>
 	</fieldset>
-	<h1>Availability</h1>
+	<h3>Availability</h3>
 	<p>A ticket can be set to be available for sale in a given period of time. For instance, a ticket can be set so that it is only purchasable from October 23rd, 2009 to
 	December 23rd, 2009. </p>		
 	<fieldset>	
@@ -44,7 +44,7 @@
 		}
 		?>
 	</fieldset>
-	<h1>Restrictions</h1>
+	<h3>Restrictions</h3>
 	<p>Tickets can be restricted further by limiting the amount available (and/or) disabling it from being purchased. This is useful if certain ticket types must be given 
 	(instead of purchased through the system). <strong>Leave Tickets Available blank</strong> if no limit is being imposed.</p>		
 	<fieldset>	

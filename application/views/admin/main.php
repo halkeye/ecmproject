@@ -1,5 +1,5 @@
-<div id="list">
-	<table>
+<br />
+<table>
 	<tr>
 		<th class='header' width=50%><?php echo html::anchor(url::site('admin/manageConventions', TRUE), __('Manage Events') ) ?></th>
 		<th class='header' width=50%><?php echo html::anchor(url::site('admin/managePasses', TRUE), __('Manage Tickets')) ?></th>
@@ -31,4 +31,4 @@
 		<td>Exports selected (or all) registration information for a particular event to a CSV file which can be opened in Excel.</td>
 	</tr>
 </table>
-</div>
+

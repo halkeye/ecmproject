@@ -10,7 +10,7 @@
 		
 	echo form::open("admin/$callback"); 
 ?>
-	<h1>General Information</h1>
+	<h3>General Information</h3>
 	<p>An account is defined by an email address. Password must be typed in twice for verification.</p>		
 	<fieldset>		
 		<?php
@@ -21,15 +21,16 @@
 					
 		?>
 	</fieldset>
-	<h1>Password</h1>
+	<h3>Password</h3>
 	<p>Set the login password for this account.</p>		
 	<fieldset>
 			<?php 
-				echo new View('global/_form_field', array('field'=>'password', 'fieldData'=>'text', 'value' => '', 'hasError'=>isset($errors[$field]) && $errors[$field]));			
-				echo new View('global/_form_field', array('field'=>'confirm_password', 'fieldData'=>'text', 'value' => '', 'hasError'=>isset($errors[$field]) && $errors[$field]));	
+			foreach (array('password', 'confirm_password') as $field) {				
+				echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => '', 'hasError'=>isset($errors[$field]) && $errors[$field]));				
+			}
 			?>
 	</fieldset>
-	<h1>Email Validation Status</h1>
+	<h3>Email Validation Status</h3>
 	<p>Admins may override the default email validation status. Setting status to VERIFIED or BANNED will prevent a validation email from going out to the email specified above.</p>		
 	<fieldset>	
 		<?php 	

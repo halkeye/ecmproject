@@ -1,29 +1,24 @@
 <div id="list">
+	<p><strong><?php echo html::anchor($createLink, $createText, null, null, true); ?></strong></p>
+	
 	<?php 
 		if (isset($crows) && isset($convention_id)) {
-			echo form::open("$callback");		
+			echo form::open("$callback", array('class' => 'f_left'));		
 	?>
-	
-		<p class='right'>
-			<label for="convention_id">Viewing Convention: </label>		
-			<?php echo form::select('convention_id', $crows, $convention_id); ?>	
-			<button type='submit'>Go</button>			
-		</p>
 		
-	<?php
-			echo form::close();
-		} 
-	?>
+	<label for="convention_id">...for Event: </label>
+	<?php echo form::select('convention_id', $crows, $convention_id); ?>
+	<button type='submit'>Go</button>			
+	<?php echo form::close(); } ?>
 	
-	<?php echo form::open("admin/search/$entity"); ?>
-	<p class='floatRight'>
-		<label for='search_term'>Search: </label> <input type='text' id='search_term' name='search_term'></input> <button type='submit'>Search</button>	
-	</p>
+	<?php echo form::open("admin/search/$entity", array('class' => 'f_right')); ?>	
+	<label for='search_term'>Search: </label>
+	<input type='text' id='search_term' name='search_term' class='inline'></input> 	
+	<button type='submit'>Search</button>	
 	<?php echo form::close(); ?>
 
-	<p>
-		<?php echo html::anchor($createLink, $createText, null, null, true); ?>
-	</p>
+	<?php //echo html::anchor($createLink, $createText, null, null, true); ?>
+
 	
 	<table width='100%'>
 	<?php 
@@ -32,7 +27,7 @@
 		endforeach;	
 	?>
 	</table>	
-	<p class='right'>
+	<p>
 		<?php 
 		
 		if (isset($convention_id))

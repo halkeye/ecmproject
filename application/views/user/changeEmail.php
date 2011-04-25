@@ -4,7 +4,7 @@ View::set_global('field_lang_prefix', 'auth.changeEmail_field_');
 
 echo '<div id="form">';
 echo form::open();
-echo '<h2 class="grey">'.html::chars(__('convention.registration_form_header')) . '</h2>';
+echo '<h3>'.html::chars(__('convention.registration_form_header')) . '</h3>';
 echo '<p>'.__('ecmproject.form_required') . '</p>';
 
 echo "<fieldset>";

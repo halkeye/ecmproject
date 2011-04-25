@@ -15,7 +15,7 @@ if (count($errors))
 
 echo '<div id="form">';
 echo form::open('/user/lostPassword');
-echo '<h2 class="grey">'.html::chars(__('Recover your password!')) . '</h2>';
+echo '<h3>'.html::chars(__('Recover your password!')) . '</h3>';
 echo '<p>To recover your password for an account, please provide us the account email address! An email will be sent to this email address with more instructions.</p>';
 
 echo "<fieldset>";

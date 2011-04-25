@@ -13,21 +13,21 @@
 
 ?>
 <div id="newLogin">
-	<h2 class='grey'>Create Log-in ID</h1>
+	<h3>Create Log-in ID</h3>
 	<p class='fixed'>Please fill out the information below. <strong>Your name will be used for all registrations</strong> that you purchase through this account, so double check! 
 	Your e-mail address will serve as your login ID. <a href="#" rel="existing_login" onclick="return switchForm();" class='special'><strong>Click here to log-in with an existing ID</strong>.</a></p>
 	<?php echo form::open('/user/register'); ?>	
 	
 	<fieldset>			
 		<!-- Temporary: Using <br /> to block the line again. -->
-		<label for="sname"><span class="required">*</span> First Name <span class="small">Your first name.</span></label>
-		<input name="sname" type="text" class='inline' value='' />
-		<?php $field = 'sname'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?>
-		<br />
-		<label for="gname"><span class="required">*</span> Last Name <span class="small">Your last name.</span></label>
+		<label for="gname"><span class="required">*</span> First Name <span class="small">Your first name.</span></label>
 		<input name="gname" type="text" class='inline' value='<?php echo html::chars($form['gname']); ?>' />
 		<?php $field = 'gname'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?>
 		<br />
+		<label for="sname"><span class="required">*</span> Last Name <span class="small">Your last name.</span></label>
+		<input name="sname" type="text" class='inline' value='' />
+		<?php $field = 'sname'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?>
+		<br />		
 		<label for="email"><span class="required">*</span> Email Address <span class="small">Add a valid email address</span></label>
 		<input name="email" type="text" class='inline' value='<?php echo html::chars($form['email']); ?>' />
 		<?php $field = 'email'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?> 
@@ -54,7 +54,7 @@
 	<?php echo form::close(); ?>
 </div>
 <div id="existingLogin">
-	<h2 class='grey'>Log-in with Existing ID</h2>
+	<h3>Log-in with Existing ID</h3>
 	<p>Please enter your e-mail address and password and click continue. <a href="#" rel="newLogin" onclick="return switchForm();" class='special'><strong>New users, click here</strong>!</a></p>
 	<?php echo form::open('/user/login'); ?>	
 	<fieldset>		

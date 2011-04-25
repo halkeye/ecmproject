@@ -7,7 +7,7 @@ if(isset($row)) { ?>
 	<td><?php print htmlspecialchars($row->location, ENT_COMPAT, "UTF-8") ?></td>	
 	<?php
 		foreach ($actions as $action): 		
-			print '<td>' . $action; '</td>';
+			print '<td class="center">' . $action; '</td>';
 		endforeach;
 	?>
 </tr>

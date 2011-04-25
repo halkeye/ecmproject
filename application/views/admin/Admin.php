@@ -10,7 +10,7 @@
 		
 	echo form::open("admin/$callback"); 
 ?>
-	<h1>Admin Account</h1>
+	<h3>Admin Account</h3>
 	<p>Specify the account (email address login) to grant admin access to. <strong>Granting admin access to the registration system is (almost) like giving free reign in our system</strong>.
 	</p>		
 	

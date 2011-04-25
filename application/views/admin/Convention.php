@@ -13,7 +13,7 @@
 
 	echo form::open("admin/$callback"); 
 ?>
-	<h1>General Information</h1>
+	<h3>General Information</h3>
 	<p>The below information defines an event - the name of the event and it's location (optional)</p>		
 	<fieldset>		
 		<?php

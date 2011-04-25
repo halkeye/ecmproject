@@ -26,7 +26,7 @@ if(isset($row)) { ?>
 		if (isset($actions))
 		{
 			foreach ($actions as $action): 
-				print '<td>' . $action; '</td>';
+				print '<td class="center">' . $action; '</td>';
 			endforeach;
 		}		
 	?>
