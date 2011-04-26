@@ -1044,9 +1044,7 @@ class Controller_Admin extends Base_MainTemplate
     /*
     * Validate and determine the page multiplier to use when fetching results from the DB.
     */
-    private function getMultiplier($page) {
-		print $page;
-		
+    private function getMultiplier($page) {		
 		// Page variable is a number.
         if (isset($page) && is_numeric($page))
         {
