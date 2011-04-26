@@ -33,6 +33,7 @@ class Model_Payment extends ORM
             'txn_id' => array ('type' => 'string','length' => '17',),
             'receipt_id' => array ('type' => 'string','length' => '19', ),
             'mod_time' => array ('type' => 'int','max' => 2147483647,'unsigned' => true,'null' => true,),
+            'payment_type' => array ('type' => 'string','length' => '20', )
     );
 
 	public function __construct($id = NULL)

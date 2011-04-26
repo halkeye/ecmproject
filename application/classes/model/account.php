@@ -233,6 +233,7 @@ class Model_Account extends ORM
     public function validateAccount()
     {
         $this->status = Model_Account::ACCOUNT_STATUS_VERIFIED;
+        $this->save();
         /* Delete any outstanding validation codes */
         ORM::Factory('verificationcode')->delete_all_for_account($this->id);
     }
