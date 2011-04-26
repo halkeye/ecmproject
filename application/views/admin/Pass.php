@@ -49,7 +49,7 @@
 	<fieldset>	
 		<div>
 		<?php 
-			echo Form::label('tickets_total', 'Tickets Available', array('class' => 'nosub');
+			echo Form::label('tickets_total', 'Tickets Available', array('class' => 'nosub'));
 			echo Form::input ('tickets_total', $row['tickets_total']);	
 		?>
 		</div>
