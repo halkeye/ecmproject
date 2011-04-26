@@ -7,7 +7,7 @@
 		foreach (array('name', 'location') as $field)
 		{
 			$row[$field] = empty($row[$field]) ? '' : $row[$field] = '';
-			echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $row[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]), 'nomar' => true);
+			echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $row[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
 		}		
 	?>
 </fieldset>	

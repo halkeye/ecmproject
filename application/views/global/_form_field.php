@@ -40,9 +40,6 @@ if ($hasError) {
 	//$attributes = array();
 	$attributes['class'] = "inline"; 
 } 
-else if ($nomar) {
-	$attributes['class'] = "nomar"; //Temporary Hack. Allow specified attributes in the future.
-}
 
 switch ($fieldData['type'])
 {
