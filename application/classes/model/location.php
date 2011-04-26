@@ -51,6 +51,8 @@ class Model_Location extends ORM
 			array('not_empty'), 
 			array('min_length', array(':value', 0)),
 			array('max_length', array(':value', 5)),
+			array(array($this, 'notReserved')),
+			array(array($this, 'uniquePrefix')),
 		);
 		$rules['location'] = array(
 			array('not_empty'), 
@@ -60,7 +62,12 @@ class Model_Location extends ORM
 		
 		return $rules;
 	}
-	
+	public function notReserved($value) {
+		return $value !== Model_Location::RESERVED_LOCATION;
+	}
+	public function uniquePrefix($value) {
+		return (bool) !ORM::Factory('Location')->where('prefix', '=', $value)->find()->loaded();
+	}
 	public static function getTotalLocations()
 	{
 		return ORM::Factory('Location')->count_all();
