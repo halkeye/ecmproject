@@ -418,9 +418,9 @@ class Controller_User extends Base_MainTemplate
     function action_lostPassword()
     {
         /* Set page title */
-        $this->template->title = "Change Email";
-        $this->template->heading = __('auth.lostPassword_heading');
-        $this->template->subheading = __('auth.lostPassword_subheading');
+        $this->template->title = 		__('Password Recovery');
+        $this->template->heading = 		__('Password Recovery');
+        $this->template->subheading = 	__('Send a password recovery email to yourself...');
 
         /* Get logged in account */
         $account = $this->auth->getAccount();
@@ -450,7 +450,7 @@ class Controller_User extends Base_MainTemplate
                 }
                 catch (Verification_Exceeds_Exception $e) 
                 {
-                    $this->addError(__('auth.too_many_verification'));
+                    $this->addError(__('Too many verification codes have been sent already! Please check your inbox again (or junk mail)'));
                     $this->template->content = "";
                     return;
                 }

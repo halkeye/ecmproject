@@ -87,7 +87,7 @@ class Auth {
         $password = sha1($account->salt . $password);
         if ($account->password !== $password)
         {
-            $this->addError(__('auth.invalid_user_pass'));
+            $this->addError(__('Sorry, no account matched the email and password you provided.')); //No giving away how close the user was.
             return FALSE;
         }
             

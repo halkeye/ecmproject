@@ -51,20 +51,20 @@ class Controller_Convention extends Base_MainTemplate
 		
 		if (!$reg->loaded())
 		{
-			$this->addError(__('convention.not_loaded'));
+			$this->addError(__('Oops. The registration seems to have disappeared...'));
 			$this->request->redirect("convention/checkout");
 		}
 		
 		/* Prevent users from using deleteReg with an arbitrary number */
 		if ($reg->account_id != $this->auth->getAccount()->id)
 		{
-			$this->addError(__('convention.not_loaded') . $reg->account_id);
+			$this->addError(__('Oops. The registration seems to have disappeared...') . $reg->account_id);
 			$this->request->redirect("convention/checkout");
 		}
 		
 		if ($reg->status != Model_Registration::STATUS_UNPROCESSED)
 		{
-			$this->addError(__('convention.registration_already_processed_unable_to_edit'));
+			$this->addError(__('Cannot delete a registration for which payment is being processed.'));
 			$this->request->redirect("convention/checkout");
         }
 				
@@ -74,11 +74,11 @@ class Controller_Convention extends Base_MainTemplate
 			{
 				if ($reg->delete())
 				{
-					$this->addMessage(__('convention.delete_success'));	
+					$this->addMessage(__('Deleted the ticket from your shopping cart.'));	
 				}
 				else
 				{
-					$this->addError(__('convention.delete_error'));	
+					$this->addError(__('Failed to delete the ticket! Please try again or contact the webmaster.'));	
 				}
 			}
 			
@@ -99,7 +99,7 @@ class Controller_Convention extends Base_MainTemplate
 		
 		if (!$reg->loaded())
 		{
-			$this->addError(__('convention.not_loaded'));
+			$this->addError(__('Oops. The registration seems to have disappeared...'));
 			$this->request->redirect("convention/checkout");
 		}
 		
@@ -158,7 +158,7 @@ class Controller_Convention extends Base_MainTemplate
 		$user = $this->auth->get_user();
 		
 		$welcome = __('Purchase tickets for ') . htmlentities($user->gname) . ' ' . htmlentities($user->sname);
-		$edit_link = html::anchor('/user/changeName', __('(Not you? Click here.)'), array('class' => 'small_link'), null, true);
+		$edit_link = html::anchor('/user/changeName', __('(Change my name)'), array('class' => 'small_link'), null, true);
 		
         $this->template->heading    = $welcome . ' ' . $edit_link;
         $this->template->subheading = __('Register and purchase tickets for events here.'); 
@@ -206,8 +206,8 @@ class Controller_Convention extends Base_MainTemplate
     public function action_checkoutOther()
     {
         $this->requireVerified();
-        $this->template->heading    = __('convention.checkout_other_heading');
-        $this->template->subheading = __('convention.checkout_other_subheading'); 
+        $this->template->heading    = __('Purchase tickets (other)');
+        $this->template->subheading = __('Purchase tickets (other)'); 
 
         $data = array();
 		
@@ -215,7 +215,7 @@ class Controller_Convention extends Base_MainTemplate
 		$data['registrations'] = ORM::Factory('Registration')->getForAccount($this->auth->getAccount()->id);
 		if (!$data['registrations']->count()) 
         {
-            $this->addError(__('convention.cart_no_items'));
+            $this->addError(__('The cart is empty...'));
 			$this->request->redirect('user/index'); 
             return;
         }
