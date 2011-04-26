@@ -43,6 +43,7 @@ class Controller_Admin extends Base_MainTemplate
         $this->template->heading =      __('Admin: Event List');
         $this->template->subheading =   __('Create, modify and delete events.');
 		
+		$page = $this->request->query('page', null);
         $this->genericManageEntity('Convention', 'Conventions', $page);            
     }    
 	function action_createConvention() {
@@ -136,6 +137,8 @@ class Controller_Admin extends Base_MainTemplate
         $crows = ORM::factory('Convention')->find_all()->as_array('id', 'name');		
 		$convention_id = $this->session->get_once('admin_convention_id', Controller_Admin::getConventionId($convention_id, $crows) );                              
 
+		$page = $this->request->query('page', null);
+		
 		$opt_conditions = array('convention_id' => $convention_id);
 		$opt_viewAttributes = array('convention_id' => $convention_id, 'crows' => $crows);	
 		$this->genericManageEntity('Pass', 'Passes', $page, $opt_conditions, $opt_viewAttributes);		
@@ -265,7 +268,9 @@ class Controller_Admin extends Base_MainTemplate
         // Get the list of conventions and convention id's.
         $crows = ORM::factory('Convention')->find_all()->as_array('id', 'name');    
 		$convention_id = Controller_Admin::getConventionId($convention_id, $crows);
-		       
+		
+		$page = $this->request->query('page', null);
+			   
         // Optional parameters
 		$opt_conditions = array('convention_id' => $convention_id);
 		$opt_viewAttributes = array('convention_id' => $convention_id, 'crows' => $crows);				
@@ -471,6 +476,7 @@ class Controller_Admin extends Base_MainTemplate
         $this->template->heading = "Administration: Manage Accounts";
         $this->template->subheading = "Create, edit and delete accounts";
                 
+		$page = $this->request->query('page', null);
 		$this->genericManageEntity('Account', $page); 					
     }
 	function action_createAccount() {
@@ -584,6 +590,7 @@ class Controller_Admin extends Base_MainTemplate
         $this->template->heading = 		__('Admin: Locations');
         $this->template->subheading = 	__('Manage Ticket Sale Locations and their prefixes (used for registration ID generation)');
 		
+		$page = $this->request->query('page', null);
 		$this->genericManageEntity('Location', $page);  
 	}
     function action_createLocation() {
@@ -1034,7 +1041,9 @@ class Controller_Admin extends Base_MainTemplate
     * Validate and determine the page multiplier to use when fetching results from the DB.
     */
     private function getMultiplier($page) {
-        // Page variable is a number.
+		print $page;
+		
+		// Page variable is a number.
         if (isset($page) && is_numeric($page))
         {
             $multiplier = $page - 1; // Subtract one since we're working starting from zero.
