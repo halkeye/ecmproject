@@ -3,7 +3,7 @@
 class Model_Location extends ORM 
 {
 	/* Prevent the retrieval of this location (internally reserved) */
-	const RESERVED_LOCATION = 'WEB';
+	const RESERVED_LOCATION = 'ECM';
 
 	protected $_primary_key = 'id';
 	protected $_table_columns = array(
