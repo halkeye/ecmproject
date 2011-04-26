@@ -32,7 +32,15 @@ address will require your account to be re-validated.</p>
 		echo '<tr class="'.$class_row.'">';
 		echo '<td>' . HTML::chars($r->gname . ' ' . $r->sname) . '</td>';
 		echo '<td>' . HTML::chars($r->pass->name) . '</td>';
-		echo '<td>' . HTML::chars($r->reg_id) . '</td>';
+		
+		/* Display the reg_id only when the registration is fully paid for. */
+		if ($r->status == Model_Registration::STATUS_PAID) {
+			echo '<td>' . HTML::chars($r->reg_id) . '</td>';
+		}
+		else {
+			echo '<td></td>';
+		}		
+		
 		echo '<td>' . HTML::chars(sprintf('$%01.2F', $r->pass->price)) . '</td>';
 		echo '<td>'.$r->statusToString().'</td>';
 		echo '</tr>';
