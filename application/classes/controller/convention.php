@@ -248,7 +248,7 @@ class Controller_Convention extends Base_MainTemplate
 
             $id = $reg->reserveTickets(1);
             if ( $id ) { //Reserve tickets. Return at least 1 except in case of failure (not enough tickets left).
-                $reg->build_regID(array('comp_loc'=>'WEB', 'comp_id'=> $id), array('WEB') , $pass->convention_id);
+                $reg->build_regID(array('comp_loc'=>'ECM', 'comp_id'=> $id), array('ECM') , $pass->convention_id);
                 #$reg->reg_id = sprintf('%s_%s_%s', $pass->convention_id, 'ECM', $id);
                 $reg->save(); 
                 $reg->finalizeTickets(); //Save has gone through. Finalize reservation.

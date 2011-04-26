@@ -210,7 +210,7 @@ INSERT INTO ticketcounters (pass_id, tickets_assigned, tickets_total, next_id) V
 
 INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 1;
 INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 2;
-INSERT INTO `locations` SET id = 1, prefix = 'WEB', location = 'ECMS';
+INSERT INTO `locations` SET id = 1, prefix = 'ECM', location = 'Electronic Convention Management System';
 -- INSERT INTO `accounts_usergroups` SET usergroup_id = 1, account_id = 3;
 
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
