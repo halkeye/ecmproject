@@ -2,10 +2,10 @@
 <p>Listed here are the various actions you can perform on your account as well as your current and past history of registrations. Please note that <strong>changing your email </strong>
 address will require your account to be re-validated.</p>
 <table width='100%'>
-	<tr><th class="theader">Account Actions</th></tr>
+	<tr><th class="header">Account Actions</th></tr>
 	<tr><td><?php echo html::anchor("/user/changeName","Change Name", null, null, true); ?> | <?php echo html::anchor("/user/changeEmail","Change Email", null, null, true); ?> | <?php echo html::anchor("/user/changePassword","Change Password", null, null, true); ?></td></tr>	
 </table>
-
+<br />
 <table width = 100%>
 <?php
 	/* $reg is assumed to be sorted by convention_id. If it's not, this will still work - just rather randomly. */
@@ -15,7 +15,7 @@ address will require your account to be re-validated.</p>
 		//Print convention header if it's different than previous.
 		if ($cid != $r->convention_id)
 		{
-			print '<tr><th colspan=5 class="theader">' . $r->convention->name . '</th></tr>';
+			print '<tr><th colspan=5 class="header">' . $r->convention->name . '</th></tr>';
 			?>
 			<tr>
 				<th width='25%'>Name</th>
