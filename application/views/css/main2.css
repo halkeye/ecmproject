@@ -184,6 +184,13 @@ table td.total {
 	border: 1px solid #A00;
 	margin-bottom: 15px;
 }
+#content p.centerID {
+	font-size: 2em;
+	text-align: center;
+}
+#content p.center {
+	text-align: center;
+}
 #content form {
 	padding: 5px 0px;
 }
