@@ -18,7 +18,7 @@
 <!-- Content container beings here --> 
 <div id="container"> 
     <!-- Header --> 
-	<?php if ($isLoggedIn || $menu): ?>
+	<?php if ($isLoggedIn): // || $menu ?>
     <div id="menu">
         <ul>      
 			<li class='header'>Menu: </li>

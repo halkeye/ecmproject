@@ -230,6 +230,7 @@ table td.total {
 	width: 100px;
 }
 #content input.fsubmit {
+	width: auto;
 	float: right;
 }
 #content select {
