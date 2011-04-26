@@ -951,8 +951,12 @@ class Controller_Admin extends Base_MainTemplate
             $entityName = $row->email;
 		else if (isset($row->location))
 			$entityName = $row->location;
-        else
-            $entityName = 'Type: ' . $row->type; //hack.
+		else if (isset($row->type))
+			$entityName = $row->type;
+        else if (isset($row->reg_id))
+            $entityName = $row->reg_id; //hack.
+		else
+			$entityName = 'Unknown';
         
         /* If row is defined (only if ID was set) and row was loaded... */
         if ($row->loaded())
