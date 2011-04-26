@@ -35,8 +35,14 @@ switch ($fieldData['type'])
         echo form::label($field, $label, $label_attributes);
 }
 
-$attributes = array('class'=>'');
-if ($hasError) { $attributes['class'] = "inline"; }
+$attributes = null;
+if ($hasError) { 
+	//$attributes = array();
+	$attributes['class'] = "inline"; 
+} 
+else if ($nomar) {
+	$attributes['class'] = "nomar"; //Temporary Hack. Allow specified attributes in the future.
+}
 
 switch ($fieldData['type'])
 {

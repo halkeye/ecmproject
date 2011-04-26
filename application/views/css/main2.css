@@ -210,7 +210,7 @@ table td.total {
 #content label.nomar {
 	width: auto;
 	margin-right: 5px;
-	margin-top: 3px;
+	margin-top: 5px;
 }
 #content label span.small {
 	font-size: 0.7em;
@@ -227,14 +227,14 @@ table td.total {
 }
 #content input.submit {
 	display: inline;
-	width: 100px;
+	width: auto;
 }
 #content input.fsubmit {
 	width: auto;
 	float: right;
 }
 #content select {
-	padding: 2px 0;
+	padding: 0px 0;
 }
 #content form fieldset p.errormsg {
 	/* The star hack to align error messages properly. */

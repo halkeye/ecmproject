@@ -3,23 +3,25 @@
 	
 	<?php 
 		if (isset($crows) && isset($convention_id)) {
-			echo form::open("$callback", array('class' => 'f_left'));		
-	?>
+			echo form::open("$callback", array('class' => 'float_left'));		
+	?>		
+		<div>
+			<label for="convention_id" class='nomar'>...for Event: </label>
+			<?php echo form::select('convention_id', $crows, $convention_id); ?>
+			<input type='submit' value='Switch Events' class='submit'>	
+		</div>
 		
-	<label for="convention_id">...for Event: </label>
-	<?php echo form::select('convention_id', $crows, $convention_id); ?>
-	<button type='submit'>Go</button>			
 	<?php echo form::close(); } ?>
 	
-	<?php echo form::open("admin/search/$entity", array('class' => 'f_right')); ?>	
-	<label for='search_term'>Search: </label>
-	<input type='text' id='search_term' name='search_term' class='inline'></input> 	
-	<button type='submit'>Search</button>	
+	
+	<?php echo form::open("admin/search/$entity", array('class' => 'float_right')); ?>	
+	<div>
+		<label for='search_term' class='nomar'>Search: </label>
+		<input type='text' id='search_term' name='search_term' class='inline'></input> 	
+		<input type='submit' value='Search' class='submit'>
+	</div>
 	<?php echo form::close(); ?>
 
-	<?php //echo html::anchor($createLink, $createText, null, null, true); ?>
-
-	
 	<table width='100%'>
 	<?php 
 		foreach ($rows as $row):
