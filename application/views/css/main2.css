@@ -212,6 +212,12 @@ table td.total {
 	margin-right: 5px;
 	margin-top: 5px;
 }
+/* Hack */
+#content label.regid {
+	width: auto;
+	margin-right: 151px;
+	margin-top: 5px;
+}
 #content label span.small {
 	font-size: 0.7em;
 	display: block;
@@ -225,6 +231,21 @@ table td.total {
 	display: inline;
 	margin-bottom: 0;
 }
+#content input.comp_prefix {
+	display: inline;
+	width: 40px;
+	background-color: #CCC;
+	margin-right: 10px;
+	text-align: center;
+	border: 1px solid #000;
+}
+#content select.comp_loc {
+	display: inline;
+}
+#content input.comp_id {
+	width: 118px;
+	display: inline;
+}
 #content input.submit {
 	display: inline;
 	width: auto;
@@ -234,6 +255,7 @@ table td.total {
 	float: right;
 }
 #content select {
+	margin: 0;
 	padding: 0px 0;
 }
 #content form fieldset p.errormsg {

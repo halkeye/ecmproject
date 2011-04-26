@@ -40,7 +40,6 @@
 		foreach (array('startDate', 'endDate') as $field)
 		{
 			echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $row[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
-			echo '<br />';
 		}
 		?>
 	</fieldset>
@@ -48,10 +47,14 @@
 	<p>Tickets can be restricted further by limiting the amount available (and/or) disabling it from being purchased. This is useful if certain ticket types must be given 
 	(instead of purchased through the system). <strong>Leave Tickets Available blank</strong> if no limit is being imposed.</p>		
 	<fieldset>	
-		<?php
-		echo Form::label('tickets_total', 'Tickets Available');
-		echo Form::input ('tickets_total', $row['tickets_total']);	
-		 	
+		<div>
+		<?php 
+			echo Form::label('tickets_total', 'Tickets Available');
+			echo Form::input ('tickets_total', $row['tickets_total']);	
+		?>
+		</div>
+		
+		<?php		 	
 		foreach (array('isPurchasable') as $field)
 		{	
 			echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $row[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));

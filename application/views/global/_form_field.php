@@ -77,7 +77,7 @@ switch ($fieldData['type'])
         if (!$values) $values = array();
         $values[-1] = "";
         asort($values);
-        $attributes['class'] .= ' block';
+        //$attributes['class'] .= ' block';
         echo form::select($field, $values, $value, $attributes);
         break;
     case 'date':
