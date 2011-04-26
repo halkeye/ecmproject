@@ -242,12 +242,13 @@ table td.total {
 	display: inline;
 	width: 40px;
 	background-color: #CCC;
-	margin-right: 10px;
+	margin-right: 1px;
 	text-align: center;
 	border: 1px solid #000;
 }
 #content select.comp_loc {
 	display: inline;
+	margin-right: 10px;
 }
 #content input.comp_id {
 	width: 118px;

@@ -443,7 +443,7 @@ class Model_Registration extends ORM
 			$this->reg_id = '';
 		}
 		else {
-			$this->reg_id = sprintf('%s_%s_%s', $convention_id, $post['comp_loc'], $post['comp_id']);
+			sprintf('%s-%02s-%04s', $post['comp_loc'], $convention_id, $post['comp_id']);
 		}
 					
 		return $errors;

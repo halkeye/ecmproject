@@ -1310,6 +1310,11 @@ class Controller_Admin extends Base_MainTemplate
 		
 		return $extra_validation;
 	}
+	public function action_regID() {
+		header("Content-type: text/plain");
+		print sprintf('%s-%02s-%04s', 'ECM', 1, 5);
+		exit;
+	}
 		    	
     public function action_testClock() {
         header("Content-type: text/plain");
