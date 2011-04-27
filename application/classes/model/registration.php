@@ -105,7 +105,10 @@ class Model_Registration extends ORM
 	}	
     
 	public function save(Validation $validation = NULL) {
-		$this->__resolve_account($this->email);
+		/* Re-resolve account id if email changes. Alternately, check for empty(account_id) && $this->_changed['email'] for a permanent lock once associated. */
+		if ($this->_changed['email']) {
+			$this->__resolve_account($this->email);
+		}
 		return parent::save($validation);
 	}
 	
