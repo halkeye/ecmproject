@@ -37,14 +37,13 @@ class Controller_Admin extends Base_MainTemplate
 	/* 
 	* Convention CRUD actions 
 	*/
-    function action_manageConventions($page = NULL) {
+    function action_manageConventions() {
         // Set headers
         $this->template->title =        __('Admin: Event List');
         $this->template->heading =      __('Admin: Event List');
         $this->template->subheading =   __('Create, modify and delete events.');
-		
-		$page = $this->request->query('page', null);
-        $this->genericManageEntity('Convention', 'Conventions', $page);            
+				
+        $this->genericManageEntity('Convention', 'Conventions');            
     }    
 	function action_createConvention() {
         $this->template->title =        __('Admin: Create an Event');
@@ -128,7 +127,7 @@ class Controller_Admin extends Base_MainTemplate
 	/*
 	* Ticket/Pass CRUD actions
 	*/
-	function action_managePasses($convention_id = NULL, $page = NULL) {
+	function action_managePasses($convention_id = NULL) {
         // Set headers
         $this->template->title = 		__('Admin: Manage Tickets');
         $this->template->heading = 		__('Admin: Manage Tickets');
@@ -136,12 +135,10 @@ class Controller_Admin extends Base_MainTemplate
             
         $crows = ORM::factory('Convention')->find_all()->as_array('id', 'name');		
 		$convention_id = $this->session->get_once('admin_convention_id', Controller_Admin::getConventionId($convention_id, $crows) );                              
-
-		$page = $this->request->query('page', null);
 		
 		$opt_conditions = array('convention_id' => $convention_id);
 		$opt_viewAttributes = array('convention_id' => $convention_id, 'crows' => $crows);	
-		$this->genericManageEntity('Pass', 'Passes', $page, $opt_conditions, $opt_viewAttributes);		
+		$this->genericManageEntity('Pass', 'Passes', $opt_conditions, $opt_viewAttributes);		
     }
 	function action_createPass()  {
         // Set headers
@@ -259,7 +256,7 @@ class Controller_Admin extends Base_MainTemplate
 	/*
 	* Registration CRUD actions
 	*/
-	function action_manageRegistrations($convention_id = NULL, $page = NULL) {
+	function action_manageRegistrations($convention_id = NULL) {
         // Set headers
         $this->template->title = 		__('Admin: Manage Registrations');
         $this->template->heading = 		__('Admin: Manage Registrations');
@@ -268,13 +265,11 @@ class Controller_Admin extends Base_MainTemplate
         // Get the list of conventions and convention id's.
         $crows = ORM::factory('Convention')->find_all()->as_array('id', 'name');    
 		$convention_id = Controller_Admin::getConventionId($convention_id, $crows);
-		
-		$page = $this->request->query('page', null);
-			   
+					   
         // Optional parameters
 		$opt_conditions = array('convention_id' => $convention_id);
 		$opt_viewAttributes = array('convention_id' => $convention_id, 'crows' => $crows);				
-		$this->genericManageEntity('Registration', 'Registrations', $page, $opt_conditions, $opt_viewAttributes);	
+		$this->genericManageEntity('Registration', 'Registrations', $opt_conditions, $opt_viewAttributes);	
     }		
 	function action_createRegistration() {
         // Set headers
@@ -470,14 +465,13 @@ class Controller_Admin extends Base_MainTemplate
 	/*
 	* Account CRUD actions
 	*/
-    function action_manageAccounts($page = NULL) {
+    function action_manageAccounts() {
         // Set headers
         $this->template->title = "Administration: Manage Accounts";
         $this->template->heading = "Administration: Manage Accounts";
         $this->template->subheading = "Create, edit and delete accounts";
                 
-		$page = $this->request->query('page', null);
-		$this->genericManageEntity('Account', $page); 					
+		$this->genericManageEntity('Account', 'Accounts'); 					
     }
 	function action_createAccount() {
         $this->template->title = 		__('Admin: Create an Account');
@@ -585,13 +579,12 @@ class Controller_Admin extends Base_MainTemplate
 	/*
 	* Location CRUD actions
 	*/
-    function action_manageLocations($page = NULL) {
+    function action_manageLocations() {
         $this->template->title = 		__('Admin: Locations');
         $this->template->heading = 		__('Admin: Locations');
         $this->template->subheading = 	__('Manage Ticket Sale Locations and their prefixes (used for registration ID generation)');
 		
-		$page = $this->request->query('page', null);
-		$this->genericManageEntity('Location', $page);  
+		$this->genericManageEntity('Location', 'Locations');  
 	}
     function action_createLocation() {
 		$this->template->title =        __('Admin: Create a Location');
@@ -1145,7 +1138,9 @@ class Controller_Admin extends Base_MainTemplate
 	*
 	* returns null
 	*/
-	private function genericManageEntity($entity, $plural_entity, $page = NULL, $opt_conditions = NULL, $opt_viewAttributes = NULL) {
+	private function genericManageEntity($entity, $plural_entity, $opt_conditions = NULL, $opt_viewAttributes = NULL) {
+		
+		$page = $this->request->query('page', null);
 		
 		//Get total number of rows. Restrict as necessary.
 		$total_rows = ORM::Factory($entity);
