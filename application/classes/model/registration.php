@@ -104,6 +104,11 @@ class Model_Registration extends ORM
         return $rules;
 	}	
     
+	public function save(Validation $validation = NULL) {
+		$this->__resolve_account($this->email);
+		return parent::save($validation);
+	}
+	
     public function filters()
     {
         $filters = parent::filters();
@@ -119,9 +124,6 @@ class Model_Registration extends ORM
         $filters['pass_id'] = array(
             array(array($this, '__update_convention_from_pass')),
         );
-		$filter['account_id'] = array(
-			array(array($this, '__resolve_account')),
-		);
         return $filters;
     }   
 	
@@ -164,8 +166,13 @@ class Model_Registration extends ORM
 		
 		return (bool) true;
 	}
-	public function __resolve_account($value) {
-	
+	public function __resolve_account($value) {		
+		$acct = ORM::Factory('Account')->where('email', '=', $value)->find();
+		if ( $acct->loaded() ) {
+			$this->account_id = $acct->id;
+		}		
+		
+		return true;
 	}
 	  
 	/* Ticket allocation methods */	
