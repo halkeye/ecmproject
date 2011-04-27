@@ -252,7 +252,7 @@ class Controller_Convention extends Base_MainTemplate
                 #$reg->reg_id = sprintf('%s_%s_%s', $pass->convention_id, 'ECM', $id);
                 $reg->save(); 
                 $reg->finalizeTickets(); //Save has gone through. Finalize reservation.
-                $this->addMessage( __('Created a new registration, ') . $reg->reg_id);
+                $this->addMessage( __('Added the ticket, ') . $reg->name . __(' to the cart.'));
             }
             else if ($reg->pass_id > 0) {					
                 $this->addError("No more tickets to allocate for " . $pass->convention->name . ' - ' . $pass->name . ". Please select a different pass.");
