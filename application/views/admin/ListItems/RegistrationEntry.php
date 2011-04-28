@@ -16,8 +16,8 @@ if(isset($row)) { ?>
 
 <?php } else { ?>
 <tr>
-	<th width='25%'>Name</th>
-	<th width='25%'>Assigned Reg ID</th>
+	<th width='30%'>Name</th>
+	<th width='20%'>Assigned Reg ID</th>
 	<th width='20%'>Email</th>
 	<th width='20%'>Status</th>
 	<th width='5%'>Edit</th>
