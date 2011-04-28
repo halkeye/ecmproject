@@ -179,13 +179,25 @@ INSERT INTO `accounts` SET
 INSERT INTO `accounts` SET
     id         = 2,
     email      = 'stt@sfu.ca',
-    gname       = 'Uchi',
+    gname      = 'Uchi',
     sname      = 'koma',
     password   = '59e9c0e9d8e1f1b26b7f867a58ee6edf93becb33',
     salt       = '9f8d6875ac',
     status     = 1,
     created    = 1257639234,
     login      = 1262579714
+;
+
+INSERT INTO `accounts` SET
+    id         = 3,
+    email      = 'greg@irlevents.com',
+    gname      = 'Gregory',
+    sname      = 'Neher',
+    password   = '19bf8c3d90c32f96a0766b03919bc03f1d3e612d',
+    salt       = '5fd18be8b9',
+    status     = 1,
+    created    = 1303752682,
+    login      = 1303752682
 ;
 
 INSERT INTO `conventions` SET
@@ -210,6 +222,8 @@ INSERT INTO ticketcounters (pass_id, tickets_assigned, tickets_total, next_id) V
 
 INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 1;
 INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 2;
+INSERT INTO `accounts_usergroups` SET usergroup_id = 1, account_id = 3;
+
 INSERT INTO `locations` SET id = 1, prefix = 'ECM', location = 'Electronic Convention Management System';
 -- INSERT INTO `accounts_usergroups` SET usergroup_id = 1, account_id = 3;
 
