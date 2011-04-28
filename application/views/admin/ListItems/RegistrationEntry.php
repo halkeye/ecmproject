@@ -3,9 +3,9 @@
 if(isset($row)) { ?>
 
 <tr>
-	<td><?php print $row->gname; ?></td>
-	<td><?php print $row->sname; ?></td>	
-	<td><?php print $row->email; ?></td>
+	<td><?php print html::chars($row->gname) . ' ' . html::chars($row->sname); ?></td>
+	<td><?php print $row->reg_id; ?></td>	
+	<td><?php print html::chars($row->email); ?></td>
 	<td><?php print $row->statusToString(); ?></td>	
 	<?php
 		foreach ($actions as $action): 		
@@ -16,8 +16,8 @@ if(isset($row)) { ?>
 
 <?php } else { ?>
 <tr>
-	<th width='25%'>First Name</th>
-	<th width='25%'>Last Name</th>
+	<th width='30%'>Name</th>
+	<th width='20%'>Assigned Reg ID</th>
 	<th width='20%'>Email</th>
 	<th width='20%'>Status</th>
 	<th width='5%'>Edit</th>

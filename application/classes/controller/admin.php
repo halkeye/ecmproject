@@ -779,7 +779,7 @@ class Controller_Admin extends Base_MainTemplate
                 ->or_where('email', 'LIKE', $search_term)
                 ->or_where('gname', 'LIKE', $search_term)
                 ->or_where('sname', 'LIKE', $search_term)
-                ->or_where('id', '=', $search_term)
+                ->or_where('reg_id', 'LIKE', $search_term)
                 ->find_all();
         }
         else if ($entity == 'Account' && $search_term != null)
@@ -795,7 +795,7 @@ class Controller_Admin extends Base_MainTemplate
             $this->template->heading = __('Searching for Events');
             $rows = ORM::Factory('Convention')
                 ->or_where('name', 'LIKE', $search_term)
-                ->or_where('id', '=', $search_term)
+                ->or_where('location', 'LIKE', $search_term)
                 ->find_all();
         }
         else if ($entity == 'Pass' && $search_term != null)
@@ -803,9 +803,16 @@ class Controller_Admin extends Base_MainTemplate
             $this->template->heading = __('Searching for Tickets');
             $rows = ORM::Factory('Pass')
                 ->or_where('name', 'LIKE', $search_term)
-                ->or_where('id', '=', $search_term)
                 ->find_all();
         }
+		else if ($entity == 'Location' && $search_term != null)
+		{
+			$this->template->heading = __('Searching for Locations');
+            $rows = ORM::Factory('Location')
+                ->or_where('prefix', '=', $search_term)
+				->or_where('location', 'LIKE', $search_term)
+                ->find_all();
+		}
     
         // Header entry. (View with no data generates a header)                 
         if ($rows != null)
