@@ -27,7 +27,7 @@
 
 		<div>
 			<label for="sname"><span class="required">*</span> Last Name <span class="small">Your last name.</span></label>
-			<input name="sname" type="text" class='inline' value='' />
+			<input name="sname" type="text" class='inline' value='<?php echo html::chars($form['sname']); ?>' />
 			<?php $field = 'sname'; echo (empty ($errors[$field])) ? '' : '<p class="errormsg">'.$errors[$field].'</p>'; ?>
 		</div>
 
