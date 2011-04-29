@@ -25,20 +25,7 @@ class Controller_Convention extends Base_MainTemplate
 
     function action_index()
     {
-        $regs = Model_Registration::getByAccount($this->auth->get_user()->id);
-        if (!$regs->count()) { $this->request->redirect(Controller_Convention::STEP1); }
-        else { $this->request->redirect('/convention/checkout'); }
-
-        $data['conventions'] = array();
-        foreach ($regs as $row) 
-        {
-            $row->incomplete = $row->pass_id ? false : true;
-            $data['conventions'][$row->convention_id]->name = $row->convention_name;
-            $data['conventions'][$row->convention_id]->id = $row->convention_id;
-            $data['conventions'][$row->convention_id]->regs[] = $row;
-        }
-        $this->template->content = new View('convention/index', $data);
-        
+        $this->request->redirect('/convention/checkout');}
         return;
     }
 
@@ -249,10 +236,9 @@ class Controller_Convention extends Base_MainTemplate
             $id = $reg->reserveTickets(1);
             if ( $id ) { //Reserve tickets. Return at least 1 except in case of failure (not enough tickets left).
                 $reg->build_regID(array('comp_loc'=>'ECM', 'comp_id'=> $id), array('ECM') , $pass->convention_id);
-                #$reg->reg_id = sprintf('%s_%s_%s', $pass->convention_id, 'ECM', $id);
                 $reg->save(); 
                 $reg->finalizeTickets(); //Save has gone through. Finalize reservation.
-                $this->addMessage( __('Added the ticket, ') . $reg->name . __(' to the cart.'));
+                $this->addMessage( __('Added the ticket, :name to the cart.', array(':name' => $reg->gname . ' '. $reg->sname) ));
             }
             else if ($reg->pass_id > 0) {					
                 $this->addError("No more tickets to allocate for " . $pass->convention->name . ' - ' . $pass->name . ". Please select a different pass.");
@@ -270,6 +256,5 @@ class Controller_Convention extends Base_MainTemplate
         }
         $this->request->redirect('/convention/checkout'); 
     }
-
 
 }
