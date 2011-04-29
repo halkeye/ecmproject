@@ -6,12 +6,14 @@
 <style type="text/css">
 	table {
 		width: 400px;
+        border-spacing: 0;
 	}
 	tr {
 		border: 1px solid #A2B0C8;
 	}
 	td {
 		padding: 3px 20px;
+		border: 1px solid #A2B0C8;
 	}
 	th {
 		background-color: #A2B0C8;
@@ -23,32 +25,24 @@
 
 <?php
 
-$cur_eventID = -1;
-foreach ($registrations as $reg) {
-	/* Open a new table per event */
-	if ($reg->convention_id != $cur_eventID) {
-		if ($cur_eventID != -1) {
-			echo '</table>';
-		}
-		echo '<table>';
-		echo '<tr><th colspan="2">' . $reg->convention->name . '</th></tr>';		
-	}
-	
-	$id = $reg->reg_id;
-	$name = HTML::chars($reg->gname) . ' ' . HTML::chars($reg->sname);
-	echo "<tr>\n";
-	echo "<td>" . /* html::image */ "</td>\n"; //TODO: ADD QR CODE IMAGE HERE.
-	echo "<td><strong>$id</strong><br />$name</td>\n";
-	echo "</tr>\n";
-}
+foreach (array_keys($registrations) as $convention_name) {
+    /* Open a new table per event */
+    echo '<table>';
+    echo '<tr><th colspan="2">' . $convention_name . '</th></tr>';		
 
-/* Close off last table if one was opened */
-if ($cur_eventID != -1) {
-	echo '</table>';
+    foreach ($registrations[$convention_name] as $reg) {
+        $id = $reg->reg_id;
+        $name = HTML::chars($reg->gname) . ' ' . HTML::chars($reg->sname);
+        echo "<tr>\n";
+        echo "<td width='100'>" . html::image('http://chart.apis.google.com/chart?chs=100x100&cht=qr&chl='.$id) . "</td>\n"; 
+        echo "<td style='text-align:center' valign='middle'><strong>$id</strong><br />$name</td>\n";
+        echo "</tr>\n";
+    }
+    echo '</table>';
 }
 
 ?>
 
 <p>Thank you and we look forward to seeing you there!</p>
 <p>Regards, </p>
-<p><strong>The IRL Events Team </strong><br />contact@irlevents.com</p> <!-- Change email address to appropriate contact point. -->
+<p><strong>The IRL Events Team </strong><br />contact@irlevents.com</p> 
