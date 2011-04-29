@@ -53,11 +53,11 @@ class Model_Registration extends ORM
             'sname' 	=> array( 'type'  => 'text', 	'label' => 'Surname', 		'required'	=> true, 'adminRequired'=>true    ),
 			'phone' 	=> array( 'type'  => 'text', 	'label' => 'Phone', 													  ),
 			'status'	=> array( 'type'  => 'select',  'label' => 'Status',		'required'	=> true							  ),
-			
+			'email' 	=> array( 'type'  => 'text', 	'label' => 'Email', 												      ),          
 			/*
             'badge' => array( 'type'  => 'text', 'label' => 'Badge', 'required'=>true    ),
             'dob'   => array( 'type'  => 'date', 'label' => 'Date of Birth', 'required'=>true ),
-            'email' => array( 'type'  => 'text', 'label' => 'Email', 'required'=>true ),           
+             
             'cell'  => array( 'type'  => 'text', 'label' => 'Cell Phone', 'required' => false),
             'city'  => array( 'type'  => 'text', 'label' => 'City', 'required' => true),
             'prov'  => array( 'type'  => 'text', 'label' => 'Province', 'required' => true),

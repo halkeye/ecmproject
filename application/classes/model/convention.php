@@ -16,13 +16,21 @@ class Model_Convention extends ORM
     );
 
     public $default_fields = array(
-            'name' 		=> array( 'type' => 'text', 'label' => 'Convention Name', 'required'=>true ),
-            'location' 	=> array( 'type' => 'text', 'label' => 'Location', 'required'=>true )
+            'name' 		=> array( 'type' => 'text', 'label' => 'Event Name', 'required'=>true ),
+            'location' 	=> array( 'type' => 'text', 'label' => 'Location' )
     );
+		
+	public function labels()
+	{
+		return array(
+			'name' => 'Event Name',
+			'location' => 'Location',
+		);
+	}
+
 	
 	public function rules()
-	{
-		
+	{		
 		return array(
 			'name'		=> array( 
 				array('not_empty'), 

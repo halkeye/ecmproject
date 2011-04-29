@@ -31,7 +31,7 @@ class Controller_User extends Base_MainTemplate
 
         if ($this->auth->is_logged_in()) 
         {
-            $this->addMessage(__('auth.already_logged_in'));
+            $this->addMessage(__('You are already logged in!'));
             $this->_redirect('');
             return;
         }
@@ -171,13 +171,13 @@ class Controller_User extends Base_MainTemplate
         $this->auth->complete_login($account);
 
         /* Show a message that they logged in, and goto the default page */
-        $this->addMessage(__('auth.verification_success'));
+        $this->addMessage(__('Email address successfully validated! You can use your account now.'));
         $this->_redirect('');
     }
         
     function _badVerify()
     {
-        $this->addError(__('auth.bad_link')); 
+        $this->addError(__('The verification link used is not valid. Please double check the link or request a new validation code.')); 
         return $this->request->redirect('/user/verifyMenu');
     }
     
@@ -193,9 +193,9 @@ class Controller_User extends Base_MainTemplate
 
     function action_verifyMenu()
     {
-        $this->template->title = "Require Verification";
-        $this->template->heading = __('auth.verifyMenu_heading');
-        $this->template->subheading = __('auth.verifyMenu_subheading');
+        $this->template->title = 		__('Verification Required');
+        $this->template->heading =		__('Verification Required');
+        $this->template->subheading = 	__('The email address associated to this account must be verified first.');
         $this->requireLogin();
         $data = array();
 
@@ -218,7 +218,7 @@ class Controller_User extends Base_MainTemplate
         }
         catch (Verification_Exceeds_Exception $e) 
         {
-            $this->addError(__('auth.too_many_verification'));
+            $this->addError(__('Too many verification codes have been sent already! Please check your inbox again (or junk mail)'));
             $this->template->content = "";
             return;
         }
@@ -226,7 +226,7 @@ class Controller_User extends Base_MainTemplate
         /* Send email */
         $account->sendValidateEmail($vcode->original_code);
 
-        $this->addMessage(__('auth.sendVerificationMessage', array('mail'=>$account->email))); 
+        $this->addMessage(__('A verification email has been sent to your email address.', array('mail'=>$account->email))); 
         return $this->request->redirect('/user/verifyMenu');
     }
 
@@ -278,7 +278,7 @@ class Controller_User extends Base_MainTemplate
 			}	
 			catch (Verification_Exceeds_Exception $e) 
 			{
-				$this->addError(__('auth.too_many_verification'));
+				$this->addError(__('Too many verification codes have been sent already! Please check your inbox again (or junk mail)'));
 				$this->template->content = "";
 				return;
 			}			

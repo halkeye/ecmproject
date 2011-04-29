@@ -329,8 +329,7 @@ class Controller_Admin extends Base_MainTemplate
             $this->addError('No purchase locations defined! Please define some locations before continuing.');
             $this->request->redirect('admin/createRegistration/');
         }
-
-			
+	
 		$passes = ORM::Factory('Pass')->where('convention_id', '=', $convention_id)->find_all()->as_array('id', 'name');
 
 		//Check if passes exist.
@@ -1265,7 +1264,7 @@ class Controller_Admin extends Base_MainTemplate
 	
     private function parseErrorMessages($e, $extra_e = NULL) {
         $errorMsg = 'Oops. You entered something bad! Please fix it! <br />';               
-        $errors = $e->errors('admin'); //Loads from directory specified by argument here.
+        $errors = $e->errors(''); //Loads from directory specified by argument here.
 		
 		//Add standard (ORM usually) errors.
         foreach ($errors as $error)	{
@@ -1314,8 +1313,7 @@ class Controller_Admin extends Base_MainTemplate
 		header("Content-type: text/plain");
 		print sprintf('%s-%02s-%04s', 'ECM', 1, 5);
 		exit;
-	}
-		    	
+	}	    	
     public function action_testClock() {
         header("Content-type: text/plain");
         print date("r");

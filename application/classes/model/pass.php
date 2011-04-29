@@ -5,7 +5,7 @@ class Model_Pass extends ORM
 	public $default_fields = array(
             'name' 				=> array( 'type'  => 'text', 	'label' => 'Pass Name', 	'required'=>true ),
             'price' 			=> array( 'type'  => 'text', 	'label' => 'Price', 		'required'=>true ),
-            'convention_id' 	=> array( 'type'  => 'select', 	'label' => 'Convention', 	'required'=>true ),
+            'convention_id' 	=> array( 'type'  => 'select', 	'label' => 'Event', 		'required'=>true ),
             'startDate' 		=> array( 'type'  => 'date', 	'label' => 'Start Date', 	'required'=>true ),
             'endDate'   		=> array( 'type'  => 'date', 	'label' => 'End Date', 		'required'=>true ),
             'isPurchasable'  	=> array( 'type'  => 'boolean', 'label' => 'Purchasable', 	'required'=>false),
@@ -39,6 +39,17 @@ class Model_Pass extends ORM
         'startDate' 		=> array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647', 'column_name' => 'startDate', 'column_default' => NULL, 'data_type' => 'int', 'is_nullable' => true, 'ordinal_position' => 6, 'display' => '11', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
         'endDate' 			=> array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647', 'column_name' => 'endDate', 'column_default' => NULL, 'data_type' => 'int', 'is_nullable' => true, 'ordinal_position' => 7, 'display' => '11', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',)
     );
+	
+	public function labels()
+	{
+		return array(
+			'name'  		=> 'Ticket Name',
+			'price' 		=> 'Price',
+			'isPurchasable' => 'Purchasable',
+			'startDate' 	=> 'Start Date',
+			'endDate' 		=> 'End Date',
+		);
+	}
 
 	public $tickets_total = -1;
 	

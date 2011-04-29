@@ -48,7 +48,7 @@ class Base_MainTemplate extends Controller_Template
                 if ($user->status != Model_Account::ACCOUNT_STATUS_VERIFIED)
                 {
                     $this->isVerifiedAccount = FALSE;
-                    $this->template->errors[] = __('ecmproject.not_validated');
+                    $this->template->errors[] = __('The email address associated with this account has <strong>NOT</strong> been validated yet.');
                     $this->addMenuItem(array('title'=>'Verify Account', 'url'=>'/user/verifyMenu'));
                 }
                 else
@@ -167,9 +167,9 @@ class Base_MainTemplate extends Controller_Template
 
     public function action_accessDenied()
     {
-        $this->template->title = __('auth.accessDenied_title');
-        $this->template->heading = __('auth.accessDenied_heading');
-        $this->template->subheading = __('auth.accessDenied_subheading');
+        $this->template->title = 		__('Access Denied');
+        $this->template->heading = 		__('Access Denied!');
+        $this->template->subheading = 	__('You may not pass.');
         $this->template->content = new View('global/accessDenied');
     }
 

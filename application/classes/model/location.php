@@ -13,10 +13,18 @@ class Model_Location extends ORM
 	);
 
 	public $formo_defaults = array(
-        'prefix' 	=> array( 'type'  => 'text', 	'label' => 'Pass', 			'required'	=> true, 'adminRequired'=>true    ),            
-        'location' 	=> array( 'type'  => 'text', 	'label' => 'Given Name', 	'required'	=> true, 'adminRequired'=>true 	  ),
+        'prefix' 	=> array( 'type'  => 'text', 	'label' => 'Prefix', 			'required'	=> true, 'adminRequired'=>true    ),            
+        'location' 	=> array( 'type'  => 'text', 	'label' => 'Location', 			'required'	=> true, 'adminRequired'=>true 	  ),
 	);
 
+	public function labels()
+	{
+		return array(
+			'prefix'  		=> 'Prefix',
+			'location' 		=> 'Location',
+		);
+	}
+	
 	public function find() 
 	{
 		$this->where('prefix', '!=', Model_Location::RESERVED_LOCATION);
