@@ -15,6 +15,7 @@ class Controller_Paypal extends Controller
         $p = new Paypal();
 
         $emailAddr = "";
+        $passes = array();
 
         try {
             $p->validateIPN();
@@ -52,7 +53,14 @@ class Controller_Paypal extends Controller
                 $emailAddr = $reg->account->email;
 
                 /* To make sure they paid the right one */
-                $reg->pass_id = $pass_id;
+                if ($reg->pass_id != $pass_id)
+                {
+                    $passes[$pass_id] = ORM::Factory('Pass', $pass_id);
+                    $reg->convention_id = $passes[$pass_id]->convention_id;
+                    $reg->convention = ORM::Factory('Convention', $reg->convention_id);
+                    $reg->pass_id = $pass_id;
+                    $reg->pass = $passes[$pass_id];
+                }
                 $reg->status = Model_Registration::STATUS_PAID;
 
                 $payment = ORM::Factory('payment');

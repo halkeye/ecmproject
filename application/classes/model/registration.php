@@ -124,9 +124,6 @@ class Model_Registration extends ORM
         $filters['endDate'] = array(
             array('strtotime'),
         );
-        $filters['pass_id'] = array(
-            array(array($this, '__update_convention_from_pass')),
-        );
         return $filters;
     }   
 	
@@ -155,12 +152,6 @@ class Model_Registration extends ORM
 		return ! (bool) ORM::Factory('Registration')->where('reg_id', '=', $value)->count_all();
 	} 
 
-	/* Filter callbacks */
-	public function __update_convention_from_pass($value) {
-        $pass = ORM::Factory('Pass')->where('passes.id','=',$value)->find();
-        $this->convention_id = $pass->convention_id;
-        return $value;
-    }
 	public function __determine_associated_account($value) {
 		if ( isset($this->email) && !empty($this->email) )
 		{
