@@ -25,7 +25,7 @@ class Controller_Convention extends Base_MainTemplate
 
     function action_index()
     {
-        $this->request->redirect('/convention/checkout');}
+        $this->request->redirect('/convention/checkout');
         return;
     }
 
