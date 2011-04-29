@@ -106,7 +106,7 @@ class Model_Registration extends ORM
     
 	public function save(Validation $validation = NULL) {
 		/* Re-resolve account id if email changes. Alternately, check for empty(account_id) && $this->_changed['email'] for a permanent lock once associated. */
-		if ($this->_changed['email']) {
+		if (@$this->_changed['email']) {
 			$this->__resolve_account($this->email);
 		}
 		return parent::save($validation);
@@ -144,7 +144,7 @@ class Model_Registration extends ORM
 	
 	/* Validation callbacks */
     public function __valid_pass($value) {
-		return (bool) ORM::Factory('Pass', $value)->where('convention_id', '=', $this->convention_id)->count_all();
+		return (bool) ORM::Factory('Pass')->where('passes.id','=',$value)->where('convention_id', '=', $this->convention_id)->count_all();
     }
 	public function __check_regID_availability($value) {
 		$changed = $this->_changed;
