@@ -224,6 +224,7 @@ class Controller_Convention extends Base_MainTemplate
 
         $reg->convention_id = $pass->convention->id;
         $reg->pass_id = $pass->id;
+        $reg->email = $this->auth->getAccount()->email;
         $reg->sname = $this->auth->getAccount()->sname;
         $reg->gname = $this->auth->getAccount()->gname;
 
