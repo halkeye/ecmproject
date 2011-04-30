@@ -274,3 +274,16 @@ table td.total {
 	padding: 2px 5px;
 	border: 0;
 }
+#content dl.success {
+	background-color: #66F59D;
+}
+#content dl.failure {
+	background-color: #F99;
+}
+#content dt {
+	font-weight: bold;
+	padding: 5px;
+}
+#content dd {
+	padding: 5px 20px;
+}

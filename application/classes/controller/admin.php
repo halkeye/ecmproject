@@ -1305,9 +1305,125 @@ class Controller_Admin extends Base_MainTemplate
 		}		
 		else if (empty($post['email'])) {
 			$extra_validation->rule('phone', 'not_empty');
-		}		
+		}	
 		
 		return $extra_validation;
+	}
+	public function action_import() {		
+		$pass_id = -1;
+		$import_success = array(); //Store reg_id's that were successfully imported.
+		$import_failure = array(); //Store reg_id's that were not imported (error).
+		
+		if ( $post = $this->request->post() ) {
+			
+			$validate = new Validation($_FILES);
+			$validate->rules('csv_file', array(
+					array('Upload::not_empty', NULL),
+					array('Upload::valid' , NULL),
+					array('Upload::size', array(':value','1M')),
+					array('Upload::type' , array(':value', array('csv') //Only checks by extension.
+					)),
+			));
+			
+			$pass_id = empty($post['pass_id']) ? -1 : $post['pass_id'];
+			$pass = $this->loadPass($post);	
+			
+			if ( $validate->check() && isset($_FILES['csv_file']) && $pass )
+			{			
+				$handle = fopen($_FILES['csv_file']['tmp_name'], 'rb');
+				$line = fgetcsv($handle);
+				
+				while ($line = fgetcsv($handle)) 
+				{
+					$reg = $this->generateReg($pass, $line);
+					$values = array('email' => $reg->email, 'phone' => $reg->phone);
+										
+					try {
+						if ( $reg->reserveTickets() ) { 
+							$reg->save( $this->validateEmailOrPhone($values) );
+							if ( !isset($import_success[$reg->email]) ) {
+								$import_success[$reg->email] = array();
+							}
+							array_push($import_success[$reg->email], $reg);
+							$reg->finalizeTickets();
+						}
+						else {
+							array_push($import_failure, implode(' | ', $line));
+						}
+					}            
+					catch (ORM_Validation_Exception $e)
+					{
+						//FIXME: Include errors in output.
+						$reg->releaseTickets();
+						array_push($import_failure, array('reg' => $reg, 'errors' => $e->errors('')));
+					}  
+				}
+				
+				fclose($handle);					
+				/* FIXME: Send an email per index. */
+			}
+			else if (!$pass) {
+				$this->addError('Not a valid ticket! Please select a valid ticket.');
+			}	
+			else
+			{
+				$this->addError('Not a valid file. Please try again.');
+			}
+		}
+			
+		if ( !empty($import_success) || !empty($import_failure) )
+		{
+			$this->template->content = new View('admin/UploadResults', array(
+				'import_success' => $import_success,
+				'import_failure' => $import_failure,
+			));
+		}
+		else {
+			$passes = ORM::Factory('registration')
+				->getPossiblePassesQuery()
+				->with('convention')
+				->find_all();
+		
+			$this->template->content = new View('admin/Upload', array(
+				'passes'		 => $passes,
+				'pass_id'		 => $pass_id,
+			));
+		}
+	}
+	private function generateReg($pass, $line) {
+		$reg = ORM::Factory('Registration');
+		if (count($line) < 5) {
+			return $reg;
+		}
+	
+		$name_components = explode(' ', $line[1]);
+		$gname_components = array_slice($name_components, 0, count($name_components) - 1);
+		$gname = implode(' ', $gname_components);					
+		$sname = $name_components [ count($name_components) - 1 ];
+	
+		
+		$reg->reg_id 		= $line[0];
+		$reg->convention_id = $pass->convention_id;  
+		$reg->pass_id 		= $pass->id; 		 	
+		$reg->gname 		= $gname; 				
+		$reg->sname 		= $sname;
+		$reg->email 		= $line[2];
+		$reg->phone 		= $line[3];
+		$reg->status 		= Model_Registration::STATUS_PAID;
+		return $reg;
+	}
+	private function loadPass($post) {
+		if ( !empty($post['pass_id']) ) {
+			$pass = ORM::Factory('Pass', $post['pass_id']);		
+			if ( $pass->loaded() ) {
+				return $pass;
+			}
+		}
+		return false;					
+	}
+	
+	public function action_testView() {
+		$this->template->content = new View('admin/UploadResults');
 	}
 	public function action_regID() {
 		header("Content-type: text/plain");
