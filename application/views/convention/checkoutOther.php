@@ -62,7 +62,7 @@ Canada <br />
 
 <p>
 If you are paying <strong>IN-PERSON</strong>, please bring in this printed page, your payment and parental consent if applicable. <br /><br />
-NOTE: The system will automatically update your registration status when payment is recieved and processed. Any questions or concerns may be directed to registration@animeevolution.com
+NOTE: The system will automatically update your registration status when payment is received and processed. Any questions or concerns may be directed to registration@animeevolution.com
 </p>
 
 </div>

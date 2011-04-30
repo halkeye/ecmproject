@@ -21,7 +21,7 @@
 </style>
 
 <h2>IRLEvents: Confirmation of Payment</h2>
-<p>This is to confirm that we have recieved your payment for the tickets listed below as of <strong>Monday, March 12th.</strong> Please double check the details below.</p> 
+<p>This is to confirm that we have received your payment for the tickets listed below as of <strong>Monday, March 12th.</strong> Please double check the details below.</p> 
 
 <?php
 
