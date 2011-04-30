@@ -191,6 +191,14 @@ table td.total {
 #content p.center {
 	text-align: center;
 }
+#content p.warning {
+	background-color: #F5E466;
+	border: 1px solid #D3BC0D;
+}
+#content p.warning img {
+	float: left;
+	margin: 5px 8px;
+}
 #content form {
 	padding: 5px 0px;
 }

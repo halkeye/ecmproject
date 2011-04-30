@@ -1,4 +1,8 @@
-<p>Select a ticket that you wish to purchase from the dropdown and click the <strong>[Add to Cart]</strong> button. You may add more than one ticket by repeating this process.</p>
+<p class='warning'><?php echo html::image(url::site('/static/img/warning.png', TRUE), array('alt' => 'WARNING')); ?><strong>The name shown above must match the name on the 
+Government ID you intend to use when picking up your tickets.</strong> If it does not match, please change it <strong>FIRST</strong> before adding anything to the cart as we will match against your ID.</p>
+<br />
+<p>
+Select a ticket that you wish to purchase from the dropdown and click the <strong>[Add to Cart]</strong> button. You may add more than one ticket by repeating this process. </p>
 
 <?php echo form::open(url::site('/convention/addRegistration', TRUE), array('method'=>'post')) . "\n"; ?>
 <fieldset>
@@ -109,4 +113,7 @@
 	?></td>
 </tr>
 <?php endif ?>
+
+<p><strong>Need to find your registration IDs?</strong> You can <?php echo html::anchor('/user/', __('view current/past registrations (including Registration IDs) on the My Accounts page'), null, null, true); ?>.</p>
+
 
