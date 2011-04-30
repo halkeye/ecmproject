@@ -1,5 +1,5 @@
-<p class='warning'><?php echo html::image(url::site('/static/img/warning.png', TRUE), array('alt' => 'WARNING')); ?><strong>The name shown above must match the name on the 
-Government ID you intend to use when picking up your tickets.</strong> If it does not match, please change it <strong>FIRST</strong> before adding anything to the cart as we will match against your ID.</p>
+<p class='warning'><?php echo html::image(url::site('/static/img/warning.png', TRUE), array('alt' => 'WARNING')); ?><strong>Please ensure that the name 
+you provide (shown above) is the same as written on your government ID. </strong> We will match the name provided here to the government ID you bring when picking up your ticket.</p>
 <br />
 <p>
 Select a ticket that you wish to purchase from the dropdown and click the <strong>[Add to Cart]</strong> button. You may add more than one ticket by repeating this process. </p>
