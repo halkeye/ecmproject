@@ -25,9 +25,12 @@
 	</tr>	
 	<tr>
 		<th><?php echo html::anchor(url::site('admin/export', TRUE), __('Export Registration Information (CSV)')) ?></th>
+		<th><?php echo html::anchor(url::site('admin/import', TRUE), __('Import (CSV)')) ?></th>
+
 	</tr>
 	<tr>
 		<td>Exports selected (or all) registration information for a particular event to a CSV file which can be opened in Excel.</td>
+		<td>Imports registration information from a user uploaded comma-separated values(CSV) file.</td>
 	</tr>
 </table>
 
