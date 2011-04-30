@@ -129,6 +129,7 @@ CREATE TABLE accounts_usergroups (
    account_id INT UNSIGNED,
    FOREIGN KEY (usergroup_id) REFERENCES usergroups(id) ON DELETE CASCADE, -- Users who were part of the delete group are removed from group.
    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE -- If account was deleted, makes sense to clear this.
+   UNIQUE (`usergroup_id`, `account_id`)
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
 
@@ -222,7 +223,7 @@ INSERT INTO ticketcounters (pass_id, tickets_assigned, tickets_total, next_id) V
 
 INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 1;
 INSERT INTO `accounts_usergroups` SET usergroup_id = 2, account_id = 2;
-INSERT INTO `accounts_usergroups` SET usergroup_id = 1, account_id = 3;
+INSERT INTO `accounts_usergroups` SET usergroup_id = 3, account_id = 3;
 
 INSERT INTO `locations` SET id = 1, prefix = 'ECM', location = 'Electronic Convention Management System';
 -- INSERT INTO `accounts_usergroups` SET usergroup_id = 1, account_id = 3;
