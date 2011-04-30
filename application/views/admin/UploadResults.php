@@ -19,7 +19,14 @@
 			
 			print '<dt>' . $reg->reg_id . "</dt>\n";
 			foreach($errors as $error) {
-				print '<dd>' . $error . '</dd>';
+				if ( is_array($error) ) {
+					foreach($error as $minime) {
+						print '<dd>' . $minime . '</dd>';
+					}
+				}
+				else {
+					print '<dd>' . $error . '</dd>';
+				}
 			}
 		}
 	?>

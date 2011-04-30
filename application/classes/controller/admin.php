@@ -1305,7 +1305,7 @@ class Controller_Admin extends Base_MainTemplate
 		}		
 		else if (empty($post['email'])) {
 			$extra_validation->rule('phone', 'not_empty');
-		}		
+		}	
 		
 		return $extra_validation;
 	}
@@ -1335,11 +1335,12 @@ class Controller_Admin extends Base_MainTemplate
 				
 				while ($line = fgetcsv($handle)) 
 				{
-					$reg = $this->generateReg($pass, $line);	
-					
+					$reg = $this->generateReg($pass, $line);
+					$values = array('email' => $reg->email, 'phone' => $reg->phone);
+										
 					try {
 						if ( $reg->reserveTickets() ) { 
-							$reg->save();
+							$reg->save( $this->validateEmailOrPhone($values) );
 							if ( !isset($import_success[$reg->email]) ) {
 								$import_success[$reg->email] = array();
 							}
@@ -1350,7 +1351,7 @@ class Controller_Admin extends Base_MainTemplate
 							array_push($import_failure, implode(' | ', $line));
 						}
 					}            
-					catch (Exception $e)
+					catch (ORM_Validation_Exception $e)
 					{
 						//FIXME: Include errors in output.
 						$reg->releaseTickets();
