@@ -125,5 +125,6 @@ switch ($fieldData['type'])
         echo form::input($field, $value, $attributes);
         break;
 }
+echo (empty ($errors[$field])) ? '' : '&nbsp;<p class="errormsg">'.$errors[$field].'</p>';
 ?>
 </div>

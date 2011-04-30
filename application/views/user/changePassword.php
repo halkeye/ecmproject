@@ -11,8 +11,7 @@ echo "<fieldset>";
 foreach (array('password', 'confirm_password') as $field)
 {
 	echo "<div>";
-    echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $form[$field], 'hasError'=>isset($errors[$field]) && $errors[$field], 'class' => 'inline'));
-	echo (empty ($errors[$field])) ? '' : '&nbsp<p class="errormsg">'.$errors[$field].'</p><br />';
+    echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $form[$field], 'hasError'=>isset($errors[$field]) && $errors[$field], 'class' => 'inline', 'errors' => $errors));
 	echo "</div>";
 }
 echo '</fieldset>';
