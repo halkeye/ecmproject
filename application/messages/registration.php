@@ -16,6 +16,7 @@ return array(
     ), 
 	'reg_id'		=> array(
 		'not_empty'		=> __('The registration ID specified is not valid.'),
+		'__check_regID_availability'	=> __('This registration ID is already used.'),
 	),
 ); 
 
