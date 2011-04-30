@@ -1067,13 +1067,12 @@ class Controller_Admin extends Base_MainTemplate
     * 
     * $age is a single value of either "all", "minor", "adult", or "none".
     */
-    private function doExport($cid, $passes, $status) {
-        $query = ORM::Factory('Registration');
-        
+    private function doExport($cid, $passes, $status) {        
         if ($cid == null || !is_numeric($cid)) {
             die('Get out of here!');    
         }
     
+		$query = ORM::Factory('Registration');
         if ($passes != null && is_array($passes) && count($passes) > 0)
         {
             $query = $query->where('registrations.pass_id', 'IN', $passes);
@@ -1086,35 +1085,36 @@ class Controller_Admin extends Base_MainTemplate
     
         //Lazy vs eager? We're going to use it all...get it all in one go.
         $results = $query->where("registrations.convention_id", '=', $cid)->with('pass')->with('account')->with('convention')->find_all();       
-        $csv_content = "";  
-        
+                 
+		/* Generate a header */
+		$csv_content = "Ticket Number,Name,Email,Phone Number,Event,Ticket,Payment Status\n"; //FIXME: Have it use values/labels in the Reg model instead.
+		
         /* Generate the content */
-        if (count($results) > 0)
-        {
-            $csv_content = $results[0]->getColumns() . "\n"; //Have it output actual column names...
-            foreach($results as $result):   
-                $temp = $result->as_array();
-                
-                /* Change to more meaningful values */
-                $temp['pass_id'] = $result->pass->name . ' ( $' . $result->pass->price . ' )';
-                $temp['account_id'] = $result->account->email;
-                $temp['convention_id'] = $result->convention->name;
-                $temp['status'] = $result->statusToString();       
-                
-                //$values = array_values($temp);    
-                //$csv_content .= implode(",", $values) . "\n";
-                $first = true;
-                foreach($temp as $value):
-                    if (!$first) 
-                        $csv_content .= ',';                        
-                    else 
-                        $first = false;
-                
-                    $csv_content .= "\"" . $value . "\"";
-                endforeach;
-                
-                $csv_content .= "\n";
-            endforeach;             
+		$convention_name = '';
+		$pass_names = array();
+		
+		foreach($results as $result) {		
+			/* Cache pass names */
+			if ( !array_key_exists($result->pass_id, $pass_names) ) {
+				$pass_names[$result->pass_id] = $result->pass->name;
+			}
+		
+			$temp = array( 
+					$result->reg_id, 
+					$result->gname . ' ' . $result->sname,
+					$result->email,
+					$result->phone,
+					empty($convention_name) ? $result->convention->name : $convention_name,
+					$pass_names[$result->pass_id],
+					$result->statusToString()
+			);
+			
+			/* In case of commas in field values ... */
+			foreach($temp as $value) {
+				$value = "\"" . $value . "\"";
+			}
+			
+			$csv_content .= implode(',', $temp) . "\n";				             
         }       
             
         $filename = 'Registrations_' . date("n_d_Y_G_H") . '.csv';
@@ -1127,6 +1127,8 @@ class Controller_Admin extends Base_MainTemplate
         exit;       
     }
 
+	
+	
 	/*
 	* Generic data listing method. Generates a list view with create/edit/delete actions based on the $entity name
 	* and a page number. 
