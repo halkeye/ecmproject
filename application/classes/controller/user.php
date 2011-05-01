@@ -97,7 +97,7 @@ class Controller_User extends Base_MainTemplate
                 $extra_validation->rule('password', 'matches', array(':validation', 'password', 'confirm_password'));
                 $account->save($extra_validation);
 
-                $vcode = $account->generateVerifyCode(Model_Verificationcode::TYPE_VALIDATE_EMAIL);
+                $vcode = $account->generateVerifyCode(Model_Verificationcode::TYPE_VALIDATE_EMAIL, '');
                 $account->sendValidateEmail($vcode->original_code);
 
                 $this->auth->complete_login($account);
@@ -113,7 +113,7 @@ class Controller_User extends Base_MainTemplate
                 // populate the error fields, if any
                 // We need to already have created an error message file, for Kohana to use
                 // Pass the error message file name to the errors() method
-				$error_list = $e->errors('form_error_messages');
+				$error_list = $e->errors('');
                 $errors = arr::overwrite($errors, $error_list);
 				
 				if ( !empty($error_list['_external']['password']) ) {
