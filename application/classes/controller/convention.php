@@ -190,27 +190,6 @@ class Controller_Convention extends Base_MainTemplate
         }
     }
     
-    public function action_checkoutOther()
-    {
-        $this->requireVerified();
-        $this->template->heading    = __('Purchase tickets (other)');
-        $this->template->subheading = __('Purchase tickets (other)'); 
-
-        $data = array();
-		
-		/* Fetch all registrations that are marked with status UNPROCESSED, or PARTIAL PAYMENT */
-		$data['registrations'] = ORM::Factory('Registration')->getForAccount($this->auth->getAccount()->id);
-		if (!$data['registrations']->count()) 
-        {
-            $this->addError(__('The cart is empty...'));
-			$this->request->redirect('user/index'); 
-            return;
-        }
-		
-        /* Our "checkout template" */
-        $this->template->content = new View('convention/checkoutOther', $data);
-    }
-
     public function action_addRegistration()
     {
         $reg = ORM::factory('registration');

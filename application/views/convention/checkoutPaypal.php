@@ -48,8 +48,4 @@ echo form::hidden("custom", implode('|', $regids));
 <?php
     echo form::submit('', Kohana::lang('convention.checkout_with_paypal')); 
     echo form::close();
-
-    echo form::open('/convention/checkoutOther', array('method'=>'get')); 
-    echo form::submit('', Kohana::lang('convention.checkout_with_other')); 
-    echo form::close();
-?>>
+?>
