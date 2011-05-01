@@ -10,8 +10,10 @@
 	<fieldset>		
 		<?php
 			foreach ($passes as $pass):
-				print form::label('p_' . $pass->id, $pass->name);	
-				print form::checkbox('p_' . $pass->id, $pass->name, TRUE);
+				print "<div>";
+				print form::label('p_' . $pass->id, $pass->name, array('class' => 'nosub'));	
+				print form::checkbox('p_' . $pass->id, $pass->name, TRUE, array('class' => 'checkbox'));
+				print "</div>";
 			endforeach;			
 		?>
 	</fieldset>
@@ -20,8 +22,10 @@
 	<fieldset>		
 		<?php
 			foreach ($status_values as $k => $v):
-				print form::label('s_' . $k, $v);
-				print form::checkbox('s_' . $k, $v, TRUE);			
+				print '<div>';
+				print form::label('s_' . $k, $v, array('class' => 'nosub'));
+				print form::checkbox('s_' . $k, $v, TRUE, array('class' => 'checkbox'));	
+				print '</div>';
 			endforeach;
 		?>
 	</fieldset>	

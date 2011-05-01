@@ -242,6 +242,9 @@ table td.total {
 	display: block;
 	width: 250px;
 }
+#content input.checkbox {
+	margin-left: 132px;
+}
 #content input.inline {
 	display: inline;
 	margin-bottom: 0;
