@@ -193,7 +193,7 @@ class Model_Registration extends ORM
 
 		return $this->ticket_next_id;
 	}
-	public function finalizeTickets($amount = 1) {
+	public function finalizeTickets($amount = 1, $incNextID = false) {
 		//Reserve tickets is not open. Do nothing (or throw an exception)
 		if (!$this->ticket_reserved) {
 			return;
@@ -204,7 +204,7 @@ class Model_Registration extends ORM
 		//If reserveTickets reserved 0, this query will change nothing. ticket_reserved/ticket_next_id fields are inaccessible from anywhere outside this class.
 		$allocate_query = DB::query(Database::UPDATE, 'UPDATE ticketcounters SET tickets_assigned = tickets_assigned + :alloc, next_id = next_id + :next_id WHERE pass_id = :pass_id');
 		$allocate_query->param(':alloc', $alloc);
-		$allocate_query->param(':next_id', $alloc); 
+		$allocate_query->param(':next_id', $incNextID ? $alloc : 0); 
 		$allocate_query->param(':pass_id', $this->pass_id);
 		$allocate_query->execute();
 		

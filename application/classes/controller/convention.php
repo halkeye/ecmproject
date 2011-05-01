@@ -239,7 +239,7 @@ class Controller_Convention extends Base_MainTemplate
             if ( $id ) { //Reserve tickets. Return at least 1 except in case of failure (not enough tickets left).
                 $reg->build_regID(array('comp_loc'=>'ECM', 'comp_id'=> $id), array('ECM') , $pass->convention_id);
                 $reg->save(); 
-                $reg->finalizeTickets(); //Save has gone through. Finalize reservation.
+                $reg->finalizeTickets(1, true); //Save has gone through. Finalize reservation. Added parameter if next_id is being used. FIXME to something more elegant.
                 $this->addMessage( __('Added the ticket, :name to the cart.', array(':name' => $reg->gname . ' '. $reg->sname) ));
             }
             else if ($reg->pass_id > 0) {					
