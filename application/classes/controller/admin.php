@@ -1350,12 +1350,11 @@ class Controller_Admin extends Base_MainTemplate
 							$reg->finalizeTickets();
 						}
 						else {
-							array_push($import_failure, implode(' | ', $line));
+							array_push($import_failure, array('reg' => $reg, 'errors' => array('No more tickets available.')));
 						}
 					}            
 					catch (ORM_Validation_Exception $e)
 					{
-						//FIXME: Include errors in output.
 						$reg->releaseTickets();
 						array_push($import_failure, array('reg' => $reg, 'errors' => $e->errors('')));
 					}  
@@ -1394,24 +1393,25 @@ class Controller_Admin extends Base_MainTemplate
 	}
 	private function generateReg($pass, $line) {
 		$reg = ORM::Factory('Registration');
-		if (count($line) < 5) {
-			return $reg;
-		}
-	
-		$name_components = explode(' ', $line[1]);
-		$gname_components = array_slice($name_components, 0, count($name_components) - 1);
-		$gname = implode(' ', $gname_components);					
-		$sname = $name_components [ count($name_components) - 1 ];
-	
-		
-		$reg->reg_id 		= $line[0];
+		$reg->reg_id  = $line[0]; 
 		$reg->convention_id = $pass->convention_id;  
-		$reg->pass_id 		= $pass->id; 		 	
-		$reg->gname 		= $gname; 				
-		$reg->sname 		= $sname;
-		$reg->email 		= $line[2];
-		$reg->phone 		= $line[3];
+		$reg->pass_id 		= $pass->id; 
 		$reg->status 		= Model_Registration::STATUS_PAID;
+
+		/* If this block is not executed, validation will fail on save() */
+		if (count($line) >= 5) {
+			$name_components = explode(' ', $line[1]);
+			$gname_components = array_slice($name_components, 0, count($name_components) - 1);
+			$gname = implode(' ', $gname_components);					
+			$sname = $name_components [ count($name_components) - 1 ];
+					
+			$reg->reg_id 		= $line[0];						
+			$reg->gname 		= $gname; 				
+			$reg->sname 		= $sname;
+			$reg->email 		= $line[2];
+			$reg->phone 		= $line[3];		
+		}
+		
 		return $reg;
 	}
 	private function loadPass($post) {

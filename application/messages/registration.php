@@ -18,6 +18,9 @@ return array(
 		'not_empty'		=> __('The registration ID specified is not valid.'),
 		'__check_regID_availability'	=> __('This registration ID is already used.'),
 	),
+	'pass_id'		=> array(
+		'__valid_pass'  => __('The pass chosen is not a valid pass.'),
+	),
 ); 
 
 ?>
