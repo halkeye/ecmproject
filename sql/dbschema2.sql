@@ -128,7 +128,7 @@ CREATE TABLE accounts_usergroups (
    usergroup_id INT UNSIGNED,
    account_id INT UNSIGNED,
    FOREIGN KEY (usergroup_id) REFERENCES usergroups(id) ON DELETE CASCADE, -- Users who were part of the delete group are removed from group.
-   FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE -- If account was deleted, makes sense to clear this.
+   FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE, -- If account was deleted, makes sense to clear this.
    UNIQUE (`usergroup_id`, `account_id`)
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
