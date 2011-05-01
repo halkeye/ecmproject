@@ -1337,6 +1337,11 @@ class Controller_Admin extends Base_MainTemplate
 				
 				while ($line = fgetcsv($handle)) 
 				{
+					$line[0] = trim($line[0]); //In the event of a blank row, there is only one element.
+					if (empty($line[0])) {
+						continue;
+					}
+					
 					$reg = $this->generateReg($pass, $line);
 					$values = array('email' => $reg->email, 'phone' => $reg->phone);
 										
