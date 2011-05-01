@@ -14,5 +14,5 @@
 
 <br />
 --<br />
-Anime Evolution Registration
-registration@animeevolution.com
+IRLEvents Registration
+contact@irlevents.com

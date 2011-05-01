@@ -3,7 +3,7 @@
 return array
 (
         'registration_success_message' => 'Successfully registered, Check email for validation link',
-        'outgoing_email_address'       => 'registration@irlevents.com',
+        'outgoing_email_address'       => 'contact@irlevents.com',
         'outgoing_email_name'          => 'IRL Events Registration',
 
         /* Subject Meessages */
@@ -15,7 +15,7 @@ return array
         'convention_name_short'        => 'IRL',
         'convention_forum_url'         => 'http://forum.irlevents.com',
         'convention_url'               => 'http://www.irlevents.com',
-        'convention_contact_email'     => 'registration@irlevents.com',
+        'convention_contact_email'     => 'contact@irlevents.com',
 
         'invalid_user_pass'            => 'Invalid Username or Password',
         'not_validated'                => 'Account is not verified. Please check your email for your validation link.',

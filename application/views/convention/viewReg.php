@@ -10,6 +10,6 @@
 </p>
 <p>
 Registrations that have had payment processed for can no longer be edited by the user. You can however view the details of the registration
-below. Should something need correcting, please contact registration@animeevolution.com.
+below. Should something need correcting, please contact contact@irlevents.com.
 </p>
 </div>
