@@ -140,7 +140,7 @@ class Base_MainTemplate extends Controller_Template
         if ($this->auth->is_logged_in() && !$this->isVerifiedAccount ) 
         {
             /* You can't go any furthur until email address is verified. */
-            $this->addError(__('auth.not_validated')); 
+            $this->addError(__('The email address associated to this account must be verified first.')); 
             $this->session->set('redirected_from',  $this->request->current());
             $this->request->redirect('/user/verifyMenu');
             return;
