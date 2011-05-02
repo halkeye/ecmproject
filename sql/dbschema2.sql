@@ -80,7 +80,7 @@ CREATE TABLE ticketcounters (
    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
    pass_id INT UNSIGNED NOT NULL,
    tickets_assigned INT UNSIGNED NOT NULL,
-   tickets_total INT UNSIGNED NOT NULL,
+   tickets_total INT NOT NULL,
    next_id INT UNSIGNED NOT NULL,
    FOREIGN KEY(pass_id) REFERENCES passes(id) ON DELETE CASCADE
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
