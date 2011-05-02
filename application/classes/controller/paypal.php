@@ -50,6 +50,7 @@ class Controller_Paypal extends Controller
                     continue;
                 }
 
+                $data['name'] = $reg->gname . ' ' . $reg->sname;
                 $emailAddr = $reg->account->email;
 
                 /* To make sure they paid the right one */
@@ -119,18 +120,19 @@ class Controller_Paypal extends Controller
         foreach ($regs as $reg)
         {
             $data['registrations'][$reg->convention->name][] = $reg;
+            $data['name'] = $reg->gname . ' ' . $reg->sname;
         }
 
         $view = new View('convention/reg_success', $data);
 
-        $email->message($view->render(),'text/html');
-        #$email->to($regs[0]->account->email);
+        $msg = $view->render();
+        /*
+        $email->message($msg,'text/html');
         $email->to("halkeye@gmail.com");
-        $email->to("stevetiu@gmail.com");
-        $email->to("stt@sfu.ca");
-        $email->to("gavinm@airg.com");
-        $email->to("g.mogan@telus.net");
-        $email->to("halkeye@shaw.ca");
         $email->send();
+        */
+
+        print $msg;
+        exit();
     }
 }
