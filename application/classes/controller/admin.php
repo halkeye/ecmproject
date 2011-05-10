@@ -1315,6 +1315,7 @@ class Controller_Admin extends Base_MainTemplate
 		$pass_id = -1;
 		$import_success = array(); //Store reg_id's that were successfully imported.
 		$import_failure = array(); //Store reg_id's that were not imported (error).
+        $reg_ids = array();
 		
 		if ( $post = $this->request->post() ) {
 			
@@ -1353,6 +1354,8 @@ class Controller_Admin extends Base_MainTemplate
 							}
 							array_push($import_success[$reg->email], $reg);
 							$reg->finalizeTickets();
+                            if (@$_POST['email_on_completion'])
+                                array_push($reg_ids, $reg->id);
 						}
 						else {
 							array_push($import_failure, array('reg' => $reg, 'errors' => array('No more tickets available.')));
@@ -1383,6 +1386,41 @@ class Controller_Admin extends Base_MainTemplate
 				'import_success' => $import_success,
 				'import_failure' => $import_failure,
 			));
+            
+            if (!empty($reg_ids) && @$_POST['email_on_completion'])
+            {
+                $config = Kohana::config('ecmproject');
+                $email = Email::factory($config['registration_subject']);
+                $email->from($config['outgoing_email_address'], $config['outgoing_email_name']);
+
+                $regs = ORM::Factory('Registration')
+                    ->where('registrations.id', 'IN', $reg_ids)
+                    ->with('convention')
+                    ->where('email', '!=', '')
+                    ->order_by('email')
+                    ->find_all();
+
+                $email = '';
+                $data = array();
+                foreach ($regs as $reg)
+                {
+                    if ($email != $reg->email)
+                    {
+                        if (count($data))
+                        {
+                            $this->email_imported_regs($email, $data);
+                        }
+                        $data = array();
+                    }
+                    $email = $reg->email;
+                    $data['registrations'][$reg->convention->name][] = $reg;
+                    $data['name'] = $reg->gname . ' ' . $reg->sname;
+                }
+                if (count($data))
+                {
+                    $this->email_imported_regs($email, $data);
+                }
+            }
 		}
 		else {
 			$passes = ORM::Factory('registration')
@@ -1394,8 +1432,23 @@ class Controller_Admin extends Base_MainTemplate
 				'passes'		 => $passes,
 				'pass_id'		 => $pass_id,
 			));
-		}
+        }
 	}
+
+    private function email_imported_regs($addr, $data)
+    {
+        $addr = str_replace(array('@','.'), '_', $addr);
+
+        $view = new View('convention/reg_success', $data);
+        $msg = $view->render();
+        
+        $config = Kohana::config('ecmproject');
+        $email = Email::factory($config['registration_subject']);
+        $email->from($config['outgoing_email_address'], $config['outgoing_email_name']);
+        $email->message($msg,'text/html');
+        $email->to("$addr@gavinmogan.com");
+        $email->send();
+    }
 	private function generateReg($pass, $line) {
 		$reg = ORM::Factory('Registration');
 		$reg->reg_id  = $line[0]; 
