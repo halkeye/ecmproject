@@ -1437,8 +1437,6 @@ class Controller_Admin extends Base_MainTemplate
 
     private function email_imported_regs($addr, $data)
     {
-        $addr = str_replace(array('@','.'), '_', $addr);
-
         $view = new View('convention/reg_success', $data);
         $msg = $view->render();
         
@@ -1446,7 +1444,7 @@ class Controller_Admin extends Base_MainTemplate
         $email = Email::factory($config['registration_subject']);
         $email->from($config['outgoing_email_address'], $config['outgoing_email_name']);
         $email->message($msg,'text/html');
-        $email->to("$addr@gavinmogan.com");
+        $email->to($addr);
         $email->send();
     }
 	private function generateReg($pass, $line) {
