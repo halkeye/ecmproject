@@ -61,7 +61,7 @@ For Any questions regarding Cos &amp; Effect, please email: contact@irlevents.co
 <li>Each ticket is redeemable for 1 (one) weekend pass wristband only. Wristbands must be worn on display at all times during the event as proof of purchase, while on convention grounds.</li>
 <li>Only the person who purchased the ticket may redeem it for a weekend pass wristband. The wristbands themselves are non-personalized and exchangable.</li>
 <li>IRL Events and the NPCs of Cos &amp; Effect may refuse admission or may expel from the convention grounds any person whose presence or conduct is deemed to be objectionable.</li>
-<li>IRL Events and the NPCs of Cos &amp; Effect is not lable for any injury or loss (whether or not caused by negligence) sustained to the holder of a weekend pass, or his/her property while on convention grounds.</li>
+<li>IRL Events and the NPCs of Cos &amp; Effect is not liable for any injury or loss (whether or not caused by negligence) sustained to the holder of a weekend pass, or his/her property while on convention grounds.</li>
 <li>This ticket has no cash value, and is non-refundable.</li>
 </ol>
 </p>
