@@ -453,10 +453,55 @@ class Controller_Admin extends Base_MainTemplate
 		$this->template->content = new View('admin/EditRegistration', array(
 			'row' => $post,
 			'fields' => $fields,
-			'callback' => "editRegistration/$rid"
+			'callback' => "editRegistration/$rid",
+			'emailCallback' => "editRegistration_sendEmail/$rid",
 		));
         
     }
+    function action_editRegistration_sendEmail($id)
+    {
+        $config = Kohana::config('ecmproject');
+        $email = Email::factory($config['registration_subject']);
+        $email->from($config['outgoing_email_address'], $config['outgoing_email_name']);
+
+        $regs = ORM::Factory('Registration')
+            ->where('registrations.id', '=', $id)
+            ->with('convention')
+            ->where('email', '!=', '')
+            ->order_by('email')
+            ->find_all();
+
+        $email = '';
+        $data = array();
+        $emails = array();
+        foreach ($regs as $reg)
+        {
+            if ($email != $reg->email)
+            {
+                if (count($data))
+                {
+                    $this->email_imported_regs($email, $data);
+                    array_push($emails, $email);
+                }
+                $data = array();
+            }
+            $email = $reg->email;
+            $data['registrations'][$reg->convention->name][] = $reg;
+            $data['name'] = $reg->gname . ' ' . $reg->sname;
+        }
+        if (count($data))
+        {
+            $this->email_imported_regs($email, $data);
+            array_push($emails, $email);
+        }
+        
+        $this->template->title = "Administration: Manage Accounts";
+        $this->template->heading = "Administration: Manage Accounts";
+        $this->template->subheading = "Resend out emails for registrations";
+                
+        $this->template->content = "Email successfully sent to to " . implode(', ', $emails);
+    }
+
 	function action_deleteRegistration($id = NULL) {
         Controller_Admin::__delete($id, 'Registration', 'deleteRegistration', 'manageRegistrations');
     }
