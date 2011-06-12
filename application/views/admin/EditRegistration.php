@@ -33,4 +33,12 @@
 		<button type="submit">Edit Registration</button>
 	</fieldset>							
 <?php echo form::close(); ?>
+<?php 	
+	View::set_global('field_lang_prefix', '');	
+	echo form::open("admin/$emailCallback"); 	
+?>
+	<fieldset>		
+		<button type="submit">Resend Email</button>
+	</fieldset>							
+<?php echo form::close(); ?>
 </div>
