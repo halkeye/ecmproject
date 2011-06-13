@@ -442,7 +442,7 @@ class Controller_User extends Base_MainTemplate
                 /* Send out verification Email */
                 $account->sendValidateEmail($vcode->original_code, 'lostPassword');
                 /* Tell the user what happened */
-                $this->addMessage(__('auth.lostPasswordSuccess'));				
+                $this->addMessage(__('Login link successfully sent to account.'));				
 				/* Redirect user to root page */
                 $this->request->redirect('user');
                 return;			
