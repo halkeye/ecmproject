@@ -72,6 +72,12 @@ switch ($fieldData['type'])
     case 'textarea':
         echo form::textarea(array('name'=>$field,'rows'=>4, 'cols'=>30), $value, $attributes);
         break;
+    case 'select_noblank':
+        $values = @$fieldData['values'];
+        if (!$values) $values = array();
+        asort($values);
+        echo form::select($field, $values, $value, $attributes);
+        break;
     case 'select':
         $values = @$fieldData['values'];
         if (!$values) $values = array();

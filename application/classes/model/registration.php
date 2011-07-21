@@ -45,6 +45,7 @@ class Model_Registration extends ORM
             'account_id'    => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true,                      ),
             'reg_id'        => array ( 'type' => 'string', 'length' => 25,                                               ),
             'status'      	=> array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                     ),
+            'pickupStatus'  => array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                     ),
     );
 
     public $formo_defaults = array(
@@ -53,6 +54,7 @@ class Model_Registration extends ORM
             'sname' 	=> array( 'type'  => 'text', 	'label' => 'Surname', 		'required'	=> true, 'adminRequired'=>true    ),
 			'phone' 	=> array( 'type'  => 'text', 	'label' => 'Phone', 													  ),
 			'status'	=> array( 'type'  => 'select',  'label' => 'Status',		'required'	=> true							  ),
+            'pickupStatus'	=> array( 'type'  => 'select_noblank','label' => 'Pickup Status',		'required'	=> true							  ),
 			'email' 	=> array( 'type'  => 'text', 	'label' => 'Email', 												      ),          
 			/*
             'badge' => array( 'type'  => 'text', 'label' => 'Badge', 'required'=>true    ),

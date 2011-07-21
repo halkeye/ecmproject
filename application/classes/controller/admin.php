@@ -415,6 +415,10 @@ class Controller_Admin extends Base_MainTemplate
 		$fields = $reg->formo_defaults; 
 		$fields['convention_name'] = ORM::Factory('Convention', $reg->convention_id)->name;
 		$fields['status']['values']	 = Model_Registration::getStatusValues();	
+        $fields['pickupStatus']['values'] = array(
+            0 => __("Not Picked Up"), 
+            1 => __("Picked Up"),
+        );
 		$passes = ORM::Factory('Pass')->where("convention_id", '=', $reg->convention_id)->find_all()->as_array('id', 'name'); 	
 		
         //Check if passes exist.
