@@ -1486,7 +1486,22 @@ class Controller_Admin extends Base_MainTemplate
 
     private function email_imported_regs($addr, $data)
     {
-        $view = new View('convention/reg_success', $data);
+        $template_suffix = "";
+        if ($data['registrations'])
+        {
+            $registrations = array_values($data['registrations']);
+            list($prefix, $convention, $id) = explode("-", $registrations[0][0]->reg_id);
+            if ($prefix)
+                $template_suffix = "_$prefix";
+        }
+        try {
+            $view = new View('convention/reg_success'.$template_suffix, $data);
+        }
+        catch (Kohana_View_Exception $e)
+        {
+            $view = new View('convention/reg_success', $data);
+        }
+
         $msg = $view->render();
         
         $config = Kohana::config('ecmproject');
