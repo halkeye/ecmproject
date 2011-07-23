@@ -1393,6 +1393,7 @@ class Controller_Admin extends Base_MainTemplate
 					}
 					
 					$reg = $this->generateReg($pass, $line);
+                    if (!$reg->pickupStatus) { $reg->pickupStatus = 0; }
 					$values = array('email' => $reg->email, 'phone' => $reg->phone);
 										
 					try {
@@ -1472,8 +1473,7 @@ class Controller_Admin extends Base_MainTemplate
             }
 		}
 		else {
-			$passes = ORM::Factory('registration')
-				->getPossiblePassesQuery()
+			$passes = ORM::Factory('pass')
 				->with('convention')
 				->find_all();
 		
