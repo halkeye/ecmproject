@@ -42,7 +42,7 @@ foreach (array_keys($registrations) as $convention_name) {
 ?>
 
 <p>Instead of using personalized badges, Cos &amp; Effect will use non-personalized convention wristbands as proof of purchase. To redeem this digital ticket for a convention pass wristband, just bring this printed email to the Info Booth at Cos &amp; Effect, and we'll exchange it for your convention pass wristband. The Info Booth will open for wrist band pickup at 9am on Saturday August 13th, in the concourse of the main floor of the Student Union Building at UBC.</p>
-<p>Please note that only Artist Alley passes may be picked up at the Info Boo</p>
+<p>Please note that only Artist Alley passes may be picked up at the Info Booth. Regularly purchased passes must be picked up from the ticket booth in the South Side Lounge.</p>
 
 <p>
 Artist Alley Hours of Operation:<br/>
