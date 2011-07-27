@@ -4,8 +4,9 @@ class Model_Registration extends ORM
 {
     const STATUS_UNPROCESSED = 0; // Payment has not been sent yet (or received if mail-in)
     const STATUS_PROCESSING  = 1; // Waiting for Paypal to respond, mail-in/in-person payment is in limbo.
-	const STATUS_NOT_ENOUGH	 = 2; // Payment received is not enough to pay cost of pass.
-	const STATUS_FAILED		 = 98; //Registration no longer valid (cancelled, refunded, etc).
+    const STATUS_NOT_ENOUGH  = 2; // Payment received is not enough to pay cost of pass.
+    const STATUS_REFUNDED    = 97; // We've refunded the ticket. No longer valid
+    const STATUS_FAILED	     = 98; // Registration no longer valid (cancelled, refunded, etc).
     const STATUS_PAID        = 99; // Fully working and paid
     
     protected $_ignored_columns = array('agree_toc', 'unique_badge', 'comp_cid', 'comp_loc', 'comp_id');
@@ -249,6 +250,7 @@ class Model_Registration extends ORM
 		$status_values[Model_Registration::STATUS_PAID] = 'PAID';
 		$status_values[Model_Registration::STATUS_NOT_ENOUGH] = 'PARTIAL PAYMENT';
 		$status_values[Model_Registration::STATUS_FAILED] = 'FAILED';
+		$status_values[Model_Registration::STATUS_REFUNDED] = 'REFUNDED';
 		return $status_values;
 	}
 	public function toString() {
@@ -331,19 +333,10 @@ class Model_Registration extends ORM
 	}	
 	
 	public function statusToString() 
-    {
-		if ($this->status == Model_Registration::STATUS_UNPROCESSED)
-			return 'UNPROCESSED';
-		else if ($this->status == Model_Registration::STATUS_PROCESSING )
-			return 'PROCESSING';
-		else if ($this->status == Model_Registration::STATUS_PAID)
-			return 'PAID';
-		else if ($this->status == Model_Registration::STATUS_NOT_ENOUGH)
-			return 'PARTIAL PAYMENT';
-		else if ($this->status == Model_Registration::STATUS_FAILED)
-			return 'CANCELLED';
-		else
-			return 'IN LIMBO';
+        {
+		$values = $this->getStatusValues();
+		if (isset($values[$this->status])) { return $values[$this->status]; };
+		return 'IN LIMBO';
 	}
 	
 	public function getColumns()
