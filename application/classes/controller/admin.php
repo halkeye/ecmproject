@@ -1136,7 +1136,7 @@ class Controller_Admin extends Base_MainTemplate
         $results = $query->where("registrations.convention_id", '=', $cid)->with('pass')->with('account')->with('convention')->find_all();       
                  
 		/* Generate a header */
-		$csv_content = "Ticket Number,Name,Email,Phone Number,Event,Ticket,Payment Status\n"; //FIXME: Have it use values/labels in the Reg model instead.
+		$csv_content = "Ticket Number,Name,Email,Phone Number,Event,Ticket,Payment Status,Pickup Status\n"; //FIXME: Have it use values/labels in the Reg model instead.
 		
         /* Generate the content */
 		$convention_name = '';
@@ -1155,7 +1155,8 @@ class Controller_Admin extends Base_MainTemplate
 					$result->phone,
 					empty($convention_name) ? $result->convention->name : $convention_name,
 					$pass_names[$result->pass_id],
-					$result->statusToString()
+                    $result->statusToString(), 
+                    $result->pickupToString(),
 			);
 			
 			/* In case of commas in field values ... */

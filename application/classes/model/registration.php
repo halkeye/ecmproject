@@ -333,10 +333,17 @@ class Model_Registration extends ORM
 	}	
 	
 	public function statusToString() 
-        {
+    {
 		$values = $this->getStatusValues();
 		if (isset($values[$this->status])) { return $values[$this->status]; };
 		return 'IN LIMBO';
+	}
+
+	public function pickupToString() 
+    {
+        if ($this->pickupStatus())
+            return __("Picked Up"); 
+        return __("Not Picked Up"); 
 	}
 	
 	public function getColumns()
