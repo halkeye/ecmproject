@@ -341,7 +341,7 @@ class Model_Registration extends ORM
 
     public function pickupToString() 
     {
-        if ($this->pickupStatus())
+        if ($this->pickupStatus)
             return __("Picked Up"); 
         return __("Not Picked Up"); 
     }
