@@ -112,6 +112,12 @@ class Model_Registration extends ORM
         if (@$this->_changed['email']) {
             $this->__resolve_account($this->email);
         }
+		
+		/* If pickup status is unset, set pickup status to not picked up (0). */
+		if ( !empty($this->pickupStatus) || !is_numeric($this->pickupStatus) ) {
+			$this->pickupStatus = 0;
+		}
+		
         return parent::save($validation);
     }
     

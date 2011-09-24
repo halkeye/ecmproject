@@ -57,7 +57,7 @@ class Controller_Convention extends Base_MainTemplate
 				
 		if ($post = $this->request->post())
         {
-			if ($val = $post['Yes'])
+			if ( isset($post['Yes']) && $post['Yes'] )
 			{
 				if ($reg->delete())
 				{
