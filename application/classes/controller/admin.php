@@ -322,8 +322,13 @@ class Controller_Admin extends Base_MainTemplate
             $this->request->redirect('admin/createRegistration/');
         }
         
-        $fields = $reg->formo_defaults;        
-        $locations = ORM::Factory('Location')->find_all()->as_array('prefix', 'prefix');
+        $fields = $reg->formo_defaults;               
+		$fields['pickupStatus']['values'] = array(
+            0 => __("Not Picked Up"), 
+            1 => __("Picked Up"),
+        );
+		
+		$locations = ORM::Factory('Location')->find_all()->as_array('prefix', 'prefix');
         if ( !$locations )
         {
             $this->addError('No purchase locations defined! Please define some locations before continuing.');
