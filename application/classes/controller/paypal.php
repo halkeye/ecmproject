@@ -59,6 +59,11 @@ class Controller_Paypal extends Controller
                     $reg->pass_id = $pass_id;
                     $reg->pass = $passes[$pass_id];
                 }
+				/* ...if the right one, ensure that we load the pass in to the passes array so we can use it's information later (price) */
+				else if (!isset($passes[$pass_id]))
+				{
+					$passes[$pass_id] = ORM::Factory('Pass', $pass_id);
+				}
 
                 $payment = ORM::Factory('payment');
                 $payment->payer_id = $data['payer_id'];
@@ -79,11 +84,20 @@ class Controller_Paypal extends Controller
 
                 if (strtolower($data['payment_status']) == 'completed')
                 {
-                    $reg->status = Model_Registration::STATUS_PAID;
-                    
-                    $data['name'] = $reg->gname . ' ' . $reg->sname;
-                    $emailAddr = $reg->account->email;
-                    $data['registrations'][$reg->convention->name][] = $reg;
+					//Normalize.
+					$payment = floatval($payment->mc_gross);
+					$pass_price = floatval($passes[$pass_id]->price);
+
+					if ( $payment >= $pass_price ) {		
+						$reg->status = Model_Registration::STATUS_PAID;
+						
+						$data['name'] = $reg->gname . ' ' . $reg->sname;
+						$emailAddr = $reg->account->email;
+						$data['registrations'][$reg->convention->name][] = $reg;
+					}
+					else {
+						$reg->status = Model_Registration::STATUS_NOT_ENOUGH;
+					}
                 }
                 else if ($reg->status == Model_Registration::STATUS_UNPROCESSED)
                 {
