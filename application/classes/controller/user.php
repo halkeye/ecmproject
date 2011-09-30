@@ -405,16 +405,6 @@ class Controller_User extends Base_MainTemplate
 		$this->template->content = new View('user/changeName', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
 	}
 	
-    function _findAccount(Validation $array, $field)
-    {
-        $exists = (bool)ORM::Factory('Account')
-            ->where('email', $array[$field])
-            ->count_all();
-
-        if (!$exists)
-            $array->add_error($field, 'email_not_exists' );
-    }
-
     function action_lostPassword()
     {
         /* Set page title */
@@ -422,29 +412,23 @@ class Controller_User extends Base_MainTemplate
         $this->template->heading = 		__('Password Recovery');
         $this->template->subheading = 	__('Send a password recovery email to yourself...');
 
-        /* Get logged in account */
-        $account = $this->auth->getAccount();
+        /* Get logged in account - is there a point in doing this? It's just going to get overwritten below. */
+        //$account = $this->auth->getAccount();
         
         $fields = ORM::Factory('Account')->default_fields;
         $form = array('email' => '');
         $errors = array();
 
-        if ($post = $this->request->post())
-        {
-            $post = new Validation($this->request->post());
-            // uses PHP trim() to remove whitespace from beginning and end of all fields before validation
-            $post->pre_filter('trim');
+        if ( $post = $this->request->post() )
+        {			
+			//Query builder escapes parameters. 
+            $account = ORM::Factory('Account')
+				->where( 'email', '=', trim ( $post['email'] ))
+				->find();
 
-            $post->add_rules('email', 'required', array('valid', 'email'));
-            $post->add_callbacks('email', array($this, '_findAccount'));
-
-            if ( $post->validate())
-            {
-                $account = ORM::Factory('Account')
-                    ->where('email', $post['email'])
-                    ->find();
-
-                /* Generate new code */
+			if ( $account->loaded() ) 	
+			{
+				/* Generate new code */
                 try {
                     $vcode           = $account->generateVerifyCode(Model_Verificationcode::TYPE_LOST_PASSWORD, $post['email']);
                 }
@@ -458,18 +442,19 @@ class Controller_User extends Base_MainTemplate
                 /* Send out verification Email */
                 $account->sendValidateEmail($vcode->original_code, 'lostPassword');
                 /* Tell the user what happened */
-                $this->addMessage(__('auth.lostPasswordSuccess'));
-                /* Show empty page */
-                $this->template->content = "";
-                return;
-            }
-            else
-            {
-                $errors = $post->errors();
-            }
+                $this->addMessage(__('Login link successfully sent to account.'));				
+				/* Redirect user to root page */
+                $this->request->redirect('user');
+                return;			
+			}
+			else
+			{
+				//Do generic error here.
+				$this->addError('Sorry, but there is no account associated with the email you provided.');
+			}
             
-            $form = arr::overwrite($form, $post->as_array());
-            $errors = $post->errors('form_error_messages');
+            $form = arr::overwrite($form, $post);
+            //$errors = $post->errors('form_error_messages');
         }
         $this->template->content = new View('user/lostPassword', array('form'=>$form, 'errors'=>$errors, 'fields'=>$fields));
     }

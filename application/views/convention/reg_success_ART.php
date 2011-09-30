@@ -20,7 +20,7 @@
 	}
 </style>
 
-<p>Congratulations <?php echo HTML::chars($name); ?> You have completed purchasing a ticket for Cos &amp; Effect 2011.</p>
+<p>Congratulations <?php echo HTML::chars($name); ?>, and welcome to the Artist Alley at Cos &amp; Effect 2011. Please see <a href="http://irlevents.com/coseffect/2011/ce2011_maps_artistalley01b.pdf">the map of the Artist Alley room</a>, with your name detailing what table you will be at.</p>
 <p>Here are your ticket details:</p>
 <?php
 foreach (array_keys($registrations) as $convention_name) {
@@ -41,9 +41,21 @@ foreach (array_keys($registrations) as $convention_name) {
 
 ?>
 
-<p>Instead of using personalized badges, Cos &amp; Effect will use non-personalized convention wristbands as proof of purchase. To redeem this digital ticket for a convention pass wristband, just bring your ticket number and government ID to the ticket booth at Cos & Effect, and we'll give you your convention pass wristband! The ticket booth will open for wrist band pick up at 9am on Saturday August 13th in the South Side Lounge of the Student Union Building at UBC.</p>
+<p>Instead of using personalized badges, Cos &amp; Effect will use non-personalized convention wristbands as proof of purchase. To redeem this digital ticket for a convention pass wristband, just bring this printed email to the Info Booth at Cos &amp; Effect, and we'll exchange it for your convention pass wristband. The Info Booth will open for wrist band pickup at 9am on Saturday August 13th, in the concourse of the main floor of the Student Union Building at UBC.</p>
+<p>Please note that only Artist Alley passes may be picked up at the Info Booth. Regularly purchased passes must be picked up from the ticket booth in the South Side Lounge.</p>
 
-<p>Please ensure that the name attached to your ticket is the same as is written on your government ID. We will match the name provided here to the government ID you bring when picking up your ticket. You must bring government issued ID in order to redeem your ticket for your convention pass wristband. High School students may bring picture student ID if they do not have a government issued ID card.</p>
+<p>
+Artist Alley Hours of Operation:<br/>
+Saturday: 9:00am to 10:00am (Artist's setup / chance to meet your peers)<br/>
+Saturday: 10:00am - 6:00pm (Open to public, artists are expected to run their tables during this time)<br/>
+Saturday: 6:00pm - 9:00pm (Optional hours of operation, artists may run their tables late during this time)<br/>
+Saturday: 9:00pm *closed* (Doors will be locked)<br/>
+<br/>
+Sunday: 9:00am to 10:00am (Artist's setup / chance to meet your peers)<br/>
+Sunday: 10:00am - 4:00pm (Open to public, artists are expected to run their tables during this time)<br/>
+Sunday: 4:00pm - 5:00pm (Optional hours of operation, artists may run their tables late during this time)<br/>
+Sunday: 5:00pm *closed* (Doors will be locked)<br/>
+</p>
 
 <p>Cos &amp; Effect 2011 - August 13-14<br/>
 University of British Columbia - Student Union Building<br/>

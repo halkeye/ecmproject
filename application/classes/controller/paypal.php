@@ -50,9 +50,6 @@ class Controller_Paypal extends Controller
                     continue;
                 }
 
-                $data['name'] = $reg->gname . ' ' . $reg->sname;
-                $emailAddr = $reg->account->email;
-
                 /* To make sure they paid the right one */
                 if ($reg->pass_id != $pass_id)
                 {
@@ -62,7 +59,6 @@ class Controller_Paypal extends Controller
                     $reg->pass_id = $pass_id;
                     $reg->pass = $passes[$pass_id];
                 }
-                $reg->status = Model_Registration::STATUS_PAID;
 
                 $payment = ORM::Factory('payment');
                 $payment->payer_id = $data['payer_id'];
@@ -79,11 +75,22 @@ class Controller_Paypal extends Controller
                 $payment->payment_type = 'paypal';
                 $payment->save();
 
-                $reg->save();
-
                 Kohana::$log->add(Log::NOTICE,"[PAYPAL] Finished $count - $reg_id/$pass_id");
-                
-                $data['registrations'][$reg->convention->name][] = $reg;
+
+                if (strtolower($data['payment_status']) == 'completed')
+                {
+                    $reg->status = Model_Registration::STATUS_PAID;
+                    
+                    $data['name'] = $reg->gname . ' ' . $reg->sname;
+                    $emailAddr = $reg->account->email;
+                    $data['registrations'][$reg->convention->name][] = $reg;
+                }
+                else if ($reg->status == Model_Registration::STATUS_UNPROCESSED)
+                {
+                    $reg->status = Model_Registration::STATUS_PROCESSING;
+                }
+
+                $reg->save();
             }
 
         }
@@ -92,7 +99,7 @@ class Controller_Paypal extends Controller
             exit();
         }
         
-        if ($emailAddr)
+        if ($emailAddr && count($data['registrations']))
         {
             $view = new View('convention/reg_success', $data);
 

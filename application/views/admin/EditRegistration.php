@@ -21,7 +21,7 @@
 		<?php	
 			echo Form::hidden('convention_id', $fields['convention_id']);	
 			
-			foreach (array('gname', 'sname', 'email', 'phone', 'status') as $field)
+			foreach (array('gname', 'sname', 'email', 'phone', 'status', 'pickupStatus') as $field)
 			{							
                 $fields[$field]['required'] = @$fields[$field]['adminRequired'];
 				echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $row[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
@@ -31,6 +31,14 @@
 	
 	<fieldset>		
 		<button type="submit">Edit Registration</button>
+	</fieldset>							
+<?php echo form::close(); ?>
+<?php 	
+	View::set_global('field_lang_prefix', '');	
+	echo form::open("admin/$emailCallback"); 	
+?>
+	<fieldset>		
+		<button type="submit">Resend Email</button>
 	</fieldset>							
 <?php echo form::close(); ?>
 </div>

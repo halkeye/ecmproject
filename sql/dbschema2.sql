@@ -71,6 +71,7 @@ CREATE TABLE registrations (
    phone VARCHAR(25),
    reg_id CHAR(25) NOT NULL UNIQUE, -- [Event ID]_[Sale Prefix]_[ID #] corresponds to 10_5_10 -> 25 characters where length 5 sale prefix is a chosen number.
    status TINYINT NOT NULL, -- Status of registration?
+   pickupStatus TINYINT NOT NULL,
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE RESTRICT, -- Events shouldn't be deleted if in use already.
    FOREIGN KEY (pass_id) REFERENCES passes(id) ON DELETE RESTRICT, -- Ticket types shouldn't be deleted if in use already.
    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE SET NULL -- Even if an account is deleted, leave registrations for stat purposes. (necessary?)
@@ -233,3 +234,6 @@ INSERT INTO `locations` SET id = 1, prefix = 'ECM', location = 'Electronic Conve
 /*!40000 ALTER TABLE `accounts_usergroups` ENABLE KEYS */;
 /*!40000 ALTER TABLE `permissions` ENABLE KEYS */;
 /*!40000 ALTER TABLE `usergroups_permissions` ENABLE KEYS */;
+
+
+alter table registrations add pickupStatus tinyint(4) not null default 0;

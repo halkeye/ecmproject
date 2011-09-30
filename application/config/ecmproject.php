@@ -3,7 +3,7 @@
 return array
 (
         'registration_success_message' => 'Successfully registered, Check email for validation link',
-        'outgoing_email_address'       => 'contact@irlevents.com',
+        'outgoing_email_address'       => 'tickets@irlevents.com',
         'outgoing_email_name'          => 'IRL Events Registration',
 
         /* Subject Meessages */

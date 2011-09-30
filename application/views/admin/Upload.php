@@ -22,6 +22,16 @@ Likewise, the event that the ticket belongs to will be associated to the registr
 	//Format this section.
 	echo Form::file('csv_file');
 	echo "<br />";
+?>
+<h3>Email registrations</h3>
+<p>Email the user with the standard template upon successful import.</p>
+
+<?php
+	echo Form::checkbox('email_on_completion');
+?>
+
+<?php
+	echo "<br />";
 	echo Form::submit(NULL, 'Import', array('class' => 'submit'));
 	echo Form::close();		
 ?>		
