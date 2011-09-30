@@ -220,7 +220,7 @@ class Model_Registration extends ORM
 		//(TEMP) Fix issue #17. Ticket registration needs to be re-thought of. 
 		//Lock-less approach: select next_id, create reg ID, attempt insert. If failure, repeat process. 
 		$allocate_query = DB::query(Database::UPDATE, 
-			'UPDATE ticketcounters SET next_id = next_id + :next_id WHERE pass_id IN (SELECT pass_id from passes where convention_id = :convention_id)');
+			'UPDATE ticketcounters SET next_id = next_id + :next_id WHERE pass_id IN (SELECT id from passes where convention_id = :convention_id)');
 		$allocate_query->param(':next_id', $incNextID ? $alloc : 0);
 		$allocate_query->param(':convention_id', $this->convention_id);
 		$allocate_query->execute();
