@@ -17,7 +17,7 @@ Likewise, the event that the ticket belongs to will be associated to the registr
 ?>
 <br /><br />
 <h3>Select CSV File to import data from</h3>
-<p>CSV File that is defined in the following format: Registration ID, Name, Email, Phone Number, Emailed. Extra columns beyond email will be ignored.</p>
+<p>CSV File that is defined in the following format: Registration ID, Name, Email, Phone Number, Date of Birth, Emailed. Extra columns beyond email will be ignored.</p>
 <?php
 	//Format this section.
 	echo Form::file('csv_file');

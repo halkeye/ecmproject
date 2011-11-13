@@ -211,7 +211,18 @@ class Controller_Convention extends Base_MainTemplate
         $reg->phone = $this->auth->getAccount()->phone;
         $reg->account_id = $this->auth->getAccount()->id;
         $reg->status = Model_Registration::STATUS_UNPROCESSED;
-
+		
+		//If DOB is required, then set DOB in reg model. (Hello nulls. One day I will fix this.).
+		if ( !empty($_POST['dob']) && $pass->requireDOB && is_numeric(str_replace('-', "", $_POST['dob'])) )
+		{
+			$reg->dob = $_POST['dob'];
+		}
+		else if ($pass->requireDOB)
+		{
+			$this->addError("Oops. No date of birth when one was expected.");
+			$this->request->redirect('/convention/checkout'); 			
+		}
+		
         try {
 
             $id = $reg->reserveTickets(1);

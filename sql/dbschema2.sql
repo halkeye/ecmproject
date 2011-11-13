@@ -57,6 +57,7 @@ CREATE TABLE passes (
    startDate INT,
    endDate INT,
    isPurchasable TINYINT NOT NULL,
+   requireDOB TINYINT NOT NULL
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE CASCADE -- Cascade deletion of passes. Will (should) still fail if registrations have started.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
@@ -69,6 +70,7 @@ CREATE TABLE registrations (
    sname VARCHAR(55) NOT NULL, -- Surname
    email VARCHAR(55),
    phone VARCHAR(25),
+   dob	 DATE,
    reg_id CHAR(25) NOT NULL UNIQUE, -- [Event ID]_[Sale Prefix]_[ID #] corresponds to 10_5_10 -> 25 characters where length 5 sale prefix is a chosen number.
    status TINYINT NOT NULL, -- Status of registration?
    pickupStatus TINYINT NOT NULL,

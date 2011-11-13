@@ -37,6 +37,7 @@ body {
 	background-color: #20232B; 
 	font-family: "Lucida Grande", "Trebuchet MS";
 	line-height: 1;
+	font-size: 12px;
 }
 ol, ul {
 	list-style: none;
@@ -109,6 +110,7 @@ table td.total {
 	width: 1024px; 
 	margin: 20px auto;
 	background-color: #FFF;
+	font-size: 16px;
 }
 #menu {
 	padding: 8px 0px;
@@ -297,4 +299,13 @@ table td.total {
 }
 #content dd {
 	padding: 5px 20px;
+}
+#dialog p {
+	font-family: "Lucida Grande", "Trebuchet MS";
+}
+
+#dialog .validateTips {
+	padding: 5px 0px;
+	margin: 5px 0px;
+	color: #F00;
 }

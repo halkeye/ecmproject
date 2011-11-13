@@ -5,7 +5,11 @@
 <head> 
 <title>Electronic Convention Management (ECM)<?php echo $title ? "::$title" : "" ?></title> 
 <?php {
-    echo HTML::style(url::site('static/css/main2.css',TRUE), NULL, TRUE);
+    echo HTML::style(url::site('static/css/main2.css',TRUE), NULL, TRUE) . "\n";
+	echo HTML::style(url::site('static/css/jquery-ui.css', TRUE), NULL, TRUE) . "\n";
+	echo HTML::script(url::site('static/js/jquery.js',TRUE), NULL, TRUE) . "\n";
+	echo HTML::script(url::site('static/js/jquery-ui.js',TRUE), NULL, TRUE) . "\n";
+	
     foreach (Assets::getCSS() as $style)
         echo HTML::style(url::site("static/css/$style",TRUE), NULL, TRUE);
     foreach (Assets::getJS() as $js)

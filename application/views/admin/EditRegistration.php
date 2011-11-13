@@ -21,7 +21,7 @@
 		<?php	
 			echo Form::hidden('convention_id', $fields['convention_id']);	
 			
-			foreach (array('gname', 'sname', 'email', 'phone', 'status', 'pickupStatus') as $field)
+			foreach (array('gname', 'sname', 'email', 'phone', 'dob', 'status', 'pickupStatus') as $field)
 			{							
                 $fields[$field]['required'] = @$fields[$field]['adminRequired'];
 				echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $row[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));

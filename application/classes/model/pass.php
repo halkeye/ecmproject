@@ -9,6 +9,7 @@ class Model_Pass extends ORM
             'startDate' 		=> array( 'type'  => 'date', 	'label' => 'Start Date', 	'required'=>true ),
             'endDate'   		=> array( 'type'  => 'date', 	'label' => 'End Date', 		'required'=>true ),
             'isPurchasable'  	=> array( 'type'  => 'boolean', 'label' => 'Purchasable', 	'required'=>false),
+			'requireDOB'		=> array( 'type'  => 'boolean', 'label' => 'DOB Required',	'required'=>false),
     );
     
     protected $_has_one = array(
@@ -37,7 +38,8 @@ class Model_Pass extends ORM
         'price' 			=> array('type' => 'float', 'exact' => true, 'column_name' => 'price', 'column_default' => NULL, 'data_type' => 'decimal', 'is_nullable' => false, 'ordinal_position' => 4, 'numeric_scale' => '2', 'numeric_precision' => '10', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
         'isPurchasable' 	=> array('type' => 'int', 'min' => '-128', 'max' => '127', 'column_name' => 'isPurchasable', 'column_default' => NULL, 'data_type' => 'tinyint', 'is_nullable' => false, 'ordinal_position' => 5, 'display' => '4', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
         'startDate' 		=> array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647', 'column_name' => 'startDate', 'column_default' => NULL, 'data_type' => 'int', 'is_nullable' => true, 'ordinal_position' => 6, 'display' => '11', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
-        'endDate' 			=> array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647', 'column_name' => 'endDate', 'column_default' => NULL, 'data_type' => 'int', 'is_nullable' => true, 'ordinal_position' => 7, 'display' => '11', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',)
+        'endDate' 			=> array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647', 'column_name' => 'endDate', 'column_default' => NULL, 'data_type' => 'int', 'is_nullable' => true, 'ordinal_position' => 7, 'display' => '11', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',),
+		'requireDOB'		=> array('type' => 'int', 'min' => '-128', 'max' => '127', 'column_name' => 'requireDOB', 'column_default' => NULL, 'data_type' => 'tinyint', 'is_nullable' => false, 'ordinal_position' => 5, 'display' => '4', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
     );
 	
 	public function labels()
@@ -48,6 +50,7 @@ class Model_Pass extends ORM
 			'isPurchasable' => 'Purchasable',
 			'startDate' 	=> 'Start Date',
 			'endDate' 		=> 'End Date',
+			'requireDOB'	=> 'DOB Required',
 		);
 	}
 
@@ -60,6 +63,9 @@ class Model_Pass extends ORM
 				array('not_empty'), 
 			),
 			'isPurchasable' => array( 
+                array('range', array(':value',0,1))
+			),
+			'requireDOB' => array( 
                 array('range', array(':value',0,1))
 			),
 			'convention_id' => array( 
@@ -106,6 +112,8 @@ class Model_Pass extends ORM
 		/* Fill in optional fields.*/			
 		if (!isset($this->isPurchasable) || empty($this->isPurchasable))
 			$this->isPurchasable = 0;
+		if (!isset($this->requireDOB) || empty($this->requireDOB))
+			$this->requireDOB = 0;
 			
 		$ret = parent::save($validation);	
 		

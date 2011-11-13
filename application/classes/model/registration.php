@@ -47,6 +47,7 @@ class Model_Registration extends ORM
             'reg_id'        => array ( 'type' => 'string', 'length' => 25,                                               ),
             'status'        => array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                     ),
             'pickupStatus'  => array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                     ),
+			'dob'  			=> array ( 'type' => 'date',   																 ),
     );
 
     public $formo_defaults = array(
@@ -55,11 +56,12 @@ class Model_Registration extends ORM
             'sname'     => array( 'type'  => 'text',    'label' => 'Surname',       'required'  => true, 'adminRequired'=>true    ),
             'phone'     => array( 'type'  => 'text',    'label' => 'Phone',                                                       ),
             'status'    => array( 'type'  => 'select',  'label' => 'Status',        'required'  => true                           ),
-            'pickupStatus'  => array( 'type'  => 'select_noblank','label' => 'Pickup Status',       'required'  => true                           ),
-            'email'     => array( 'type'  => 'text',    'label' => 'Email',                                                       ),          
+            'pickupStatus'  => array( 'type'  => 'select_noblank','label' => 'Pickup Status',       'required'  => true           ),
+            'email'     => array( 'type'  => 'text',    'label' => 'Email',                                                       ), 
+			'dob'   => array( 'type'  => 'date', 'label' => 'Date of Birth', 		'required'=>false 							  ),			
             /*
             'badge' => array( 'type'  => 'text', 'label' => 'Badge', 'required'=>true    ),
-            'dob'   => array( 'type'  => 'date', 'label' => 'Date of Birth', 'required'=>true ),
+            
              
             'cell'  => array( 'type'  => 'text', 'label' => 'Cell Phone', 'required' => false),
             'city'  => array( 'type'  => 'text', 'label' => 'City', 'required' => true),
@@ -90,6 +92,9 @@ class Model_Registration extends ORM
         $rules['email'] = array(
             array('email')
         );
+		$rules['dob'] = array(
+			array('date')
+		);
                 
         foreach ($this->formo_defaults as $field => $fieldData) {
             if (!isset($rules[$field])) $rules[$field] = array();
@@ -106,7 +111,17 @@ class Model_Registration extends ORM
                 
         return $rules;
     }   
-    
+    	
+	public function values(array $values, array $expected = NULL)
+	{
+		if ( !empty($values['dob-year']) && !empty($values['dob-month']) && !empty($values['dob-day']) )
+		{
+			$values['dob'] = $values['dob-year'] . '-' . $values['dob-month'] . '-' . $values['dob-day'];
+		}
+			
+		return parent::values($values, $expected);
+	}	
+		
     public function save(Validation $validation = NULL) {
         /* Re-resolve account id if email changes. Alternately, check for empty(account_id) && $this->_changed['email'] for a permanent lock once associated. */
         if (@$this->_changed['email']) {

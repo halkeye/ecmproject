@@ -159,6 +159,9 @@ class Controller_Admin extends Base_MainTemplate
             $extra_validation = Validation::Factory($post);
             $extra_validation->rule('tickets_total', 'numeric'); 
             
+			$post['isPurchasable'] = empty($post['isPurchasable']) ? 0 : $post['isPurchasable'];
+			$post['requireDOB']	= empty($post['requireDOB']) ? 0 : $post['requireDOB'];
+			
             $pass->values($post);
             $pass->tickets_total = $post['tickets_total'];
             
@@ -218,6 +221,7 @@ class Controller_Admin extends Base_MainTemplate
             $extra_validation->rule('tickets_total', 'numeric'); 
             
             $post['isPurchasable'] = empty($post['isPurchasable']) ? 0 : $post['isPurchasable'];
+			$post['requireDOB']	= empty($post['requireDOB']) ? 0 : $post['requireDOB'];
             
             $pass->values($post);
             $pass->tickets_total = $post['tickets_total'];
@@ -441,7 +445,7 @@ class Controller_Admin extends Base_MainTemplate
             unset($post['reg_id']);     
             $reg->values($post);
             $extra_validation = $this->validateEmailOrPhone($post);
-        
+
             //No tickets are being allocated or deleted so no call necessary to ticket allocation methods.
             try {
                 $reg->save(); 
@@ -1141,7 +1145,7 @@ class Controller_Admin extends Base_MainTemplate
         $results = $query->where("registrations.convention_id", '=', $cid)->with('pass')->with('account')->with('convention')->find_all();       
                  
         /* Generate a header */
-        $csv_content = "Ticket Number,Name,Email,Phone Number,Event,Ticket,Payment Status,Pickup Status\n"; //FIXME: Have it use values/labels in the Reg model instead.
+        $csv_content = "Ticket Number,Name,Email,Phone Number,Date of Birth,Event,Ticket,Payment Status,Pickup Status\n"; //FIXME: Have it use values/labels in the Reg model instead.
         
         /* Generate the content */
         $convention_name = '';
@@ -1158,10 +1162,11 @@ class Controller_Admin extends Base_MainTemplate
                     $result->gname . ' ' . $result->sname,
                     $result->email,
                     $result->phone,
+					$result->dob,
                     empty($convention_name) ? $result->convention->name : $convention_name,
                     $pass_names[$result->pass_id],
                     $result->statusToString(), 
-                    $result->pickupToString(),
+                    $result->pickupToString(),					
             );
             
             /* In case of commas in field values ... */
@@ -1523,9 +1528,9 @@ class Controller_Admin extends Base_MainTemplate
         $reg->convention_id = $pass->convention_id;  
         $reg->pass_id       = $pass->id; 
         $reg->status        = Model_Registration::STATUS_PAID;
-
+		
         /* If this block is not executed, validation will fail on save() */
-        if (count($line) >= 5) {
+        if (count($line) >= 6) {
             $name_components = explode(' ', $line[1]);
             $gname_components = array_slice($name_components, 0, count($name_components) - 1);
             $gname = implode(' ', $gname_components);                   
@@ -1535,7 +1540,17 @@ class Controller_Admin extends Base_MainTemplate
             $reg->gname         = $gname;               
             $reg->sname         = $sname;
             $reg->email         = $line[2];
-            $reg->phone         = $line[3];     
+            $reg->phone         = $line[3];
+			
+			if ( !empty($line[4]) ) 
+			{
+				$date = str_replace("/", "-", $line[4]);
+				$date = date("Y-m-d", strtotime($date));
+				
+				if ($date) {
+					$reg->dob = $date;
+				}
+			}
         }
         
         return $reg;

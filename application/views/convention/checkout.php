@@ -4,15 +4,81 @@ you provide (shown above) is the same as written on your government ID. </strong
 <p>
 Select a ticket that you wish to purchase from the dropdown and click the <strong>[Add to Cart]</strong> button. You may add more than one ticket by repeating this process. </p>
 
-<?php echo form::open(url::site('/convention/addRegistration', TRUE), array('method'=>'post')) . "\n"; ?>
+<div id="dialog" title="Specify your Date of Birth" style="display:none">
+	<br />
+	<p>This ticket requires your Date of Birth (DOB) to determine whether you are the age of majority.</p>
+	<p class="validateTips"></p>
+	<p>Date of Birth (YYYY-MM-DD): <input type="text" id="dob_dialog"></p>	
+</div>
+<script>
+	dob = $( "#dob_dialog" );
+	tips = $( ".validateTips" );
+
+	function updateTips( t ) {
+		tips
+			.text( t )
+			.addClass( "ui-state-highlight" );
+		setTimeout(function() {
+			tips.removeClass( "ui-state-highlight", 1500 );
+		}, 500 );
+	}
+
+	function checkRegexp( o, regexp, n ) {
+		if ( !( regexp.test( o.val() ) ) ) {
+			o.addClass( "ui-state-error" );
+			updateTips( n );
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	function doDOB() {
+		var pass_id = $( "#select_pass" ).val();
+		if (! $("#dob_" + pass_id).val() )
+		{
+			$("#form_add_ticket").submit();
+			return;
+		}
+
+		$( "#dialog" ).dialog({
+			modal: true,
+			width: 500,
+			buttons: {
+				"Add to Cart" : function() {			
+					var valid = true;
+					valid = checkRegexp( dob, /^(\d{4})-(\d{1,2})-(\d{1,2})/, "Date of birth cannot be empty and must be specified YYYY-MM-DD." );
+
+					if (valid) {
+						$("#dob").val( dob.val() );
+						$("#form_add_ticket").submit();
+					}
+				},
+				"Cancel" : function() {
+					$( this ).dialog( "close" );
+				}
+			}			
+		});	
+	}
+</script>
+
+
+
+<?php echo form::open(url::site('/convention/addRegistration', TRUE), array('id' => 'form_add_ticket', 'method'=>'post')) . "\n"; ?>
 <fieldset>
 	<?php
 	$options[-1] = "SELECT A TICKET";
 	foreach ($passes as $pass) {						
 		$options[$pass->convention->name][$pass->id] = "$pass";
+		
+		if ($pass->requireDOB) {
+			echo form::hidden("dob_" . $pass->id, true, array('id' => "dob_" . $pass->id));
+		}
 	}
-	echo form::select('pass_id', $options) . "\n";
-	echo form::submit('add_ticket', __('Add to Cart'), array('class' => 'submit')) . "\n";
+	echo form::select('pass_id', $options, NULL, array('id' => "select_pass")) . "\n";
+	echo form::hidden("dob", "", array('id' => 'dob'));
+	echo form::input('add_ticket', __('Add to Cart'), array('type' => 'button', 'onclick' => 'doDOB()', 'class' => 'submit'));
+	//echo form::input('add_ticket', __('Add to Cart'), array('type' => 'button', 'id' => 'add_ticket', 'class' => 'submit')) . "\n";
 	?>
 </fieldset>
 <?php echo form::close(); ?>

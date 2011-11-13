@@ -54,8 +54,8 @@
 		?>
 		</div>
 		
-		<?php		 	
-		foreach (array('isPurchasable') as $field)
+		<?php		
+		foreach (array('isPurchasable', 'requireDOB') as $field)
 		{	
 			echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $row[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
 		}		
