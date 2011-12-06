@@ -16,7 +16,7 @@ class Controller_Paypal extends Controller
 
         $emailAddr = "";
         $passes = array();
-        $conventRegistrations = array)(;
+        $currentRegs = array();
 
         try {
             $p->validateIPN();
@@ -94,7 +94,7 @@ class Controller_Paypal extends Controller
 						
 						$data['name'] = $reg->gname . ' ' . $reg->sname;
 						$emailAddr = $reg->account->email;
-                        $conventRegistrations[$reg->convention->name][] = $reg;
+                        $currentRegs[$reg->convention->id][$reg->convention->name][] = $reg;
 					}
 					else {
 						$reg->status = Model_Registration::STATUS_NOT_ENOUGH;
@@ -114,16 +114,17 @@ class Controller_Paypal extends Controller
             exit();
         }
         
-        foreach (array_keys($conventRegistrations) as $id)
+        foreach (array_keys($currentRegs) as $id)
         {
-            if ($emailAddr && count($data['registrations']))
+            if ($emailAddr && count($currentRegs))
             {
-                $data['registrations'] = $conventRegistrations[$id];
+                $data['registrations'] = $currentRegs[$id];
                 try {
                     $view = new View('convention/reg_success--'.$id, $data);
                 }
                 catch (Kohana_View_Exception $e)
                 {
+                    Kohana::$log->add(Log::ERROR,"[PAYPAL] convention/reg_success--$id was not found: $e");
                     $view = new View('convention/reg_success', $data);
                 }
 
