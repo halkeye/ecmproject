@@ -16,6 +16,7 @@ class Controller_Paypal extends Controller
 
         $emailAddr = "";
         $passes = array();
+        $conventRegistrations = array)(;
 
         try {
             $p->validateIPN();
@@ -93,7 +94,7 @@ class Controller_Paypal extends Controller
 						
 						$data['name'] = $reg->gname . ' ' . $reg->sname;
 						$emailAddr = $reg->account->email;
-						$data['registrations'][$reg->convention->name][] = $reg;
+                        $conventRegistrations[$reg->convention->name][] = $reg;
 					}
 					else {
 						$reg->status = Model_Registration::STATUS_NOT_ENOUGH;
@@ -113,14 +114,24 @@ class Controller_Paypal extends Controller
             exit();
         }
         
-        if ($emailAddr && count($data['registrations']))
+        foreach (array_keys($conventRegistrations) as $id)
         {
-            $view = new View('convention/reg_success', $data);
+            if ($emailAddr && count($data['registrations']))
+            {
+                $data['registrations'] = $conventRegistrations[$id];
+                try {
+                    $view = new View('convention/reg_success--'.$id, $data);
+                }
+                catch (Kohana_View_Exception $e)
+                {
+                    $view = new View('convention/reg_success', $data);
+                }
 
-            $email->message($view->render(),'text/html');
+                $email->message($view->render(),'text/html');
 
-            $email->to($emailAddr);
-            $email->send();
+                $email->to($emailAddr);
+                $email->send();
+            }
         }
         return;
     }
