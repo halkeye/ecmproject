@@ -236,6 +236,3 @@ INSERT INTO `locations` SET id = 1, prefix = 'ECM', location = 'Electronic Conve
 /*!40000 ALTER TABLE `accounts_usergroups` ENABLE KEYS */;
 /*!40000 ALTER TABLE `permissions` ENABLE KEYS */;
 /*!40000 ALTER TABLE `usergroups_permissions` ENABLE KEYS */;
-
-
-alter table registrations add pickupStatus tinyint(4) not null default 0;
