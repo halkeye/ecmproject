@@ -57,7 +57,7 @@ CREATE TABLE passes (
    startDate INT,
    endDate INT,
    isPurchasable TINYINT NOT NULL,
-   requireDOB TINYINT NOT NULL
+   requireDOB TINYINT NOT NULL,
    FOREIGN KEY (convention_id) REFERENCES conventions(id) ON DELETE CASCADE -- Cascade deletion of passes. Will (should) still fail if registrations have started.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;
 
