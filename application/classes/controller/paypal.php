@@ -5,8 +5,6 @@ class Controller_Paypal extends Controller
     public function action_registrationPaypalIPN()
     {
         $config = Kohana::config('ecmproject');
-        $email = Email::factory($config['registration_subject']);
-        $email->from($config['outgoing_email_address'], $config['outgoing_email_name']);
 
         $data = array();
 
@@ -130,10 +128,9 @@ class Controller_Paypal extends Controller
                     $view = new View('convention/reg_success', $data);
                 }
 
+                $email = Email::factory($config['registration_subject']);
+                $email->from($config['outgoing_email_address'], $config['outgoing_email_name']);
                 $email->message($view->render(),'text/html');
-                Kohana::$log->add(Log::ERROR, "Sending to $emailAddr for $id");
-
-                $email->raw_message()->setId($messageIdOffset.$email->raw_message()->getId());
                 $email->to($emailAddr);
                 $email->send();
             }
