@@ -114,9 +114,11 @@ class Controller_Paypal extends Controller
             exit();
         }
         
+        $messageIdOffset = 0;
         foreach (array_keys($currentRegs) as $id)
         {
-            if ($emailAddr && count($currentRegs))
+            $messageIdOffset++;
+            if ($emailAddr && count($currentRegs[$id]))
             {
                 $data['registrations'] = $currentRegs[$id];
                 try {
@@ -129,7 +131,9 @@ class Controller_Paypal extends Controller
                 }
 
                 $email->message($view->render(),'text/html');
+                Kohana::$log->add(Log::ERROR, "Sending to $emailAddr for $id");
 
+                $email->raw_message()->setId($messageIdOffset.$email->raw_message()->getId());
                 $email->to($emailAddr);
                 $email->send();
             }
