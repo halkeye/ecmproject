@@ -1506,6 +1506,14 @@ class Controller_Admin extends Base_MainTemplate
             if ($prefix)
                 $template_suffix = "_$prefix";
         }
+
+        /** FIXME - this really needs to be centralized and not hacked so ugly in
+         * Order should be:
+         * reg_success_ART--3.php
+         * reg_success--3.php
+         * reg_success_ART.php
+         * reg_success.php
+         */
         try {
             $view = new View('convention/reg_success'.$template_suffix.'--'.$convention_id, $data);
             Kohana::$log->add(Log::NOTICE,"[email_imported_regs] 'convention/reg_success'.$template_suffix.'--'.$convention_id was found");
