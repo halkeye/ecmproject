@@ -1501,16 +1501,33 @@ class Controller_Admin extends Base_MainTemplate
         if ($data['registrations'])
         {
             $registrations = array_values($data['registrations']);
+            $convention_id = $registrations[0][0]->convention->id;
             list($prefix, $convention, $id) = explode("-", $registrations[0][0]->reg_id);
             if ($prefix)
                 $template_suffix = "_$prefix";
         }
         try {
-            $view = new View('convention/reg_success'.$template_suffix, $data);
+            $view = new View('convention/reg_success'.$template_suffix.'--'.$convention_id, $data);
+            Kohana::$log->add(Log::NOTICE,"[email_imported_regs] 'convention/reg_success'.$template_suffix.'--'.$convention_id was found");
         }
         catch (Kohana_View_Exception $e)
         {
-            $view = new View('convention/reg_success', $data);
+            try {
+                $view = new View('convention/reg_success--'.$convention_id, $data);
+                Kohana::$log->add(Log::NOTICE,"[email_imported_regs] 'convention/reg_success--'.$convention_id was found");
+            }
+            catch (Kohana_View_Exception $e)
+            {
+                try {
+                    $view = new View('convention/reg_success'.$template_suffix, $data);
+                    Kohana::$log->add(Log::NOTICE,"[email_imported_regs] 'convention/reg_success'.$template_suffix was found");
+                }
+                catch (Kohana_View_Exception $e)
+                {
+                    $view = new View('convention/reg_success', $data);
+                    Kohana::$log->add(Log::NOTICE,"[email_imported_regs] 'convention/reg_success' was found");
+                }
+            }
         }
 
         $msg = $view->render();
