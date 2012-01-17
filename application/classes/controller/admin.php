@@ -879,14 +879,16 @@ class Controller_Admin extends Base_MainTemplate
             {
                 $data['actions']['edit'] = html::anchor(
                     "admin/edit$entity/". $row->id,
-                    html::image(url::site('/static/img/edit-copy.png', TRUE), array('title'=>__("Edit $entity")))
+                    html::image(url::site('/static/img/edit-copy.png', TRUE), array('title'=>__("Edit $entity"))), 
+                    null, null, true
                 );
                 $data['actions']['delete'] = html::anchor(
                     "admin/delete$entity/" . $row->id,
-                    html::image(url::site('/static/img/edit-delete.png',TRUE), array('title'=>__("Delete $entity")))
+                    html::image(url::site('/static/img/edit-delete.png',TRUE), array('title'=>__("Delete $entity"))),
+                    null, null, true
                 );          
             
-                $data['entries'][$row->id] = new View("admin/ListItems/$entity" . 'Entry', array('row' => $row, 'actions' => $data['actions']));                
+                $data['entries'][$row->id] = new View("admin/ListItems/$entity" . 'Entry', array('row' => $row, 'actions' => $data['actions']));
             }           
         } else if ($search_term == null) {
             $this->addError('No search term entered.');
