@@ -22,6 +22,3 @@
 [submodule "application/vendor/swiftmailer"]
 	path = application/vendor/swiftmailer
 	url = git://github.com/swiftmailer/swiftmailer.git
-[submodule "modules/oauth2"]
-	path = modules/oauth2
-	url = https://github.com/managedit/kohana-oauth2.git
