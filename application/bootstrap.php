@@ -108,6 +108,10 @@ $modules = array(
      'static'     => MODPATH.'static',
      'log'        => MODPATH.'log',
 	 'email'      => MODPATH.'email',
+	'oauth2'                  => MODPATH.'oauth2',                  // OAuth2
+	'minion'                  => MODPATH.'minion',                  // Minion CLI Framework
+	'minion-tasks-migrations' => MODPATH.'minion-tasks-migrations', // Minion Database Migrations
+	'uuid'                    => MODPATH.'uuid',                    // UUID Generation
 );
 if (file_exists(MODPATH.'debug-toolbar'))
 {
