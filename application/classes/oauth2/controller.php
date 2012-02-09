@@ -18,7 +18,7 @@ class OAuth2_Controller extends Kohana_OAuth2_Controller
 		catch (OAuth2_Exception_InvalidRequest $e)
 		{
             error_log("$e");
-			throw new HTTP_Exception_401('Invalid Request');
+			throw new HTTP_Exception_401('Invalid Request - :error', array(':error'=> "$e"));
 		}
 	}
 

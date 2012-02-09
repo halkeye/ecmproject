@@ -120,6 +120,12 @@ if (file_exists(MODPATH.'debug-toolbar'))
 Kohana::modules($modules);
 unset($modules);
 
+Route::set('oauth-api', 'api/<controller>/<action>')
+	->defaults(array(
+		'directory'  => 'api',
+        'action'     => 'index',
+		'controller' => 'lookup',
+	));
 /**
  * Set the routes. Each route must have a minimum of a name, a URI and a set of
  * defaults for the URI.
