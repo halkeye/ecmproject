@@ -81,7 +81,7 @@ if (isset($_SERVER['KOHANA_ENV']))
  */
 Kohana::init(array(
 	'base_url'   => dirname($_SERVER['SCRIPT_NAME']),
-	'index_file' => (file_exists('.htaccess') ? '':basename($_SERVER['SCRIPT_NAME'])),
+    'index_file' => (file_exists('.htaccess') ? '':basename($_SERVER['SCRIPT_NAME'])),
     'profile'    => Kohana::$environment !== Kohana::PRODUCTION,
     'caching'    => Kohana::$environment === Kohana::PRODUCTION,
 ));
@@ -119,6 +119,8 @@ if (file_exists(MODPATH.'debug-toolbar'))
 }
 Kohana::modules($modules);
 unset($modules);
+
+Cookie::$salt = 'ecmproject';
 
 Route::set('oauth-api', 'api/<controller>/<action>')
 	->defaults(array(

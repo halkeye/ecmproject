@@ -66,11 +66,12 @@ class Migration_Application_20120122183500 extends Minion_Migration_Base {
         #FOREIGN KEY(pass_id) REFERENCES passes(id) ON DELETE CASCADE
 		$db->query(NULL, 'CREATE TABLE IF NOT EXISTS ticketcounters (
            id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-           pass_id INT UNSIGNED NOT NULL,
+           location_id INT UNSIGNED NOT NULL,
+           convention_id INT UNSIGNED NOT NULL,
            tickets_assigned INT UNSIGNED NOT NULL,
            tickets_total INT NOT NULL,
            next_id INT UNSIGNED NOT NULL,
-           FOREIGN KEY(pass_id) REFERENCES passes(id)
+           UNIQUE (`location_id`, `convention_id`)
         ) ENGINE=Innodb DEFAULT CHARSET=utf8');
 
         # Store payment processor data.

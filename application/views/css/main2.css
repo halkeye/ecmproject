@@ -241,7 +241,7 @@ table td.total {
 	color: #888;
 }	
 #content input {
-	display: block;
+	/*display: block; */
 	width: 250px;
 }
 #content input.checkbox {

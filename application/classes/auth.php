@@ -194,6 +194,7 @@ class Auth {
     /* Error functions */
     public function clearErrors() { $this->errors = array(); }
     public function addError($err) { $this->errors[] = $err; }
+    public function hasErrors() { count($this->errors) > 0; }
     public function errors() { return $this->errors; }
 
 

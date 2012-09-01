@@ -200,6 +200,9 @@ class Controller_Convention extends Base_MainTemplate
             $this->addError('Pass provided is no longer valid');
             $this->request->redirect('/convention/checkout'); 
         }
+        $location = Model_Location::defaultLocation();
+        $reg->location_id = $location->id;
+        $reg->location = $location;
 
         $reg->convention_id = $pass->convention->id;
         $reg->pass_id = $pass->id;
@@ -224,12 +227,14 @@ class Controller_Convention extends Base_MainTemplate
 		}
 		
         try {
+            if (! $reg->check_passes_available() ) 
+            {
+                $this->addError("No more tickets to allocate for " . $pass->convention->name . ' - ' . $pass->name . ". Please select a different pass.");
+            }
 
-            $id = $reg->reserveTickets(1);
-            if ( $id ) { //Reserve tickets. Return at least 1 except in case of failure (not enough tickets left).
-                $reg->build_regID(array('comp_loc'=>'ECM', 'comp_id'=> $id), array('ECM') , $pass->convention_id);
-                $reg->save(); 
-                $reg->finalizeTickets(1, true); //Save has gone through. Finalize reservation. Added parameter if next_id is being used. FIXME to something more elegant.
+            if (! $this->hasErrors() )
+            {
+                $reg->save();
                 $this->addMessage( __('Added the ticket, :name to the cart.', array(':name' => $reg->gname . ' '. $reg->sname) ));
             }
             else if ($reg->pass_id > 0) {					
@@ -240,10 +245,10 @@ class Controller_Convention extends Base_MainTemplate
             }
         }
         catch (ORM_Validation_Exception $e)
-        {				
-            foreach ($e->errors() as $field => $msg)
+        {
+            foreach ($e->errors('validation',TRUE) as $msg)
             {
-                $this->addError("$field is $msg");
+                $this->addError($msg);
             }
         }
         $this->request->redirect('/convention/checkout'); 

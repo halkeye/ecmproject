@@ -332,7 +332,7 @@ class Controller_Admin extends Base_MainTemplate
             1 => __("Picked Up"),
         );
 		
-		$locations = ORM::Factory('Location')->find_all()->as_array('prefix', 'prefix');
+		$locations = ORM::Factory('Location')->find_all_non_reserved()->as_array('prefix', 'prefix');
         if ( !$locations )
         {
             $this->addError('No purchase locations defined! Please define some locations before continuing.');
@@ -1404,6 +1404,9 @@ class Controller_Admin extends Base_MainTemplate
                     if (empty($line[0])) {
                         continue;
                     }
+                    /* FIXME - select * from location
+                     * if location doesn't match do an insert and update cache hash
+                     */
                     
                     $reg = $this->generateReg($pass, $line);
                     if (!$reg->pickupStatus) { $reg->pickupStatus = 0; }

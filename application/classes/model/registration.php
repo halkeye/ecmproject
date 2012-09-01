@@ -19,6 +19,10 @@ class Model_Registration extends ORM
             'model' => 'convention', 
             'foreign_key' => 'convention_id'
         ),
+        'location' => array (
+            'model' => 'location', 
+            'foreign_key' => 'location_id'
+        ),
         'pass' => array(
             'model' => 'pass', 
             'foreign_key' => 'pass_id',
@@ -39,12 +43,13 @@ class Model_Registration extends ORM
             'id'            => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, 'sequenced' => true, ),
             'convention_id' => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true,                      ),
             'pass_id'       => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true,                      ),
+            'location_id'   => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true,                      ),
             'gname'         => array ( 'type' => 'string', 'length' => 55                                                ),
             'sname'         => array ( 'type' => 'string', 'length' => 55                                                ),
             'email'         => array ( 'type' => 'string', 'length' => 55                                                ),
             'phone'         => array ( 'type' => 'string', 'length' => 25                                                ),
             'account_id'    => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true,                      ),
-            'reg_id'        => array ( 'type' => 'string', 'length' => 25,                                               ),
+            'reg_id'        => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true,                      ),
             'status'        => array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                     ),
             'pickupStatus'  => array ( 'type' => 'int',    'max' => 127,        'unsigned' => false,                     ),
 			'dob'  			=> array ( 'type' => 'date',   																 ),
@@ -85,8 +90,10 @@ class Model_Registration extends ORM
         $rules['pass_id'] = array(
             array(array($this, '__valid_pass')),
         );
-        $rules['reg_id'] = array(
+        $rules['location_id'] = array(
             array('not_empty'),
+        );
+        $rules['reg_id'] = array(
             array(array($this, '__check_regID_availability')),
         );
         $rules['email'] = array(
@@ -194,10 +201,11 @@ class Model_Registration extends ORM
     }
       
     /* Ticket allocation methods */ 
-    public function reserveTickets($amount = 1) {
+    public function reserveTickets($location_id, $amount = 1) {
         DB::query(NULL, 'START TRANSACTION')->execute();
-        $query = DB::query(Database::SELECT, 'SELECT * FROM ticketcounters WHERE pass_id = :pass_id FOR UPDATE'); 
-        $query->param(':pass_id', $this->pass_id);              
+        $query = DB::query(Database::SELECT, 'SELECT * FROM ticketcounters WHERE convention_id = :convention_id AND location_id = :location_id FOR UPDATE'); 
+        $query->param(':convention_id', $this->convention_id);
+        $query->param(':location_id', $location_id);
         $result = $query->execute();
         
         /* No ticket counter, non-numeric reservation amount, amount less than zero */
@@ -217,7 +225,7 @@ class Model_Registration extends ORM
 
         return $this->ticket_next_id;
     }
-    public function finalizeTickets($amount = 1, $incNextID = false) {
+    public function finalizeTickets($location_id, $amount = 1, $incNextID = false) {
         //Reserve tickets is not open. Do nothing (or throw an exception)
         if (!$this->ticket_reserved) {
             return;
@@ -226,20 +234,13 @@ class Model_Registration extends ORM
         $alloc = ($amount <= $this->ticket_reserved) ? $amount : $this->ticket_reserved; //Don't "allocate" more than what was originally reserved.
     
         //If reserveTickets reserved 0, this query will change nothing. ticket_reserved/ticket_next_id fields are inaccessible from anywhere outside this class.
-        $allocate_query = DB::query(Database::UPDATE, 'UPDATE ticketcounters SET tickets_assigned = tickets_assigned + :alloc WHERE pass_id = :pass_id');
+        $allocate_query = DB::query(Database::UPDATE, 'UPDATE ticketcounters SET tickets_assigned = tickets_assigned + :alloc, next_id + :next_id WHERE convention_id = :convention_id AND location_id = :location_id');
         $allocate_query->param(':alloc', $alloc);
         $allocate_query->param(':next_id', $incNextID ? $alloc : 0); 
-        $allocate_query->param(':pass_id', $this->pass_id);
+        $allocate_query->param(':convention_id', $this->convention_id);
+        $allocate_query->param(':location_id', $location_id);
         $allocate_query->execute();
 		
-		//(TEMP) Fix issue #17. Ticket registration needs to be re-thought of. 
-		//Lock-less approach: select next_id, create reg ID, attempt insert. If failure, repeat process. 
-		$allocate_query = DB::query(Database::UPDATE, 
-			'UPDATE ticketcounters SET next_id = next_id + :next_id WHERE pass_id IN (SELECT id from passes where convention_id = :convention_id)');
-		$allocate_query->param(':next_id', $incNextID ? $alloc : 0);
-		$allocate_query->param(':convention_id', $this->convention_id);
-		$allocate_query->execute();
-        
         DB::query(NULL, 'COMMIT')->execute();
         $this->ticket_reserved = 0;
         $this->ticket_next_id = 0;
@@ -258,12 +259,12 @@ class Model_Registration extends ORM
         }
         
         DB::query(NULL, 'START TRANSACTION')->execute();
-        $query = DB::query(Database::SELECT, 'SELECT * FROM ticketcounters WHERE pass_id = :pass_id FOR UPDATE'); 
-        $query->param(':pass_id', $pass_id);                
+        $query = DB::query(Database::SELECT, 'SELECT * FROM ticketcounters WHERE convention_id = :convention_id FOR UPDATE'); 
+        $query->param(':convention_id', $convention_id);                
         $result = $query->execute();
         
-        $allocate_query = DB::query(Database::UPDATE, 'UPDATE ticketcounters SET tickets_assigned = tickets_assigned - 1 WHERE pass_id = :pass_id');
-        $allocate_query->param(':pass_id', $pass_id);
+        $allocate_query = DB::query(Database::UPDATE, 'UPDATE ticketcounters SET tickets_assigned = tickets_assigned - 1 WHERE convention_id = :convention_id');
+        $allocate_query->param(':convention_id', $convention_id);
         $allocate_query->execute();
         DB::query(NULL, 'COMMIT')->execute();   
     }
@@ -449,37 +450,106 @@ class Model_Registration extends ORM
 
         return ((bool)$query->count_all());
     }
-    
-    /*
-    * Builds a registration identifier given a post, valid locations and a unique id number.
-    *
-    * array $post 
-    * array $locations
-    * int $convention_id 
-    * returns an empty array on success or an array with error messages on failure. 
-    */
-    public function build_regID($post, $locations, $convention_id) {
-        $validate = Validation::Factory($post)
-            ->rule('comp_loc', 'in_array', array(':value', array_values($locations)))
-            ->rule('comp_id', 'numeric')
-            ->rule('comp_id', 'not_empty');
-                    
-        $errors = array();  
-        if ( !$validate->check() || !is_numeric($convention_id) )
-        {               
-            foreach($validate->errors('reg_id') as $error_msg) 
-            {
-                array_push($errors, $error_msg);
-            }
-            
-            $this->reg_id = '';
-        }
-        else {
-            $this->reg_id = sprintf('%s-%02s-%04s', $post['comp_loc'], $convention_id, $post['comp_id']);
-        }
-                    
-        return $errors;
+
+    public function getRegID()
+    {
+        return sprintf("%3s-%02d-%04d", $this->location->prefix, $this->convention_id, $this->reg_id);
     }
+
+    public function check_passes_available() 
+    {
+        /* Unlimited available */
+        if ($this->pass->max_allowed === NULL ) return true;
+
+        $query = ORM::Factory('registration');
+        $query->where('pass_id', '=',$this->pass_id);
+        if ($this->loaded()) 
+            $query->where('id','!=', $this->id);
+        $count = (bool)$query->count_all();
+        # Do we have any available?
+        if ($count > $this->pass->max_allowed) { 
+            return false;
+        }
+        return true;
+    }
+    
+    public function create(Validation $validation = NULL)
+	{
+		if ($this->_loaded)
+			throw new Kohana_Exception('Cannot create :model model because it is already loaded.', array(':model' => $this->_object_name));
+
+        # This is an admin created one
+        if ($this->reg_id) {
+            return parent::create($validation);
+        }
+
+		// Require model validation before saving
+		if ( ! $this->_valid)
+		{
+			$this->check($validation);
+		}
+
+		$data = array();
+		foreach ($this->_changed as $column)
+		{
+			// Generate list of column => values
+			$data[$column] = $this->_object[$column];
+		}
+
+		if (is_array($this->_created_column))
+		{
+			// Fill the created column
+			$column = $this->_created_column['column'];
+			$format = $this->_created_column['format'];
+
+			$data[$column] = $this->_object[$column] = ($format === TRUE) ? time() : date($format);
+		}
+        
+        
+
+        $field_values = array();
+        $field_keys = array();
+        $escaped_values = array();
+        foreach ($data as $key => $value) {
+            $field_keys[] = $key;
+            $field_values[] = "?";
+            $escaped_values[] = $this->_db->escape($value);
+        }
+
+        unset($data['reg_id']);
+        $newPassInsert = 'INSERT INTO '.$this->_table_name.' (reg_id, ' . implode(',', $field_keys ) . ')
+            SELECT (MAX(reg_id) + 1), ' . implode(',', $escaped_values) . '
+            FROM registrations WHERE 
+                location_id='.$this->_db->escape($this->location_id).' 
+                AND
+                convention_id='.$this->_db->escape($this->convention_id).' 
+                GROUP BY convention_id
+        ';
+        $result = $this->_db->query(
+            Database::INSERT, 
+            $newPassInsert
+        );
+
+		if ( ! array_key_exists($this->_primary_key, $data))
+		{
+			// Load the insert id as the primary key if it was left out
+			$this->_object[$this->_primary_key] = $this->_primary_key_value = $result[0];
+		}
+
+		if (empty($this->_primary_key_value))
+		{
+			// Set the primary key value if it was manually chosen by the user
+			$this->_primary_key_value = $this->_object[$this->_primary_key];
+		}
+
+		// Object is now loaded and saved
+		$this->_loaded = $this->_saved = TRUE;
+
+		// All changes have been saved
+		$this->_changed = array();
+
+		return $this;
+	}
 }
 
 /* End of file user.php */

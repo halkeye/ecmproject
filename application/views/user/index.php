@@ -35,7 +35,7 @@ address will require your account to be re-validated.</p>
 		
 		/* Display the reg_id only when the registration is fully paid for. */
 		if ($r->status == Model_Registration::STATUS_PAID) {
-			echo '<td>' . HTML::chars($r->reg_id) . '</td>';
+			echo '<td>' . HTML::chars($r->getRegId()) . '</td>';
 		}
 		else {
 			echo '<td></td>';

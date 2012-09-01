@@ -91,7 +91,7 @@ switch ($fieldData['type'])
         ### Generate list of years
         foreach (date::months() as $month)
         {
-            $months[$month] = __('calendar.' . strtolower(date('F', mktime(0,0,0,$month, 1))));
+            $months[$month] = __(ucfirst(date('F', mktime(0,0,0,$month, 1))));
         }
 
         $year = '';

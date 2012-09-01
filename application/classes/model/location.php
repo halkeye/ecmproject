@@ -25,13 +25,7 @@ class Model_Location extends ORM
 		);
 	}
 	
-	public function find() 
-	{
-		$this->where('prefix', '!=', Model_Location::RESERVED_LOCATION);
-		return parent::find();
-	}
-	
-	public function find_all() 
+	public function find_all_non_reserved() 
 	{
 		$this->where('prefix', '!=', Model_Location::RESERVED_LOCATION);
 		return parent::find_all();
@@ -80,6 +74,10 @@ class Model_Location extends ORM
 	{
 		return ORM::Factory('Location')->count_all();
 	}
+
+    public static function defaultLocation() {
+        return ORM::Factory('Location')->where('prefix', '=', Model_Location::RESERVED_LOCATION)->find();
+    }
 }
 
 ?>

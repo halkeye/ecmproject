@@ -106,6 +106,7 @@ class Base_MainTemplate extends Controller_Template
         $this->session->set('messages',  $messages);
     }
     
+    protected function hasErrors() { count($this->session->get('errors') or array()) > 0; }
     protected function addError($error)
     {
         $errors = $this->session->get('errors') or array();

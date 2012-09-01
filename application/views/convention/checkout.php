@@ -114,7 +114,7 @@ Select a ticket that you wish to purchase from the dropdown and click the <stron
 			echo '<td>' . HTML::chars($reg->gname . ' ' . $reg->sname) . '</td>';
 			if (!$expiredReg)
 			{
-				echo '<td>' . HTML::chars($reg->pass->name) . '</td>';
+				echo '<td>' . HTML::chars($reg->convention->name . ' - ' . $reg->pass->name) . '</td>';
 				echo '<td>' . HTML::chars(sprintf('$%01.2F', $reg->pass->price)) . '</td>';
 				
 				//Don't have it go belly up if it's not a number.

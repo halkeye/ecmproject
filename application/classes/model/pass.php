@@ -40,6 +40,7 @@ class Model_Pass extends ORM
         'startDate' 		=> array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647', 'column_name' => 'startDate', 'column_default' => NULL, 'data_type' => 'int', 'is_nullable' => true, 'ordinal_position' => 6, 'display' => '11', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
         'endDate' 			=> array('type' => 'int', 'min' => '-2147483648', 'max' => '2147483647', 'column_name' => 'endDate', 'column_default' => NULL, 'data_type' => 'int', 'is_nullable' => true, 'ordinal_position' => 7, 'display' => '11', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',),
 		'requireDOB'		=> array('type' => 'int', 'min' => '-128', 'max' => '127', 'column_name' => 'requireDOB', 'column_default' => NULL, 'data_type' => 'tinyint', 'is_nullable' => false, 'ordinal_position' => 5, 'display' => '4', 'comment' => '', 'extra' => '', 'key' => '', 'privileges' => 'select,insert,update,references',), 
+        'max_allowed'       => array( 'type'  => 'int',     'max' => 2147483647, 'unsigned' => true,                      ),
     );
 	
 	public function labels()
