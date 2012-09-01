@@ -370,6 +370,20 @@ class Model_Registration extends ORM
         return ((bool)$query->count_all());
     }
 
+    public function findByRegId($reg) 
+    {
+        list($location,$convention_id, $reg_id) = explode('-', $reg);
+        $location = ORM::Factory('Location')->where('prefix','=',$location)->find();
+        if (!$location->loaded()) { return $this; }
+
+        $this->with('location');
+        $this->with('pass');
+        $this->where($this->_table_name . '.location_id', '=', intval($location->id));
+        $this->where($this->_table_name . '.convention_id', '=', intval($convention_id));
+        $this->where($this->_table_name . '.reg_id', '=', intval($reg_id));
+        return $this->find();
+    }
+
     public function getRegID()
     {
         return sprintf("%3s-%02d-%04d", $this->location->prefix, $this->convention_id, $this->reg_id);
