@@ -49,8 +49,8 @@
 	<fieldset>	
 		<div>
 		<?php 
-			echo Form::label('tickets_total', 'Tickets Available', array('class' => 'nosub'));
-			echo Form::input ('tickets_total', $row['tickets_total']);	
+			echo Form::label('max_allowed', 'Tickets Available', array('class' => 'nosub'));
+			echo Form::input ('max_allowed', $row['max_allowed']);	
 		?>
 		</div>
 		

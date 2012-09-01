@@ -199,6 +199,7 @@ class Controller_Convention extends Base_MainTemplate
         {
             $this->addError('Pass provided is no longer valid');
             $this->request->redirect('/convention/checkout'); 
+            return;
         }
         $location = Model_Location::defaultLocation();
         $reg->location_id = $location->id;
@@ -231,17 +232,10 @@ class Controller_Convention extends Base_MainTemplate
             {
                 $this->addError("No more tickets to allocate for " . $pass->convention->name . ' - ' . $pass->name . ". Please select a different pass.");
             }
-
-            if (! $this->hasErrors() )
+            else
             {
                 $reg->save();
                 $this->addMessage( __('Added the ticket, :name to the cart.', array(':name' => $reg->gname . ' '. $reg->sname) ));
-            }
-            else if ($reg->pass_id > 0) {					
-                $this->addError("No more tickets to allocate for " . $pass->convention->name . ' - ' . $pass->name . ". Please select a different pass.");
-            }	
-            else {
-                $this->addError("No pass selected. Please select a pass."); 
             }
         }
         catch (ORM_Validation_Exception $e)

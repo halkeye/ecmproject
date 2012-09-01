@@ -28,12 +28,8 @@ class Migration_Application_201208022345 extends Minion_Migration_Base {
         # feeling lazy, so sub select and copy the value over
         $db->query(NULL, 'UPDATE passes p SET p.max_allowed=(SELECT tickets_total FROM ticketcounters t WHERE t.pass_id=p.id)');
 
-        $newPassInsert = 'INSERT INTO registration (id, convention_id, pass_id, account_id, gname, sname, email, phone, dob, reg_id, status, pickupStatus) 
-            VALUES(
-                SELECT 
-                    (MAX(id) + 1), convention_id, :pass_id, :account_id, :gname, :sname, :email, :phone, :dob, CONCAT(?, "-", LPAD(convention_id,2 ,"0"), "-", LPAD(MAX(id) + 1,4,"0")), 0, 0)
-                FROM registrations GROUP BY convention_id
-                  )';
+        # Remove ticket counte rtable
+        $db->query(NULL, 'DROP TABLE ticketcounter');
 	}
 
 	/**

@@ -158,18 +158,6 @@ class Model_Registration extends ORM
         return $filters;
     }   
     
-    public function delete()
-    {
-        $pass_id = $this->pass_id;
-        $result = parent::delete();
-        
-        if ($result) {
-            $this->deleteTicket($pass_id);
-        }
-        
-        return $result;
-    }
-    
     /* Validation callbacks */
     public function __valid_pass($value) {
         return (bool) ORM::Factory('Pass')->where('passes.id','=',$value)->where('convention_id', '=', $this->convention_id)->count_all();
@@ -200,75 +188,6 @@ class Model_Registration extends ORM
         return true;
     }
       
-    /* Ticket allocation methods */ 
-    public function reserveTickets($location_id, $amount = 1) {
-        DB::query(NULL, 'START TRANSACTION')->execute();
-        $query = DB::query(Database::SELECT, 'SELECT * FROM ticketcounters WHERE convention_id = :convention_id AND location_id = :location_id FOR UPDATE'); 
-        $query->param(':convention_id', $this->convention_id);
-        $query->param(':location_id', $location_id);
-        $result = $query->execute();
-        
-        /* No ticket counter, non-numeric reservation amount, amount less than zero */
-        if ( !$result->count() || !is_numeric($amount) || $amount <= 0 ) {
-            DB::query(NULL, 'ROLLBACK');
-            return 0;
-        }
-        /* No limit, or enough tickets available */
-        else if ( $result->get('tickets_total', -1) == -1 || $result->get('tickets_total') - $result->get('tickets_assigned') >= $amount) { //No limit.
-            $this->ticket_reserved = $amount;
-            $this->ticket_next_id  = $result->get('next_id');       
-        }
-        else {
-            DB::query(NULL, 'ROLLBACK');
-            return 0;
-        }
-
-        return $this->ticket_next_id;
-    }
-    public function finalizeTickets($location_id, $amount = 1, $incNextID = false) {
-        //Reserve tickets is not open. Do nothing (or throw an exception)
-        if (!$this->ticket_reserved) {
-            return;
-        }
-    
-        $alloc = ($amount <= $this->ticket_reserved) ? $amount : $this->ticket_reserved; //Don't "allocate" more than what was originally reserved.
-    
-        //If reserveTickets reserved 0, this query will change nothing. ticket_reserved/ticket_next_id fields are inaccessible from anywhere outside this class.
-        $allocate_query = DB::query(Database::UPDATE, 'UPDATE ticketcounters SET tickets_assigned = tickets_assigned + :alloc, next_id + :next_id WHERE convention_id = :convention_id AND location_id = :location_id');
-        $allocate_query->param(':alloc', $alloc);
-        $allocate_query->param(':next_id', $incNextID ? $alloc : 0); 
-        $allocate_query->param(':convention_id', $this->convention_id);
-        $allocate_query->param(':location_id', $location_id);
-        $allocate_query->execute();
-		
-        DB::query(NULL, 'COMMIT')->execute();
-        $this->ticket_reserved = 0;
-        $this->ticket_next_id = 0;
-    }
-    public function releaseTickets() {
-        if ($this->ticket_reserved) {
-            DB::query(NULL, 'ROLLBACK')->execute(); //Incidentally, if a save() actually got through but then an exception gets thrown while in the same block, everything gets rolled back.            
-        }
-        
-        $this->ticket_reserved = 0;
-        $this->ticket_next_id = 0;
-    }   
-    private function deleteTicket($pass_id) {
-        if ($this->ticket_reserved) {
-            return;
-        }
-        
-        DB::query(NULL, 'START TRANSACTION')->execute();
-        $query = DB::query(Database::SELECT, 'SELECT * FROM ticketcounters WHERE convention_id = :convention_id FOR UPDATE'); 
-        $query->param(':convention_id', $convention_id);                
-        $result = $query->execute();
-        
-        $allocate_query = DB::query(Database::UPDATE, 'UPDATE ticketcounters SET tickets_assigned = tickets_assigned - 1 WHERE convention_id = :convention_id');
-        $allocate_query->param(':convention_id', $convention_id);
-        $allocate_query->execute();
-        DB::query(NULL, 'COMMIT')->execute();   
-    }
-    
     /* Utility methods */
     public static function getTotalRegistrations($cid) {
         return ORM::Factory('Registration')->where('convention_id','=',$cid)->count_all();
@@ -465,7 +384,7 @@ class Model_Registration extends ORM
         $query->where('pass_id', '=',$this->pass_id);
         if ($this->loaded()) 
             $query->where('id','!=', $this->id);
-        $count = (bool)$query->count_all();
+        $count = $query->count_all();
         # Do we have any available?
         if ($count > $this->pass->max_allowed) { 
             return false;

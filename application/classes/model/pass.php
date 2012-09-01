@@ -12,12 +12,6 @@ class Model_Pass extends ORM
 			'requireDOB'		=> array( 'type'  => 'boolean', 'label' => 'DOB Required',	'required'=>false),
     );
     
-    protected $_has_one = array(
-		'ticketcounter' => array(
-			'model' => 'TicketCounter',
-			'foreign_key' => 'pass_id',
-		),
-    );
 	protected $_belongs_to = array(
 		'convention' => array(
             'model' => 'Convention',
@@ -116,37 +110,7 @@ class Model_Pass extends ORM
 		if (!isset($this->requireDOB) || empty($this->requireDOB))
 			$this->requireDOB = 0;
 			
-		$ret = parent::save($validation);	
-		
-		/* Create ticket counter on CREATE. */
-		$this->setTicketCounter();
-		return $ret;
-	}
-	
-	private function setTicketCounter() 
-	{	
-		//Mrawr.
-		if ($this->tickets_total < -1 || empty($this->tickets_total) ) {
-			$this->tickets_total = -1;
-		}
-	
-		$tc = $this->ticketcounter;
-		if ( $tc->loaded() )
-		{
-			if ($tc->tickets_total !== $this->tickets_total )
-			{
-				$tc->tickets_total = $this->tickets_total;
-				$tc->save();
-			}
-		}
-		else 
-		{
-			$tc->pass_id = $this->id;
-			$tc->tickets_assigned = 0;
-			$tc->tickets_total = $this->tickets_total;
-			$tc->next_id = 1;
-			$tc->save();
-		}		
+		return parent::save($validation);	
 	}
 	
 	/* Only admin will modify passes anyways.*/

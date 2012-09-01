@@ -224,7 +224,6 @@ class Controller_Admin extends Base_MainTemplate
 			$post['requireDOB']	= empty($post['requireDOB']) ? 0 : $post['requireDOB'];
             
             $pass->values($post);
-            $pass->tickets_total = $post['tickets_total'];
             
             try {
                 $pass->save();                              
@@ -243,8 +242,6 @@ class Controller_Admin extends Base_MainTemplate
         }   
         else {      
             $post = $pass->as_array();
-            $tc = $pass->ticketcounter->tickets_total;
-            $post['tickets_total'] = $tc < 0 ? '' : $tc;
         }   
         $this->template->content = new View('admin/Pass', array(
             'crows' => $crows,  
@@ -363,36 +360,22 @@ class Controller_Admin extends Base_MainTemplate
             $extra_validation = $this->validateEmailOrPhone($post);
 
             try {
+                $reg->save($extra_validation); 
+                $this->addMessage( __('Created a new registration, ') . $reg->reg_id);
+                $this->session->set('admin_convention_id', $post['convention_id']);
+                
+                $new_reg = ORM::factory('Registration');
+                $new_reg->pass_id = $reg->pass_id;
+                $comp_loc = $post['comp_loc'];
             
-                //Reserve tickets. Return at least 1 except in case of failure (not enough tickets left).
-                if ( $reg->reserveTickets() ) { 
-                    $reg->save($extra_validation); 
-                    $reg->finalizeTickets(); //Finalize the reservation.
-                    $this->addMessage( __('Created a new registration, ') . $reg->reg_id);
-                    $this->session->set('admin_convention_id', $post['convention_id']);
-                    
-                    $new_reg = ORM::factory('Registration');
-                    $new_reg->pass_id = $reg->pass_id;
-                    $comp_loc = $post['comp_loc'];
-                
-                    $post = $new_reg->as_array();
-                    $post['comp_loc'] = $comp_loc;
-                    $post['status'] = Model_Registration::STATUS_PAID;
-                }
-                else if ($reg->pass_id > 0) {                   
-                    $this->addError("No more tickets to allocate for " . $fields['pass_id']['values'][$reg->pass_id] . '. Please select a different pass.');                
-                }   
-                else {
-                    $this->addError("No pass selected. Please select a pass."); 
-                }
-                
+                $post = $new_reg->as_array();
+                $post['comp_loc'] = $comp_loc;
+                $post['status'] = Model_Registration::STATUS_PAID;
             }
             catch (ORM_Validation_Exception $e)
             {               
                 $this->parseErrorMessages($e, $errors);             
             }     
-            
-            $reg->releaseTickets(); //Something went wrong during saving. Rollback everything.
         }
         else
         {           
@@ -1413,23 +1396,16 @@ class Controller_Admin extends Base_MainTemplate
                     $values = array('email' => $reg->email, 'phone' => $reg->phone);
                                         
                     try {
-                        if ( $reg->reserveTickets() ) { 
-                            $reg->save( $this->validateEmailOrPhone($values) );
-                            if ( !isset($import_success[$reg->email]) ) {
-                                $import_success[$reg->email] = array();
-                            }
-                            array_push($import_success[$reg->email], $reg);
-                            $reg->finalizeTickets();
-                            if (@$_POST['email_on_completion'])
-                                array_push($reg_ids, $reg->id);
+                        $reg->save( $this->validateEmailOrPhone($values) );
+                        if ( !isset($import_success[$reg->email]) ) {
+                            $import_success[$reg->email] = array();
                         }
-                        else {
-                            array_push($import_failure, array('reg' => $reg, 'errors' => array('No more tickets available.')));
-                        }
+                        array_push($import_success[$reg->email], $reg);
+                        if (@$_POST['email_on_completion'])
+                            array_push($reg_ids, $reg->id);
                     }            
                     catch (ORM_Validation_Exception $e)
                     {
-                        $reg->releaseTickets();
                         array_push($import_failure, array('reg' => $reg, 'errors' => $e->errors('')));
                     }  
                 }
