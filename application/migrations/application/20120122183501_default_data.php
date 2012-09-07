@@ -11,6 +11,10 @@ class Migration_Application_20120122183501 extends Minion_Migration_Base {
 	 */
 	public function up(Kohana_Database $db)
 	{
+        $rows = $db->query(Database::SELECT,"select count(*) as c from `usergroups`");
+        # migrating existing db
+        if ($rows->get('c') > 0) { return; }
+
         $db->query(NULL,"ALTER TABLE `accounts` DISABLE KEYS");
         $db->query(NULL,"ALTER TABLE `accounts` DISABLE KEYS");
         $db->query(NULL,"ALTER TABLE `usergroups` DISABLE KEYS");
