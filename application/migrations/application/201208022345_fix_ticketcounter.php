@@ -29,7 +29,7 @@ class Migration_Application_201208022345 extends Minion_Migration_Base {
         $db->query(NULL, 'UPDATE passes p SET p.max_allowed=(SELECT tickets_total FROM ticketcounters t WHERE t.pass_id=p.id)');
 
         # Remove ticket counte rtable
-        $db->query(NULL, 'DROP TABLE ticketcounter');
+        $db->query(NULL, 'DROP TABLE ticketcounters');
 	}
 
 	/**
