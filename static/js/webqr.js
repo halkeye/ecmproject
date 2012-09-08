@@ -69,6 +69,16 @@ function finishLookup(data)
 {
     var container = jQuery('#kiosk_lookup');
     container.hide();
+
+    if (data.error) {
+        if (data.not_found)
+        {
+            alert("Unable to find given registration");
+            return;
+        }
+        alert("Unknown error occurred: " + JSON.stringify(data));
+        return;
+    }
     jQuery('#lookup_name').text([data.gname, data.sname].join(' '));
     jQuery('#lookup_reg_id').text(data.pretty_reg_id);
     jQuery('#lookup_pass').text(data.pass);
@@ -125,7 +135,6 @@ jQuery(document).ready(function() {
     jQuery('#kiosk_lookup table').hide();
     var lookupText = jQuery('#kiosk_lookup_text').change(function() {
         var that = jQuery(this);
-        console.log('checking');
         if (that.val().length >= lookupLength) {
             lookupReg(that.val());
         }
