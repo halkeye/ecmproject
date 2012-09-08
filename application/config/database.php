@@ -1,5 +1,10 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
+if (file_exists('database-local.php'))
+{
+    return include('database-local.php');
+    die('here');
+}
 return array
 (
 	'default' => array
