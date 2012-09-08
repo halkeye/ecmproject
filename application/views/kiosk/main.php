@@ -1,10 +1,10 @@
 <script type="text/javascript">
 var lookupURL = "<?php echo URL::site('/kiosk/lookupReg') ?>";
-var spinnerImage = "<?php echo URL::base() ?>/static/spinner/spinner-large.gif";
+var spinnerImage = "<?php echo URL::site('/static/spinner/spinner-large.gif', NULL, FALSE) ?>";
 </script>
-<script type="text/javascript" src="<?php echo URL::base() ?>/static/js/llqrcode.js" /></script>
-<script type="text/javascript" src="<?php echo URL::base() ?>/static/js/webqr.js" /></script>
-<script type="text/javascript" src="<?php echo URL::base() ?>/static/spinner/jquery.spinner.js" /></script>
+<script type="text/javascript" src="<?php echo URL::site('/static/js/llqrcode.js',NULL,FALSE) ?>" /></script>
+<script type="text/javascript" src="<?php echo URL::site('/static/js/webqr.js',NULL,FALSE) ?>" /></script>
+<script type="text/javascript" src="<?php echo URL::site('/static/spinner/jquery.spinner.js',NULL,FALSE) ?>" /></script>
 
 <style type="text/css"><!--
 #qr-canvas { border: 1px solid black; display: none; }
