@@ -432,7 +432,7 @@ class Controller_Admin extends Base_MainTemplate
             //No tickets are being allocated or deleted so no call necessary to ticket allocation methods.
             try {
                 $reg->save();
-                $this->addMessage( __('Successfully edited registration, ') . $reg->reg_id);
+                $this->addMessage( __('Successfully edited registration, ') . $reg->getRegID());
                 $this->session->set('admin_convention_id', $reg->convention_id);
                 $this->request->redirect('admin/manageRegistrations');
             }
@@ -444,6 +444,7 @@ class Controller_Admin extends Base_MainTemplate
             $post = $reg->as_array();
         }
 
+        $post['reg_id'] = $reg->getRegID();
          /* Full registration at this step. */
         $fields['convention_id'] = $reg->convention_id;
         $this->template->content = new View('admin/EditRegistration', array(
@@ -804,6 +805,7 @@ class Controller_Admin extends Base_MainTemplate
 
         //Determine search term (POST).
         $post = $this->request->post();
+        $post = $_GET;
 
         if (isset($post['search_term']))
             $search_term = '%' . $post['search_term'] . '%';
@@ -815,12 +817,25 @@ class Controller_Admin extends Base_MainTemplate
         if ($entity == 'Registration' && $search_term != null)
         {
             $this->template->heading = __('Searching for Registrations');
-            $rows = ORM::Factory('Registration')
-                ->or_where('email', 'LIKE', $search_term)
-                ->or_where('gname', 'LIKE', $search_term)
-                ->or_where('sname', 'LIKE', $search_term)
-                ->or_where('reg_id', 'LIKE', $search_term)
-                ->find_all();
+            if (preg_match('/^\w+-\d{2}-\d+$/', $post['search_term']) === 1)
+            {
+                list($location_name, $convention_id, $reg_id) = explode('-', $post['search_term']);
+                $rows = ORM::Factory('Registration')
+                    ->with('location')
+                    ->where('location.prefix','=', $location_name)
+                    ->where('convention_id','=', $convention_id)
+                    ->where('reg_id','=', $reg_id)
+                    ->find_all();
+            }
+            else
+            {
+                $rows = ORM::Factory('Registration')
+                    ->or_where('email', 'LIKE', $search_term)
+                    ->or_where('gname', 'LIKE', $search_term)
+                    ->or_where('sname', 'LIKE', $search_term)
+                    ->or_where('reg_id', 'LIKE', $search_term)
+                    ->find_all();
+            }
         }
         else if ($entity == 'Account' && $search_term != null)
         {
