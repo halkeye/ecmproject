@@ -329,7 +329,7 @@ class Controller_Admin extends Base_MainTemplate
             1 => __("Picked Up"),
         );
 		
-		$locations = ORM::Factory('Location')->find_all_non_reserved()->as_array('prefix', 'prefix');
+		$locations = ORM::Factory('Location')->find_all_non_reserved()->as_array('id', 'prefix');
         if ( !$locations )
         {
             $this->addError('No purchase locations defined! Please define some locations before continuing.');
@@ -355,13 +355,15 @@ class Controller_Admin extends Base_MainTemplate
 
         if ($post)
         {
+            $post['convention_id'] = $post['convention_id'];
+            $post['location_id'] = $post['comp_loc'];
+            $post['reg_id'] = $post['comp_id'];
             $reg->values($post);
-            $errors = $reg->build_regID($post, $locations, $convention_id); //If validation fails, empty regID and save() will fail.
             $extra_validation = $this->validateEmailOrPhone($post);
 
             try {
                 $reg->save($extra_validation);
-                $this->addMessage( __('Created a new registration, ') . $reg->reg_id);
+                $this->addMessage( __('Created a new registration, ') . $reg->getRegID());
                 $this->session->set('admin_convention_id', $post['convention_id']);
 
                 $new_reg = ORM::factory('Registration');
@@ -374,7 +376,7 @@ class Controller_Admin extends Base_MainTemplate
             }
             catch (ORM_Validation_Exception $e)
             {
-                $this->parseErrorMessages($e, $errors);
+                $this->parseErrorMessages($e);
             }
         }
         else
