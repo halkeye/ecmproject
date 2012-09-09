@@ -1,6 +1,6 @@
 <?php
 
-class Model_Permission extends ORM 
+class Model_Permission extends ORM
 {
     var $_table_name = 'permissions';
     #var $primary_key = 'permissions_id';
@@ -12,7 +12,7 @@ class Model_Permission extends ORM
     );
 
 
-    public function unique_key($id = NULL) 
+    public function unique_key($id = NULL)
     {
         if (empty($id))
             return parent::unique_key($id);
@@ -22,7 +22,7 @@ class Model_Permission extends ORM
 
         return parent::unique_key($id);
     }
-    
+
     /**
 	 * Validates and optionally saves a new user record from an array.
 	 *
@@ -44,11 +44,11 @@ class Model_Permission extends ORM
         //$array->add_callbacks('email', array($this, '_unique_name'));
         //$array->add_rules('name', 'required', array($this, '_name_exists'));
 
- 
+
 		return parent::validate($array, $save);
 	}
 
 }
 
 /* End of file permission.php */
-/* Location: ./application/models/permission.php */ 
+/* Location: ./application/models/permission.php */

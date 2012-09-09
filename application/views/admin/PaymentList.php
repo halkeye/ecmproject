@@ -8,12 +8,12 @@
 	<p>
 		<?php echo html::anchor($createLink, $createText, $createText); ?>
 	</p>
-	
+
 	<table width='100%'>
-	<?php 
+	<?php
 		foreach ($rows as $row):
-			print $row;	
-		endforeach;	
+			print $row;
+		endforeach;
 	?>
 	</table>
 </div>

@@ -21,7 +21,7 @@ class Model_Event extends ORM
         'name' 			=> array( 'type'  => 'text', 'label' => 'Convention Name', 'required'=>true ),
         'location' 		=> array( 'type'  => 'text', 'label' => 'Location', 	   'required'=>true )
     );
-	
+
 	protected $_rules = array(
 		'name'		=> array(
 			'not_empty'		=> true,
@@ -29,7 +29,7 @@ class Model_Event extends ORM
 		),
 		'location'	=> array(
 			'max_length'	=> array(255)
-		)		
+		)
 	);
 
     public function filters()
@@ -38,7 +38,7 @@ class Model_Event extends ORM
         $filters['*'] = array('trim');
         return $filters;
     }
-    
+
     public static function getTotalEvents()
     {
         $query = DB::query(Database::SELECT, 'SELECT COUNT(*) as count FROM events');

@@ -13,10 +13,10 @@ foreach (array('email') as $field)
     echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $form[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
 }
 echo '</fieldset>';
- 
+
 echo "<fieldset class='left'>";
 echo form::submit(null,__('auth.changeEmail_field_submit'));
-echo '</fieldset>'; 
+echo '</fieldset>';
 
 echo form::close();
 echo '</div>';

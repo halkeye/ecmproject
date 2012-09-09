@@ -81,7 +81,7 @@ class Migration_Application_20120122183501 extends Minion_Migration_Base {
             convention_id = 1,
             name          = 'Weekend Pass',
             price         = '35.00',
-            startDate     = 1204226000, 
+            startDate     = 1204226000,
             endDate       = 1306904400,
             isPurchasable = 1
         ");
@@ -93,7 +93,7 @@ class Migration_Application_20120122183501 extends Minion_Migration_Base {
         $db->query(NULL,"INSERT INTO `accounts_usergroups` SET usergroup_id = 3, account_id = 3");
 
         $db->query(NULL,"INSERT INTO `locations` SET id = 1, prefix = 'ECM', location = 'Electronic Convention Management System'");
-        
+
         $db->query(NULL,"ALTER TABLE `accounts` ENABLE KEYS");
         $db->query(NULL,"ALTER TABLE `accounts` ENABLE KEYS");
         $db->query(NULL,"ALTER TABLE `usergroups` ENABLE KEYS");

@@ -5,7 +5,7 @@
 
 <p>Your <?php echo $convention_name ?> login is (just in case you forgot) is <?php echo $email ?></p>
 
-<p>Questions? Head to the <?php echo $convention_name ?> forums at <?php echo html::anchor($convention_forum_url) ?> 
+<p>Questions? Head to the <?php echo $convention_name ?> forums at <?php echo html::anchor($convention_forum_url) ?>
     or email <?php echo $convention_contact_email ?> </p>
 
 <p>- <?php echo $convention_name ?><br />

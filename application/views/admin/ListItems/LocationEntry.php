@@ -1,4 +1,4 @@
-<?php 
+<?php
 //If the row containing the information is set, print out the information.
 if(isset($row)) { ?>
 
@@ -6,7 +6,7 @@ if(isset($row)) { ?>
 	<td><?php print $row->prefix; ?></td>
 	<td><?php print $row->location; ?></td>
 	<?php
-		foreach ($actions as $action): 		
+		foreach ($actions as $action):
 			print '<td class="center">' . $action; '</td>';
 		endforeach;
 	?>

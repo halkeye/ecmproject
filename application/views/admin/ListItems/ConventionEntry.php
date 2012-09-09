@@ -1,12 +1,12 @@
-<?php 
+<?php
 //If the row containing the information is set, print out the information.
 if(isset($row)) { ?>
 
 <tr>
 	<td><?php print htmlspecialchars($row->name, ENT_COMPAT, "UTF-8") ?></td>
-	<td><?php print htmlspecialchars($row->location, ENT_COMPAT, "UTF-8") ?></td>	
+	<td><?php print htmlspecialchars($row->location, ENT_COMPAT, "UTF-8") ?></td>
 	<?php
-		foreach ($actions as $action): 		
+		foreach ($actions as $action):
 			print '<td class="center">' . $action; '</td>';
 		endforeach;
 	?>

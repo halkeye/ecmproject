@@ -2,7 +2,7 @@
 /**
  * API-User api
  *
- * @package    
+ * @package
  * @category   Controller
  * @author     Gavin Mogan
  * @copyright  (c) 2012 KodeKoan
@@ -10,7 +10,7 @@
 class Controller_API_Lookup extends OAuth2_Controller
 #class Controller_API_Lookup extends Controller
 {
-    public function before() 
+    public function before()
     {
         Kohana_Exception::$error_view = "api/error";
         $this->request->headers['Content-Type'] = 'application/json';
@@ -27,4 +27,4 @@ class Controller_API_Lookup extends OAuth2_Controller
             ))
         );
     }
-} 
+}

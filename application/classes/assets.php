@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.'); 
+<?php defined('SYSPATH') OR die('No direct access allowed.');
 
 class Assets
 {
@@ -9,7 +9,7 @@ class Assets
     {
         self::$stylesheets[$filename] = $weight;
     }
-    
+
     public static function getCSS()
     {
         return array_keys(self::$stylesheets);

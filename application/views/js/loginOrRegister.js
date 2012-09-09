@@ -1,7 +1,7 @@
 var newLoginContainer = document.getElementById("newLogin");
 var existingLoginContainer = document.getElementById("existingLogin");
 
-function createCookie(name,value,days) 
+function createCookie(name,value,days)
 {
     if (days) {
         var date = new Date();
@@ -12,7 +12,7 @@ function createCookie(name,value,days)
     document.cookie = name+"="+value+expires+"; path=/";
 }
 
-function readCookie(name) 
+function readCookie(name)
 {
     var nameEQ = name + "=";
     var ca = document.cookie.split(';');
@@ -33,7 +33,7 @@ function switchForm()
     return false;
 }
 
-if ( readCookie('loginPageTab') == 'existing') 
+if ( readCookie('loginPageTab') == 'existing')
 {
     newLoginContainer.style.display='none';
 }

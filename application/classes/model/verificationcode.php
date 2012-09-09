@@ -1,6 +1,6 @@
 <?php
 
-class Model_Verificationcode extends ORM 
+class Model_Verificationcode extends ORM
 {
     const TYPE_EMAIL_CHANGE   = 1;
     const TYPE_VALIDATE_EMAIL = 2;
@@ -28,8 +28,8 @@ class Model_Verificationcode extends ORM
             'code'        => array ( 'type' => 'string', 'length' => '40'                                              ),
             'value'       => array ( 'type' => 'string', 'length' => '255'                                             ),
     );
-	
-    public function unique_key($id = NULL) 
+
+    public function unique_key($id = NULL)
     {
         if (empty($id))
             return $this->primary_key;
@@ -37,7 +37,7 @@ class Model_Verificationcode extends ORM
         /*
         if (is_string($id) && !ctype_digit($id))
             return 'code';
-        
+
         if (is_numeric($id))
             return $this->primary_key;
         */
@@ -55,7 +55,7 @@ class Model_Verificationcode extends ORM
     {
         while (true)
         {
-            try 
+            try
             {
                 $code = substr(md5(uniqid(rand(), true)), 0, 10);
                 $vcode = ORM::Factory('verificationcode');

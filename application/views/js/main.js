@@ -10,13 +10,13 @@ var Scheduler = function() {
             var className = $schedItemSelectors.eq(i).attr('class');
             $scheduleContent.find('.schedItem.' + className).addClass(className + 'Offline').removeClass(className);
         }
-    } 
+    }
     return {
         init: function() {
             firstClick = 1;
             $schedItemSelectors = jQuery("#schedItemSelector").find("div");
             $scheduleContent = jQuery("#scheduleContent");
-            
+
             //Set toggle
             $schedItemSelectors.toggle(function(){
                 if (firstClick) {

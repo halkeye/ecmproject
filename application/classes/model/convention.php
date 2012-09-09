@@ -19,7 +19,7 @@ class Model_Convention extends ORM
             'name' 		=> array( 'type' => 'text', 'label' => 'Event Name', 'required'=>true ),
             'location' 	=> array( 'type' => 'text', 'label' => 'Location' )
     );
-		
+
 	public function labels()
 	{
 		return array(
@@ -28,26 +28,26 @@ class Model_Convention extends ORM
 		);
 	}
 
-	
+
 	public function rules()
-	{		
+	{
 		return array(
-			'name'		=> array( 
-				array('not_empty'), 
+			'name'		=> array(
+				array('not_empty'),
 				array('max_length',	array(':value', 255) )
 			),
 			'location'	=> array(
-				array( 'max_length', array(':value', 255) )		
+				array( 'max_length', array(':value', 255) )
 			)
-		);	
-	}	
+		);
+	}
 
     public function filters()
     {
 		$filters = parent::filters();
 		$filters[TRUE] = array ( array('trim') );
 		return $filters;
-    }   
+    }
     public static function getTotalConventions()
     {
         $query = DB::query(Database::SELECT, 'SELECT COUNT(*) as count FROM conventions');

@@ -2,7 +2,7 @@
 
 /**
  * User Controller
- * 
+ *
  * All user related webpage and functionality.
  * @author Gavin Mogan <ecm@gavinmogan.com>
  * @version 1.0
@@ -10,7 +10,7 @@
  */
 
 
-class Controller_Convention extends Base_MainTemplate 
+class Controller_Convention extends Base_MainTemplate
 {
     const STEP1 = "convention/checkout";
     const STEP2 = "convention/checkout";
@@ -35,73 +35,73 @@ class Controller_Convention extends Base_MainTemplate
 	{
 		$reg_id = isset($reg_id) ? intval($reg_id) : NULL;
 		$reg = ORM::factory('registration', $reg_id);
-		
+
 		if (!$reg->loaded())
 		{
 			$this->addError(__('Oops. The registration seems to have disappeared...'));
 			$this->request->redirect("convention/checkout");
 		}
-		
+
 		/* Prevent users from using deleteReg with an arbitrary number */
 		if ($reg->account_id != $this->auth->getAccount()->id)
 		{
 			$this->addError(__('Oops. The registration seems to have disappeared...') . $reg->account_id);
 			$this->request->redirect("convention/checkout");
 		}
-		
+
 		if ($reg->status != Model_Registration::STATUS_UNPROCESSED)
 		{
 			$this->addError(__('Cannot delete a registration for which payment is being processed.'));
 			$this->request->redirect("convention/checkout");
         }
-				
+
 		if ($post = $this->request->post())
         {
 			if ( isset($post['Yes']) && $post['Yes'] )
 			{
 				if ($reg->delete())
 				{
-					$this->addMessage(__('Deleted the ticket from your shopping cart.'));	
+					$this->addMessage(__('Deleted the ticket from your shopping cart.'));
 				}
 				else
 				{
-					$this->addError(__('Failed to delete the ticket! Please try again or contact the webmaster.'));	
+					$this->addError(__('Failed to delete the ticket! Please try again or contact the webmaster.'));
 				}
 			}
-			
+
 			$this->request->redirect("convention/checkout");
 		}
-				
+
 		$this->template->content = new View('convention/deleteReg', array('reg'=>$reg));
 
 	}
-	
+
 	function action_viewReg($reg_id = NULL)
 	{
-		$this->template->title = "Viewing Registration...";		
-	
+		$this->template->title = "Viewing Registration...";
+
 		$reg_id = isset($reg_id) ? intval($reg_id) : NULL;
 		$reg = ORM::factory('registration', $reg_id);
 		$pass = ORM::factory('Pass', $reg->pass_id);
-		
+
 		if (!$reg->loaded())
 		{
 			$this->addError(__('Oops. The registration seems to have disappeared...'));
 			$this->request->redirect("convention/checkout");
 		}
-		
+
 		$this->template->heading = $pass->name . ' for ' . $reg->gname . ' ' . $reg->sname;
 		$this->template->subheading = 'Viewing registration...';
 		$this->template->content = new View('convention/viewReg', array('reg' => $reg, 'pass' => $pass));
 	}
-	
+
     function action_registrationCancel($reg_id)
     {
         $reg_id = intval($reg_id);
         $reg = ORM::Factory('registration',$reg_id);
         $this->template->content = "cancel/fail page";
     }
-    
+
     function action_registrationReturn()
     {
         $regids = array();
@@ -110,7 +110,7 @@ class Controller_Convention extends Base_MainTemplate
         while (isset($_POST['item_number'.$count]) && $_POST['item_number'.$count])
         {
             $data = explode('|', $_POST['item_number'.$count]);
-            $regids[$data[0]] = array('id' => $data[0], 'pass_id' => $data[1]); 
+            $regids[$data[0]] = array('id' => $data[0], 'pass_id' => $data[1]);
             $count++;
         }
 
@@ -143,12 +143,12 @@ class Controller_Convention extends Base_MainTemplate
     {
         $this->requireVerified();
 		$user = $this->auth->get_user();
-		
+
 		$welcome = __('Purchase tickets for ') . htmlentities($user->gname) . ' ' . htmlentities($user->sname);
 		$edit_link = html::anchor('/user/changeName', __('(Change my name)'), array('class' => 'small_link'), null, true);
-		
+
         $this->template->heading    = $welcome . ' ' . $edit_link;
-        $this->template->subheading = __('Register and purchase tickets for events here.'); 
+        $this->template->subheading = __('Register and purchase tickets for events here.');
 
 
         $data = Kohana::config('paypal');
@@ -159,25 +159,25 @@ class Controller_Convention extends Base_MainTemplate
 
         /* get all the registrations we need */
         $data['registrations'] = ORM::Factory('registration')->getForAccount($this->auth->getAccount()->id);
-        /*if (!$data['registrations']->count()) 
+        /*if (!$data['registrations']->count())
         {
-			$this->request->redirect('user/index'); 
+			$this->request->redirect('user/index');
         }
          */
 
         /* Config file is currently 'url', lets map it to 'paypal_url' incase any other url is used */
         $data['paypal_url'] = $data['url'];
         unset($data['url']);
-		
+
         /* Where paypal should tell us about successful transactions */
         $data['notify_url'] = url::site('/paypal/registrationPaypalIPN',TRUE);
-		
+
         ### FIXME - This needs an external url, so can't be localhost
         if (strpos($data['notify_url'], 'moocow.local') !== FALSE) {
             $data['notify_url'] = 'http://moocow.halkeye.net:4080/ecmproject/index.php/paypal/registrationPaypalIPN';
         }
 
-        /* Where to send the user when we complete */ 
+        /* Where to send the user when we complete */
         $data['return_url'] = url::site('/convention/registrationReturn',TRUE);
         /* where to send the user if they back out */
         $data['cancel_url'] = url::site('/convention/registrationCancel',TRUE);
@@ -189,16 +189,16 @@ class Controller_Convention extends Base_MainTemplate
             $this->template->content->$key = $value;
         }
     }
-    
+
     public function action_addRegistration()
     {
         $reg = ORM::factory('registration');
-        
+
         $pass = $reg->getPossiblePassesQuery()->with('convention')->where('passes.id', '=', $_POST['pass_id'])->find();
         if (!$pass->loaded())
         {
             $this->addError('Pass provided is no longer valid');
-            $this->request->redirect('/convention/checkout'); 
+            $this->request->redirect('/convention/checkout');
             return;
         }
         $location = Model_Location::defaultLocation();
@@ -215,7 +215,7 @@ class Controller_Convention extends Base_MainTemplate
         $reg->phone = $this->auth->getAccount()->phone;
         $reg->account_id = $this->auth->getAccount()->id;
         $reg->status = Model_Registration::STATUS_UNPROCESSED;
-		
+
 		//If DOB is required, then set DOB in reg model. (Hello nulls. One day I will fix this.).
 		if ( !empty($_POST['dob']) && $pass->requireDOB && is_numeric(str_replace('-', "", $_POST['dob'])) )
 		{
@@ -224,11 +224,11 @@ class Controller_Convention extends Base_MainTemplate
 		else if ($pass->requireDOB)
 		{
 			$this->addError("Oops. No date of birth when one was expected.");
-			$this->request->redirect('/convention/checkout'); 			
+			$this->request->redirect('/convention/checkout');
 		}
-		
+
         try {
-            if (! $reg->check_passes_available() ) 
+            if (! $reg->check_passes_available() )
             {
                 $this->addError("No more tickets to allocate for " . $pass->convention->name . ' - ' . $pass->name . ". Please select a different pass.");
             }
@@ -245,7 +245,7 @@ class Controller_Convention extends Base_MainTemplate
                 $this->addError($msg);
             }
         }
-        $this->request->redirect('/convention/checkout'); 
+        $this->request->redirect('/convention/checkout');
     }
 
 }

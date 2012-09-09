@@ -1,6 +1,6 @@
 <?php
 
-class Model_Usergroup extends orm 
+class Model_Usergroup extends orm
 {
     var $_table_name = 'usergroups';
     #var $primary_key = 'usergroups_id';
@@ -12,18 +12,18 @@ class Model_Usergroup extends orm
     );
 
     public $_has_many = array(
-        'Permissions' => array ( 
+        'Permissions' => array (
             'model' => 'permission',
             'through' => 'usergroups_permissions',
             'foreign_key' => 'usergroup_id',
         ),
-		'Accounts' => array ( 
+		'Accounts' => array (
             'model' => 'account',
             'through' => 'accounts_usergroups',
         )
     );
-    
-    public function unique_key($id = NULL) 
+
+    public function unique_key($id = NULL)
     {
         if (empty($id))
             return parent::unique_key($id);
@@ -33,7 +33,7 @@ class Model_Usergroup extends orm
 
         return parent::unique_key($id);
     }
-    
+
     /**
 	 * Validates and optionally saves a new user record from an array.
 	 *
@@ -55,11 +55,11 @@ class Model_Usergroup extends orm
         //$array->add_callbacks('email', array($this, '_unique_name'));
         //$array->add_rules('name', 'required', array($this, '_name_exists'));
 
- 
+
 		return parent::validate($array, $save);
 	}
 
 }
 
 /* End of file usergroup.php */
-/* Location: ./application/models/usergroup.php */ 
+/* Location: ./application/models/usergroup.php */

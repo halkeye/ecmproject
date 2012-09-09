@@ -26,7 +26,7 @@ foreach (array('gname','sname', 'badge', 'dob', 'email', 'phone','cell', 'city',
 }
 echo '</fieldset>';
 
-    
+
 echo '<h1>'.HTML::chars(__('convention.registration_select_pass_header')) . '</h1>';
 echo '<p>'.HTML::chars(__('convention.registration_select_pass_desc')) . '</p>';
 
@@ -50,10 +50,10 @@ echo form::textarea('agree_toc', __('convention.registration_tac'), array('rows'
     echo new View('global/_form_field', array('field'=>$field, 'fieldData'=>$fields[$field], 'value' => $form[$field], 'hasError'=>isset($errors[$field]) && $errors[$field]));
 }
 echo '</fieldset>';
-        
+
 echo "<fieldset class='left'>";
 echo form::submit(null,__('convention.registration_submit'));
-echo '</fieldset>'; 
+echo '</fieldset>';
 
 echo form::close();
 echo '</div>';

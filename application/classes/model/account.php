@@ -5,7 +5,7 @@ class Verification_Exceeds_Exception extends Exception {}
 
 // FIXME - on insert
 // ORM::factory('usergroup')->where('name', '=', 'Registered')->find()
-class Model_Account extends ORM 
+class Model_Account extends ORM
 {
     const ACCOUNT_STATUS_UNVERIFIED =  0;
     const ACCOUNT_STATUS_VERIFIED   =  1;
@@ -19,7 +19,7 @@ class Model_Account extends ORM
 
     // Current relationships
     public $_has_many = array(
-        'Usergroups' => array ( 
+        'Usergroups' => array (
             'model' => 'usergroup',
             'through' => 'accounts_usergroups',
         )
@@ -42,7 +42,7 @@ class Model_Account extends ORM
             'login'       => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => false, 'null' => true,     ),
     );
     // var_export($model->list_columns());
-	
+
 	public $default_fields = array(
             'email' 			=> array( 'type'  => 'text', 	'label' => 'Email', 			'sub_label' =>	'Account email address', 'required'=>true 		),
 			'gname' 			=> array( 'type'  => 'text', 	'label' => 'First Name', 		'required'=>true 		),
@@ -52,7 +52,7 @@ class Model_Account extends ORM
 			'confirm_password' 	=> array( 'type'  => 'password', 	'label' => 'Confirm Password', 	'required'=>true    	),
             'status' 			=> array( 'type'  => 'select', 	'label' => 'Status', 			'required'=>false  		)
     );
-	
+
 	private $_labels = array(
 		'email' => 'Email',
 		'gname' => 'First Name',
@@ -60,14 +60,14 @@ class Model_Account extends ORM
 		'phone' => 'Phone number',
 		'password' => 'Password',
 	);
-	
+
     protected $ignored_columns = array('confirm_password', 'groups', 'permissions');
-	
+
 	public function labels()
 	{
 		return $this->_labels;
 	}
-	
+
     public function filters()
     {
         $filters = parent::filters();
@@ -103,8 +103,8 @@ class Model_Account extends ORM
 		$rules['password'] = array(
 			array('not_empty'),
 			array('min_length', array(':value',6)),
-			array('max_length', array(':value',255)),		
-		);		
+			array('max_length', array(':value',255)),
+		);
 		$rules['status'] = array(
 			array(array($this, '_valid_status_code'))
 		);
@@ -121,7 +121,7 @@ class Model_Account extends ORM
             $this->status = Model_Account::ACCOUNT_STATUS_UNVERIFIED;
         }
     }
-	
+
     public function _set_password($value)
     {
         if (empty($this->salt))
@@ -172,26 +172,26 @@ class Model_Account extends ORM
 	{
         $data = (array) $array;
 		// Initialise the validation library and setup some rules
-		$array = Validation::factory($array);		
-		
-		/* Password is not required, but if it is...the new passwords should match. */		
+		$array = Validation::factory($array);
+
+		/* Password is not required, but if it is...the new passwords should match. */
 		return parent::validate($array, $save);
 	}
- 
-	public function unique_key($id = NULL) 
+
+	public function unique_key($id = NULL)
     {
         if (empty($id))
             return $this->primary_key;
 
         if (is_string($id) && !ctype_digit($id))
             return 'email';
-        
+
         if (is_numeric($id))
             return $this->primary_key;
 
         return parent::unique_key($id);
     }
-    
+
     public function _valid_unique($field, $email)
     {
         $query = ORM::factory('Account');
@@ -205,13 +205,13 @@ class Model_Account extends ORM
     }
 	public function _valid_status_code($code)
 	{
-		if ($code == Model_Account::ACCOUNT_STATUS_UNVERIFIED 	|| 
-			$code == Model_Account::ACCOUNT_STATUS_VERIFIED 	|| 
-			$code == Model_Account::ACCOUNT_STATUS_BANNED) 
-		{		
+		if ($code == Model_Account::ACCOUNT_STATUS_UNVERIFIED 	||
+			$code == Model_Account::ACCOUNT_STATUS_VERIFIED 	||
+			$code == Model_Account::ACCOUNT_STATUS_BANNED)
+		{
 			return true;
 		}
-	
+
 		return false;
 	}
 
@@ -237,7 +237,7 @@ class Model_Account extends ORM
         /* Delete any outstanding validation codes */
         ORM::Factory('verificationcode')->delete_all_for_account($this->id);
     }
-	
+
 	public function statusToString() {
 		if ($this->status == Model_Account::ACCOUNT_STATUS_UNVERIFIED)
 			return 'UNVERIFIED';
@@ -248,28 +248,28 @@ class Model_Account extends ORM
 		else
 			return 'UNKNOWN STATUS';
 	}
-	
+
 	public function stringToStatus($status) {
 		if (strcmp($status, 'UNVERIFIED') == 0)
 			return Model_Account::ACCOUNT_STATUS_UNVERIFIED;
 		else if (strcmp($status, 'VERIFIED') == 0)
 			return Model_Account::ACCOUNT_STATUS_VERIFIED;
 		else
-			return Model_Account::ACCOUNT_STATUS_BANNED;	
-	
-	}	
-	
+			return Model_Account::ACCOUNT_STATUS_BANNED;
+
+	}
+
 	public static function getVerifySelectList() {
 		return array('0' => 'Unverified', '1' => 'Confirmed', '99' => 'Banned');
 	}
-	
+
 	public static function getTotalAccounts()
-	{	
+	{
 		$query = DB::query(Database::SELECT, 'SELECT COUNT(*) as count FROM accounts');
         $row = $query->execute();
         return (int) $row[0]['count'];
 	}
-	
+
 	/**
 	* Given an email address, create an account if it does not already exist with the email as the password.
 	* Return the id of the account (new or existing).
@@ -277,20 +277,20 @@ class Model_Account extends ORM
 	public function createAccount($email)
 	{
 		$account = ORM::Factory('Account');
-		$account->email = $email; //Race condition aside, we know it won't be in the DB.	
+		$account->email = $email; //Race condition aside, we know it won't be in the DB.
 		$account->password = $account->_encryptValue($email);
-		
+
 		try {
-		
+
 			$account->save();
-			if ($account->saved)			
+			if ($account->saved)
 				return $account->id;
-			
+
 		} catch (Exception $exception)
 		{
 			//Do nothing. Assume that it already exists (the account).
 		}
-			
+
 		/* Email column has restraint UNIQUE. We will either get 0 ... 1 entries. */
 		$results = ORM::Factory('Account')->where('email',$email)->find_all();
 		if (count($results) > 0)
@@ -300,7 +300,7 @@ class Model_Account extends ORM
 		else
 		{
 			return -1;
-		}		
+		}
 	}
 
     public function incrNumLogins()
@@ -315,4 +315,4 @@ class Model_Account extends ORM
 }
 
 /* End of file user.php */
-/* Location: ./application/models/user.php */ 
+/* Location: ./application/models/user.php */

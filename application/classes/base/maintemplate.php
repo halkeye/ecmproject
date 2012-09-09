@@ -6,7 +6,7 @@ class Base_MainTemplate extends Controller_Template
     protected $auth = null;
 	// Session instance
 	protected $session;
-    
+
     public $template = 'mainTemplate';
 
     function before()
@@ -34,7 +34,7 @@ class Base_MainTemplate extends Controller_Template
         $this->template->profiler = '';
 
         $this->template->set_global('currentUrl', $this->request->current());
-        
+
         if ($this->auth->is_logged_in())
         {
             $this->isVerifiedAccount = TRUE;
@@ -42,7 +42,7 @@ class Base_MainTemplate extends Controller_Template
             if ($user->status != Model_Account::ACCOUNT_STATUS_VERIFIED)
             {
                 /* check the database not the cached version for determining if they are cached or not
-                 * Maybe we can get away with not doing this 
+                 * Maybe we can get away with not doing this
                  */
                 $user = ORM::factory('Account', array('id'=>$user->id));
                 if ($user->status != Model_Account::ACCOUNT_STATUS_VERIFIED)
@@ -70,10 +70,10 @@ class Base_MainTemplate extends Controller_Template
             $this->template->subheading = ucfirst($this->request->action());
 
         $session_messages = $this->session->get_once('messages');
-        if ($session_messages) 
+        if ($session_messages)
             $this->template->messages = array_merge($session_messages, $this->template->messages);
         $session_errors = $this->session->get_once('errors');
-        if ($session_errors) 
+        if ($session_errors)
             $this->template->errors = array_merge($session_errors, $this->template->errors);
 
         /* Are you logged in? */
@@ -81,21 +81,21 @@ class Base_MainTemplate extends Controller_Template
         $this->template->set_global('isVerifiedAccount', isset($this->isVerifiedAccount) ? $this->isVerifiedAccount : FALSE);
         /* store the user */
         $this->template->set_global('account', $this->auth->getAccount());
-        
+
         if ($this->template->isLoggedIn)
         {
-			
+
 			$this->addMenuItem(array('url'=>'convention/checkout', 'title'=>'Purchase Tickets'));
 			$this->addMenuItem(array('title'=>'My Account', 'url'=>'user'));
-			
+
 			if ($this->auth->hasPermission('admin'))
 			{
 				$this->addMenuItem(array('title'=>'Administration', 'url'=>'admin'));
 			}
-			
+
             $this->addMenuItem(array('url'=>'user/logout', 'title'=>'Logout'));
         }
-		
+
         return parent::after();
     }
 
@@ -105,7 +105,7 @@ class Base_MainTemplate extends Controller_Template
         $messages[] = $message;
         $this->session->set('messages',  $messages);
     }
-    
+
     protected function hasErrors() { count($this->session->get('errors') or array()) > 0; }
     protected function addError($error)
     {
@@ -128,7 +128,7 @@ class Base_MainTemplate extends Controller_Template
 
     protected function requireLogin()
     {
-        if (!$this->auth->is_logged_in()) 
+        if (!$this->auth->is_logged_in())
         {
             $this->session->set('redirected_from', $this->request->current());
             $this->request->redirect('/user/loginOrRegister');
@@ -138,17 +138,17 @@ class Base_MainTemplate extends Controller_Template
 
     protected function requireVerified()
     {
-        if ($this->auth->is_logged_in() && !$this->isVerifiedAccount ) 
+        if ($this->auth->is_logged_in() && !$this->isVerifiedAccount )
         {
             /* You can't go any furthur until email address is verified. */
-            $this->addError(__('The email address associated to this account must be verified first.')); 
+            $this->addError(__('The email address associated to this account must be verified first.'));
             $this->session->set('redirected_from',  $this->request->current());
             $this->request->redirect('/user/verifyMenu');
             return;
         }
     }
 
-    protected function requirePermission($permission) 
+    protected function requirePermission($permission)
     {
         $this->requireLogin();
         if (!$this->auth->hasPermission($permission))

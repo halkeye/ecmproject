@@ -1,10 +1,10 @@
 <?php
 
-class Model_Payment extends ORM 
+class Model_Payment extends ORM
 {
 	const STATUS_PENDING = 'Pending'; // Payment approval is pending.
     const STATUS_DENIED  = 'Denied'; // Payment was denied (invalid, insufficient funds, etc).
-	const STATUS_COMPLETED	 = 'Completed'; // Payment status is accepted (completed).	
+	const STATUS_COMPLETED	 = 'Completed'; // Payment status is accepted (completed).
 
 	/* These fields are all that are needed for manual payment entry. Other fields are for PayPal use only */
 	public $default_fields = array(
@@ -14,7 +14,7 @@ class Model_Payment extends ORM
             'mc_gross' => array( 'type'  => 'text', 'label' => 'Password', 'required'=>true     					),
             'payment_status' => array( 'type'  => 'select', 'label' => 'Status', 'required'=>true    					)
     );
-    
+
     /* On unserialize never check the db */
     protected $_reload_on_wakeup = false;
 
@@ -44,12 +44,12 @@ class Model_Payment extends ORM
 			$this->payment_date = time();
         }
 	}
-	
+
 	public function validate_admin(array & $array, $save = FALSE)
 	{
 		$array = Validation::factory($array);
         $array->pre_filter('trim');
-		
+
 		$fields = $this->default_fields;
         foreach ($fields as $field => $fieldData)
         {
@@ -58,22 +58,22 @@ class Model_Payment extends ORM
                 $array->add_rules($field, 'required');
             }
         }
-		
+
 		/* For optional fields */
         $array->add_rules('txn_id', 'length[0-255]');
         $array->add_rules('receipt_id', 'length[0-255]');
-		
+
 		/* Ensure non-empty dropdown menus */
 
 		if (empty($array->type) || $array->type == -1)
 			$array->add_error('type', 'type_default');
-			
+
 		if (empty($array->payment_status) || $array->type == -1)
 			$array->add_error('payment_status', 'payment_status_default');
-		
+
 		return parent::validate($array, $save);
 	}
-	
+
 	public function getPaymentStatusSelectList() {
 		return array(Model_Payment::STATUS_PENDING => 'Pending', Model_Payment::STATUS_DENIED => 'Denied', Model_Payment::STATUS_COMPLETED => 'Completed');
 	}
@@ -89,34 +89,34 @@ class Model_Payment extends ORM
 		else
 			return $this->payment_status; //If paypal sets status values, it'll probably be in string format. So just return it.
 	}
-	
+
 	public function getTotalPayments($reg)
 	{
 		$db = new Database();
 		$result = $db->query('SELECT COUNT(*) as count FROM payments WHERE reg_id=?', $db->escape($reg));
-		
+
 		return (int) $result[0]->count;
 	}
-	
+
 	public function lastModifiedName()
 	{
         /* FIXME UCHI< YOU ARE MY ONLY HOPE */
         return $this->id;
 	}
-	
+
 	public function getTotal()
 	{
-		$db = new Database();				
+		$db = new Database();
 		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE reg_id=? AND payment_status=?',$this->reg_id, Model_Payment::STATUS_COMPLETED);
-		
-		return (int) $result[0]->gross;		
+
+		return (int) $result[0]->gross;
 	}
-	
+
 	public function staticGetTotal($reg_id)
 	{
 		$db = new Database();
 		$result = $db->query('SELECT SUM(mc_gross) as gross FROM payments WHERE reg_id=? AND payment_status=?',$reg_id, Model_Payment::STATUS_COMPLETED);
-		
-		return (int) $result[0]->gross;		
+
+		return (int) $result[0]->gross;
 	}
 }

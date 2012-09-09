@@ -1,8 +1,8 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
 /**
- * Example 
- * 
+ * Example
+ *
  * @package    OAuth2-Example
  * @category   Library
  * @author     Managed I.T.
@@ -26,7 +26,7 @@ class OAuth2_Provider_GrantType_Password extends Kohana_OAuth2_Provider_GrantTyp
         $this->auth = Auth::instance();
         $account = ORM::factory('account')->where('email', '=', $username)->find();
         $this->auth->login($account,$password);
-        if (!$this->auth->is_logged_in()) 
+        if (!$this->auth->is_logged_in())
         {
             return FALSE;
         }

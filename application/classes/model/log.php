@@ -1,6 +1,6 @@
 <?php
 
-class Model_Log extends ORM 
+class Model_Log extends ORM
 {
     /* On unserialize never check the db */
     protected $_reload_on_wakeup = false;
@@ -20,7 +20,7 @@ class Model_Log extends ORM
             'end_date'      => array ( 'type' => 'int',    'max' => 2147483647, 'unsigned' => true, ),
     );
     */
-    
+
     /**
      * Prepares the model database connection and loads the object.
      *

@@ -4,18 +4,18 @@ if (!isset($fieldData['type'])) { $fieldData['type'] = 'text'; }
 $classRow = text::alternate('odd','even');
 
 /* Set main label: empty() checks both variable set and empty status (false) */
-$label = empty($fieldData['label']) ? $field : $fieldData['label'];	
+$label = empty($fieldData['label']) ? $field : $fieldData['label'];
 $sub_label = empty($fieldData['sub_label']) ? '' : $fieldData['sub_label'];
 $label_attributes = array();
 
 /* Add required mark */
 if (isset($fieldData['required']) && $fieldData['required']) {
-	$label .= ' <span class="required">*</span>';	
+	$label .= ' <span class="required">*</span>';
 }
 
 /* Add sub-label or lack thereof */
 if ($sub_label) {
-	$label .= ' <span class="small">' . $sub_label . '</span>';	
+	$label .= ' <span class="small">' . $sub_label . '</span>';
 }
 else {
 	$label_attributes = array('class' => 'nosub');
@@ -36,10 +36,10 @@ switch ($fieldData['type'])
 }
 
 $attributes = null;
-if ($hasError) { 
+if ($hasError) {
 	//$attributes = array();
-	$attributes['class'] = "inline"; 
-} 
+	$attributes['class'] = "inline";
+}
 
 switch ($fieldData['type'])
 {
@@ -97,14 +97,14 @@ switch ($fieldData['type'])
         $year = '';
         $month = '';
         $day = '';
-		
+
 		/* Deal with cases where we feed in a UNIX timestamp value instead - Steve does this a lot (feed DB rows directly in as_array) */
 		if ($value && is_numeric($value))
-		{	
+		{
 			$year = date('Y', $value);
             $month = date('n', $value);
-            $day = date('d', $value);		
-		}		
+            $day = date('d', $value);
+		}
         else if ($value && $value != '0000-00-00')
         {
             $date = strtotime($value);

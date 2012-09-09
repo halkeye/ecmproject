@@ -1,4 +1,4 @@
-<?php 
+<?php
 //If the row containing the information is set, print out the information.
 if(isset($row)) { ?>
 
@@ -7,15 +7,15 @@ if(isset($row)) { ?>
 	<td><?php print $row->email; ?></td>
 	<td><?php print $row->statusToString() ?></td>
 	<td>
-	<?php 
-		if (isset($row->login))
-			print date("M j, Y H:i", $row->login);		
-		else
-			print '--';	
-	?>
-	</td>	
 	<?php
-		foreach ($actions as $action): 		
+		if (isset($row->login))
+			print date("M j, Y H:i", $row->login);
+		else
+			print '--';
+	?>
+	</td>
+	<?php
+		foreach ($actions as $action):
 			print '<td class="center">' . $action; '</td>';
 		endforeach;
 	?>

@@ -9,7 +9,7 @@
 	</tr>
 	<tr>
 		<th><?php echo html::anchor(url::site('admin/manageAccounts', TRUE), __('Manage Accounts')) ?></th>
-		<th><?php echo html::anchor(url::site('admin/manageRegistrations', TRUE), __('Manage Registrations')) ?></th>	
+		<th><?php echo html::anchor(url::site('admin/manageRegistrations', TRUE), __('Manage Registrations')) ?></th>
 	</tr>
 	<tr>
 		<td>Add, modify, or delete user accounts in the system.</td>
@@ -22,7 +22,7 @@
 	<tr>
 		<td>Manage the list of sale locations and their prefixes (which are used to help generate registration ID's)</td>
 		<td>Grant and manage administrator access to accounts</td>
-	</tr>	
+	</tr>
 	<tr>
 		<th><?php echo html::anchor(url::site('admin/export', TRUE), __('Export Registration Information (CSV)')) ?></th>
 		<th><?php echo html::anchor(url::site('admin/import', TRUE), __('Import (CSV)')) ?></th>

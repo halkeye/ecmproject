@@ -29,7 +29,7 @@ class Controller_Paypal extends Controller
 
             foreach (range(1, $total_items) as $count)
             {
-                if (!isset($data['item_number'.$count]) || strpos($data['item_number'.$count], "|") === FALSE ) 
+                if (!isset($data['item_number'.$count]) || strpos($data['item_number'.$count], "|") === FALSE )
                 {
                     Kohana::$log->add(Log::ERROR, "[PAYPAL] unable to find item $count - " . var_export($_POST,1));
                     break;
@@ -87,9 +87,9 @@ class Controller_Paypal extends Controller
 					$payment = floatval($payment->mc_gross);
 					$pass_price = floatval($passes[$pass_id]->price);
 
-					if ( $payment >= $pass_price ) {		
+					if ( $payment >= $pass_price ) {
 						$reg->status = Model_Registration::STATUS_PAID;
-						
+
 						$data['name'] = $reg->gname . ' ' . $reg->sname;
 						$emailAddr = $reg->account->email;
                         $currentRegs[$reg->convention->id][$reg->convention->name][] = $reg;
@@ -107,11 +107,11 @@ class Controller_Paypal extends Controller
             }
 
         }
-        catch (Exception $e) { 
+        catch (Exception $e) {
             Kohana::$log->add(Log::ERROR,"[PAYPAL] Error doing stuff: $e");
             exit();
         }
-        
+
         $messageIdOffset = 0;
         foreach (array_keys($currentRegs) as $id)
         {
@@ -137,7 +137,7 @@ class Controller_Paypal extends Controller
         }
         return;
     }
-    
+
     public function action_testEmail()
     {
         $config = Kohana::config('ecmproject');

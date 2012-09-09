@@ -45,8 +45,8 @@ if (!isset($menuLinks[$currentPage]))
 }
 
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
-<html xmlns="http://www.w3.org/1999/xhtml"> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>The Online Programming Schedule (TOPS)<?php echo $title ? "::$title" : "" ?></title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -54,13 +54,13 @@ if (!isset($menuLinks[$currentPage]))
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js"></script>
     <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/ui-darkness/jquery-ui.css" />
-    
+
     <?php {
         echo HTML::style('static/css/a1.css', NULL, TRUE);
         foreach (Assets::getCSS() as $style)
             echo HTML::style("static/css/$style", NULL, TRUE);
         echo HTML::style('static/css/jquery_bar.css', NULL, TRUE);
-        echo HTML::script('static/js/jquery_bar.js', NULL, TRUE); 
+        echo HTML::script('static/js/jquery_bar.js', NULL, TRUE);
         foreach (Assets::getJS() as $js)
             echo HTML::script("static/js/$js", NULL, TRUE);
     } ?>
@@ -83,7 +83,7 @@ if (!isset($menuLinks[$currentPage]))
                 <?php if ($url == $currentPage): /* I hate this duplication, but littering it with ifs suck alot more */ ?>
                 <li class="current">
                     <?php echo html::image('static/img/22_'.$link['img'].'.png', array('alt'=>$link['title']), TRUE); ?>
-                    <?php echo htmlentities($link['title']) ?> 
+                    <?php echo htmlentities($link['title']) ?>
                 </li>
                 <?php else: ?>
                 <li>
@@ -97,9 +97,9 @@ if (!isset($menuLinks[$currentPage]))
             <?php endforeach ?>
             </ul>
         </div>
-        
+
         <div id="content"><?php echo $content ?></div>
-        
+
         <div id="footer">
             <a href="http://validator.w3.org/check?uri=referer">XHTML 1.1 Validated</a> |
             <a href="http://jigsaw.w3.org/css-validator/check/referer">CSS 2.1 Validated</a> |

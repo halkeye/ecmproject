@@ -31,7 +31,7 @@ class Migration_Application_20120122183500 extends Minion_Migration_Base {
            location VARCHAR(255)
         ) ENGINE=Innodb DEFAULT CHARSET=utf8');
 
-        # Table that describes the various passes. 
+        # Table that describes the various passes.
         # isPurchasable indicates whether a ticket can be purchased (or if it has to be given by an admin)
 		$db->query(NULL, 'CREATE TABLE IF NOT EXISTS passes (
                id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -126,7 +126,7 @@ class Migration_Application_20120122183500 extends Minion_Migration_Base {
            `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
            `account_id` INT UNSIGNED NOT NULL,
            `type` INT UNSIGNED NOT NULL,
-           `code` VARCHAR(40) NOT NULL, 
+           `code` VARCHAR(40) NOT NULL,
            `value` VARCHAR(255) NOT NULL,
            FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
            UNIQUE (`code`)
@@ -138,7 +138,7 @@ class Migration_Application_20120122183500 extends Minion_Migration_Base {
           location VARCHAR(255) NOT NULL
         ) ENGINE=Innodb DEFAULT CHARSET=utf8');
     }
-    
+
     /**
 	 * Run queries needed to remove this migration
 	 *

@@ -1,14 +1,14 @@
-<?php 
+<?php
 //If the row containing the information is set, print out the information.
 if(isset($row)) { ?>
 
 <tr>
 	<td><?php print $row->type; ?></td>
-	<td><?php print '$' . $row->mc_gross; ?></td>	
+	<td><?php print '$' . $row->mc_gross; ?></td>
 	<td><?php print $row->lastModifiedName(); ?></td>
-	<td><?php print $row->statusToString(); ?></td>	
+	<td><?php print $row->statusToString(); ?></td>
 	<?php
-		foreach ($actions as $action): 		
+		foreach ($actions as $action):
 			print '<td class="center">' . $action; '</td>';
 		endforeach;
 	?>

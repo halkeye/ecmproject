@@ -1,6 +1,6 @@
-<?php 
- 
-return array( 
+<?php
+
+return array(
 	'comp_id'		=> array(
 		'not_empty'		=> __('Please provide an ID number for the registration ID.'),
 		'numeric'		=> __('The ID component must be a number.'),
@@ -11,6 +11,6 @@ return array(
 	'comp_cid'		=> array(
 		'not_empty'		=> __('á_á'),
 	),
-); 
+);
 
 ?>

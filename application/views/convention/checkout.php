@@ -1,4 +1,4 @@
-<p class='warning'><?php echo html::image(url::site('/static/img/warning.png', TRUE), array('alt' => 'WARNING')); ?><strong>Please ensure that the name 
+<p class='warning'><?php echo html::image(url::site('/static/img/warning.png', TRUE), array('alt' => 'WARNING')); ?><strong>Please ensure that the name
 you provide (shown above) is the same as written on your government ID. </strong> We will match the name provided here to the government ID you bring when picking up your ticket.</p>
 <br />
 <p>
@@ -8,7 +8,7 @@ Select a ticket that you wish to purchase from the dropdown and click the <stron
 	<br />
 	<p>This ticket requires your Date of Birth (DOB) to determine whether you are the age of majority.</p>
 	<p class="validateTips"></p>
-	<p>Date of Birth (YYYY-MM-DD): <input type="text" id="dob_dialog"></p>	
+	<p>Date of Birth (YYYY-MM-DD): <input type="text" id="dob_dialog"></p>
 </div>
 <script>
 	dob = $( "#dob_dialog" );
@@ -45,7 +45,7 @@ Select a ticket that you wish to purchase from the dropdown and click the <stron
 			modal: true,
 			width: 500,
 			buttons: {
-				"Add to Cart" : function() {			
+				"Add to Cart" : function() {
 					var valid = true;
 					valid = checkRegexp( dob, /^(\d{4})-(\d{1,2})-(\d{1,2})/, "Date of birth cannot be empty and must be specified YYYY-MM-DD." );
 
@@ -57,8 +57,8 @@ Select a ticket that you wish to purchase from the dropdown and click the <stron
 				"Cancel" : function() {
 					$( this ).dialog( "close" );
 				}
-			}			
-		});	
+			}
+		});
 	}
 </script>
 
@@ -68,9 +68,9 @@ Select a ticket that you wish to purchase from the dropdown and click the <stron
 <fieldset>
 	<?php
 	$options[-1] = "SELECT A TICKET";
-	foreach ($passes as $pass) {						
+	foreach ($passes as $pass) {
 		$options[$pass->convention->name][$pass->id] = "$pass";
-		
+
 		if ($pass->requireDOB) {
 			echo form::hidden("dob_" . $pass->id, true, array('id' => "dob_" . $pass->id));
 		}
@@ -83,20 +83,20 @@ Select a ticket that you wish to purchase from the dropdown and click the <stron
 </fieldset>
 <?php echo form::close(); ?>
 
-<table width='100%' class='border'>    
+<table width='100%' class='border'>
 <tr><th class='header' colspan=5>Shopping Cart</th></tr>
-<tr>    
+<tr>
 	<th width='40%'>For</th>
 	<th width='40%'>Item</th>
-	<th width='10%'>Price</th>  
-	<th width='10%'>Status</th> 
+	<th width='10%'>Price</th>
+	<th width='10%'>Status</th>
 	<th width='5%'>Delete</th>
 </tr>
-	
+
 <?php
 	$total_cost = 0;
 	$noBadRegistrations = 0;
-	
+
 	if (count($registrations) > 0)
 	{
 		$noBadRegistrations = 1;
@@ -109,14 +109,14 @@ Select a ticket that you wish to purchase from the dropdown and click the <stron
 				$expiredReg = 1;
 				$noBadRegistrations = 0;
 			}
-			
+
 			echo '<tr class="'.$class_row.'">';
 			echo '<td>' . HTML::chars($reg->gname . ' ' . $reg->sname) . '</td>';
 			if (!$expiredReg)
 			{
 				echo '<td>' . HTML::chars($reg->convention->name . ' - ' . $reg->pass->name) . '</td>';
 				echo '<td>' . HTML::chars(sprintf('$%01.2F', $reg->pass->price)) . '</td>';
-				
+
 				//Don't have it go belly up if it's not a number.
 				if (is_numeric($reg->pass->price)) {
 					$total_cost += $reg->pass->price;
@@ -126,19 +126,19 @@ Select a ticket that you wish to purchase from the dropdown and click the <stron
 			{
 				echo '<td class="expiredReg" colspan="2">The registration pass you\'ve selected has expired. Please click edit to choose a different pass.</td>';
 			}
-			
+
 			echo '<td>'.$reg->statusToString().'</td>';
 			echo '<td class="center">'.HTML::anchor('/convention/deleteReg/'.$reg->id, HTML::image(url::site('/static/img/edit-delete.png',TRUE), array('tite'=>'Delete this account')), null, null, true) . '</td>';
 			echo '</tr>';
 		}
-		
+
 		echo '<tr><td colspan=2 class="total_header">Total: </td><td colspan=3 class="total">' . sprintf('$%01.2F', $total_cost) . '</td></tr>';
 	}
 	else
 	{
 		echo '<td colspan="5">No Registrations yet</td>';
 	}
-?>	
+?>
 </table>
 
 <?php if ($noBadRegistrations): ?>
@@ -152,10 +152,10 @@ Select a ticket that you wish to purchase from the dropdown and click the <stron
 		echo form::hidden('currency_code', 'CAD');
 		foreach (array('business', 'notify_url', 'cancel_url') as $key) {
 			if (!isset($$key)) { continue; }
-			echo form::hidden($key, $$key); 
+			echo form::hidden($key, $$key);
 		}
-		echo form::hidden('return', $return_url); 
-		echo form::hidden('cbt', "Finalize Registration"); 
+		echo form::hidden('return', $return_url);
+		echo form::hidden('cbt', "Finalize Registration");
 		$regids = array();
 		foreach ($registrations as $reg)
 		{

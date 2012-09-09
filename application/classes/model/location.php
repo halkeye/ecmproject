@@ -1,6 +1,6 @@
 <?php
 
-class Model_Location extends ORM 
+class Model_Location extends ORM
 {
 	/* Prevent the retrieval of this location (internally reserved) */
 	const RESERVED_LOCATION = 'ECM';
@@ -13,7 +13,7 @@ class Model_Location extends ORM
 	);
 
 	public $formo_defaults = array(
-        'prefix' 	=> array( 'type'  => 'text', 	'label' => 'Prefix', 			'required'	=> true, 'adminRequired'=>true    ),            
+        'prefix' 	=> array( 'type'  => 'text', 	'label' => 'Prefix', 			'required'	=> true, 'adminRequired'=>true    ),
         'location' 	=> array( 'type'  => 'text', 	'label' => 'Location', 			'required'	=> true, 'adminRequired'=>true 	  ),
 	);
 
@@ -24,44 +24,44 @@ class Model_Location extends ORM
 			'location' 		=> 'Location',
 		);
 	}
-	
-	public function find_all_non_reserved() 
+
+	public function find_all_non_reserved()
 	{
 		$this->where('prefix', '!=', Model_Location::RESERVED_LOCATION);
 		return parent::find_all();
 	}
-	
+
 	public function count_all()
 	{
 		return parent::count_all() - 1;
 	}
-	
+
 	 public function filters()
     {
         $filters = parent::filters();
         $filters[TRUE] = array(
             array('trim')
         );
-		
+
 		return $filters;
 	}
-	
+
 	public function rules()
 	{
         $rules = parent::rules();
 		$rules['prefix'] = array(
-			array('not_empty'), 
+			array('not_empty'),
 			array('min_length', array(':value', 0)),
 			array('max_length', array(':value', 5)),
 			array(array($this, 'notReserved')),
 			array(array($this, 'uniquePrefix')),
 		);
 		$rules['location'] = array(
-			array('not_empty'), 
+			array('not_empty'),
 			array('min_length', array(':value', 0)),
 			array('max_length', array(':value', 255)),
 		);
-		
+
 		return $rules;
 	}
 	public function notReserved($value) {

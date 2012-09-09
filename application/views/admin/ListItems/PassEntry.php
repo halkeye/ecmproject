@@ -1,34 +1,34 @@
-<?php 
+<?php
 //If the row containing the information is set, print out the information.
 if(isset($row)) { ?>
 
 <tr>
 	<td><?php print html::chars($row->name) . (!$row->isPurchasable ? ' <strong>(Private)</strong>' : ''); ?></td>
-	<td><?php print $row->price; //Force price formatting. ?></td> 	
+	<td><?php print $row->price; //Force price formatting. ?></td>
 	<td>
-	<?php 
+	<?php
 		if (isset($row->startDate))
-			print date("M j, Y", $row->startDate);		
+			print date("M j, Y", $row->startDate);
 		else
-			print '--';	
+			print '--';
 	?>
 	</td>
 	<td>
-	<?php 
+	<?php
 		if (isset($row->endDate))
-			print date("M j, Y", $row->endDate);		
+			print date("M j, Y", $row->endDate);
 		else
-			print '--';	
+			print '--';
 	?>
 	</td>
-	 
+
 	<?php
 		if (isset($actions))
 		{
-			foreach ($actions as $action): 
+			foreach ($actions as $action):
 				print '<td class="center">' . $action; '</td>';
 			endforeach;
-		}		
+		}
 	?>
 </tr>
 

@@ -46,8 +46,8 @@ class Auth {
         $this->account    =  new StdClass;
         if ($this->isLoggedIn() && $this->session->get('account'))
         {
-            $this->account     = is_string($this->session->get('account')) ? 
-                unserialize($this->session->get('account')) : 
+            $this->account     = is_string($this->session->get('account')) ?
+                unserialize($this->session->get('account')) :
                 $this->session->get('account');
             $this->groups      = $this->session->get('account_groups');
             $this->permissions = $this->session->get('account_perms');
@@ -90,7 +90,7 @@ class Auth {
             $this->addError(__('Sorry, no account matched the email and password you provided.')); //No giving away how close the user was.
             return FALSE;
         }
-            
+
         $this->complete_login($account);
 
         return TRUE;
@@ -157,8 +157,8 @@ class Auth {
         // Store session data
         $this->session->set('account_id'    , $account->id);
         $this->session->set('account'       , $this->account);
-        $this->session->set('account_groups', $this->groups); 
-        $this->session->set('account_perms' , $this->permissions); 
+        $this->session->set('account_groups', $this->groups);
+        $this->session->set('account_perms' , $this->permissions);
     }
 
     /**
@@ -178,17 +178,17 @@ class Auth {
     public function getAccount() { return $this->account; }
     public function get_user() { return $this->getAccount(); }
 
-    public function hasPermission($permission) 
+    public function hasPermission($permission)
     {
         if ($permission != 'superAdmin' && $this->hasPermission('superAdmin'))
             return true;
-        return isset($this->permissions[$permission]); 
+        return isset($this->permissions[$permission]);
     }
     public function hasUserGroup($group)
     {
         if ($group != 'SuperAdmin' && $this->hasPermission('superAdmin'))
             return true;
-        return isset($this->groups[$permission]); 
+        return isset($this->groups[$permission]);
     }
 
     /* Error functions */

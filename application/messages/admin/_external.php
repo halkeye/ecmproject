@@ -1,9 +1,9 @@
-<?php 
- 
-return array( 
+<?php
+
+return array(
 	'comp_id'	=> array(
-		'not_empty' 	=> __('Test.'), 
+		'not_empty' 	=> __('Test.'),
 	),
-); 
+);
 
 ?>

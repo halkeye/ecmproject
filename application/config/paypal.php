@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
 /**
- * @FIXME: Describe config variables 
+ * @FIXME: Describe config variables
  */
 return array
 (

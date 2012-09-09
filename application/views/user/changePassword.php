@@ -15,10 +15,10 @@ foreach (array('password', 'confirm_password') as $field)
 	echo "</div>";
 }
 echo '</fieldset>';
- 
+
 echo "<fieldset class='left'>";
 echo form::submit(null,__('Change Password'), array('class' => 'submit'));
-echo '</fieldset>'; 
+echo '</fieldset>';
 
 echo form::close();
 echo '</div>';

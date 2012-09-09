@@ -1,12 +1,12 @@
-<?php 
- 
-return array( 
+<?php
+
+return array(
 	'email'		=> array(
-		'not_empty' 	=> __('Please provide a valid email address.'), 
+		'not_empty' 	=> __('Please provide a valid email address.'),
 	),
 	'phone'		=> array(
-		'not_empty' 	=> __('Please provide a valid phone number.'), 
+		'not_empty' 	=> __('Please provide a valid phone number.'),
 	),
-); 
+);
 
 ?>

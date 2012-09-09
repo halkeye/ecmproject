@@ -1,6 +1,6 @@
 <?php
 
-class Model_TicketCounter extends ORM 
+class Model_TicketCounter extends ORM
 {
 
 }

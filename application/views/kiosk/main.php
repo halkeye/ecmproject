@@ -19,14 +19,14 @@ var spinnerImage = "<?php echo URL::site('/static/spinner/spinner-large.gif', NU
 	font-weight: bold;
 	font-size: 14px;
 	color: #000;
-	background-color: #DDD;	
+	background-color: #DDD;
 	text-decoration: underline;
 }
-.notPaid { 
+.notPaid {
     color: white;
     background-color: #F00;
 }
-.alreadyPickedUp { 
+.alreadyPickedUp {
     color: white;
     background-color: #F00;
 }

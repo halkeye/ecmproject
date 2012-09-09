@@ -3,7 +3,7 @@
 address will require your account to be re-validated.</p>
 <table width='100%'>
 	<tr><th class="header">Account Actions</th></tr>
-	<tr><td><?php echo html::anchor("/user/changeName","Change Name", null, null, true); ?> | <?php echo html::anchor("/user/changeEmail","Change Email", null, null, true); ?> | <?php echo html::anchor("/user/changePassword","Change Password", null, null, true); ?></td></tr>	
+	<tr><td><?php echo html::anchor("/user/changeName","Change Name", null, null, true); ?> | <?php echo html::anchor("/user/changeEmail","Change Email", null, null, true); ?> | <?php echo html::anchor("/user/changePassword","Change Password", null, null, true); ?></td></tr>
 </table>
 <br />
 <table width = 100%>
@@ -11,7 +11,7 @@ address will require your account to be re-validated.</p>
 	/* $reg is assumed to be sorted by convention_id. If it's not, this will still work - just rather randomly. */
 	$cid = -1;
 	foreach($registrations as $r):
-	
+
 		//Print convention header if it's different than previous.
 		if ($cid != $r->convention_id)
 		{
@@ -20,31 +20,31 @@ address will require your account to be re-validated.</p>
 			<tr>
 				<th width='25%'>Name</th>
 				<th width='25%'>Ticket</th>
-				<th width='25%'>Ticket ID</th>	
-				<th width='10%'>Price</th>				
-				<th width='15%'>Status</th>				
+				<th width='25%'>Ticket ID</th>
+				<th width='10%'>Price</th>
+				<th width='15%'>Status</th>
 			</tr>
 			<?php
 			$cid = $r->convention_id;
 		}
-	
+
 		$class_row = text::alternate('odd','even');
 		echo '<tr class="'.$class_row.'">';
 		echo '<td>' . HTML::chars($r->gname . ' ' . $r->sname) . '</td>';
 		echo '<td>' . HTML::chars($r->pass->name) . '</td>';
-		
+
 		/* Display the reg_id only when the registration is fully paid for. */
 		if ($r->status == Model_Registration::STATUS_PAID) {
 			echo '<td>' . HTML::chars($r->getRegId()) . '</td>';
 		}
 		else {
 			echo '<td></td>';
-		}		
-		
+		}
+
 		echo '<td>' . HTML::chars(sprintf('$%01.2F', $r->pass->price)) . '</td>';
 		echo '<td>'.$r->statusToString().'</td>';
 		echo '</tr>';
-		
+
 	endforeach;
 ?>
 </table>

@@ -1,5 +1,5 @@
 <p><strong>
-You are about to remove the registration for <?php echo $reg->gname . ' ' . $reg->sname ?> from your shoppping cart.</strong> 
+You are about to remove the registration for <?php echo $reg->gname . ' ' . $reg->sname ?> from your shoppping cart.</strong>
 This action is <strong>NOT</strong> reversible.</p>
 <br />
 <?php echo form::open("convention/deleteReg/" . $reg->id); ?>

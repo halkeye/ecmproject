@@ -2,7 +2,7 @@
 /**
  * API-User api
  *
- * @package    
+ * @package
  * @category   Controller
  * @author     Gavin Mogan
  * @copyright  (c) 2012 KodeKoan
@@ -15,4 +15,4 @@ class Controller_API_Lookup extends OAuth2_Controller
             "moo" => 1
         ));
     }
-} 
+}

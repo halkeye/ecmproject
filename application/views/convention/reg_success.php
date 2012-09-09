@@ -26,13 +26,13 @@
 foreach (array_keys($registrations) as $convention_name) {
     /* Open a new table per event */
     echo '<table>';
-    echo '<tr><th colspan="2">' . $convention_name . '</th></tr>';		
+    echo '<tr><th colspan="2">' . $convention_name . '</th></tr>';
 
     foreach ($registrations[$convention_name] as $reg) {
         $id = $reg->reg_id;
         $name = HTML::chars($reg->gname . ' ' . $reg->sname);
         echo "<tr>\n";
-        echo "<td width='100'>" . html::image('http://chart.apis.google.com/chart?chs=100x100&cht=qr&chl='.$id) . "</td>\n"; 
+        echo "<td width='100'>" . html::image('http://chart.apis.google.com/chart?chs=100x100&cht=qr&chl='.$id) . "</td>\n";
         echo "<td style='text-align:center' valign='middle'>Ticket Number: <strong>$id</strong><br/>Pickup By: <strong>$name</strong></td>\n";
         echo "</tr>\n";
     }

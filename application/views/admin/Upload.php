@@ -4,13 +4,13 @@
 */
 ?>
 <h3>Select ticket to assign</h3>
-<p>This ticket will be assigned to <strong>all registrations</strong> that are imported. 
+<p>This ticket will be assigned to <strong>all registrations</strong> that are imported.
 Likewise, the event that the ticket belongs to will be associated to the registration.</p>
-<?php 
+<?php
 	echo Form::open('admin/import', array('enctype' => 'multipart/form-data'));
 
 	$options[-1] = "SELECT A TICKET";
-	foreach ($passes as $pass) {						
+	foreach ($passes as $pass) {
 		$options[$pass->convention->name][$pass->id] = "$pass";
 	}
 	echo form::select('pass_id', $options, $pass_id) . "\n";
@@ -33,7 +33,7 @@ Likewise, the event that the ticket belongs to will be associated to the registr
 <?php
 	echo "<br />";
 	echo Form::submit(NULL, 'Import', array('class' => 'submit'));
-	echo Form::close();		
-?>		
- 
- 
+	echo Form::close();
+?>
+
+

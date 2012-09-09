@@ -2,7 +2,7 @@
 
 /**
  * Kiosk Controller
- * 
+ *
  * Kiosk Support
  * @author Gavin Mogan <gavin@kodekoan.com>
  * @version 1.1
@@ -10,8 +10,8 @@
  */
 
 
-class Controller_Kiosk extends Base_MainTemplate 
-{ 
+class Controller_Kiosk extends Base_MainTemplate
+{
 //    public $template = 'kioskTemplate';
 
     function before()
@@ -27,10 +27,10 @@ class Controller_Kiosk extends Base_MainTemplate
         $this->template->title =        __('Kiosk');
         $this->template->heading =      __('Kiosk');
         $this->template->subheading =   __('Find Registrations');
-                    
+
         $this->template->content = new View('kiosk/main');
     }
-    
+
     public function action_lookupReg()
     {
         header("Content-type: application/json");
@@ -62,6 +62,6 @@ class Controller_Kiosk extends Base_MainTemplate
     public function action_testClock() {
         header("Content-type: text/plain");
         print date("r");
-        exit;       
+        exit;
     }
 }

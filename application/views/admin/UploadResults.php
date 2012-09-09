@@ -8,7 +8,7 @@
 			}
 		}
 	?>
-</dl>	
+</dl>
 <br />
 <h3>Registrations that failed validation/import.</h3>
 <dl class='failure'>
@@ -16,7 +16,7 @@
 		foreach($import_failure as $error) {
 			$reg = $error['reg'];
 			$errors = $error['errors'];
-			
+
 			print '<dt>' . $reg->reg_id . "</dt>\n";
 			foreach($errors as $error) {
 				if ( is_array($error) ) {
