@@ -805,7 +805,6 @@ class Controller_Admin extends Base_MainTemplate
 
         //Determine search term (POST).
         $post = $this->request->post();
-        $post = $_GET;
 
         if (isset($post['search_term']))
             $search_term = '%' . $post['search_term'] . '%';
