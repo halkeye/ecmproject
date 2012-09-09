@@ -16,9 +16,6 @@
 [submodule "modules/orm"]
 	path = modules/orm
 	url = https://github.com/kohana/orm.git
-[submodule "modules/pagination"]
-	path = modules/pagination
-	url = https://github.com/kohana/pagination.git
 [submodule "application/vendor/swiftmailer"]
 	path = application/vendor/swiftmailer
 	url = git://github.com/swiftmailer/swiftmailer.git
