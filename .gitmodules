@@ -31,6 +31,3 @@
 [submodule "modules/uuid"]
 	path = modules/uuid
 	url = https://github.com/shadowhand/uuid.git
-[submodule "modules/pagination"]
-	path = modules/pagination
-	url = git://github.com/shadowhand/pagination.git
