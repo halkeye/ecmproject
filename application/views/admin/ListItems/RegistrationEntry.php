@@ -1,14 +1,14 @@
-<?php 
+<?php
 //If the row containing the information is set, print out the information.
 if(isset($row)) { ?>
 
 <tr>
 	<td><?php print html::chars($row->gname) . ' ' . html::chars($row->sname); ?></td>
-	<td><?php print $row->reg_id; ?></td>	
+	<td><?php print $row->getRegID(); ?></td>
 	<td><?php print html::chars($row->email); ?></td>
-	<td><?php print $row->statusToString(); ?></td>	
+	<td><?php print $row->statusToString(); ?></td>
 	<?php
-		foreach ($actions as $action): 		
+		foreach ($actions as $action):
 			print '<td class="center">' . $action; '</td>';
 		endforeach;
 	?>
@@ -24,5 +24,3 @@ if(isset($row)) { ?>
 	<th width='5%'>Delete</th>
 </tr>
 <?php } ?>
-
-
