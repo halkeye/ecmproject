@@ -159,9 +159,9 @@ class Controller_Admin extends Base_MainTemplate
             $extra_validation = Validation::Factory($post);
             $extra_validation->rule('tickets_total', 'numeric');
 
-			$post['isPurchasable'] = empty($post['isPurchasable']) ? 0 : $post['isPurchasable'];
-			$post['requireDOB']	= empty($post['requireDOB']) ? 0 : $post['requireDOB'];
-			
+            $post['isPurchasable'] = empty($post['isPurchasable']) ? 0 : $post['isPurchasable'];
+            $post['requireDOB'] = empty($post['requireDOB']) ? 0 : $post['requireDOB'];
+            
             $pass->values($post);
             $pass->tickets_total = $post['tickets_total'];
 
@@ -221,7 +221,7 @@ class Controller_Admin extends Base_MainTemplate
             $extra_validation->rule('tickets_total', 'numeric');
 
             $post['isPurchasable'] = empty($post['isPurchasable']) ? 0 : $post['isPurchasable'];
-			$post['requireDOB']	= empty($post['requireDOB']) ? 0 : $post['requireDOB'];
+            $post['requireDOB'] = empty($post['requireDOB']) ? 0 : $post['requireDOB'];
 
             $pass->values($post);
 
@@ -324,12 +324,12 @@ class Controller_Admin extends Base_MainTemplate
         }
 
         $fields = $reg->formo_defaults;
-		$fields['pickupStatus']['values'] = array(
+        $fields['pickupStatus']['values'] = array(
             0 => __("Not Picked Up"),
             1 => __("Picked Up"),
         );
-		
-		$locations = ORM::Factory('Location')->find_all_non_reserved()->as_array('id', 'prefix');
+        
+        $locations = ORM::Factory('Location')->find_all_non_reserved()->as_array('id', 'prefix');
         if ( !$locations )
         {
             $this->addError('No purchase locations defined! Please define some locations before continuing.');
@@ -1163,11 +1163,11 @@ class Controller_Admin extends Base_MainTemplate
                     $result->gname . ' ' . $result->sname,
                     $result->email,
                     $result->phone,
-					$result->dob,
+                    $result->dob,
                     empty($convention_name) ? $result->convention->name : $convention_name,
                     $pass_names[$result->pass_id],
                     $result->statusToString(),
-                    $result->pickupToString(),					
+                    $result->pickupToString(),                  
             );
 
             /* In case of commas in field values ... */
@@ -1550,7 +1550,7 @@ class Controller_Admin extends Base_MainTemplate
         $reg->convention_id = $pass->convention_id;
         $reg->pass_id       = $pass->id;
         $reg->status        = Model_Registration::STATUS_PAID;
-		
+        
         /* If this block is not executed, validation will fail on save() */
         if (count($line) >= 6) {
             $name_components = explode(' ', $line[1]);
@@ -1563,16 +1563,16 @@ class Controller_Admin extends Base_MainTemplate
             $reg->sname         = $sname;
             $reg->email         = $line[2];
             $reg->phone         = $line[3];
-			
-			if ( !empty($line[4]) )
-			{
-				$date = str_replace("/", "-", $line[4]);
-				$date = date("Y-m-d", strtotime($date));
-				
-				if ($date) {
-					$reg->dob = $date;
-				}
-			}
+            
+            if ( !empty($line[4]) )
+            {
+                $date = str_replace("/", "-", $line[4]);
+                $date = date("Y-m-d", strtotime($date));
+                
+                if ($date) {
+                    $reg->dob = $date;
+                }
+            }
         }
 
         return $reg;
