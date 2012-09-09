@@ -124,6 +124,11 @@ function lookupReg(reg_id)
         },
         data: { regId: reg_id },
         url: lookupURL,
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert("Error - " + textStatus + " - " + errorThrown);
+            jQuery('#kiosk_lookup').hide();
+            return;
+        },
         success: function(data, textStatus, jqXHR) {
             finishLookup(data);
         }
@@ -133,12 +138,15 @@ function lookupReg(reg_id)
 jQuery(document).ready(function() {
     var lookupLength = "ECM-01-0001".length;
     jQuery('#kiosk_lookup table').hide();
-    var lookupText = jQuery('#kiosk_lookup_text').change(function() {
+    var lookupText = jQuery('#kiosk_lookup_text');
+    /*
+    lookupText.change(function() {
         var that = jQuery(this);
         if (that.val().length >= lookupLength) {
             lookupReg(that.val());
         }
     });
+    */
     lookupText.closest('form').submit(function(e) { 
         e.preventDefault();
         lookupReg(lookupText.val());
