@@ -168,7 +168,11 @@ class Model_Registration extends ORM
             return true;
         }
         
-        return ! (bool) ORM::Factory('Registration')->where('reg_id', '=', $value)->count_all();
+        return ! (bool) ORM::Factory('Registration')
+            ->where('reg_id', '=', $value)
+            ->where('location_id', '=', $this->location_id)
+            ->where('convention_id', '=', $this->convention_id)
+            ->count_all();
     } 
 
     public function __determine_associated_account($value) {
