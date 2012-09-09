@@ -33,7 +33,7 @@
             
             // removal handling
             if (options == 'remove' || options == 'close') {
-                var $s = $this.data('spinner');
+                $s = $this.data('spinner');
                 var o = $this.data('opts');
                 if (typeof $s != 'undefined') {
                     $s.remove();
@@ -60,7 +60,7 @@
             } else if (opts.position == 'left') {
                 l = pos.left - opts.width - 10 + 'px';
             } else {
-                l = pos.left + Math.round(.5 * w) - Math.round(.5 * opts.width) + 'px';
+                l = pos.left + Math.round(0.5 * w) - Math.round(0.5 * opts.width) + 'px';
             }
             
             // call start callback
@@ -74,6 +74,7 @@
             
             // removal handling
             $this.data('spinner', $s).data('opts', opts);
+            return $s;
         });
     };
     
