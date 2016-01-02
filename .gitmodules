@@ -9,10 +9,10 @@
 	url = https://github.com/shadowhand/email.git
 [submodule "modules/log"]
 	path = modules/log
-	url = git@github.com:halkeye/kohana-log.git
+	url = git://github.com/halkeye/kohana-log.git
 [submodule "modules/static"]
 	path = modules/static
-	url = git@github.com:halkeye/kohana-static.git
+	url = git://github.com/halkeye/kohana-static.git
 [submodule "modules/orm"]
 	path = modules/orm
 	url = https://github.com/kohana/orm.git
