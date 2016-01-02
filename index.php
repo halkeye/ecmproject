@@ -1,5 +1,9 @@
 <?php
 
+if (isset($_SERVER["HTTP_X_FORWARDED_PROTO"])) {
+  $_SERVER["HTTPS"] = $_SERVER["HTTP_X_FORWARDED_PROTO"] == "https";
+}
+
 /**
  * The directory in which your application specific resources are located.
  * The application directory must contain the bootstrap.php file.
@@ -109,4 +113,3 @@ echo Request::factory()
 	->execute()
 	->send_headers()
 	->body();
-phpinfo();
