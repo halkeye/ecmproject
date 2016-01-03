@@ -38,6 +38,7 @@ function database_config() {
         'password'   => $password,
         'persistent' => FALSE,
       ),
+      'identifier'   => '`',
       'table_prefix' => '',
       'charset'      => 'utf8',
       'caching'      => FALSE,
