@@ -1,12 +1,26 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
 function database_config() {
-  $url = parse_url(getenv("CLEARDB_DATABASE_URL"));
+  if (getenv("CLEARDB_DATABASE_URL")) {
+    $url = parse_url(getenv("CLEARDB_DATABASE_URL"));
+    $dsn = 'mysql:dbname=' . substr($url["path"], 1) . ';host=' . $url["host"];
+    $user = $url["user"];
+    $password = $url["pass"];
+  } else {
+    if (file_exists('/tmp/mysql.sock')) {
+      $dsn = 'mysql:dbname=ecms;unix_socket=/tmp/mysql.sock';
+    } else {
+      $dsn = 'mysql:dbname=ecms;host=localhost';
+    }
+    $user = 'root';
+    $password = FALSE;
+  }
+
   return array
   (
     'default' => array
     (
-      'type'       => 'mysql',
+      'type'       => 'pdo',
       'connection' => array(
         /**
          * The following options are available for MySQL:
@@ -19,10 +33,9 @@ function database_config() {
          *
          * Ports and sockets may be appended to the hostname.
          */
-        'hostname'   => $url["host"] || file_exists('/tmp/mysql.sock') ? ':/tmp/mysql.sock' : 'localhost',
-        'database'   => substr($url["path"], 1) || 'ecms',
-        'username'   => $url["user"] || 'root',
-        'password'   => $url["pass"] || FALSE,
+        'dsn'        => $dsn,
+        'username'   => $user,
+        'password'   => $password,
         'persistent' => FALSE,
       ),
       'table_prefix' => '',
