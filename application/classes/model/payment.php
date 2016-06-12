@@ -10,7 +10,7 @@ class Model_Payment extends ORM
 	public $default_fields = array(
             'type' => array( 'type'  => 'select', 'label' => 'Email', 'required'=>true 								),
 			'txn_id' => array ('type' => 'text', 'label' => 'Transaction ID', 'required' => false					),
-			'receipt_id' => array ('type' => 'text', 'label' => 'Reciept ID', 'required' => false					),
+			'receipt_id' => array ('type' => 'text', 'label' => 'Receipt ID', 'required' => false					),
             'mc_gross' => array( 'type'  => 'text', 'label' => 'Password', 'required'=>true     					),
             'payment_status' => array( 'type'  => 'select', 'label' => 'Status', 'required'=>true    					)
     );
