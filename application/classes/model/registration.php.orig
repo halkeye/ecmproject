@@ -2,9 +2,9 @@
 
 class Model_Registration extends ORM 
 {
-    const STATUS_UNPROCESSED = 0; // Payment has not been sent yet (or recieved if mail-in)
+    const STATUS_UNPROCESSED = 0; // Payment has not been sent yet (or received if mail-in)
     const STATUS_PROCESSING  = 1; // Waiting for Paypal to respond, mail-in/in-person payment is in limbo.
-	const STATUS_NOT_ENOUGH	 = 2; // Payment recieved is not enough to pay cost of pass.
+	const STATUS_NOT_ENOUGH	 = 2; // Payment received is not enough to pay cost of pass.
 	const STATUS_FAILED		 = 98; //Registration no longer valid (cancelled, refunded, etc).
     const STATUS_PAID        = 99; // Fully working and paid
     

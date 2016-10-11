@@ -100,7 +100,7 @@ CREATE TABLE payments (
    payment_date INT NOT NULL,
    payment_status VARCHAR(17) NOT NULL,
    txn_id VARCHAR(17), -- txn_id is 17 characters alphanumeric.
-   receipt_id VARCHAR(19), -- reciept id is in form XXXX-XXXX-XXXX-XXXX (19 characters)
+   receipt_id VARCHAR(19), -- receipt id is in form XXXX-XXXX-XXXX-XXXX (19 characters)
    mod_time INT,
    FOREIGN KEY (reg_id) REFERENCES registrations(id) ON DELETE RESTRICT -- Registrations with payment information shouldn't be deleted.
 ) ENGINE=Innodb DEFAULT CHARSET=utf8;

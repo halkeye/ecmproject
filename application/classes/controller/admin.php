@@ -746,7 +746,7 @@ class Controller_Admin extends Base_MainTemplate
         {
             $data['actions']['delete'] = html::anchor(
                 "/admin/deleteAdmin/". $row->id ,
-                html::image(url::site('/static/img/edit-delete.png', TRUE), array('title'=>__("Remove Admin Priviledges"))), 
+                html::image(url::site('/static/img/edit-delete.png', TRUE), array('title'=>__("Remove Admin Privileges"))), 
                 null, null, true
             );               
             $data['entries'][$row->id] = new View('admin/ListItems/AdminAccountEntry', array('row' => $row, 'actions' => $data['actions']));                
